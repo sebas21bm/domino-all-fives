@@ -1,0 +1,895 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="assembly">
+            <xs:complexType>
+              <xs:attribute name="alias" type="xsd:string" />
+              <xs:attribute name="name" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" ns1:Ordinal="1" />
+              <xs:attribute name="type" type="xsd:string" ns1:Ordinal="3" />
+              <xs:attribute name="mimetype" type="xsd:string" ns1:Ordinal="4" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Global_btnAccept" xml:space="preserve">
+    <value>Aceitar</value>
+  </data>
+  <data name="Global_btnBack" xml:space="preserve">
+    <value>Voltar</value>
+  </data>
+  <data name="Global_btnCancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="Global_btnClose" xml:space="preserve">
+    <value>Fechar</value>
+  </data>
+  <data name="Global_btnDiscard" xml:space="preserve">
+    <value>Descartar alterações</value>
+  </data>
+  <data name="Global_btnSave" xml:space="preserve">
+    <value>Salvar</value>
+  </data>
+  <data name="Global_btnSearch" xml:space="preserve">
+    <value>Buscar</value>
+  </data>
+  <data name="Global_btnSend" xml:space="preserve">
+    <value>Enviar</value>
+  </data>
+  <data name="Global_btnSendFriendRequest" xml:space="preserve">
+    <value>Enviar solicitação de amizade</value>
+  </data>
+  <data name="Global_btnSendReport" xml:space="preserve">
+    <value>Enviar denúncia</value>
+  </data>
+  <data name="Global_btnResolve" xml:space="preserve">
+    <value>Resolver</value>
+  </data>
+  <data name="Global_btnMatchReplay" xml:space="preserve">
+    <value>Ver repetição da partida</value>
+  </data>
+  <data name="Global_fmtShortDate" xml:space="preserve">
+    <value>dd/MM/yyyy</value>
+  </data>
+  <data name="Global_lblAdditionalDetails" xml:space="preserve">
+    <value>Detalhes adicionais:</value>
+  </data>
+  <data name="Global_lblChat" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="Global_lblConfirmPassword" xml:space="preserve">
+    <value>Confirmar senha</value>
+  </data>
+  <data name="Global_lblDate" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <data name="Global_lblEmail" xml:space="preserve">
+    <value>E-mail</value>
+  </data>
+  <data name="MessageGeneral_msgErrorTitle" xml:space="preserve">
+    <value>Erro</value>
+  </data>
+  <data name="Global_lblFinalScores" xml:space="preserve">
+    <value>Pontuações finais</value>
+  </data>
+  <data name="Global_lblOffline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="Global_lblOnline" xml:space="preserve">
+    <value>Online</value>
+  </data>
+  <data name="Global_lblParticipants" xml:space="preserve">
+    <value>Participantes</value>
+  </data>
+  <data name="Global_lblPassword" xml:space="preserve">
+    <value>Senha</value>
+  </data>
+  <data name="Global_lblPlayers" xml:space="preserve">
+    <value>Jogadores</value>
+  </data>
+  <data name="Global_lblScore" xml:space="preserve">
+    <value>Pontuação</value>
+  </data>
+  <data name="Global_lblWinner" xml:space="preserve">
+    <value>Vencedor</value>
+  </data>
+  <data name="Global_lblReason" xml:space="preserve">
+    <value>Motivo</value>
+  </data>
+  <data name="Global_lblDecision" xml:space="preserve">
+    <value>Decisão</value>
+  </data>
+  <data name="Global_txtChatPlaceholder" xml:space="preserve">
+    <value>Digite uma mensagem...</value>
+  </data>
+  <data name="Global_lblEmailRequired" xml:space="preserve">
+    <value>O e-mail não pode ficar vazio</value>
+  </data>
+  <data name="MessageAccount_msgErrorChangingPasswordTitle" xml:space="preserve">
+    <value>Erro ao alterar a senha</value>
+  </data>
+  <data name="MessageAccount_msgErrorChangingPassword" xml:space="preserve">
+    <value>Não foi possível atualizar a senha neste momento. Ocorreu um erro. Tente novamente mais tarde.</value>
+  </data>
+  <data name="MessageAccount_msgUnsafePasswordTitle" xml:space="preserve">
+    <value>Senha fraca</value>
+  </data>
+  <data name="MessageAccount_msgUnsafePassword" xml:space="preserve">
+    <value>A senha deve conter no mínimo 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caractere especial.</value>
+  </data>
+  <data name="MessageAccount_msgIncorrectPasswordTitle" xml:space="preserve">
+    <value>Os campos não coincidem</value>
+  </data>
+  <data name="MessageAccount_msgIncorrectPassword" xml:space="preserve">
+    <value>As senhas não coincidem. Verifique se as duas senhas são iguais e tente novamente.</value>
+  </data>
+  <data name="MessageAuthentication_msgConnectionErrorTitle" xml:space="preserve">
+    <value>Erro de login</value>
+  </data>
+  <data name="MessageAuthentication_msgConnectionError" xml:space="preserve">
+    <value>Não é possível entrar neste momento. Tente novamente.</value>
+  </data>
+  <data name="MessageAuthentication_msgDisabledAccountTitle" xml:space="preserve">
+    <value>Conta desativada</value>
+  </data>
+  <data name="MessageAuthentication_msgDisabledAccount" xml:space="preserve">
+    <value>Não é possível entrar com esta conta.</value>
+  </data>
+  <data name="MessageAuthentication_msgInvalidCredentialsTitle" xml:space="preserve">
+    <value>Credenciais inválidas</value>
+  </data>
+  <data name="MessageAuthentication_msgInvalidCredentials" xml:space="preserve">
+    <value>Nome de usuário ou senha incorretos.</value>
+  </data>
+  <data name="MessageAccount_msgAccountCreationErrorTitle" xml:space="preserve">
+    <value>Falha ao criar conta</value>
+  </data>
+  <data name="MessageAccount_msgAccountCreationError" xml:space="preserve">
+    <value>Não foi possível criar a conta. Ocorreu um erro. Tente novamente.</value>
+  </data>
+  <data name="MessageAccount_msgAccountCreatedTitle" xml:space="preserve">
+    <value>Conta criada</value>
+  </data>
+  <data name="MessageAccount_msgAccountCreated" xml:space="preserve">
+    <value>A conta foi criada com sucesso.</value>
+  </data>
+  <data name="MessageAccount_msgEmailUsedTitle" xml:space="preserve">
+    <value>E-mail já cadastrado</value>
+  </data>
+  <data name="MessageAccount_msgEmailUsed" xml:space="preserve">
+    <value>Este e-mail já está associado a uma conta.</value>
+  </data>
+  <data name="MessageAccount_msgInvalidDataTitle" xml:space="preserve">
+    <value>Dados inválidos</value>
+  </data>
+  <data name="MessageAccount_msgInvalidData" xml:space="preserve">
+    <value>Um ou mais campos não estão no formato exigido.</value>
+  </data>
+  <data name="MessageAccount_msgPasswordChangedTitle" xml:space="preserve">
+    <value>Senha alterada</value>
+  </data>
+  <data name="MessageAccount_msgPasswordChanged" xml:space="preserve">
+    <value>A senha foi atualizada com sucesso.</value>
+  </data>
+  <data name="MessageAccount_msgUsernameUsedTitle" xml:space="preserve">
+    <value>Nome de usuário já em uso</value>
+  </data>
+  <data name="MessageAccount_msgUsernameUsed" xml:space="preserve">
+    <value>O nome de usuário já está em uso.</value>
+  </data>
+  <data name="MessageProfile_msgPhotoInvalidFormatTitle" xml:space="preserve">
+    <value>Foto de perfil inválida</value>
+  </data>
+  <data name="MessageProfile_msgPhotoInvalidFormat" xml:space="preserve">
+    <value>O arquivo selecionado não possui um formato válido para a foto de perfil.</value>
+  </data>
+  <data name="MessageProfile_msgPhotoCannotBeUploadedTitle" xml:space="preserve">
+    <value>Erro ao enviar foto</value>
+  </data>
+  <data name="MessageProfile_msgPhotoCannotBeUploaded" xml:space="preserve">
+    <value>Não foi possível salvar a foto de perfil. Ocorreu um erro. Tente novamente mais tarde.</value>
+  </data>
+  <data name="MessageProfile_msgPhotoTooLargeTitle" xml:space="preserve">
+    <value>Tamanho do arquivo</value>
+  </data>
+  <data name="MessageProfile_msgPhotoTooLarge" xml:space="preserve">
+    <value>O tamanho da foto excede o limite de 1 MB. Tente uma foto menor.</value>
+  </data>
+  <data name="MessageProfile_msgProfileErrorTitle" xml:space="preserve">
+    <value>Erro ao carregar perfil</value>
+  </data>
+  <data name="MessageProfile_msgProfileError" xml:space="preserve">
+    <value>Não foi possível carregar o perfil. Tente novamente.</value>
+  </data>
+  <data name="MessageProfile_msgUpdateProfileErrorTitle" xml:space="preserve">
+    <value>Erro ao atualizar</value>
+  </data>
+  <data name="MessageProfile_msgUpdateProfileError" xml:space="preserve">
+    <value>Não é possível salvar as alterações neste momento. Tente novamente.</value>
+  </data>
+  <data name="MessageFriends_msgErrorFriendshipTitle" xml:space="preserve">
+    <value>Erro ao adicionar amigo</value>
+  </data>
+  <data name="MessageFriends_msgErrorFriendship" xml:space="preserve">
+    <value>Ocorreu um erro ao adicionar o amigo. Tente novamente.</value>
+  </data>
+  <data name="MessageFriends_msgFriendshipTitle" xml:space="preserve">
+    <value>Novo amigo</value>
+  </data>
+  <data name="MessageFriends_msgFriendship" xml:space="preserve">
+    <value>Agora você e {0} são amigos.</value>
+  </data>
+  <data name="MessageAccount_msgConfirmEliminationTitle" xml:space="preserve">
+    <value>Confirmar</value>
+  </data>
+  <data name="MessageAccount_msgConfirmElimination" xml:space="preserve">
+    <value>Tem certeza de que deseja excluir sua conta?</value>
+  </data>
+  <data name="MessageFriends_msgErrorFriendRequestTitle" xml:space="preserve">
+    <value>Erro na solicitação de amizade</value>
+  </data>
+  <data name="MessageFriends_msgErrorFriendRequest" xml:space="preserve">
+    <value>Não foi possível enviar a solicitação de amizade. Ocorreu um erro. Tente novamente.</value>
+  </data>
+  <data name="MessageFriends_msgSentFriendRequestTitle" xml:space="preserve">
+    <value>Solicitação já enviada</value>
+  </data>
+  <data name="MessageFriends_msgSentFriendRequest" xml:space="preserve">
+    <value>Você já enviou uma solicitação de amizade para este jogador.</value>
+  </data>
+  <data name="MessageFriends_msgPendingFriendRequestTitle" xml:space="preserve">
+    <value>Solicitação pendente</value>
+  </data>
+  <data name="MessageFriends_msgPendingFriendRequest" xml:space="preserve">
+    <value>Você já recebeu uma solicitação de amizade deste jogador.</value>
+  </data>
+  <data name="MessageFriends_msgOwnRequestTitle" xml:space="preserve">
+    <value>Solicitação de amizade inválida</value>
+  </data>
+  <data name="MessageFriends_msgOwnRequest" xml:space="preserve">
+    <value>Você não pode enviar uma solicitação de amizade para si mesmo.</value>
+  </data>
+  <data name="MessageFriends_msgAlreadyFriendsTitle" xml:space="preserve">
+    <value>Já são amigos</value>
+  </data>
+  <data name="MessageFriends_msgAlreadyFriends" xml:space="preserve">
+    <value>Você e {0} já são amigos.</value>
+  </data>
+  <data name="MessageFriends_msgFriendAddedTitle" xml:space="preserve">
+    <value>Amigo adicionado</value>
+  </data>
+  <data name="MessageFriends_msgFriendAdded" xml:space="preserve">
+    <value>O amigo foi adicionado com sucesso.</value>
+  </data>
+  <data name="MessageFriends_msgFriendLimitTitle" xml:space="preserve">
+    <value>Limite de amigos</value>
+  </data>
+  <data name="MessageFriends_msgFriendLimit" xml:space="preserve">
+    <value>Você atingiu o limite de 99 amigos. Remova um amigo para aceitar novas solicitações de amizade.</value>
+  </data>
+  <data name="MessageFriends_msgLoadFriendsErrorTitle" xml:space="preserve">
+    <value>Erro ao carregar amigos</value>
+  </data>
+  <data name="MessageFriends_msgLoadFriendsError" xml:space="preserve">
+    <value>Não foi possível carregar a lista de amigos.</value>
+  </data>
+  <data name="MessageFriends_msgLoadRequestsErrorTitle" xml:space="preserve">
+    <value>Erro ao carregar solicitações</value>
+  </data>
+  <data name="MessageFriends_msgLoadRequestsError" xml:space="preserve">
+    <value>Não foi possível carregar as solicitações de amizade.</value>
+  </data>
+  <data name="MessageFriends_msgRequesterLimit" xml:space="preserve">
+    <value>Não é possível aceitar a solicitação porque este jogador atingiu o limite de amigos.</value>
+  </data>
+  <data name="MessageFriends_msgDeleteFriendTitle" xml:space="preserve">
+    <value>Remover amigo</value>
+  </data>
+  <data name="MessageFriends_msgDeleteFriend" xml:space="preserve">
+    <value>Tem certeza de que deseja remover {0} da sua lista de amigos?</value>
+  </data>
+  <data name="MessageFriends_msgDeleteFriendRequestTitle" xml:space="preserve">
+    <value>Cancelar solicitação de amizade</value>
+  </data>
+  <data name="MessageFriends_msgDeleteFriendRequest" xml:space="preserve">
+    <value>Tem certeza de que deseja cancelar a solicitação de amizade enviada para {0}?</value>
+  </data>
+  <data name="MessageRooms_msgErrorCreateGameTitle" xml:space="preserve">
+    <value>Erro ao criar partida</value>
+  </data>
+  <data name="MessageRooms_msgErrorCreateGame" xml:space="preserve">
+    <value>Ocorreu um erro e não foi possível criar a sala.</value>
+  </data>
+  <data name="MessageRooms_msgRoomFull" xml:space="preserve">
+    <value>Não foi possível entrar na sala. O limite de jogadores desta sala foi atingido.</value>
+  </data>
+  <data name="MessageRooms_msgRoomFullTitle" xml:space="preserve">
+    <value>Sala cheia</value>
+  </data>
+  <data name="MessageRooms_msgRoomNotFound" xml:space="preserve">
+    <value>Não foi possível entrar na sala. Nenhuma sala foi encontrada com o código informado.</value>
+  </data>
+  <data name="MessageRooms_msgRoomNotFoundTitle" xml:space="preserve">
+    <value>Sala não encontrada</value>
+  </data>
+  <data name="Global_lblNoFriends" xml:space="preserve">
+    <value>Você ainda não adicionou nenhum amigo</value>
+  </data>
+  <data name="Global_lblPasswordRequired" xml:space="preserve">
+    <value>A senha não pode ficar vazia</value>
+  </data>
+  <data name="MessageVerification_msgCodeSentTitle" xml:space="preserve">
+    <value>Código enviado</value>
+  </data>
+  <data name="MessageVerification_msgCodeSent" xml:space="preserve">
+    <value>Um código de verificação foi enviado para o seu e-mail.</value>
+  </data>
+  <data name="MessageVerification_msgExpiredCodeTitle" xml:space="preserve">
+    <value>Código expirado</value>
+  </data>
+  <data name="MessageVerification_msgExpiredCode" xml:space="preserve">
+    <value>O código de verificação expirou.</value>
+  </data>
+  <data name="MessageVerification_msgInvalidCodeTitle" xml:space="preserve">
+    <value>Código inválido</value>
+  </data>
+  <data name="MessageVerification_msgInvalidCode" xml:space="preserve">
+    <value>O código de verificação é inválido.</value>
+  </data>
+  <data name="MessageVerification_msgEmailVerifiedTitle" xml:space="preserve">
+    <value>E-mail verificado</value>
+  </data>
+  <data name="MessageVerification_msgEmailVerified" xml:space="preserve">
+    <value>Seu e-mail foi verificado com sucesso.</value>
+  </data>
+  <data name="MessageVerification_msgAttemptsExceededTitle" xml:space="preserve">
+    <value>Tentativas esgotadas</value>
+  </data>
+  <data name="MessageVerification_msgAttemptsExceeded" xml:space="preserve">
+    <value>O código expirou. Você pode solicitar o envio de um novo código para seu e-mail.</value>
+  </data>
+  <data name="MessageVerification_msgEmailServiceErrorTitle" xml:space="preserve">
+    <value>Erro ao enviar e-mail</value>
+  </data>
+  <data name="MessageVerification_msgEmailServiceError" xml:space="preserve">
+    <value>Não foi possível enviar o código. Ocorreu um erro ao enviá-lo. Tente novamente.</value>
+  </data>
+  <data name="MessageVerification_msgVerificationCodeErrorTitle" xml:space="preserve">
+    <value>Erro no código de verificação</value>
+  </data>
+  <data name="MessageVerification_msgVerificationCodeError" xml:space="preserve">
+    <value>Ocorreu um erro ao processar o código de verificação. Tente novamente.</value>
+  </data>
+  <data name="MessageRooms_msgUnavailableRoomTitle" xml:space="preserve">
+    <value>Sala indisponível</value>
+  </data>
+  <data name="MessageRooms_msgUnavailableRoom" xml:space="preserve">
+    <value>Não é possível entrar na sala. O código expirou ou a partida já começou.</value>
+  </data>
+  <data name="MessageRooms_msgPreviouslyKickedTitle" xml:space="preserve">
+    <value>Expulso da sala</value>
+  </data>
+  <data name="MessageRooms_msgPreviouslyKicked" xml:space="preserve">
+    <value>Você não pode entrar nesta sala porque foi expulso dela anteriormente.</value>
+  </data>
+  <data name="MessageRooms_msgErrorJoiningRoomTitle" xml:space="preserve">
+    <value>Erro ao entrar na partida</value>
+  </data>
+  <data name="MessageRooms_msgErrorJoiningRoom" xml:space="preserve">
+    <value>Não foi possível entrar na partida. Ocorreu um erro. Tente novamente.</value>
+  </data>
+  <data name="MessageRooms_msgRoomCapacityTitle" xml:space="preserve">
+    <value>Limite de jogadores da sala</value>
+  </data>
+  <data name="MessageRooms_msgRoomCapacity" xml:space="preserve">
+    <value>Não foi possível entrar na partida. Outro jogador ocupou a última vaga.</value>
+  </data>
+  <data name="MessageLobby_msgKick" xml:space="preserve">
+    <value>Tem certeza de que deseja expulsar {0} da sala?</value>
+  </data>
+  <data name="MessageLobby_msgKickTitle" xml:space="preserve">
+    <value>Expulsar jogador</value>
+  </data>
+  <data name="MessageLobby_msgStart" xml:space="preserve">
+    <value>Tem certeza de que deseja iniciar a partida?</value>
+  </data>
+  <data name="MessageLobby_msgStartTitle" xml:space="preserve">
+    <value>Iniciar partida</value>
+  </data>
+  <data name="MessageLobby_msgKickFailedBody" xml:space="preserve">
+    <value>Não foi possível expulsar o jogador. Tente novamente.</value>
+  </data>
+  <data name="MessageLobby_msgKickFailedTitle" xml:space="preserve">
+    <value>Falha na expulsão</value>
+  </data>
+  <data name="MessageLobby_msgCloseLobby" xml:space="preserve">
+    <value>Se você sair da sala, ela será fechada. Tem certeza de que deseja sair?</value>
+  </data>
+  <data name="MessageLobby_msgCloseLobbyTitle" xml:space="preserve">
+    <value>Sair da sala</value>
+  </data>
+  <data name="MessageLobby_msgNotEnoughPlayersTitle" xml:space="preserve">
+    <value>Jogadores insuficientes</value>
+  </data>
+  <data name="MessageLobby_msgNotEnoughPlayers" xml:space="preserve">
+    <value>Não há jogadores suficientes para iniciar a partida.</value>
+  </data>
+  <data name="MessageLobby_msgInvitationFailed" xml:space="preserve">
+    <value>Não foi possível convidar o jogador. Tente novamente.</value>
+  </data>
+  <data name="MessageLobby_msgInvitationFailedTitle" xml:space="preserve">
+    <value>Erro ao convidar</value>
+  </data>
+  <data name="MessageLobby_msgEmailInvitationFailed" xml:space="preserve">
+    <value>Não é possível convidar por e-mail. Ocorreu um erro no serviço. Tente novamente.</value>
+  </data>
+  <data name="MessageLobby_msgEmailInvitationFailedTitle" xml:space="preserve">
+    <value>Erro no convite por e-mail</value>
+  </data>
+  <data name="MessageLobby_msgAlreadyInvitedTitle" xml:space="preserve">
+    <value>Jogador já convidado</value>
+  </data>
+  <data name="MessageLobby_msgAlreadyInvited" xml:space="preserve">
+    <value>Você já convidou este jogador para a sala.</value>
+  </data>
+  <data name="MessageLobby_msgStartErrorTitle" xml:space="preserve">
+    <value>Erro ao iniciar partida</value>
+  </data>
+  <data name="MessageLobby_msgStartError" xml:space="preserve">
+    <value>Não foi possível iniciar a partida. Tente novamente.</value>
+  </data>
+  <data name="MessageReports_msgReportSendErrorTitle" xml:space="preserve">
+    <value>Erro ao enviar denúncia</value>
+  </data>
+  <data name="MessageReports_msgReportSendError" xml:space="preserve">
+    <value>Não foi possível enviar sua denúncia. Ocorreu um erro ao tentar registrá-la. Tente novamente.</value>
+  </data>
+  <data name="MessageReports_msgReportSentTitle" xml:space="preserve">
+    <value>Denúncia enviada</value>
+  </data>
+  <data name="MessageReports_msgReportSent" xml:space="preserve">
+    <value>Sua denúncia foi enviada. Um moderador irá analisá-la mais tarde.</value>
+  </data>
+  <data name="MessageReports_msgReportResolvedTitle" xml:space="preserve">
+    <value>Denúncia resolvida</value>
+  </data>
+  <data name="MessageReports_msgReportResolved" xml:space="preserve">
+    <value>A resposta à denúncia #{0} foi registrada.</value>
+  </data>
+  <data name="MessageReports_msgResolutionSaveErrorTitle" xml:space="preserve">
+    <value>Erro ao salvar a resolução</value>
+  </data>
+  <data name="MessageReports_msgResolutionSaveError" xml:space="preserve">
+    <value>Não foi possível registrar a resposta da denúncia. Ocorreu um erro ao salvá-la. Tente novamente.</value>
+  </data>
+  <data name="MessageReports_msgReportRetrievalErrorTitle" xml:space="preserve">
+    <value>Erro ao recuperar a denúncia</value>
+  </data>
+  <data name="MessageReports_msgReportRetrievalError" xml:space="preserve">
+    <value>Não foi possível recuperar as informações da denúncia. Ocorreu um erro durante a consulta. Tente novamente.</value>
+  </data>
+  <data name="MessageReports_msgEvidenceRetrievalErrorTitle" xml:space="preserve">
+    <value>Erro ao recuperar evidências</value>
+  </data>
+  <data name="MessageReports_msgEvidenceRetrievalError" xml:space="preserve">
+    <value>Não foi possível recuperar as evidências associadas à denúncia. Ocorreu um erro durante a consulta. Tente novamente.</value>
+  </data>
+  <data name="MessageReports_msgNoReasonTitle" xml:space="preserve">
+    <value>Nenhum motivo selecionado</value>
+  </data>
+  <data name="MessageReports_msgNoReason" xml:space="preserve">
+    <value>Não foi possível enviar sua denúncia. Você deve selecionar um motivo antes de enviá-la. Tente novamente.</value>
+  </data>
+  <data name="MessageReports_msgPlayerAlreadyReportedTitle" xml:space="preserve">
+    <value>Jogador já denunciado</value>
+  </data>
+  <data name="MessageReports_msgPlayerAlreadyReported" xml:space="preserve">
+    <value>Não foi possível enviar sua denúncia. Você já denunciou este jogador nesta partida.</value>
+  </data>
+  <data name="MessageReports_msgMatchAlreadyReportedTitle" xml:space="preserve">
+    <value>Partida já denunciada</value>
+  </data>
+  <data name="MessageReports_msgMatchAlreadyReported" xml:space="preserve">
+    <value>Não foi possível enviar sua denúncia. Você já denunciou esta partida.</value>
+  </data>
+  <data name="HomePage_btnGuest" xml:space="preserve">
+    <value>Jogar como convidado</value>
+  </data>
+  <data name="Login_btnCreateAccount" xml:space="preserve">
+    <value>Criar conta</value>
+  </data>
+  <data name="Login_btnForgotPassword" xml:space="preserve">
+    <value>Esqueci minha senha</value>
+  </data>
+  <data name="Global_btnLogin" xml:space="preserve">
+    <value>Entrar</value>
+  </data>
+  <data name="MainMenu_btnCreateGame" xml:space="preserve">
+    <value>Criar partida</value>
+  </data>
+  <data name="MainMenu_btnFriends" xml:space="preserve">
+    <value>Amigos</value>
+  </data>
+  <data name="MainMenu_btnHowToPlay" xml:space="preserve">
+    <value>Como jogar</value>
+  </data>
+  <data name="MainMenu_btnJoinGame" xml:space="preserve">
+    <value>Entrar em partida</value>
+  </data>
+  <data name="Global_btnSettings" xml:space="preserve">
+    <value>Configurações</value>
+  </data>
+  <data name="MainMenu_btnScores" xml:space="preserve">
+    <value>Ranking</value>
+  </data>
+  <data name="MainMenu_btnViewReports" xml:space="preserve">
+    <value>Ver denúncias</value>
+  </data>
+  <data name="RegisterAccount_btnRegister" xml:space="preserve">
+    <value>Cadastrar-se</value>
+  </data>
+  <data name="RegisterAccount_lblTitle" xml:space="preserve">
+    <value>Criar conta</value>
+  </data>
+  <data name="RegisterAccount_lblUsername" xml:space="preserve">
+    <value>Usuário</value>
+  </data>
+  <data name="RegisterAccount_lblUsernameRequired" xml:space="preserve">
+    <value>O nome de usuário não pode estar vazio</value>
+  </data>
+  <data name="RecoverAccount_lblTitle" xml:space="preserve">
+    <value>Recuperar conta</value>
+  </data>
+  <data name="RecoverAccount_btnSendVerificationCode" xml:space="preserve">
+    <value>Enviar código de verificação</value>
+  </data>
+  <data name="ChangePassword_btnChangePassword" xml:space="preserve">
+    <value>Alterar senha</value>
+  </data>
+  <data name="ChangePassword_lblNewPassword" xml:space="preserve">
+    <value>Nova senha</value>
+  </data>
+  <data name="Profile_lblGamesPlayed" xml:space="preserve">
+    <value>Partidas jogadas</value>
+  </data>
+  <data name="Profile_lblTitle" xml:space="preserve">
+    <value>Perfil</value>
+  </data>
+  <data name="Profile_lblTotalPoints" xml:space="preserve">
+    <value>Pontos totais</value>
+  </data>
+  <data name="Profile_btnMatchHistory" xml:space="preserve">
+    <value>Histórico de partidas</value>
+  </data>
+  <data name="Profile_lblWins" xml:space="preserve">
+    <value>Vitórias</value>
+  </data>
+  <data name="UploadProfilePicture_lblProfilePhoto" xml:space="preserve">
+    <value>Foto de perfil</value>
+  </data>
+  <data name="UploadProfilePicture_lblInstruction" xml:space="preserve">
+    <value>Selecione uma foto de perfil</value>
+  </data>
+  <data name="UploadProfilePicture_btnSkipPhoto" xml:space="preserve">
+    <value>Pular</value>
+  </data>
+  <data name="UploadProfilePicture_btnAddPhoto" xml:space="preserve">
+    <value>Adicionar foto</value>
+  </data>
+  <data name="EditProfile_btnSaveChanges" xml:space="preserve">
+    <value>Salvar alterações</value>
+  </data>
+  <data name="EditProfile_lblTitle" xml:space="preserve">
+    <value>Editar perfil</value>
+  </data>
+  <data name="MessageAccount_msgDeleteAccountTitle" xml:space="preserve">
+    <value>Excluir conta</value>
+  </data>
+  <data name="DeleteAccount_lblDeleteAccountWarning" xml:space="preserve">
+    <value>Após confirmar, você não poderá mais entrar com esta conta nem acessar suas partidas e pontuações.</value>
+  </data>
+  <data name="DeleteAccount_lblCurrentPassword" xml:space="preserve">
+    <value>Senha atual</value>
+  </data>
+  <data name="Friends_btnAddFriends" xml:space="preserve">
+    <value>Adicionar amigos</value>
+  </data>
+  <data name="Friends_btnDeclineRequest" xml:space="preserve">
+    <value>Recusar</value>
+  </data>
+  <data name="Friends_btnFriendList" xml:space="preserve">
+    <value>Lista de amigos</value>
+  </data>
+  <data name="Friends_btnRemoveFriend" xml:space="preserve">
+    <value>Remover amigo</value>
+  </data>
+  <data name="Friends_btnRequests" xml:space="preserve">
+    <value>Solicitações de amizade</value>
+  </data>
+  <data name="Friends_lblSentRequests" xml:space="preserve">
+    <value>Solicitações enviadas</value>
+  </data>
+  <data name="Friends_lblTitle" xml:space="preserve">
+    <value>Amigos</value>
+  </data>
+  <data name="Friends_lblReceivedRequests" xml:space="preserve">
+    <value>Solicitações de amizade recebidas</value>
+  </data>
+  <data name="Friends_lblNoSentFriendRequests" xml:space="preserve">
+    <value>Você não tem solicitações de amizade enviadas pendentes</value>
+  </data>
+  <data name="Friends_lblPlayerNotFound" xml:space="preserve">
+    <value>Jogador não encontrado</value>
+  </data>
+  <data name="Friends_lblNoReceivedFriendRequests" xml:space="preserve">
+    <value>Você não recebeu solicitações de amizade</value>
+  </data>
+  <data name="CreateGame_lblNumberOfPlayers" xml:space="preserve">
+    <value>Número de jogadores</value>
+  </data>
+  <data name="CreateGame_btnCreate" xml:space="preserve">
+    <value>Criar</value>
+  </data>
+  <data name="CreateGame_lblTitle" xml:space="preserve">
+    <value>Crie sua partida</value>
+  </data>
+  <data name="CreateGame_lblWinningScore" xml:space="preserve">
+    <value>Pontuação vencedora</value>
+  </data>
+  <data name="JoinGame_lblEmptyRoomCode" xml:space="preserve">
+    <value>Você deve inserir o código da sala.</value>
+  </data>
+  <data name="JoinGame_btnAcceptInvitation" xml:space="preserve">
+    <value>Aceitar convite</value>
+  </data>
+  <data name="JoinGame_btnJoinByCode" xml:space="preserve">
+    <value>Entrar com código</value>
+  </data>
+  <data name="JoinGame_btnJoinRoom" xml:space="preserve">
+    <value>Entrar na sala</value>
+  </data>
+  <data name="JoinGame_btnInvitations" xml:space="preserve">
+    <value>Convites</value>
+  </data>
+  <data name="JoinGame_lblRoomCode" xml:space="preserve">
+    <value>Código da sala</value>
+  </data>
+  <data name="InviteFriends_btnInvite" xml:space="preserve">
+    <value>Convidar para a sala</value>
+  </data>
+  <data name="Lobby_btnInviteFriends" xml:space="preserve">
+    <value>Convidar amigos</value>
+  </data>
+  <data name="Lobby_btnKick" xml:space="preserve">
+    <value>Expulsar</value>
+  </data>
+  <data name="Lobby_btnReport" xml:space="preserve">
+    <value>Denunciar</value>
+  </data>
+  <data name="Lobby_btnStartGame" xml:space="preserve">
+    <value>Jogar!</value>
+  </data>
+  <data name="Lobby_btnViewProfile" xml:space="preserve">
+    <value>Ver perfil</value>
+  </data>
+  <data name="Lobby_lblRoomCode" xml:space="preserve">
+    <value>Código da sala</value>
+  </data>
+  <data name="Lobby_lblStarting" xml:space="preserve">
+    <value>Iniciando partida</value>
+  </data>
+  <data name="Lobby_lblTitle" xml:space="preserve">
+    <value>Sala de espera</value>
+  </data>
+  <data name="Lobby_tooltipCopyCode" xml:space="preserve">
+    <value>Copiar código para a área de transferência</value>
+  </data>
+  <data name="Settings_btnChange" xml:space="preserve">
+    <value>Alterar</value>
+  </data>
+  <data name="Settings_btnDeleteAccount" xml:space="preserve">
+    <value>Excluir conta</value>
+  </data>
+  <data name="MessageSettings_msgEmailDuplicate" xml:space="preserve">
+    <value>O e-mail já está cadastrado.</value>
+  </data>
+  <data name="MessageSettings_msgEmailUpdateError" xml:space="preserve">
+    <value>Não é possível atualizar o e-mail.</value>
+  </data>
+  <data name="MessageSettings_msgEmailUpdated" xml:space="preserve">
+    <value>O e-mail foi atualizado com sucesso.</value>
+  </data>
+  <data name="MessageSettings_msgConfirmLogout" xml:space="preserve">
+    <value>Tem certeza de que deseja sair?</value>
+  </data>
+  <data name="MessageSettings_msgInvalidEmail" xml:space="preserve">
+    <value>O e-mail informado não possui um formato válido.</value>
+  </data>
+  <data name="ReportPlayer_lblTitle" xml:space="preserve">
+    <value>Denunciar jogador</value>
+  </data>
+  <data name="ReportPlayer_btnInappropriateBehavior" xml:space="preserve">
+    <value>Comportamento inadequado</value>
+  </data>
+  <data name="ReportPlayer_btnCheating" xml:space="preserve">
+    <value>Trapaça</value>
+  </data>
+  <data name="ReportMatch_lblTitle" xml:space="preserve">
+    <value>Denunciar partida</value>
+  </data>
+  <data name="Reports_lblTitle" xml:space="preserve">
+    <value>Denúncias</value>
+  </data>
+  <data name="Reports_btnMatches" xml:space="preserve">
+    <value>Partidas</value>
+  </data>
+  <data name="Reports_btnViewReport" xml:space="preserve">
+    <value>Ver denúncia</value>
+  </data>
+  <data name="PlayerReportInfo_btnViewChatHistory" xml:space="preserve">
+    <value>Ver histórico do chat</value>
+  </data>
+  <data name="ResolvePlayerReport_btnBan" xml:space="preserve">
+    <value>Banir jogador</value>
+  </data>
+  <data name="ResolvePlayerReport_btnDoNothing" xml:space="preserve">
+    <value>Não fazer nada</value>
+  </data>
+  <data name="ResolvePlayerReport_btnSuspend" xml:space="preserve">
+    <value>Suspender</value>
+  </data>
+  <data name="ResolvePlayerReport_lblDays" xml:space="preserve">
+    <value>Dias:</value>
+  </data>
+  <data name="MatchReportInfo_lblMatchItem" xml:space="preserve">
+    <value>Partida nº {0} - Data: {1}</value>
+  </data>
+  <data name="ResolveMatchReport_btnInvalidMatch" xml:space="preserve">
+    <value>Partida inválida</value>
+  </data>
+  <data name="ResolveMatchReport_btnValidMatch" xml:space="preserve">
+    <value>Partida válida</value>
+  </data>
+  <data name="MatchReplay_lblMove" xml:space="preserve">
+    <value>Movimento</value>
+  </data>
+  <data name="MatchHistory_lblTitle" xml:space="preserve">
+    <value>Histórico de partidas</value>
+  </data>
+  <data name="Settings_lblTitle" xml:space="preserve">
+    <value>Configurações</value>
+  </data>
+  <data name="Settings_btnAccount" xml:space="preserve">
+    <value>Conta</value>
+  </data>
+  <data name="Settings_btnLanguage" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="Settings_btnLogout" xml:space="preserve">
+    <value>Sair</value>
+  </data>
+  <data name="Rankings_lblTitle" xml:space="preserve">
+    <value>Ranking de vitórias</value>
+  </data>
+  <data name="Rankings_lblYourRank" xml:space="preserve">
+    <value>Sua posição:</value>
+  </data>
+  <data name="HowToPlay_lblTitle" xml:space="preserve">
+    <value>Como jogar?</value>
+  </data>
+  <data name="HowToPlay_lblRules" xml:space="preserve">
+    <value>Regras do jogo</value>
+  </data>
+  <data name="HowToPlay_lblPlaceTile" xml:space="preserve">
+    <value>Para colocar uma peça, um dos lados deve ter a mesma quantidade de pontos que uma das extremidades abertas.</value>
+  </data>
+  <data name="HowToPlay_lblScoreMultipleFive" xml:space="preserve">
+    <value>Se as extremidades abertas somarem um múltiplo de 5, esse valor será adicionado à sua pontuação!</value>
+  </data>
+  <data name="HowToPlay_lblWinningScore" xml:space="preserve">
+    <value>O primeiro jogador a atingir a pontuação vencedora ganha a partida!</value>
+  </data>
+  <data name="HowToPlay_lblWildcards" xml:space="preserve">
+    <value>Coringas</value>
+  </data>
+  <data name="HowToPlay_lblBlockEndTitle" xml:space="preserve">
+    <value>Bloqueia uma extremidade</value>
+  </data>
+  <data name="HowToPlay_lblBlockEnd" xml:space="preserve">
+    <value>Por um turno, nenhuma outra peça pode ser colocada nessa extremidade, e os pontos dessa extremidade não são contabilizados.</value>
+  </data>
+  <data name="HowToPlay_lblDoublePointsTitle" xml:space="preserve">
+    <value>Pontos em dobro</value>
+  </data>
+  <data name="HowToPlay_lblDoublePoints" xml:space="preserve">
+    <value>Quando a soma for múltipla de 5.</value>
+  </data>
+  <data name="MessageGameplay_msgStartHighestDouble" xml:space="preserve">
+    <value>Começa quem tiver a maior dupla</value>
+  </data>
+  <data name="MessageGameplay_msgStartHighestScore" xml:space="preserve">
+    <value>Começa quem tiver a peça com a maior soma</value>
+  </data>
+  <data name="GameBoard_btnBoneyard" xml:space="preserve">
+    <value>Monte</value>
+  </data>
+  <data name="GameBoard_btnPass" xml:space="preserve">
+    <value>Passar</value>
+  </data>
+  <data name="MessageGameplay_msgDrewFromBoneyard" xml:space="preserve">
+    <value>{0} comprou do monte</value>
+  </data>
+  <data name="MessageGameplay_msgPassTurn" xml:space="preserve">
+    <value>{0} passou a vez</value>
+  </data>
+  <data name="GameBoard_lblGoal" xml:space="preserve">
+    <value>Meta</value>
+  </data>
+  <data name="GameBoard_btnReportGame" xml:space="preserve">
+    <value>Denunciar partida</value>
+  </data>
+  <data name="MessageGameplay_msgGameEnd" xml:space="preserve">
+    <value>Fim de jogo</value>
+  </data>
+  <data name="MessageGameplay_msgRoundEnd" xml:space="preserve">
+    <value>Fim da rodada</value>
+  </data>
+  <data name="VerifyEmail_btnResend" xml:space="preserve">
+    <value>Reenviar código</value>
+  </data>
+  <data name="VerifyEmail_btnVerify" xml:space="preserve">
+    <value>Verificar</value>
+  </data>
+  <data name="VerifyEmail_lblCode" xml:space="preserve">
+    <value>Código de verificação</value>
+  </data>
+  <data name="VerifyEmail_lblTitle" xml:space="preserve">
+    <value>Verificar e-mail</value>
+  </data>
+</root>
