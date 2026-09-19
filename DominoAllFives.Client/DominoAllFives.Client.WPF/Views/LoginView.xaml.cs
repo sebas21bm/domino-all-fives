@@ -10,14 +10,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace DominoAllFives.Client.WPF.Styles
+namespace DominoAllFives.Client.WPF.Views
 {
     /// <summary>
-    /// Lógica de interacción para Placeholder.xaml
+    /// Lógica de interacción para LoginView.xaml
     /// </summary>
-    public partial class Placeholder : Window
+    public partial class LoginView : Window
     {
-        public Placeholder()
+        public LoginView()
         {
             InitializeComponent();
         }
