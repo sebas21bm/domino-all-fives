@@ -1,1 +1,3 @@
-<Solution />
+<Solution>
+  <Project Path="DominoAllFives.Client.WPF/DominoAllFives.Client.WPF.csproj" />
+</Solution>
