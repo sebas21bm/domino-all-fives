@@ -1,0 +1,78 @@
+﻿<Window x:Class="DominoAllFives.Client.WPF.Views.MainMenu"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DominoAllFives.Client.WPF.Views"
+        mc:Ignorable="d"
+        xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization;assembly=DominoAllFives.Client.WPF"
+        
+        Title="MainMenu"
+        WindowState="Maximized" 
+        WindowStyle="None"
+        Background="{StaticResource DarkBgBrush}">
+
+    <Grid Margin="50">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top">
+            <Button Style="{StaticResource PrimaryButton}" 
+                    Content="nickname31" 
+                    Width="140" Height="38"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="0" 
+                    VerticalAlignment="Center" 
+                    HorizontalAlignment="Left" 
+                    Margin="40,0,0,0">
+
+            <StackPanel Margin="0,0,0,35">
+                <TextBlock Text="DOMINO" Style="{StaticResource PageTitleText}" Foreground="{StaticResource CreamBrush}"/>
+                <TextBlock Text="ALL FIVES" Style="{StaticResource PageTitleText}" Foreground="{StaticResource RedBrush}" Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <StackPanel Width="270">
+                <Button Style="{StaticResource PrimaryButton}" 
+                        Content="{x:Static loc:Resources.MainMenu_btnCreateGame}" 
+                        Height="45" Margin="0,0,0,10"/>
+                <Button Style="{StaticResource PrimaryButton}" 
+                        Content="{x:Static loc:Resources.MainMenu_btnJoinGame}" 
+                        Height="45" Margin="0,0,0,10"/>
+                <Button Style="{StaticResource PrimaryButton}" 
+                        Content="{x:Static loc:Resources.MainMenu_btnFriends}" 
+                        Height="45" Margin="0,0,0,10"/>
+                <Button Style="{StaticResource PrimaryButton}" 
+                        Content="{x:Static loc:Resources.MainMenu_btnScores}" 
+                        Height="45" Margin="0,0,0,10"/>
+                <Button Style="{StaticResource PrimaryButton}" 
+                        Content="{x:Static loc:Resources.MainMenu_btnHowToPlay}" 
+                        Height="45" Margin="0,0,0,10"/>
+                <Button Style="{StaticResource DarkButton}" 
+                        Content="{x:Static loc:Resources.Global_btnSettings}" 
+                        Height="45"/>
+            </StackPanel>
+
+        </StackPanel>
+        <Canvas Grid.Row="1" Grid.Column="1" Width="350" Height="450" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,60,0">
+            <Border Width="200" Height="350" Background="{StaticResource CreamBrush}" BorderBrush="{StaticResource DarkBgBrush}" BorderThickness="4" CornerRadius="2" RenderTransformOrigin="0.5,0.5">
+                <Border.RenderTransform>
+                    <RotateTransform Angle="15"/>
+                </Border.RenderTransform>
+            </Border>
+        </Canvas>
+        <Grid x:Name="ModalOverlay" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2" 
+              Background="#B2000000" 
+              Visibility="Collapsed">
+           
+        </Grid>
+
+    </Grid>
+</Window>
