@@ -64,6 +64,7 @@
     <EmbeddedResource Update="Localization\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		<CustomToolNamespace>DominoAllFives.Client.WPF.Localization</CustomToolNamespace>
     </EmbeddedResource>
   </ItemGroup>
 
