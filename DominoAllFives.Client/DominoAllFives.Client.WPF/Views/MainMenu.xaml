@@ -12,67 +12,100 @@
         WindowStyle="None"
         Background="{StaticResource DarkBgBrush}">
 
-    <Grid Margin="50">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
+    <Grid>
+        <Image Source="/Assets/Images/backgroundDominoPattern.png" 
+               Style="{StaticResource BackgroundDominoPatternStyle}"/>
+        <Viewbox Stretch="Uniform">
+            <Grid Width="1280" Height="720" Margin="40,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top">
-            <Button Style="{StaticResource PrimaryButton}" 
-                    Content="nickname31" 
-                    Width="140" Height="38"/>
-        </StackPanel>
+                <Border Grid.Row="0" Grid.Column="1" 
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Top">
+                    <Button x:Name="btnUserProfile"
+                    Style="{StaticResource PrimaryButton}" 
+                    Content="{Binding Username}" 
+                    MinWidth="180" Height="46"/>
+                </Border>
 
-        <StackPanel Grid.Row="1" Grid.Column="0" 
+                <StackPanel Grid.Row="1" Grid.Column="0" 
                     VerticalAlignment="Center" 
                     HorizontalAlignment="Left" 
-                    Margin="40,0,0,0">
+                    Margin="10,0,0,0">
 
-            <StackPanel Margin="0,0,0,35">
-                <TextBlock Text="DOMINO" Style="{StaticResource PageTitleText}" Foreground="{StaticResource CreamBrush}"/>
-                <TextBlock Text="ALL FIVES" Style="{StaticResource PageTitleText}" Foreground="{StaticResource RedBrush}" Margin="0,5,0,0"/>
-            </StackPanel>
+                    <Image Source="/Assets/Images/logoFull.png" 
+                   Style="{StaticResource FullLogoStyle}" 
+                   Width="580" Height="180"
+                   HorizontalAlignment="Left" 
+                   Margin="0,0,0,25"/>
 
-            <StackPanel Width="270">
-                <Button Style="{StaticResource PrimaryButton}" 
+                    <StackPanel Width="400">
+                        <Button x:Name="btnCreateGame"
+                        Style="{StaticResource PrimaryButton}" 
                         Content="{x:Static loc:Resources.MainMenu_btnCreateGame}" 
-                        Height="45" Margin="0,0,0,10"/>
-                <Button Style="{StaticResource PrimaryButton}" 
+                        MinHeight="54" 
+                        Margin="0,0,0,10"/>
+
+                        <Button x:Name="btnJoinGame"
+                        Style="{StaticResource OutlineButton}" 
                         Content="{x:Static loc:Resources.MainMenu_btnJoinGame}" 
-                        Height="45" Margin="0,0,0,10"/>
-                <Button Style="{StaticResource PrimaryButton}" 
+                        MinHeight="54" 
+                        Margin="0,0,0,10"/>
+
+                        <Button x:Name="btnFriends"
+                        Style="{StaticResource OutlineButton}" 
                         Content="{x:Static loc:Resources.MainMenu_btnFriends}" 
-                        Height="45" Margin="0,0,0,10"/>
-                <Button Style="{StaticResource PrimaryButton}" 
+                        MinHeight="54" 
+                        Margin="0,0,0,10"/>
+
+                        <Button x:Name="btnScores"
+                        Style="{StaticResource OutlineButton}" 
                         Content="{x:Static loc:Resources.MainMenu_btnScores}" 
-                        Height="45" Margin="0,0,0,10"/>
-                <Button Style="{StaticResource PrimaryButton}" 
+                        MinHeight="54" 
+                        Margin="0,0,0,10"/>
+
+                        <Button x:Name="btnHowToPlay"
+                        Style="{StaticResource OutlineButton}" 
                         Content="{x:Static loc:Resources.MainMenu_btnHowToPlay}" 
-                        Height="45" Margin="0,0,0,10"/>
-                <Button Style="{StaticResource DarkButton}" 
+                        MinHeight="54" 
+                        Margin="0,0,0,10"/>
+
+                        <Button x:Name="btnSettings"
+                        Style="{StaticResource DarkButton}" 
                         Content="{x:Static loc:Resources.Global_btnSettings}" 
-                        Height="45"/>
-            </StackPanel>
+                        MinHeight="54"
+                        Margin="0,0,0,10"/>
 
-        </StackPanel>
-        <Canvas Grid.Row="1" Grid.Column="1" Width="350" Height="450" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,60,0">
-            <Border Width="200" Height="350" Background="{StaticResource CreamBrush}" BorderBrush="{StaticResource DarkBgBrush}" BorderThickness="4" CornerRadius="2" RenderTransformOrigin="0.5,0.5">
-                <Border.RenderTransform>
-                    <RotateTransform Angle="15"/>
-                </Border.RenderTransform>
-            </Border>
-        </Canvas>
-        <Grid x:Name="ModalOverlay" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2" 
-              Background="#B2000000" 
+                        <Button x:Name="btnExitGame"
+                        Style="{StaticResource DarkButton}" 
+                        Content="{x:Static loc:Resources.Global_btnExitGame}" 
+                        MinHeight="54"
+                        Click="ExitGameButtonClick"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Grid Grid.Row="1" Grid.Column="1" 
+              HorizontalAlignment="Right" 
+              VerticalAlignment="Center" 
+              Margin="0,0,10,0">
+                    <Image Source="/Assets/Images/dominoDecorativeLarge.png" 
+                   Style="{StaticResource DecorativeDominoLargeStyle}" 
+                   Width="520" Height="620"/>
+                </Grid>
+            </Grid>
+        </Viewbox>
+
+        <Grid x:Name="ModalOverlay" 
+              Background="#CC000000" 
               Visibility="Collapsed">
-           
         </Grid>
-
     </Grid>
 </Window>

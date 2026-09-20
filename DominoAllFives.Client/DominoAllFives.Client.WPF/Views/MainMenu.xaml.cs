@@ -21,5 +21,10 @@ namespace DominoAllFives.Client.WPF.Views
         {
             InitializeComponent();
         }
+
+        private void ExitGameButtonClick(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
     }
 }
