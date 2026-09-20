@@ -423,4 +423,21 @@
         <Setter Property="Background" Value="{StaticResource HeaderLineBrush}"/>
     </Style>
 
+    <!-- Avatar pequeño -->
+    <Style x:Key="SmallAvatarImageStyle" TargetType="Image">
+        <Setter Property="Width" Value="54"/>
+        <Setter Property="Height" Value="54"/>
+        <Setter Property="Stretch" Value="UniformToFill"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
+
+    <!-- Borde de avatar pequeño -->
+    <Style x:Key="SmallAvatarBorderStyle" TargetType="Ellipse">
+        <Setter Property="Width" Value="58"/>
+        <Setter Property="Height" Value="58"/>
+        <Setter Property="Fill" Value="{StaticResource DarkBgBrush}"/>
+        <Setter Property="Stroke" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="StrokeThickness" Value="2"/>
+    </Style>
+
 </ResourceDictionary>
