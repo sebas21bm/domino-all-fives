@@ -10,14 +10,46 @@
 
   <ItemGroup>
     <None Remove="Assets\Fonts\PressStart.ttf" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Assets\Images\" />
+    <None Remove="Assets\Icons\iconEdit.png" />
+    <None Remove="Assets\Icons\iconError.png" />
+    <None Remove="Assets\Icons\iconInformation.png" />
+    <None Remove="Assets\Icons\iconQuestion.png" />
+    <None Remove="Assets\Icons\iconSuccess.png" />
+    <None Remove="Assets\Icons\iconWarning.png" />
+    <None Remove="Assets\Images\backgroundDominoPattern.png" />
+    <None Remove="Assets\Images\dominoDecorativeLarge.png" />
+    <None Remove="Assets\Images\logoFull.png" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Assets\Fonts\PressStart.ttf" />
+    <Resource Include="Assets\Icons\iconEdit.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\iconError.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\iconInformation.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\iconQuestion.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\iconSuccess.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\iconWarning.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Images\backgroundDominoPattern.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Images\dominoDecorativeLarge.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Images\logoFull.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>

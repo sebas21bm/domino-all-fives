@@ -13,11 +13,11 @@ using System.Windows.Shapes;
 namespace DominoAllFives.Client.WPF.Views
 {
     /// <summary>
-    /// Lógica de interacción para Placeholder.xaml
+    /// Lógica de interacción para ProfileView.xaml
     /// </summary>
-    public partial class Placeholder : Window
+    public partial class Profile : Window
     {
-        public Placeholder()
+        public Profile()
         {
             InitializeComponent();
         }
