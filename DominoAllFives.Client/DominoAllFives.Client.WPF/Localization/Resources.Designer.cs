@@ -331,6 +331,15 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Salir del juego.
+        /// </summary>
+        public static string Global_btnExitGame {
+            get {
+                return ResourceManager.GetString("Global_btnExitGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Iniciar sesión.
         /// </summary>
         public static string Global_btnLogin {
