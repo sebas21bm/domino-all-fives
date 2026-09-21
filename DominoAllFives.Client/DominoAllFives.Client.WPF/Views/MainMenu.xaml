@@ -84,6 +84,7 @@
                             Style="{StaticResource DarkButton}" 
                             Content="{x:Static loc:Resources.Global_btnSettings}" 
                             MinHeight="54"
+                            Click="SettingsButtonClick"
                             Margin="0,0,0,10"/>
 
                         <Button x:Name="btnExitGame"

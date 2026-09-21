@@ -13,7 +13,8 @@
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         WindowState="Maximized"
-        Background="{StaticResource DarkBgBrush}"
+        AllowsTransparency="True"
+        Background="{x:Null}"
         UseLayoutRounding="True"
         SnapsToDevicePixels="True">
 
@@ -47,7 +48,8 @@
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
                                 Style="{StaticResource BackButton}"
-                                ToolTip="{x:Static loc:Resources.Global_btnBack}"/>
+                                ToolTip="{x:Static loc:Resources.Global_btnBack}"
+                                Click="BackButtonClick"/>
 
                         <Image Grid.Column="2"
                                Source="../Assets/Images/logoShort.png"
