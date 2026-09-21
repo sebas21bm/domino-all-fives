@@ -31,10 +31,13 @@ namespace DominoAllFives.Client.WPF.Views
             ShowLanguageSection();
         }
 
-        private void LanguageOptionButtonClick(object sender,
+        private void LanguageOptionButtonClick(
+            object sender,
             RoutedEventArgs eventArgs)
         {
-            if (sender is not Button selectedButton)
+            Button selectedButton = sender as Button;
+
+            if (selectedButton == null)
             {
                 return;
             }

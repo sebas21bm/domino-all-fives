@@ -25,7 +25,6 @@ namespace DominoAllFives.Client.WPF.Views
         {
             _onLoginSuccess = onLoginSuccess;
             InitializeComponent();
-            InitializeComponent();
         }
 
         private void BackButtonClick(object sender, RoutedEventArgs e)
