@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="DominoAllFives.Client.WPF.Views.Login"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DominoAllFives.Client.WPF.Views"
+             xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization;assembly=DominoAllFives.Client.WPF"
+             mc:Ignorable="d"
+             Background="Transparent">
+
+    <Border Style="{StaticResource RoundedPanelStyle}" Width="650" Padding="30,40">
+        <Grid>
+
+            <Button x:Name="btnBack"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Style="{StaticResource BackButton}"
+                    ToolTip="{x:Static loc:Resources.Global_btnBack}"
+                    Click="BackButtonClick"/>
+
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="400" Margin="0,20,0,0">
+
+                <Image Source="/Assets/Images/logoFull.png" 
+                       Style="{StaticResource FullLogoStyle}"
+                       Width="320" Height="100"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,40"/>
+                <TextBlock Text="{x:Static loc:Resources.Global_lblEmail}" 
+                           Style="{StaticResource FieldLabelText}" 
+                           HorizontalAlignment="Center" 
+                           Margin="0,0,0,10"/>
+                <TextBox x:Name="txtEmail" 
+                         Style="{StaticResource CreamTextBox}" 
+                         Height="48"/>
+                <TextBlock x:Name="txbEmailError" 
+                           Style="{StaticResource ValidationText}" 
+                           Text="{x:Static loc:Resources.Global_lblEmailRequired}" 
+                           Visibility="Hidden"
+                           HorizontalAlignment="Left"
+                           Margin="0,5,0,25"/>
+                <TextBlock Text="{x:Static loc:Resources.Global_lblPassword}" 
+                           Style="{StaticResource FieldLabelText}" 
+                           HorizontalAlignment="Center" 
+                           Margin="0,0,0,10"/>
+                <PasswordBox x:Name="pwdPassword" 
+                             Style="{StaticResource CreamPasswordBox}" 
+                             Height="48"/>
+                <TextBlock x:Name="txbPasswordError" 
+                           Style="{StaticResource ValidationText}" 
+                           Text="{x:Static loc:Resources.Global_lblPasswordRequired}" 
+                           Visibility="Hidden"
+                           HorizontalAlignment="Left"
+                           Margin="0,5,0,20"/>
+                <Button x:Name="btnForgotPassword"
+                        Style="{StaticResource IconButton}"
+                        HorizontalAlignment="Center"
+                        Margin="0,0,0,30">
+                    <TextBlock Text="{x:Static loc:Resources.Login_btnForgotPassword}" 
+                               Style="{StaticResource TextRed}" 
+                               FontSize="12"/>
+                </Button>
+                <Button x:Name="btnLoginSubmit"
+                        Style="{StaticResource PrimaryButton}"
+                        Content="{x:Static loc:Resources.Global_btnLogin}"
+                        Height="54"
+                        Margin="0,0,0,15"
+                        Click="LoginButtonClick"/>
+                <Button x:Name="btnCreateAccount"
+                        Style="{StaticResource OutlineButton}"
+                        Content="{x:Static loc:Resources.Login_btnCreateAccount}"
+                        Height="54"
+                        Click="CreateAccountButtonClick"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

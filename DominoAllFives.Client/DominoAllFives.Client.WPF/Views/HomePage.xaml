@@ -12,14 +12,10 @@
         Background="{StaticResource DarkBgBrush}">
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="369*"/>
-            <ColumnDefinition Width="311*"/>
-        </Grid.ColumnDefinitions>
         <Image Source="/Assets/Images/backgroundDominoPattern.png" 
-               Style="{StaticResource BackgroundDominoPatternStyle}" Grid.ColumnSpan="2"/>
+               Style="{StaticResource BackgroundDominoPatternStyle}"/>
 
-        <Viewbox Stretch="Uniform" Grid.ColumnSpan="2">
+        <Viewbox Stretch="Uniform">
             <Grid Width="1280" Height="720" Margin="40,20">
 
                 <Grid VerticalAlignment="Top">
@@ -45,7 +41,7 @@
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Image Source="/Assets/Images/logoFull.png" 
                            Style="{StaticResource FullLogoStyle}"
-                           Width="720" Height="225"
+                           Width="720" Height="225" 
                            HorizontalAlignment="Center" 
                            Margin="0,0,0,60"/>
 
@@ -54,7 +50,8 @@
                                 Style="{StaticResource PrimaryButton}"
                                 Content="{x:Static loc:Resources.Global_btnLogin}"
                                 Width="260" MinHeight="60"
-                                Margin="0,0,30,0"/>
+                                Margin="0,0,30,0"
+                                Click="LoginButtonClick"/>
 
                         <Button x:Name="btnGuestMode"
                                 Style="{StaticResource OutlineButton}"
@@ -64,5 +61,14 @@
                 </StackPanel>
             </Grid>
         </Viewbox>
+
+        <Grid x:Name="ModalOverlay" 
+              Visibility="Collapsed"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            <ContentControl x:Name="ModalContent" 
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"/>
+        </Grid>
     </Grid>
 </Window>
