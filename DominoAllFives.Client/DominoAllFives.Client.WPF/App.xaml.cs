@@ -1,14 +1,15 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
+﻿using System.Windows;
+using DominoAllFives.Client.WPF.Localization;
 
 namespace DominoAllFives.Client.WPF
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
-    }
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            LanguageManager.LoadLanguage();
 
+            base.OnStartup(e);
+        }
+    }
 }
