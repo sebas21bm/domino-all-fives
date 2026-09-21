@@ -22,9 +22,30 @@ namespace DominoAllFives.Client.WPF.Views
             InitializeComponent();
         }
 
-        private void ExitGameButtonClick(object sender, RoutedEventArgs e)
+        private void ExitGameButtonClick(object sender, RoutedEventArgs eventArgs)
         {
             Application.Current.Shutdown();
+        }
+
+        private void UserProfileButtonClick(object sender, RoutedEventArgs eventArgs)
+        {
+            Profile profileWindow = new Profile();
+            profileWindow.Show();
+            this.Close();
+        }
+
+        private void FriendsButtonClick(object sender, RoutedEventArgs eventArgs)
+        {
+            Friends friendsWindow = new Friends();
+            friendsWindow.Show();
+            this.Close();
+        }
+
+        private void SettingsButtonClick(object sender, RoutedEventArgs eventArgs)
+        {
+            Settings settingsWindow = new Settings();
+            settingsWindow.Show();
+            this.Close();
         }
     }
 }

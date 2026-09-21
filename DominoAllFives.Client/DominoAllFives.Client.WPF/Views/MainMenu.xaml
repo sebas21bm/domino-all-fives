@@ -6,13 +6,13 @@
         xmlns:local="clr-namespace:DominoAllFives.Client.WPF.Views"
         mc:Ignorable="d"
         xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization;assembly=DominoAllFives.Client.WPF"
-        
         Title="MainMenu"
         WindowState="Maximized" 
         WindowStyle="None"
-        Background="{StaticResource DarkBgBrush}">
+        AllowsTransparency="True"
+        Background="{x:Null}">
 
-    <Grid>
+    <Grid Background="{StaticResource DarkBgBrush}">
         <Image Source="/Assets/Images/backgroundDominoPattern.png" 
                Style="{StaticResource BackgroundDominoPatternStyle}"/>
         <Viewbox Stretch="Uniform">
@@ -31,9 +31,10 @@
                 HorizontalAlignment="Right" 
                 VerticalAlignment="Top">
                     <Button x:Name="btnUserProfile"
-                    Style="{StaticResource PrimaryButton}" 
-                    Content="{Binding Username}" 
-                    MinWidth="180" Height="46"/>
+                        Style="{StaticResource PrimaryButton}" 
+                        Content="{Binding Username}" 
+                        MinWidth="180" Height="46"
+                        Click="UserProfileButtonClick"/>    
                 </Border>
 
                 <StackPanel Grid.Row="1" Grid.Column="0" 
@@ -42,63 +43,65 @@
                     Margin="10,0,0,0">
 
                     <Image Source="/Assets/Images/logoFull.png" 
-                   Style="{StaticResource FullLogoStyle}" 
-                   Width="580" Height="180"
-                   HorizontalAlignment="Left" 
-                   Margin="0,0,0,25"/>
+                       Style="{StaticResource FullLogoStyle}" 
+                       Width="580" Height="180"
+                       HorizontalAlignment="Left" 
+                       Margin="0,0,0,25"/>
 
                     <StackPanel Width="400">
                         <Button x:Name="btnCreateGame"
-                        Style="{StaticResource PrimaryButton}" 
-                        Content="{x:Static loc:Resources.MainMenu_btnCreateGame}" 
-                        MinHeight="54" 
-                        Margin="0,0,0,10"/>
+                            Style="{StaticResource PrimaryButton}" 
+                            Content="{x:Static loc:Resources.MainMenu_btnCreateGame}" 
+                            MinHeight="54" 
+                            Margin="0,0,0,10"/>
 
                         <Button x:Name="btnJoinGame"
-                        Style="{StaticResource OutlineButton}" 
-                        Content="{x:Static loc:Resources.MainMenu_btnJoinGame}" 
-                        MinHeight="54" 
-                        Margin="0,0,0,10"/>
+                            Style="{StaticResource OutlineButton}" 
+                            Content="{x:Static loc:Resources.MainMenu_btnJoinGame}" 
+                            MinHeight="54" 
+                            Margin="0,0,0,10"/>
 
                         <Button x:Name="btnFriends"
-                        Style="{StaticResource OutlineButton}" 
-                        Content="{x:Static loc:Resources.MainMenu_btnFriends}" 
-                        MinHeight="54" 
-                        Margin="0,0,0,10"/>
+                            Style="{StaticResource OutlineButton}" 
+                            Content="{x:Static loc:Resources.MainMenu_btnFriends}" 
+                            MinHeight="54" 
+                            Margin="0,0,0,10"
+                            Click="FriendsButtonClick"/>
 
                         <Button x:Name="btnScores"
-                        Style="{StaticResource OutlineButton}" 
-                        Content="{x:Static loc:Resources.MainMenu_btnScores}" 
-                        MinHeight="54" 
-                        Margin="0,0,0,10"/>
+                            Style="{StaticResource OutlineButton}" 
+                            Content="{x:Static loc:Resources.MainMenu_btnScores}" 
+                            MinHeight="54" 
+                            Margin="0,0,0,10"/>
 
                         <Button x:Name="btnHowToPlay"
-                        Style="{StaticResource OutlineButton}" 
-                        Content="{x:Static loc:Resources.MainMenu_btnHowToPlay}" 
-                        MinHeight="54" 
-                        Margin="0,0,0,10"/>
+                            Style="{StaticResource OutlineButton}" 
+                            Content="{x:Static loc:Resources.MainMenu_btnHowToPlay}" 
+                            MinHeight="54" 
+                            Margin="0,0,0,10"/>
 
                         <Button x:Name="btnSettings"
-                        Style="{StaticResource DarkButton}" 
-                        Content="{x:Static loc:Resources.Global_btnSettings}" 
-                        MinHeight="54"
-                        Margin="0,0,0,10"/>
+                            Style="{StaticResource DarkButton}" 
+                            Content="{x:Static loc:Resources.Global_btnSettings}" 
+                            MinHeight="54"
+                            Click="SettingsButtonClick"
+                            Margin="0,0,0,10"/>
 
                         <Button x:Name="btnExitGame"
-                        Style="{StaticResource DarkButton}" 
-                        Content="{x:Static loc:Resources.Global_btnExitGame}" 
-                        MinHeight="54"
-                        Click="ExitGameButtonClick"/>
+                            Style="{StaticResource DarkButton}" 
+                            Content="{x:Static loc:Resources.Global_btnExitGame}" 
+                            MinHeight="54"
+                            Click="ExitGameButtonClick"/>
                     </StackPanel>
                 </StackPanel>
 
                 <Grid Grid.Row="1" Grid.Column="1" 
-              HorizontalAlignment="Right" 
-              VerticalAlignment="Center" 
-              Margin="0,0,10,0">
+                  HorizontalAlignment="Right" 
+                  VerticalAlignment="Center" 
+                  Margin="0,0,10,0">
                     <Image Source="/Assets/Images/dominoDecorativeLarge.png" 
-                   Style="{StaticResource DecorativeDominoLargeStyle}" 
-                   Width="520" Height="620"/>
+                       Style="{StaticResource DecorativeDominoLargeStyle}" 
+                       Width="520" Height="620"/>
                 </Grid>
             </Grid>
         </Viewbox>

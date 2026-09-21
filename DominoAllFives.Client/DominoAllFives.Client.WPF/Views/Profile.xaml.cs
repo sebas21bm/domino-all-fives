@@ -21,5 +21,12 @@ namespace DominoAllFives.Client.WPF.Views
         {
             InitializeComponent();
         }
+
+        private void BackButtonClick(object sender, RoutedEventArgs e)
+        {
+            MainMenu mainMenuWindow = new MainMenu();
+            mainMenuWindow.Show();
+            this.Close();
+        }
     }
 }
