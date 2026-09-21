@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DominoAllFives.Client.WPF.Services;
+using DominoAllFives.Client.WPF.Views;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -36,7 +38,27 @@ namespace DominoAllFives.Client.WPF.Controls
         }
         private void RegisterButtonClick(object sender, RoutedEventArgs e)
         {
-            _onRegisterSuccess.Invoke();
+            if (Window.GetWindow(this) is IModalNavigator navigator)
+            {
+                navigator.OpenModal(new VerifyEmail(
+                    onCancel: () => navigator.CloseModal(),
+                    onVerifySuccess: () =>
+                    {
+                        Action goToMainMenu = () =>
+                        {
+                            MainMenu mainMenu = new MainMenu();
+                            mainMenu.Show();
+                            Window.GetWindow(this)?.Close();
+                        };
+
+                        navigator.OpenModal(new UploadProfilePicture(
+                            onBack: () => navigator.CloseModal(),
+                            onAddPhoto: goToMainMenu,
+                            onSkipPhoto: goToMainMenu
+                        ));
+                    }
+                ));
+            }
         }
     }
 }

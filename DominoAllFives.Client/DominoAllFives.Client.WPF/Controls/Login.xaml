@@ -54,7 +54,8 @@
                 <Button x:Name="btnForgotPassword"
                         Style="{StaticResource IconButton}"
                         HorizontalAlignment="Center"
-                        Margin="0,0,0,30">
+                        Margin="0,0,0,30"
+                        Click="ForgotPasswordButtonClick">
                     <TextBlock Text="{x:Static loc:Resources.Login_btnForgotPassword}" 
                                Style="{StaticResource TextRed}" 
                                FontSize="12"/>

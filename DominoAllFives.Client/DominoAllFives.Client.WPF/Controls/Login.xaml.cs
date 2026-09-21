@@ -41,10 +41,27 @@ namespace DominoAllFives.Client.WPF.Views
             if (Window.GetWindow(this) is IModalNavigator navigator)
             {
                 navigator.OpenModal(new RegisterAccount(
-                    onCancel: () => navigator.OpenModal(new Login(_onLoginSuccess)),
+                    onCancel: () => navigator.CloseModal(),
                     onRegisterSuccess: () =>
                     {
-                        navigator.CloseModal();
+                        navigator.OpenModal(new VerifyEmail(
+                            onCancel: () => navigator.CloseModal(),
+                            onVerifySuccess: () =>
+                            {
+                                Action goToMainMenu = () =>
+                                {
+                                    MainMenu mainMenu = new MainMenu();
+                                    mainMenu.Show();
+                                    Window.GetWindow(this)?.Close();
+                                };
+
+                                navigator.OpenModal(new UploadProfilePicture(
+                                    onBack: () => navigator.CloseModal(),
+                                    onAddPhoto: goToMainMenu,
+                                    onSkipPhoto: goToMainMenu
+                                ));
+                            }
+                        ));
                     }
                 ));
             }
@@ -53,6 +70,34 @@ namespace DominoAllFives.Client.WPF.Views
         private void LoginButtonClick(object sender, RoutedEventArgs e)
         {
             _onLoginSuccess.Invoke();
+        }
+
+        private void ForgotPasswordButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (Window.GetWindow(this) is IModalNavigator navigator)
+            {
+                navigator.OpenModal(new RecoverAccount(
+                    onCancel: () => navigator.CloseModal(),
+                    onSendCodeSuccess: () =>
+                    {
+                        navigator.OpenModal(new VerifyEmail(
+                            onCancel: () => navigator.CloseModal(),
+                            onVerifySuccess: () =>
+                            {
+                                navigator.OpenModal(new ChangePassword(
+                                    onCancel: () => navigator.CloseModal(),
+                                    onChangeSuccess: () =>
+                                    {
+                                        MainMenu mainMenu = new MainMenu();
+                                        mainMenu.Show();
+                                        Window.GetWindow(this)?.Close();
+                                    }
+                                ));
+                            }
+                        ));
+                    }
+                ));
+            }
         }
     }
 }
