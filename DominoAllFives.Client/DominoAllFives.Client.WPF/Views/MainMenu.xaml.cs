@@ -26,5 +26,19 @@ namespace DominoAllFives.Client.WPF.Views
         {
             Application.Current.Shutdown();
         }
+
+        private void UserProfileButtonClick(object sender, RoutedEventArgs e)
+        {
+            Profile profileWindow = new Profile();
+            profileWindow.Show();
+            this.Close();
+        }
+
+        private void FriendsButtonClick(object sender, RoutedEventArgs e)
+        {
+            Friends friendsWindow = new Friends();
+            friendsWindow.Show();
+            this.Close();
+        }
     }
 }
