@@ -78,5 +78,12 @@ namespace DominoAllFives.Client.WPF.Views
             selectedButton.Style =
                 (Style)FindResource("SelectedNavigationTabButton");
         }
+
+        private void BackButtonClick(object sender, RoutedEventArgs e)
+        {
+            MainMenu mainMenuWindow = new MainMenu();
+            mainMenuWindow.Show();
+            this.Close();
+        }
     }
 }
