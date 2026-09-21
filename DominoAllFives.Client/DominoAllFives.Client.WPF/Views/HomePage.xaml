@@ -25,17 +25,6 @@
                             Content="{x:Static loc:Resources.Global_btnExitGame}"
                             MinWidth="200" MinHeight="54"
                             Click="ExitButtonClick"/>
-
-                    <ComboBox x:Name="cbLanguageSelector"
-                              HorizontalAlignment="Right"
-                              Style="{StaticResource DarkComboBox}"
-                              Width="220" MinHeight="54"
-                              VerticalContentAlignment="Center"
-                              HorizontalContentAlignment="Center">
-                        <ComboBoxItem Content="Español (MX)" Tag="es-MX" IsSelected="True"/>
-                        <ComboBoxItem Content="English (USA)" Tag="en-US"/>
-                        <ComboBoxItem Content="Português (BR)" Tag="pt-BR"/>
-                    </ComboBox>
                 </Grid>
 
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
