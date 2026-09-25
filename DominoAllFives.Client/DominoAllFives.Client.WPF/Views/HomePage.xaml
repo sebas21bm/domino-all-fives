@@ -1,4 +1,4 @@
-﻿<Window x:Class="DominoAllFives.Client.WPF.Views.HomePage"
+﻿<Page x:Class="DominoAllFives.Client.WPF.Views.HomePage"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,8 +7,6 @@
         xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization;assembly=DominoAllFives.Client.WPF"
         mc:Ignorable="d"
         Title="HomePage" 
-        WindowState="Maximized" 
-        WindowStyle="None"
         Background="{StaticResource DarkBgBrush}">
 
     <Grid>
@@ -60,4 +58,4 @@
                             VerticalAlignment="Center"/>
         </Grid>
     </Grid>
-</Window>
+</Page>

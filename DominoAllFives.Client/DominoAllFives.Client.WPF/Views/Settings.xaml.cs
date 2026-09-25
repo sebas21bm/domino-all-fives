@@ -5,7 +5,7 @@ using DominoAllFives.Client.WPF.Localization;
 
 namespace DominoAllFives.Client.WPF.Views
 {
-    public partial class Settings : Window
+    public partial class Settings : Page
     {
         private string _selectedLanguageCode;
 
@@ -59,27 +59,19 @@ namespace DominoAllFives.Client.WPF.Views
                 return;
             }
 
-            Settings settingsWindow = new Settings();
-            settingsWindow.ShowLanguageSection();
-            settingsWindow.Show();
-
-            Close();
+            
         }
 
         private void LogoutButtonClick(object sender,
             RoutedEventArgs eventArgs)
         {
-            //HomePage homePageWindow = new HomePage();
-            //homePageWindow.Show();
-            //Close();
+            
         }
 
         private void BackButtonClick(object sender,
             RoutedEventArgs eventArgs)
         {
-            MainMenu mainMenuWindow = new MainMenu();
-            mainMenuWindow.Show();
-            Close();
+            
         }
 
 

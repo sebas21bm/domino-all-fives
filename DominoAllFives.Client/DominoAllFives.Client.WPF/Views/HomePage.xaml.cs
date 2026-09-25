@@ -17,7 +17,7 @@ namespace DominoAllFives.Client.WPF.Views
     /// <summary>
     /// Lógica de interacción para HomePage.xaml
     /// </summary>
-    public partial class HomePage : Window, IModalNavigator
+    public partial class HomePage : Page, IModalNavigator
     {
         public HomePage()
         {
@@ -43,9 +43,7 @@ namespace DominoAllFives.Client.WPF.Views
             OpenModal(new Login(
                 onLoginSuccess: () =>
                 {
-                    MainMenu mainMenu = new MainMenu();
-                    mainMenu.Show();
-                    this.Close();
+                    
                 }
             ));
         }

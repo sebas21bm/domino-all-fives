@@ -46,9 +46,7 @@ namespace DominoAllFives.Client.WPF.Controls
                     {
                         Action goToMainMenu = () =>
                         {
-                            MainMenu mainMenu = new MainMenu();
-                            mainMenu.Show();
-                            Window.GetWindow(this)?.Close();
+                            
                         };
 
                         navigator.OpenModal(new UploadProfilePicture(

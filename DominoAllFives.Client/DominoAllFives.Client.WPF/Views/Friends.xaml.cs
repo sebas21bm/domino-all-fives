@@ -13,7 +13,7 @@ using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Views
 {
-    public partial class Friends : Window
+    public partial class Friends : Page
     {
 
         public Friends()
@@ -66,14 +66,11 @@ namespace DominoAllFives.Client.WPF.Views
 
         private void SetSelectedNavigationButton(Button selectedButton)
         {
-            btnFriendList.Style =
-                (Style)FindResource("NavigationTabButton");
+            btnFriendList.Style = (Style)FindResource("NavigationTabButton");
 
-            btnAddFriends.Style =
-                (Style)FindResource("NavigationTabButton");
+            btnAddFriends.Style = (Style)FindResource("NavigationTabButton");
 
-            btnRequests.Style =
-                (Style)FindResource("NavigationTabButton");
+            btnRequests.Style = (Style)FindResource("NavigationTabButton");
 
             selectedButton.Style =
                 (Style)FindResource("SelectedNavigationTabButton");
@@ -81,9 +78,7 @@ namespace DominoAllFives.Client.WPF.Views
 
         private void BackButtonClick(object sender, RoutedEventArgs e)
         {
-            MainMenu mainMenuWindow = new MainMenu();
-            mainMenuWindow.Show();
-            this.Close();
+            
         }
     }
 }

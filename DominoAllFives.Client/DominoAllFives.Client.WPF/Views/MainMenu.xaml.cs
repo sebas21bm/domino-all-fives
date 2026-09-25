@@ -15,7 +15,7 @@ namespace DominoAllFives.Client.WPF.Views
     /// <summary>
     /// Lógica de interacción para MainMenu.xaml
     /// </summary>
-    public partial class MainMenu : Window
+    public partial class MainMenu : Page
     {
         public MainMenu()
         {
@@ -29,23 +29,17 @@ namespace DominoAllFives.Client.WPF.Views
 
         private void UserProfileButtonClick(object sender, RoutedEventArgs eventArgs)
         {
-            Profile profileWindow = new Profile();
-            profileWindow.Show();
-            this.Close();
+            
         }
 
         private void FriendsButtonClick(object sender, RoutedEventArgs eventArgs)
         {
-            Friends friendsWindow = new Friends();
-            friendsWindow.Show();
-            this.Close();
+            
         }
 
         private void SettingsButtonClick(object sender, RoutedEventArgs eventArgs)
         {
-            Settings settingsWindow = new Settings();
-            settingsWindow.Show();
-            this.Close();
+            
         }
     }
 }

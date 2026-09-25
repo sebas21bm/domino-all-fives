@@ -49,9 +49,7 @@ namespace DominoAllFives.Client.WPF.Views
                             {
                                 Action goToMainMenu = () =>
                                 {
-                                    MainMenu mainMenu = new MainMenu();
-                                    mainMenu.Show();
-                                    Window.GetWindow(this)?.Close();
+                                    
                                 };
 
                                 navigator.OpenModal(new UploadProfilePicture(
@@ -87,9 +85,7 @@ namespace DominoAllFives.Client.WPF.Views
                                     onCancel: () => navigator.CloseModal(),
                                     onChangeSuccess: () =>
                                     {
-                                        MainMenu mainMenu = new MainMenu();
-                                        mainMenu.Show();
-                                        Window.GetWindow(this)?.Close();
+                                        
                                     }
                                 ));
                             }
