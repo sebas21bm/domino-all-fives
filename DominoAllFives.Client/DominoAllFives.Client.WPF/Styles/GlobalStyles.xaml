@@ -544,4 +544,6 @@
         </Setter>
     </Style>
 
+    <SolidColorBrush x:Key="BlockPurpleBrush" Color="#9747FF"/>
+
 </ResourceDictionary>

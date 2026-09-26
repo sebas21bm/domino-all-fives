@@ -16,6 +16,8 @@
     <None Remove="Assets\Icons\iconWarning.png" />
     <None Remove="Assets\Images\backgroundDominoPattern.png" />
     <None Remove="Assets\Images\dominoDecorativeLarge.png" />
+    <None Remove="Assets\Images\examplePlayValid.png" />
+    <None Remove="Assets\Images\examplePointsSum.png" />
     <None Remove="Assets\Images\logoFull.png" />
   </ItemGroup>
 
@@ -47,6 +49,12 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\Images\dominoDecorativeLarge.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Images\examplePlayValid.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Images\examplePointsSum.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\Images\logoFull.png">

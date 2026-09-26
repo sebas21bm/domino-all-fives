@@ -2,11 +2,12 @@
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using System;
-using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -18,6 +19,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand GoToFriendsCommand { get; }
         public RelayCommand GoToSettingsCommand { get; }
         public RelayCommand ExitGameCommand { get; }
+        public RelayCommand ShowHowToPlayCommand { get; }
 
         public MainMenuViewModel(IFrameNavigationService navigationService)
         {
@@ -26,6 +28,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             GoToProfileCommand = new RelayCommand(_ => _navigationService.NavigateTo<ProfileViewModel>());
             GoToFriendsCommand = new RelayCommand(_ => _navigationService.NavigateTo<FriendsViewModel>());
             GoToSettingsCommand = new RelayCommand(_ => _navigationService.NavigateTo<GameSettingsViewModel>());
+            ShowHowToPlayCommand = new RelayCommand(_ => _navigationService.NavigateTo<HowToPlayViewModel>());
             ExitGameCommand = new RelayCommand(_ => Application.Current.Shutdown());
         }
     }
