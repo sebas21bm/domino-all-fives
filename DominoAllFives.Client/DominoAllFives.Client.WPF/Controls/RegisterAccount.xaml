@@ -14,24 +14,21 @@
             VerticalAlignment="Center">
 
         <Grid>
-            <!-- Back Button -->
             <Button x:Name="btnBack"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
                     Style="{StaticResource BackButton}"
-                    ToolTip="{x:Static loc:Resources.Global_btnBack}"
+                    ToolTip="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnBack]}"
                     Click="BackButtonClick"/>
 
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="400" Margin="0,15,0,0">
 
-                <!-- Title -->
-                <TextBlock Text="{x:Static loc:Resources.RegisterAccount_lblTitle}" 
+                <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[RegisterAccount_lblTitle]}" 
                            Style="{StaticResource PageTitleText}" 
                            HorizontalAlignment="Center" 
                            Margin="0,0,0,40"/>
 
-                <!-- Email Field -->
-                <TextBlock Text="{x:Static loc:Resources.Global_lblEmail}" 
+                <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_lblEmail]}" 
                            Style="{StaticResource FieldLabelText}" 
                            HorizontalAlignment="Center" 
                            Margin="0,0,0,10"/>
@@ -40,13 +37,12 @@
                          Height="48"/>
                 <TextBlock x:Name="txbEmailError" 
                            Style="{StaticResource ValidationText}" 
-                           Text="{x:Static loc:Resources.Global_lblEmailRequired}" 
+                           Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_lblEmailRequired]}" 
                            Visibility="Hidden"
                            HorizontalAlignment="Left"
                            Margin="0,5,0,15"/>
 
-                <!-- Username Field -->
-                <TextBlock Text="{x:Static loc:Resources.RegisterAccount_lblUsername}" 
+                <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[RegisterAccount_lblUsername]}" 
                            Style="{StaticResource FieldLabelText}" 
                            HorizontalAlignment="Center" 
                            Margin="0,0,0,10"/>
@@ -55,13 +51,12 @@
                          Height="48"/>
                 <TextBlock x:Name="txbUsernameError" 
                            Style="{StaticResource ValidationText}" 
-                           Text="{x:Static loc:Resources.RegisterAccount_lblUsernameRequired}" 
+                           Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[RegisterAccount_lblUsernameRequired]}" 
                            Visibility="Hidden"
                            HorizontalAlignment="Left"
                            Margin="0,5,0,15"/>
 
-                <!-- Password Field -->
-                <TextBlock Text="{x:Static loc:Resources.Global_lblPassword}" 
+                <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_lblPassword]}" 
                            Style="{StaticResource FieldLabelText}" 
                            HorizontalAlignment="Center" 
                            Margin="0,0,0,10"/>
@@ -70,13 +65,12 @@
                              Height="48"/>
                 <TextBlock x:Name="txbPasswordError" 
                            Style="{StaticResource ValidationText}" 
-                           Text="{x:Static loc:Resources.Global_lblPasswordRequired}" 
+                           Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_lblPasswordRequired]}" 
                            Visibility="Hidden"
                            HorizontalAlignment="Left"
                            Margin="0,5,0,15"/>
 
-                <!-- Confirm Password Field -->
-                <TextBlock Text="{x:Static loc:Resources.Global_lblConfirmPassword}" 
+                <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_lblConfirmPassword]}" 
                            Style="{StaticResource FieldLabelText}" 
                            HorizontalAlignment="Center" 
                            Margin="0,0,0,10"/>
@@ -90,10 +84,9 @@
                            HorizontalAlignment="Left"
                            Margin="0,5,0,30"/>
 
-                <!-- Register Action -->
                 <Button x:Name="btnRegister"
                         Style="{StaticResource OutlineButton}"
-                        Content="{x:Static loc:Resources.RegisterAccount_btnRegister}"
+                        Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[RegisterAccount_btnRegister]}"
                         Height="54"
                         Click="RegisterButtonClick"/>
             </StackPanel>

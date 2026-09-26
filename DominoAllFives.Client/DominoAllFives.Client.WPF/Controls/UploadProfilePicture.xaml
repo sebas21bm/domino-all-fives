@@ -17,7 +17,7 @@
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
                     Style="{StaticResource BackButton}"
-                    ToolTip="{x:Static loc:Resources.Global_btnBack}"
+                    ToolTip="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnBack]}"
                     Click="BackButtonClick"/>
 
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="420" Margin="0,15,0,0">
@@ -28,7 +28,7 @@
                        HorizontalAlignment="Center"
                        Margin="0,0,0,30"/>
 
-                <TextBlock Text="{x:Static loc:Resources.UploadProfilePicture_lblInstruction}" 
+                <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[UploadProfilePicture_lblInstruction]}" 
                            Style="{StaticResource FieldLabelText}" 
                            HorizontalAlignment="Center" 
                            Margin="0,0,0,25"/>
@@ -55,13 +55,13 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button x:Name="btnAddPhoto"
                             Style="{StaticResource PrimaryButton}"
-                            Content="{x:Static loc:Resources.UploadProfilePicture_btnAddPhoto}"
+                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[UploadProfilePicture_btnAddPhoto]}"
                             Width="180" Height="54"
                             Margin="0,0,15,0"
                             Click="AddPhotoButtonClick"/>
                     <Button x:Name="btnSkipPhoto"
                             Style="{StaticResource OutlineButton}"
-                            Content="{x:Static loc:Resources.UploadProfilePicture_btnSkipPhoto}"
+                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[UploadProfilePicture_btnSkipPhoto]}"
                             Width="180" Height="54"
                             Margin="15,0,0,0"
                             Click="SkipPhotoButtonClick"/>

@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DominoAllFives.Client.WPF.Views"
-        xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization;assembly=DominoAllFives.Client.WPF"
+        xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization"
         mc:Ignorable="d"
         Title="HomePage" 
         Background="{StaticResource DarkBgBrush}">
@@ -20,7 +20,7 @@
                     <Button x:Name="btnExitGame"
                             HorizontalAlignment="Left"
                             Style="{StaticResource OutlineButton}"
-                            Content="{x:Static loc:Resources.Global_btnExitGame}"
+                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnExitGame]}"
                             MinWidth="200" MinHeight="54"
                             Click="ExitButtonClick"/>
                 </Grid>
@@ -35,14 +35,14 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button x:Name="btnLogin"
                                 Style="{StaticResource PrimaryButton}"
-                                Content="{x:Static loc:Resources.Global_btnLogin}"
+                                Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnLogin]}"
                                 Width="260" MinHeight="60"
                                 Margin="0,0,30,0"
                                 Click="LoginButtonClick"/>
 
                         <Button x:Name="btnGuestMode"
                                 Style="{StaticResource OutlineButton}"
-                                Content="{x:Static loc:Resources.HomePage_btnGuest}"
+                                Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[HomePage_btnGuest]}"
                                 Width="260" MinHeight="60"/>
                     </StackPanel>
                 </StackPanel>

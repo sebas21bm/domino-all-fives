@@ -8,16 +8,20 @@ namespace DominoAllFives.Client.WPF.Views
     public partial class Settings : Page
     {
         private string _selectedLanguageCode;
-
+        
         public Settings()
         {
             InitializeComponent();
+            _selectedLanguageCode = Properties.Settings.Default.LanguageCode;
 
-            _selectedLanguageCode = LanguageManager.CurrentLanguageCode;
+            if (string.IsNullOrWhiteSpace(_selectedLanguageCode))
+            {
+                _selectedLanguageCode = "es-MX";
+            }
 
-            SetSelectedLanguageButton(
-                GetLanguageButton(_selectedLanguageCode));
+            SetSelectedLanguageButton(GetLanguageButton(_selectedLanguageCode));
         }
+        
 
         private void AccountButtonClick(object sender,
             RoutedEventArgs eventArgs)
@@ -31,36 +35,25 @@ namespace DominoAllFives.Client.WPF.Views
             ShowLanguageSection();
         }
 
+        
         private void LanguageOptionButtonClick(
             object sender,
             RoutedEventArgs eventArgs)
         {
-            Button selectedButton = sender as Button;
-
-            if (selectedButton == null)
+            if (sender is Button clickedButton && clickedButton.Tag is string languageCode)
             {
-                return;
+                _selectedLanguageCode = languageCode;
+                SetSelectedLanguageButton(clickedButton);
             }
-
-            _selectedLanguageCode =
-                GetLanguageCode(selectedButton);
-
-            SetSelectedLanguageButton(selectedButton);
         }
-
+        
+        
         private void SaveLanguageButtonClick(object sender,
             RoutedEventArgs eventArgs)
         {
-            bool languageSaved =
-                LanguageManager.SaveLanguage(_selectedLanguageCode);
-
-            if (!languageSaved)
-            {
-                return;
-            }
-
-            
+            LanguageManager.Instance.ChangeLanguage(_selectedLanguageCode);
         }
+        
 
         private void LogoutButtonClick(object sender,
             RoutedEventArgs eventArgs)
@@ -94,24 +87,17 @@ namespace DominoAllFives.Client.WPF.Views
         private void SetSelectedNavigationButton(
             Button selectedButton)
         {
-            btnAccount.Style =
-                (Style)FindResource("NavigationTabButton");
+            btnAccount.Style = (Style)FindResource("NavigationTabButton");
+            btnLanguage.Style = (Style)FindResource("NavigationTabButton");
 
-            btnLanguage.Style =
-                (Style)FindResource("NavigationTabButton");
-
-            selectedButton.Style =
-                (Style)FindResource("SelectedNavigationTabButton");
+            selectedButton.Style = (Style)FindResource("SelectedNavigationTabButton");
         }
 
         private void SetSelectedLanguageButton(
             Button selectedButton)
         {
-            Brush unselectedForeground =
-                (Brush)FindResource("DisabledGrayBrush");
-
-            Brush selectedForeground =
-                (Brush)FindResource("CreamLightBrush");
+            Brush unselectedForeground = (Brush)FindResource("DisabledGrayBrush");
+            Brush selectedForeground = (Brush)FindResource("CreamLightBrush");
 
             btnEnglish.Foreground = unselectedForeground;
             btnSpanish.Foreground = unselectedForeground;
@@ -120,36 +106,33 @@ namespace DominoAllFives.Client.WPF.Views
             selectedButton.Foreground = selectedForeground;
         }
 
+        
+        
         private string GetLanguageCode(Button selectedButton)
         {
-            if (selectedButton == btnEnglish)
+            if (selectedButton.Tag is string languageCode)
             {
-                return LanguageManager.EnglishLanguageCode;
+                return languageCode;
             }
 
-            if (selectedButton == btnPortuguese)
-            {
-                return LanguageManager.PortugueseLanguageCode;
-            }
-
-            return LanguageManager.SpanishLanguageCode;
+            return "es-MX";
         }
+        
 
+        
         private Button GetLanguageButton(string languageCode)
         {
-            if (languageCode ==
-                LanguageManager.EnglishLanguageCode)
+            switch (languageCode)
             {
-                return btnEnglish;
+                case "en-US":
+                    return btnEnglish;
+                case "pt-BR":
+                    return btnPortuguese;
+                case "es-MX":
+                default:
+                    return btnSpanish;
             }
-
-            if (languageCode ==
-                LanguageManager.PortugueseLanguageCode)
-            {
-                return btnPortuguese;
-            }
-
-            return btnSpanish;
         }
+        
     }
 }

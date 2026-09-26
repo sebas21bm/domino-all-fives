@@ -14,13 +14,13 @@
             VerticalAlignment="Center">
 
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="420">
-            <TextBlock Text="{x:Static loc:Resources.VerifyEmail_lblTitle}" 
+            <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[VerifyEmail_lblTitle]}" 
                        Style="{StaticResource PageTitleText}" 
                        HorizontalAlignment="Center" 
                        Margin="0,0,0,45"/>
 
 
-            <TextBlock Text="{x:Static loc:Resources.VerifyEmail_lblCode}" 
+            <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[VerifyEmail_lblCode]}" 
                        Style="{StaticResource FieldLabelText}" 
                        HorizontalAlignment="Center" 
                        Margin="0,0,0,15"/>
@@ -35,18 +35,17 @@
 
             <TextBlock x:Name="txbCodeError" 
                        Style="{StaticResource ValidationText}" 
-                       Text="{x:Static loc:Resources.MessageVerification_msgInvalidCode}" 
+                       Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[MessageVerification_msgInvalidCode]}" 
                        Visibility="Hidden"
                        HorizontalAlignment="Center"
                        Margin="0,0,0,5"/>
 
-            <!-- Resend Code Timer Button -->
             <Button x:Name="btnResendCode"
                     Style="{StaticResource IconButton}"
                     HorizontalAlignment="Center"
                     Margin="0,0,0,35">
                 <TextBlock Style="{StaticResource TextGray}" FontSize="12">
-                    <Run Text="{x:Static loc:Resources.VerifyEmail_btnResend}"/>
+                    <Run Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[VerifyEmail_btnResend]}"/>
                     <Run Text=": "/>
                     <Run x:Name="runTimerDisplay" Text=""/>
                 </TextBlock>
@@ -54,14 +53,14 @@
 
             <Button x:Name="btnVerifyCode"
                     Style="{StaticResource PrimaryButton}"
-                    Content="{x:Static loc:Resources.VerifyEmail_btnVerify}"
+                    Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[VerifyEmail_btnVerify]}"
                     Height="54"
                     Margin="0,0,0,15"
                     Click="VerifyCodeButtonClick"/>
 
             <Button x:Name="btnCancel"
                     Style="{StaticResource OutlineButton}"
-                    Content="{x:Static loc:Resources.Global_btnCancel}"
+                    Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnCancel]}"
                     Height="54"
                     Click="CancelButtonClick"/>
 

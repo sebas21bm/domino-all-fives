@@ -54,39 +54,40 @@
 
                         <Button x:Name="btnJoinGame"
                             Style="{StaticResource OutlineButton}" 
-                            Content="{x:Static loc:Resources.MainMenu_btnJoinGame}" 
+             
+                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[MainMenu_btnJoinGame]}"
                             MinHeight="54" 
                             Margin="0,0,0,10"/>
 
                         <Button x:Name="btnFriends"
                             Style="{StaticResource OutlineButton}" 
-                            Content="{x:Static loc:Resources.MainMenu_btnFriends}" 
+                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[MainMenu_btnFriends]}" 
                             MinHeight="54" 
                             Margin="0,0,0,10"
                             Click="FriendsButtonClick"/>
 
                         <Button x:Name="btnScores"
                             Style="{StaticResource OutlineButton}" 
-                            Content="{x:Static loc:Resources.MainMenu_btnScores}" 
+                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[MainMenu_btnScores]}" 
                             MinHeight="54" 
                             Margin="0,0,0,10"/>
 
                         <Button x:Name="btnHowToPlay"
                             Style="{StaticResource OutlineButton}" 
-                            Content="{x:Static loc:Resources.MainMenu_btnHowToPlay}" 
+                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[MainMenu_btnHowToPlay]}" 
                             MinHeight="54" 
                             Margin="0,0,0,10"/>
 
                         <Button x:Name="btnSettings"
                             Style="{StaticResource DarkButton}" 
-                            Content="{x:Static loc:Resources.Global_btnSettings}" 
+                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnSettings]}" 
                             MinHeight="54"
                             Click="SettingsButtonClick"
                             Margin="0,0,0,10"/>
 
                         <Button x:Name="btnExitGame"
                             Style="{StaticResource DarkButton}" 
-                            Content="{x:Static loc:Resources.Global_btnExitGame}" 
+                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnExitGame]}" 
                             MinHeight="54"
                             Click="ExitGameButtonClick"/>
                     </StackPanel>
