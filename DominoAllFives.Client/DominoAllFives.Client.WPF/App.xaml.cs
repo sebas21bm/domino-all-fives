@@ -7,9 +7,8 @@ namespace DominoAllFives.Client.WPF
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            LanguageManager.LoadLanguage();
-
             base.OnStartup(e);
+            var initializedLanguageManager = LanguageManager.Instance;
         }
     }
 }

@@ -5,8 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DominoAllFives.Client.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Domino All Fives" Height="720" Width="1280"
+        WindowState="Maximized"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="{x:Null}"
+        WindowStartupLocation="CenterScreen">
     <Grid>
-
+        <Frame x:Name="mainFrame" 
+               NavigationUIVisibility="Hidden" 
+               Source="Views/HomePage.xaml"/>
     </Grid>
 </Window>

@@ -18,24 +18,10 @@ namespace DominoAllFives.Client.WPF.Controls
     /// </summary>
     public partial class RecoverAccount : UserControl
     {
-        private readonly Action _onCancel;
-        private readonly Action _onSendCodeSuccess;
 
-        public RecoverAccount(Action onCancel, Action onSendCodeSuccess)
+        public RecoverAccount()
         {
-            _onCancel = onCancel;
-            _onSendCodeSuccess = onSendCodeSuccess;
             InitializeComponent();
-        }
-
-        private void CancelButtonClick(object sender, RoutedEventArgs e)
-        {
-            _onCancel.Invoke();
-        }
-
-        private void SendCodeButtonClick(object sender, RoutedEventArgs e)
-        {
-            _onSendCodeSuccess.Invoke();
         }
     }
 }

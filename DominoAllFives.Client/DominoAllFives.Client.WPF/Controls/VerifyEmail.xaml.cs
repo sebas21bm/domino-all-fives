@@ -18,24 +18,9 @@ namespace DominoAllFives.Client.WPF.Controls
     /// </summary>
     public partial class VerifyEmail : UserControl
     {
-        private readonly Action _onCancel;
-        private readonly Action _onVerifySuccess;
-
-        public VerifyEmail(Action onCancel, Action onVerifySuccess)
+        public VerifyEmail()
         {
-            _onCancel = onCancel;
-            _onVerifySuccess = onVerifySuccess;
             InitializeComponent();
-        }
-
-        private void CancelButtonClick(object sender, RoutedEventArgs e)
-        {
-            _onCancel.Invoke();
-        }
-
-        private void VerifyCodeButtonClick(object sender, RoutedEventArgs e)
-        {
-            _onVerifySuccess.Invoke();
         }
     }
 }

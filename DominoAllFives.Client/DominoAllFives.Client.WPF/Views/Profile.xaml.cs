@@ -15,18 +15,11 @@ namespace DominoAllFives.Client.WPF.Views
     /// <summary>
     /// Lógica de interacción para ProfileView.xaml
     /// </summary>
-    public partial class Profile : Window
+    public partial class Profile : Page
     {
         public Profile()
         {
             InitializeComponent();
-        }
-
-        private void BackButtonClick(object sender, RoutedEventArgs e)
-        {
-            MainMenu mainMenuWindow = new MainMenu();
-            mainMenuWindow.Show();
-            this.Close();
         }
     }
 }

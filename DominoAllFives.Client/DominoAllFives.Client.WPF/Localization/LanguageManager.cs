@@ -1,87 +1,93 @@
-﻿using System.Configuration;
+﻿using System;
+using System.ComponentModel;
 using System.Globalization;
+using System.Resources;
 using System.Threading;
+
+using DominoAllFives.Client.WPF.Properties;
 
 namespace DominoAllFives.Client.WPF.Localization
 {
     /// <summary>
-    /// Manages the application language, including loading, applying,
-    /// and persisting the user's language preference.
+    /// Manages application culture and handles dynamic translation updates for MVVM bindings.
     /// </summary>
-    public static class LanguageManager
+    public class LanguageManager : INotifyPropertyChanged
     {
-        public const string SpanishLanguageCode = "es-MX";
-        public const string EnglishLanguageCode = "en-US";
-        public const string PortugueseLanguageCode = "pt-BR";
+        private const string DefaultLanguageCode = "es-MX";
+        private const string SpanishLanguageCode = "es-MX";
+        private const string EnglishLanguageCode = "en-US";
+        private const string PortugueseLanguageCode = "pt-BR";
 
-        private const string DefaultLanguageCode = SpanishLanguageCode;
+        private static readonly Lazy<LanguageManager> _instance = new Lazy<LanguageManager>(() => new LanguageManager());
 
-        public static string CurrentLanguageCode { get; private set; }
-            = DefaultLanguageCode;
+        private readonly ResourceManager _resourceManager;
+        private string _currentLanguageCode;
 
-        public static void LoadLanguage()
+        public static LanguageManager Instance => _instance.Value;
+
+        public string CurrentLanguageCode => _currentLanguageCode;
+
+        public CultureInfo CurrentCulture => Thread.CurrentThread.CurrentUICulture;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private LanguageManager()
         {
-            string languageCode =
-                Properties.Settings.Default.LanguageCode;
+            _resourceManager = new ResourceManager("DominoAllFives.Client.WPF.Localization.Resources",
+                typeof(Resources).Assembly);
 
-            if (!IsSupportedLanguage(languageCode))
+            string savedLanguage = Settings.Default.LanguageCode;
+            if (string.IsNullOrWhiteSpace(savedLanguage) || !IsSupportedLanguage(savedLanguage))
             {
-                languageCode = DefaultLanguageCode;
+                savedLanguage = DefaultLanguageCode;
             }
 
-            ApplyLanguage(languageCode);
+            ApplyCulture(savedLanguage);
         }
 
-        public static bool SaveLanguage(string languageCode)
+        public string this[string key]
         {
-            if (!IsSupportedLanguage(languageCode))
+            get
             {
-                return false;
-            }
+                if (string.IsNullOrWhiteSpace(key))
+                {
+                    return string.Empty;
+                }
 
-            try
-            {
-                Properties.Settings.Default.LanguageCode =
-                    languageCode;
-
-                Properties.Settings.Default.Save();
-
-                ApplyLanguage(languageCode);
-
-                return true;
-            }
-            catch (ConfigurationErrorsException)
-            {
-                return false;
+                string translation = _resourceManager.GetString(key, Thread.CurrentThread.CurrentUICulture);
+                return translation ?? $"[{key}]";
             }
         }
 
-        public static void ApplyLanguage(string languageCode)
+        public void ChangeLanguage(string cultureCode)
         {
-            if (!IsSupportedLanguage(languageCode))
+            if (string.IsNullOrWhiteSpace(cultureCode) || !IsSupportedLanguage(cultureCode))
             {
-                languageCode = DefaultLanguageCode;
+                cultureCode = DefaultLanguageCode;
             }
 
-            CultureInfo culture = new CultureInfo(languageCode);
-
-            Thread.CurrentThread.CurrentCulture = culture;
-            Thread.CurrentThread.CurrentUICulture = culture;
-
-            CultureInfo.DefaultThreadCurrentCulture = culture;
-            CultureInfo.DefaultThreadCurrentUICulture = culture;
-
-            Resources.Culture = culture;
-
-            CurrentLanguageCode = languageCode;
+            ApplyCulture(cultureCode);
+            Settings.Default.LanguageCode = cultureCode;
+            Settings.Default.Save();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
         }
 
-        private static bool IsSupportedLanguage(
-            string languageCode)
+        private static bool IsSupportedLanguage(string languageCode)
         {
             return languageCode == SpanishLanguageCode
                 || languageCode == EnglishLanguageCode
                 || languageCode == PortugueseLanguageCode;
+        }
+
+        private void ApplyCulture(string cultureCode)
+        {
+            CultureInfo culture = new CultureInfo(cultureCode);
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+            _currentLanguageCode = cultureCode;
         }
     }
 }

@@ -13,77 +13,11 @@ using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Views
 {
-    public partial class Friends : Window
+    public partial class Friends : Page
     {
-
         public Friends()
         {
             InitializeComponent();
-            ShowFriendListSection();
-        }
-
-        private void FriendListButtonClick(object sender, RoutedEventArgs eventArgs)
-        {
-            ShowFriendListSection();
-        }
-
-        private void AddFriendsButtonClick(object sender, RoutedEventArgs eventArgs)
-        {
-            ShowAddFriendsSection();
-        }
-
-        private void RequestsButtonClick(object sender, RoutedEventArgs eventArgs)
-        {
-            ShowFriendRequestsSection();
-        }
-
-        private void ShowFriendListSection()
-        {
-            grdFriendList.Visibility = Visibility.Visible;
-            grdAddFriends.Visibility = Visibility.Collapsed;
-            grdFriendRequests.Visibility = Visibility.Collapsed;
-
-            SetSelectedNavigationButton(btnFriendList);
-        }
-
-        private void ShowAddFriendsSection()
-        {
-            grdFriendList.Visibility = Visibility.Collapsed;
-            grdAddFriends.Visibility = Visibility.Visible;
-            grdFriendRequests.Visibility = Visibility.Collapsed;
-
-            SetSelectedNavigationButton(btnAddFriends);
-        }
-
-        private void ShowFriendRequestsSection()
-        {
-            grdFriendList.Visibility = Visibility.Collapsed;
-            grdAddFriends.Visibility = Visibility.Collapsed;
-            grdFriendRequests.Visibility = Visibility.Visible;
-
-            SetSelectedNavigationButton(btnRequests);
-        }
-
-        private void SetSelectedNavigationButton(Button selectedButton)
-        {
-            btnFriendList.Style =
-                (Style)FindResource("NavigationTabButton");
-
-            btnAddFriends.Style =
-                (Style)FindResource("NavigationTabButton");
-
-            btnRequests.Style =
-                (Style)FindResource("NavigationTabButton");
-
-            selectedButton.Style =
-                (Style)FindResource("SelectedNavigationTabButton");
-        }
-
-        private void BackButtonClick(object sender, RoutedEventArgs e)
-        {
-            MainMenu mainMenuWindow = new MainMenu();
-            mainMenuWindow.Show();
-            this.Close();
         }
     }
 }
