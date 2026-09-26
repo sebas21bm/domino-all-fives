@@ -1,0 +1,32 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="clr-namespace:DominoAllFives.Client.WPF.ViewModels"
+                    xmlns:controls="clr-namespace:DominoAllFives.Client.WPF.Controls">
+    
+    <DataTemplate DataType="{x:Type vm:LoginViewModel}">
+        <controls:Login />
+    </DataTemplate>
+
+    <!-- Se irán descomentando a medida que creemos los ViewModels -->
+    <!--
+    <DataTemplate DataType="{x:Type vm:RegisterAccountViewModel}">
+        <controls:RegisterAccount />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:RecoverAccountViewModel}">
+        <controls:RecoverAccount />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:VerifyEmailViewModel}">
+        <controls:VerifyEmail />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:ChangePasswordViewModel}">
+        <controls:ChangePassword />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:UploadProfilePictureViewModel}">
+        <controls:UploadProfilePicture />
+    </DataTemplate>
+    -->
+</ResourceDictionary>

@@ -21,8 +21,13 @@ namespace DominoAllFives.Client.WPF.Localization
         private static readonly Lazy<LanguageManager> _instance = new Lazy<LanguageManager>(() => new LanguageManager());
 
         private readonly ResourceManager _resourceManager;
+        private string _currentLanguageCode;
 
         public static LanguageManager Instance => _instance.Value;
+
+        public string CurrentLanguageCode => _currentLanguageCode;
+
+        public CultureInfo CurrentCulture => Thread.CurrentThread.CurrentUICulture;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -74,13 +79,15 @@ namespace DominoAllFives.Client.WPF.Localization
                 || languageCode == PortugueseLanguageCode;
         }
 
-        private static void ApplyCulture(string cultureCode)
+        private void ApplyCulture(string cultureCode)
         {
             CultureInfo culture = new CultureInfo(cultureCode);
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+            _currentLanguageCode = cultureCode;
         }
     }
 }

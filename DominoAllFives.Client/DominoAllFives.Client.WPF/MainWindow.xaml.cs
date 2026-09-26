@@ -1,4 +1,6 @@
-﻿    using System.Text;
+﻿using DominoAllFives.Client.WPF.Services;
+using DominoAllFives.Client.WPF.ViewModels;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +21,10 @@ namespace DominoAllFives.Client.WPF
         public MainWindow()
         {
             InitializeComponent();
+            IFrameNavigationService navigationService = new FrameNavigationService(mainFrame);
+            DataContext = new MainWindowViewModel(navigationService);
+
+            navigationService.NavigateTo<HomePageViewModel>();
         }
     }
 }

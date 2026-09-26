@@ -22,7 +22,19 @@
                             Style="{StaticResource OutlineButton}"
                             Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnExitGame]}"
                             MinWidth="200" MinHeight="54"
-                            Click="ExitButtonClick"/>
+                            Command="{Binding ExitGameCommand}"/>
+                    <ComboBox x:Name="cbLanguageSelector"
+                              HorizontalAlignment="Right"
+                              Style="{StaticResource DarkComboBox}"
+                              Width="220" MinHeight="54"
+                              VerticalContentAlignment="Center"
+                              HorizontalContentAlignment="Center"
+                              SelectedValuePath="Tag"
+                              SelectedValue="{Binding SelectedLanguage, Mode=TwoWay}">
+                        <ComboBoxItem Content="Español (MX)" Tag="es-MX" IsSelected="True"/>
+                        <ComboBoxItem Content="English (USA)" Tag="en-US"/>
+                        <ComboBoxItem Content="Português (BR)" Tag="pt-BR"/>
+                    </ComboBox>
                 </Grid>
 
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -38,22 +50,25 @@
                                 Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnLogin]}"
                                 Width="260" MinHeight="60"
                                 Margin="0,0,30,0"
-                                Click="LoginButtonClick"/>
+                                Command="{Binding ShowLoginCommand}"/>
 
                         <Button x:Name="btnGuestMode"
                                 Style="{StaticResource OutlineButton}"
                                 Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[HomePage_btnGuest]}"
-                                Width="260" MinHeight="60"/>
+                                Width="260" MinHeight="60"
+                                Margin="0,0,30,0"
+                                Command="{Binding PlayAsGuestCommand}"/>
+                        
                     </StackPanel>
                 </StackPanel>
             </Grid>
         </Viewbox>
 
         <Grid x:Name="ModalOverlay" 
-              Visibility="Collapsed"
+              Visibility="{Binding IsModalVisible, Converter={StaticResource BoolToVis}}"
               HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch">
-            <ContentControl x:Name="ModalContent" 
+            <ContentControl Content="{Binding CurrentModal}" 
                             HorizontalAlignment="Center" 
                             VerticalAlignment="Center"/>
         </Grid>

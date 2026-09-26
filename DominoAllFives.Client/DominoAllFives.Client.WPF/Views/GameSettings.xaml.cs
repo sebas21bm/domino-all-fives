@@ -5,11 +5,11 @@ using DominoAllFives.Client.WPF.Localization;
 
 namespace DominoAllFives.Client.WPF.Views
 {
-    public partial class Settings : Page
+    public partial class GameSettings : Page
     {
         private string _selectedLanguageCode;
         
-        public Settings()
+        public GameSettings()
         {
             InitializeComponent();
             _selectedLanguageCode = Properties.Settings.Default.LanguageCode;
