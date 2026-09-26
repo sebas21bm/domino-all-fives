@@ -98,18 +98,82 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OpenRegisterModal()
         {
-            // Instantiates RegisterAccountViewModel with its specific forward/backward flows
+            CurrentModal = new RegisterAccountViewModel(
+                onGoToVerifyEmail: OpenVerifyEmailForRegistrationModal,
+                onCancel: CloseModal
+            );
+
+            IsModalVisible = true;
+        }
+
+        private void OpenVerifyEmailForRegistrationModal(string email)
+        {
+            CurrentModal = new VerifyEmailViewModel(
+                targetEmail: email,
+                onVerificationSuccess: OpenUploadProfilePictureModal,
+                onCancel: CloseModal
+            );
+
+            IsModalVisible = true;
+        }
+
+        private void OpenUploadProfilePictureModal()
+        {
+            CurrentModal = new UploadProfilePictureViewModel(
+                onFinishRegistration: OnRegistrationSuccess,
+                onCancel: CloseModal
+            );
+
+            IsModalVisible = true;
+        }
+
+        private void OnRegistrationSuccess()
+        {
+            CloseModal();
+            _navigationService.NavigateTo<MainMenuViewModel>();
         }
 
         private void OpenRecoverModal()
         {
-            // Instantiates RecoverAccountViewModel with its specific forward/backward flows
+            CurrentModal = new RecoverAccountViewModel(
+                onGoToVerifyEmail: OpenVerifyEmailForRecoveryModal,
+                onCancel: CloseModal
+            );
+
+            IsModalVisible = true;
+        }
+
+        private void OpenVerifyEmailForRecoveryModal(string email)
+        {
+            CurrentModal = new VerifyEmailViewModel(
+                targetEmail: email,
+                onVerificationSuccess: OpenChangePasswordModal,
+                onCancel: CloseModal
+            );
+
+            IsModalVisible = true;
+        }
+
+        private void OpenChangePasswordModal()
+        {
+            CurrentModal = new ChangePasswordViewModel(
+                onPasswordChangedSuccess: OnPasswordRecoverySuccess,
+                onCancel: CloseModal
+            );
+
+            IsModalVisible = true;
+        }
+
+        private void OnPasswordRecoverySuccess()
+        {
+            CloseModal();
+            _navigationService.NavigateTo<MainMenuViewModel>();
         }
 
         private void PlayAsGuest()
         {
             // TODO: Implement guest logic and navigate to MainMenu
-            // _navigationService.NavigateTo<MainMenuViewModel>();
+            _navigationService.NavigateTo<MainMenuViewModel>();
         }
 
         private void ExitGame()

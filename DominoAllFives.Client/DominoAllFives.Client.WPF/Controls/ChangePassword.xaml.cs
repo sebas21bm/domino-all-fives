@@ -18,24 +18,9 @@ namespace DominoAllFives.Client.WPF.Controls
     /// </summary>
     public partial class ChangePassword : UserControl
     {
-        private readonly Action _onCancel;
-        private readonly Action _onChangeSuccess;
-
-        public ChangePassword(Action onCancel, Action onChangeSuccess)
+        public ChangePassword()
         {
-            _onCancel = onCancel;
-            _onChangeSuccess = onChangeSuccess;
             InitializeComponent();
-        }
-
-        private void CancelButtonClick(object sender, RoutedEventArgs e)
-        {
-            _onCancel.Invoke();
-        }
-
-        private void ChangePasswordButtonClick(object sender, RoutedEventArgs e)
-        {
-            _onChangeSuccess.Invoke();
         }
     }
 }

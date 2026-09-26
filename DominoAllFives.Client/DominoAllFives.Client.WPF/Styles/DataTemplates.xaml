@@ -7,26 +7,24 @@
         <controls:Login />
     </DataTemplate>
 
-    <!-- Se irán descomentando a medida que creemos los ViewModels -->
-    <!--
     <DataTemplate DataType="{x:Type vm:RegisterAccountViewModel}">
         <controls:RegisterAccount />
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type vm:RecoverAccountViewModel}">
-        <controls:RecoverAccount />
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type vm:VerifyEmailViewModel}">
         <controls:VerifyEmail />
     </DataTemplate>
 
+    <DataTemplate DataType="{x:Type vm:UploadProfilePictureViewModel}">
+        <controls:UploadProfilePicture />
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type vm:RecoverAccountViewModel}">
+        <controls:RecoverAccount />
+    </DataTemplate>
+
     <DataTemplate DataType="{x:Type vm:ChangePasswordViewModel}">
         <controls:ChangePassword />
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type vm:UploadProfilePictureViewModel}">
-        <controls:UploadProfilePicture />
-    </DataTemplate>
-    -->
 </ResourceDictionary>

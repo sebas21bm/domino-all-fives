@@ -19,7 +19,7 @@
                     VerticalAlignment="Top"
                     Style="{StaticResource BackButton}"
                     ToolTip="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnBack]}"
-                    Click="BackButtonClick"/>
+                    Command="{Binding CancelCommand}"/>
 
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="400" Margin="0,15,0,0">
 
@@ -88,7 +88,7 @@
                         Style="{StaticResource OutlineButton}"
                         Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[RegisterAccount_btnRegister]}"
                         Height="54"
-                        Click="RegisterButtonClick"/>
+                        Command="{Binding RegisterCommand}"/>
             </StackPanel>
         </Grid>
     </Border>

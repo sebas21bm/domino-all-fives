@@ -70,9 +70,11 @@ namespace DominoAllFives.Client.WPF.Services
 
         private void RegisterRoutes()
         {
-            //_viewModelToPageMap.Add(typeof(SettingsViewModel), typeof(GameSettings));
             _viewModelToPageMap.Add(typeof(HomePageViewModel), typeof(HomePage));
             _viewModelToPageMap.Add(typeof(MainMenuViewModel), typeof(MainMenu));
+            _viewModelToPageMap.Add(typeof(GameSettingsViewModel), typeof(GameSettings));
+            _viewModelToPageMap.Add(typeof(ProfileViewModel), typeof(Profile));
+            _viewModelToPageMap.Add(typeof(FriendsViewModel), typeof(Friends));
         }
     }
 }

@@ -6,11 +6,6 @@
         xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization"
         mc:Ignorable="d"
         Title="Domino All Fives"
-        Width="1600"
-        Height="900"
-        MinWidth="1000"
-        MinHeight="600"
-        Background="{x:Null}"
         UseLayoutRounding="True"
         SnapsToDevicePixels="True">
 
@@ -44,7 +39,7 @@
                                 VerticalAlignment="Center"
                                 Style="{StaticResource BackButton}"
                                 ToolTip="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnBack]}"
-                                Click="BackButtonClick"/>
+                                Command="{Binding GoBackCommand}"/>
 
                         <Image Grid.Column="2"
                                Source="../Assets/Images/logoShort.png"
@@ -117,7 +112,8 @@
                             Width="58"
                             Height="58"
                             Style="{StaticResource IconButton}"
-                            ToolTip="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[EditProfile_lblTitle]}">
+                            ToolTip="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[EditProfile_lblTitle]}"
+                            Command="{Binding GoToEditProfileCommand}">
 
                         <Image Source="../Assets/Icons/iconEdit.png"
                                Style="{StaticResource EditIconStyle}"/>
@@ -210,6 +206,7 @@
                             MinHeight="66"
                             Padding="24,16"
                             Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Profile_btnMatchHistory]}"
+                            Command="{Binding GoToMatchHistoryCommand}"
                             Style="{StaticResource OutlineButton}"
                             FontSize="17"/>
 

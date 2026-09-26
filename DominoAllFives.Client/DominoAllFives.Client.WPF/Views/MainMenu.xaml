@@ -31,7 +31,7 @@
                         Style="{StaticResource PrimaryButton}" 
                         Content="{Binding Username}" 
                         MinWidth="180" Height="46"
-                        Click="UserProfileButtonClick"/>    
+                        Command="{Binding GoToProfileCommand}"/>    
                 </Border>
 
                 <StackPanel Grid.Row="1" Grid.Column="0" 
@@ -64,7 +64,7 @@
                             Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[MainMenu_btnFriends]}" 
                             MinHeight="54" 
                             Margin="0,0,0,10"
-                            Click="FriendsButtonClick"/>
+                            Command="{Binding GoToFriendsCommand}"/>
 
                         <Button x:Name="btnScores"
                             Style="{StaticResource OutlineButton}" 
@@ -82,14 +82,14 @@
                             Style="{StaticResource DarkButton}" 
                             Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnSettings]}" 
                             MinHeight="54"
-                            Click="SettingsButtonClick"
+                            Command="{Binding GoToSettingsCommand}"
                             Margin="0,0,0,10"/>
 
                         <Button x:Name="btnExitGame"
                             Style="{StaticResource DarkButton}" 
                             Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnExitGame]}" 
                             MinHeight="54"
-                            Click="ExitGameButtonClick"/>
+                            Command="{Binding ExitGameCommand}"/>
                     </StackPanel>
                 </StackPanel>
 

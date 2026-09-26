@@ -18,7 +18,7 @@
                     VerticalAlignment="Top"
                     Style="{StaticResource BackButton}"
                     ToolTip="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnBack]}"
-                    Click="BackButtonClick"/>
+                    Command="{Binding CancelCommand}"/>
 
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="420" Margin="0,15,0,0">
 
@@ -38,7 +38,7 @@
                         Style="{StaticResource IconButton}" 
                         HorizontalAlignment="Center" 
                         Margin="0,0,0,45" 
-                        Click="SelectPictureButtonClick">
+                        Command="{Binding SelectImageCommand}">
                     <Grid>
                         <Ellipse Fill="{StaticResource DarkBgBrush}" 
                                  Stroke="{StaticResource CreamLightBrush}" 
@@ -58,13 +58,13 @@
                             Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[UploadProfilePicture_btnAddPhoto]}"
                             Width="180" Height="54"
                             Margin="0,0,15,0"
-                            Click="AddPhotoButtonClick"/>
+                            Command="{Binding UploadCommand}"/>
                     <Button x:Name="btnSkipPhoto"
                             Style="{StaticResource OutlineButton}"
                             Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[UploadProfilePicture_btnSkipPhoto]}"
                             Width="180" Height="54"
                             Margin="15,0,0,0"
-                            Click="SkipPhotoButtonClick"/>
+                            Command="{Binding SkipCommand}"/>
                 </StackPanel>
             </StackPanel>
         </Grid>

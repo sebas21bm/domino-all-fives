@@ -42,10 +42,11 @@
 
             <Button x:Name="btnResendCode"
                     Style="{StaticResource IconButton}"
+                    Command="{Binding ResendCodeCommand}"
                     HorizontalAlignment="Center"
                     Margin="0,0,0,35">
                 <TextBlock Style="{StaticResource TextGray}" FontSize="12">
-                    <Run Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[VerifyEmail_btnResend]}"/>
+                    <Run Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[VerifyEmail_btnResend], Mode=OneWay}"/>
                     <Run Text=": "/>
                     <Run x:Name="runTimerDisplay" Text=""/>
                 </TextBlock>
@@ -56,13 +57,13 @@
                     Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[VerifyEmail_btnVerify]}"
                     Height="54"
                     Margin="0,0,0,15"
-                    Click="VerifyCodeButtonClick"/>
+                    Command="{Binding VerifyCodeCommand}"/>
 
             <Button x:Name="btnCancel"
                     Style="{StaticResource OutlineButton}"
                     Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnCancel]}"
                     Height="54"
-                    Click="CancelButtonClick"/>
+                    Command="{Binding CancelCommand}"/>
 
         </StackPanel>
     </Border>

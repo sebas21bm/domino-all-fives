@@ -6,14 +6,13 @@
         xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization"
         mc:Ignorable="d"
         Title="Domino All Fives"
-        Width="1600"
-        Height="900"
-        MinWidth="1000"
-        MinHeight="600"
-        Background="{x:Null}"
         UseLayoutRounding="True"
         SnapsToDevicePixels="True">
 
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Page.Resources>
+    
     <Grid Background="{StaticResource DarkBgBrush}">
 
         <Viewbox Stretch="Uniform">
@@ -43,7 +42,7 @@
                                 VerticalAlignment="Center"
                                 Style="{StaticResource BackButton}"
                                 ToolTip="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnBack]}"
-                                Click="BackButtonClick"/>
+                                Command="{Binding GoBackCommand}"/>
 
                         <Image Grid.Column="2"
                                Source="../Assets/Images/logoShort.png"
@@ -87,12 +86,18 @@
                                     MinHeight="62"
                                     Margin="0,0,0,55"
                                     Padding="18,12"
-                                    Click="FriendListButtonClick"
-                                    Style="{StaticResource SelectedNavigationTabButton}">
-
-                                <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Friends_btnFriendList]}"
-                                           TextAlignment="Center"
-                                           TextWrapping="Wrap"/>
+                                    Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Friends_btnFriendList], Mode=OneWay}"
+                                    Command="{Binding ShowFriendsListCommand}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource NavigationTabButton}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsFriendsListVisible}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource PrimaryRedBrush}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource DarkRedBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
 
                             </Button>
 
@@ -101,12 +106,18 @@
                                     MinHeight="62"
                                     Margin="0,0,0,55"
                                     Padding="18,12"
-                                    Click="AddFriendsButtonClick"
-                                    Style="{StaticResource NavigationTabButton}">
-
-                                <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Friends_btnAddFriends]}"
-                                           TextAlignment="Center"
-                                           TextWrapping="Wrap"/>
+                                    Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Friends_btnAddFriends], Mode=OneWay}"
+                                    Command="{Binding ShowAddFriendsCommand}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource NavigationTabButton}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsAddFriendsVisible}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource PrimaryRedBrush}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource DarkRedBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
 
                             </Button>
 
@@ -114,12 +125,18 @@
                                     MinWidth="270"
                                     MinHeight="62"
                                     Padding="18,12"
-                                    Click="RequestsButtonClick"
-                                    Style="{StaticResource NavigationTabButton}">
-
-                                <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Friends_btnRequests]}"
-                                           TextAlignment="Center"
-                                           TextWrapping="Wrap"/>
+                                    Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Friends_btnRequests], Mode=OneWay}"
+                                    Command="{Binding ShowFriendRequestsCommand}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource NavigationTabButton}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsFriendRequestsVisible}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource PrimaryRedBrush}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource DarkRedBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
 
                             </Button>
 
@@ -135,7 +152,7 @@
 
                         <Grid x:Name="grdFriendList"
                               Margin="55,65,85,40"
-                              Visibility="Visible">
+                              Visibility="{Binding IsFriendsListVisible, Converter={StaticResource BoolToVis}}">
 
                             <ScrollViewer VerticalScrollBarVisibility="Auto"
                                           HorizontalScrollBarVisibility="Disabled">
@@ -306,7 +323,7 @@
 
                         <Grid x:Name="grdAddFriends"
                               Margin="55,65,85,40"
-                              Visibility="Collapsed">
+                              Visibility="{Binding IsAddFriendsVisible, Converter={StaticResource BoolToVis}}">
 
                             <ScrollViewer VerticalScrollBarVisibility="Auto"
                                           HorizontalScrollBarVisibility="Disabled">
@@ -491,7 +508,7 @@
 
                         <Grid x:Name="grdFriendRequests"
                               Margin="55,65,85,40"
-                              Visibility="Collapsed">
+                              Visibility="{Binding IsFriendRequestsVisible, Converter={StaticResource BoolToVis}}">
 
                             <ScrollViewer VerticalScrollBarVisibility="Auto"
                                           HorizontalScrollBarVisibility="Disabled">

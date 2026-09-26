@@ -18,37 +18,9 @@ namespace DominoAllFives.Client.WPF.Controls
     /// </summary>
     public partial class UploadProfilePicture : UserControl
     {
-        private readonly Action _onBack;
-        private readonly Action _onAddPhoto;
-        private readonly Action _onSkipPhoto;
-
-        public UploadProfilePicture(Action onBack, Action onAddPhoto, Action onSkipPhoto)
+        public UploadProfilePicture()
         {
-            _onBack = onBack;
-            _onAddPhoto = onAddPhoto;
-            _onSkipPhoto = onSkipPhoto;
             InitializeComponent();
-        }
-
-        private void BackButtonClick(object sender, RoutedEventArgs e)
-        {
-            _onBack.Invoke();
-        }
-
-        private void SelectPictureButtonClick(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void AddPhotoButtonClick(object sender, RoutedEventArgs e)
-        {
-
-            _onAddPhoto.Invoke();
-        }
-
-        private void SkipPhotoButtonClick(object sender, RoutedEventArgs e)
-        {
-            _onSkipPhoto.Invoke();
         }
     }
 }

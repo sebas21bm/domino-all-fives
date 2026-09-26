@@ -21,10 +21,5 @@ namespace DominoAllFives.Client.WPF.Views
         {
             InitializeComponent();
         }
-
-        private void BackButtonClick(object sender, RoutedEventArgs e)
-        {
-            
-        }
     }
 }

@@ -6,13 +6,12 @@
         xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization"
         mc:Ignorable="d"
         Title="Domino All Fives"
-        Width="1600"
-        Height="900"
-        MinWidth="1000"
-        MinHeight="600"
-        Background="{x:Null}"
         UseLayoutRounding="True"
         SnapsToDevicePixels="True">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Page.Resources>
 
     <Grid Background="{StaticResource DarkBgBrush}">
 
@@ -44,7 +43,7 @@
                                 VerticalAlignment="Center"
                                 Style="{StaticResource BackButton}"
                                 ToolTip="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnBack]}"
-                                Click="BackButtonClick"/>
+                                Command="{Binding GoBackCommand}"/>
 
                         <Image Grid.Column="2"
                                Source="../Assets/Images/logoShort.png"
@@ -88,12 +87,18 @@
                                     Margin="0,0,0,55"
                                     Padding="20,12"
                                     HorizontalAlignment="Left"
-                                    Click="AccountButtonClick"
-                                    Style="{StaticResource SelectedNavigationTabButton}">
-
-                                <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Settings_btnAccount]}"
-                                           TextAlignment="Center"
-                                           TextWrapping="Wrap"/>
+                                    Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Settings_btnAccount], Mode=OneWay}"
+                                    Command="{Binding ShowAccountSectionCommand}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource NavigationTabButton}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsAccountSectionVisible}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource PrimaryRedBrush}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource DarkRedBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
 
                             </Button>
 
@@ -103,12 +108,18 @@
                                     Margin="0,0,0,55"
                                     Padding="20,12"
                                     HorizontalAlignment="Left"
-                                    Click="LanguageButtonClick"
-                                    Style="{StaticResource NavigationTabButton}">
-
-                                <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Settings_btnLanguage]}"
-                                           TextAlignment="Center"
-                                           TextWrapping="Wrap"/>
+                                    Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Settings_btnLanguage], Mode=OneWay}"
+                                    Command="{Binding ShowLanguageSectionCommand}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource NavigationTabButton}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsLanguageSectionVisible}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource PrimaryRedBrush}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource DarkRedBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
 
                             </Button>
 
@@ -117,7 +128,7 @@
                                     MinHeight="62"
                                     Padding="20,12"
                                     HorizontalAlignment="Left"
-                                    Click="LogoutButtonClick"
+                                    Command="{Binding LogoutCommand}"
                                     Style="{StaticResource NavigationTabButton}">
 
                                 <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Settings_btnLogout]}"
@@ -138,7 +149,7 @@
 
                         <Grid x:Name="grdAccount"
                               Margin="65,80,75,65"
-                              Visibility="Visible">
+                              Visibility="{Binding IsAccountSectionVisible, Converter={StaticResource BoolToVis}}">
 
                             <Grid HorizontalAlignment="Stretch"
                                   VerticalAlignment="Center">
@@ -237,7 +248,7 @@
 
                         <Grid x:Name="grdLanguage"
                               Margin="65,80,75,65"
-                              Visibility="Collapsed">
+                              Visibility="{Binding IsLanguageSectionVisible, Converter={StaticResource BoolToVis}}">
 
                             <StackPanel HorizontalAlignment="Center"
                                         VerticalAlignment="Center">
@@ -259,10 +270,20 @@
                                             Padding="24,12"
                                             Content="ENGLISH"
                                             Tag="en-US"
-                                            Click="LanguageOptionButtonClick"
-                                            Style="{StaticResource DarkButton}"
-                                            Foreground="{StaticResource DisabledGrayBrush}"
-                                            FontSize="11"/>
+                                            Command="{Binding SelectLanguageCommand}"
+                                            CommandParameter="en-US"
+                                            FontSize="11">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                <Setter Property="Foreground" Value="{StaticResource DisabledGrayBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsEnglishSelected}" Value="True">
+                                                        <Setter Property="Foreground" Value="{StaticResource CreamLightBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
 
                                     <Button x:Name="btnSpanish"
                                             Grid.Column="2"
@@ -271,10 +292,20 @@
                                             Padding="24,12"
                                             Content="ESPAÑOL"
                                             Tag="es-MX"
-                                            Click="LanguageOptionButtonClick"
-                                            Style="{StaticResource DarkButton}"
-                                            Foreground="{StaticResource CreamLightBrush}"
-                                            FontSize="11"/>
+                                            Command="{Binding SelectLanguageCommand}"
+                                            CommandParameter="es-MX"
+                                            FontSize="11">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                <Setter Property="Foreground" Value="{StaticResource DisabledGrayBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSpanishSelected}" Value="True">
+                                                        <Setter Property="Foreground" Value="{StaticResource CreamLightBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
 
                                     <Button x:Name="btnPortuguese"
                                             Grid.Column="4"
@@ -283,10 +314,20 @@
                                             Padding="24,12"
                                             Content="PORTUGUÊS"
                                             Tag="pt-BR"
-                                            Click="LanguageOptionButtonClick"
-                                            Style="{StaticResource DarkButton}"
-                                            Foreground="{StaticResource DisabledGrayBrush}"
-                                            FontSize="11"/>
+                                            Command="{Binding SelectLanguageCommand}"
+                                            CommandParameter="pt-BR"
+                                            FontSize="11">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                <Setter Property="Foreground" Value="{StaticResource DisabledGrayBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPortugueseSelected}" Value="True">
+                                                        <Setter Property="Foreground" Value="{StaticResource CreamLightBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
 
                                 </Grid>
 
@@ -297,7 +338,7 @@
                                         Padding="24,12"
                                         HorizontalAlignment="Center"
                                         Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnSave]}"
-                                        Click="SaveLanguageButtonClick"
+                                        Command="{Binding SaveLanguageCommand}"
                                         Style="{StaticResource OutlineButton}"
                                         FontSize="11"/>
 
