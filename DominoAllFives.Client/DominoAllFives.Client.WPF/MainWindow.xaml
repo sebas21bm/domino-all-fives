@@ -17,6 +17,7 @@
                NavigationUIVisibility="Hidden" 
                Source="Views/HomePage.xaml"/>
         <controls:CustomMessage DataContext="{Binding CurrentDialogViewModel}"
-                               Visibility="{Binding IsDialogVisible, Converter={StaticResource BoolToVis}}"/>
+                               Visibility="{Binding IsDialogVisible, Converter={StaticResource BoolToVis}, 
+                                            FallbackValue=Collapsed, TargetNullValue=Collapsed}"/>
     </Grid>
 </Window>
