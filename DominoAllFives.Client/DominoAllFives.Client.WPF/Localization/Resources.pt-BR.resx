@@ -760,7 +760,7 @@
     <value>Código da sala</value>
   </data>
   <data name="InviteFriends_btnInvite" xml:space="preserve">
-    <value>Convidar para a sala</value>
+    <value>Convidar</value>
   </data>
   <data name="Lobby_btnInviteFriends" xml:space="preserve">
     <value>Convidar amigos</value>
@@ -781,7 +781,7 @@
     <value>Código da sala</value>
   </data>
   <data name="Lobby_lblStarting" xml:space="preserve">
-    <value>Iniciando partida</value>
+    <value>INICIANDO</value>
   </data>
   <data name="Lobby_lblTitle" xml:space="preserve">
     <value>Sala de espera</value>
@@ -953,5 +953,8 @@
   </data>
   <data name="Global_btnExitGame" xml:space="preserve">
     <value>Sair do jogo</value>
+  </data>
+  <data name="Lobby_lblGame" xml:space="preserve">
+    <value>PARTIDA</value>
   </data>
 </root>

@@ -781,7 +781,7 @@
     <value>Room code</value>
   </data>
   <data name="Lobby_lblStarting" xml:space="preserve">
-    <value>Starting match</value>
+    <value>STARTING</value>
   </data>
   <data name="Lobby_lblTitle" xml:space="preserve">
     <value>Waiting room</value>
@@ -953,5 +953,8 @@
   </data>
   <data name="Global_btnExitGame" xml:space="preserve">
     <value>Exit game</value>
+  </data>
+  <data name="Lobby_lblGame" xml:space="preserve">
+    <value>MATCH</value>
   </data>
 </root>
