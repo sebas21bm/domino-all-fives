@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="DominoAllFivesModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="DominoAllFivesModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="FriendRequest">
           <Key>
             <PropertyRef Name="IdFriendRequest" />
@@ -88,6 +88,7 @@
           <Property Name="GamesWon" Type="int" Nullable="false" />
           <Property Name="GamesPlayed" Type="int" Nullable="false" />
           <Property Name="TotalPointsScored" Type="int" Nullable="false" />
+          <Property Name="LastVictoryDate" Type="datetime2" Precision="7" />
         </EntityType>
         <EntityType Name="Report">
           <Key>
@@ -384,8 +385,7 @@
             <End Role="VerificationCode" EntitySet="VerificationCode" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="DominoAllFivesModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -490,6 +490,7 @@
           <Property Name="GamesPlayed" Type="Int32" Nullable="false" />
           <Property Name="TotalPointsScored" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Player" Relationship="Self.FK_PlayerStats_Player1" FromRole="PlayerStats" ToRole="Player" />
+          <Property Name="LastVictoryDate" Type="DateTime" Precision="7" />
         </EntityType>
         <EntityType Name="Report">
           <Key>
@@ -846,6 +847,7 @@
           <EntitySetMapping Name="PlayerStats">
             <EntityTypeMapping TypeName="DominoAllFivesModel.PlayerStats">
               <MappingFragment StoreEntitySet="PlayerStats">
+                <ScalarProperty Name="LastVictoryDate" ColumnName="LastVictoryDate" />
                 <ScalarProperty Name="IdPlayer" ColumnName="IdPlayer" />
                 <ScalarProperty Name="GamesWon" ColumnName="GamesWon" />
                 <ScalarProperty Name="GamesPlayed" ColumnName="GamesPlayed" />

@@ -18,6 +18,7 @@ namespace DominoAllFives.DataAccess.Models
         public int GamesWon { get; set; }
         public int GamesPlayed { get; set; }
         public int TotalPointsScored { get; set; }
+        public Nullable<System.DateTime> LastVictoryDate { get; set; }
     
         public virtual Player Player { get; set; }
     }
