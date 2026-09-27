@@ -48,36 +48,21 @@
 
                 <Grid Grid.Row="1">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="90"/>
+                        <RowDefinition Height="80"/>
                         <RowDefinition Height="*"/>
-                        <RowDefinition Height="120"/>
+                        <RowDefinition Height="110"/>
                     </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="0" Margin="55,30,85,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="300"/>
-                        </Grid.ColumnDefinitions>
-
+                    <Grid Grid.Row="0" Margin="55,25,85,0">
                         <TextBlock x:Name="txbRankingTitle"
-                                   Grid.Column="0"
                                    HorizontalAlignment="Left"
                                    VerticalAlignment="Center"
                                    Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Rankings_lblTitle]}" 
                                    Style="{StaticResource PageTitleText}"
                                    Foreground="{StaticResource PrimaryRedBrush}"/>
-
-                        <ComboBox x:Name="cbxRankingFilter" 
-                                  Grid.Column="2" 
-                                  Style="{StaticResource DarkComboBox}" 
-                                  VerticalAlignment="Center"
-                                  Height="45">
-                            <ComboBoxItem Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Profile_lblWins]}" IsSelected="True"/>
-                        </ComboBox>
                     </Grid>
-                    
-                    <Grid Grid.Row="1" Margin="55,30,85,10">
+
+                    <Grid Grid.Row="1" Margin="55,20,85,10">
                         <ListBox x:Name="lstLeaderboard" 
                                  Background="Transparent" 
                                  BorderThickness="0" 
@@ -100,30 +85,43 @@
                                 <DataTemplate>
                                     <Grid Width="1200" HorizontalAlignment="Center">
                                         <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="70"/>
                                             <ColumnDefinition Width="80"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="200"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <Grid Grid.Column="0" Width="58" Height="58" HorizontalAlignment="Left">
+                                        <TextBlock x:Name="txbPosition"
+                                                   Grid.Column="0"
+                                                   Text="{Binding Rank, StringFormat=#{0}}" 
+                                                   Style="{StaticResource SectionTitleText}" 
+                                                   Foreground="{StaticResource PrimaryRedBrush}"
+                                                   HorizontalAlignment="Center" 
+                                                   VerticalAlignment="Center"/>
+
+                                        <Grid Grid.Column="1" Width="58" Height="58" HorizontalAlignment="Left">
                                             <Ellipse Style="{StaticResource SmallAvatarBorderStyle}"/>
-                                            <Image Style="{StaticResource SmallAvatarImageStyle}">
+                                            <Image Style="{StaticResource SmallAvatarImageStyle}" Source="{Binding AvatarPath}">
                                                 <Image.Clip>
                                                     <EllipseGeometry Center="27,27" RadiusX="27" RadiusY="27"/>
                                                 </Image.Clip>
                                             </Image>
                                         </Grid>
 
-                                        <Border Grid.Column="1" Style="{StaticResource OutlinedListItemStyle}" Margin="20,0">
+                                        <Border Grid.Column="2" Style="{StaticResource OutlinedListItemStyle}" Margin="15,0">
                                             <TextBlock Text="{Binding Username}" 
                                                        Style="{StaticResource TextCream}" 
-                                                       FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                       FontSize="14" 
+                                                       HorizontalAlignment="Center" 
+                                                       VerticalAlignment="Center"/>
                                         </Border>
 
-                                        <Border Grid.Column="2" Style="{StaticResource OutlinedListItemStyle}">
+                                        <Border Grid.Column="3" Style="{StaticResource OutlinedListItemStyle}">
                                             <TextBlock Text="{Binding StatisticValue}" 
                                                        Style="{StaticResource TextRed}" 
-                                                       FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                       FontSize="14" 
+                                                       HorizontalAlignment="Center" 
+                                                       VerticalAlignment="Center"/>
                                         </Border>
                                     </Grid>
                                 </DataTemplate>
@@ -131,7 +129,7 @@
                         </ListBox>
                     </Grid>
 
-                    <Grid Grid.Row="2" Margin="0,0,85,40" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <Grid Grid.Row="2" Margin="0,0,85,30" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="150"/>
@@ -148,7 +146,9 @@
                             <TextBlock x:Name="txbCurrentPlayerRank" 
                                        Text="{Binding CurrentPlayerRank}" 
                                        Style="{StaticResource TextRed}" 
-                                       FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                       FontSize="16" 
+                                       HorizontalAlignment="Center" 
+                                       VerticalAlignment="Center"/>
                         </Border>
                     </Grid>
                 </Grid>

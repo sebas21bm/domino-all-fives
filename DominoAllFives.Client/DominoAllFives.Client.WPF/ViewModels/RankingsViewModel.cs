@@ -1,4 +1,5 @@
 ﻿using DominoAllFives.Client.WPF.Commands;
+using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using System;
@@ -12,13 +13,6 @@ using System.Windows.Navigation;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
-    public class PlayerRankingRecord
-    {
-        public int Rank { get; set; }
-        public string Username { get; set; }
-        public int StatisticValue { get; set; }
-        public string AvatarPath { get; set; }
-    }
 
     public class RankingsViewModel : ViewModelBase
     {
@@ -29,11 +23,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public ObservableCollection<PlayerRankingRecord> Leaderboard
         {
             get => _leaderboard;
-            set
-            {
-                _leaderboard = value;
-                OnPropertyChanged(nameof(Leaderboard));
-            }
+            set => SetProperty(ref _leaderboard, value);
         }
 
         public string CurrentPlayerRank
@@ -56,5 +46,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
         }
+        
     }
 }
