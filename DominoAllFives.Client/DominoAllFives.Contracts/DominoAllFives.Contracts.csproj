@@ -44,6 +44,8 @@
     <Compile Include="DTOs\LoginResultDto.cs" />
     <Compile Include="DTOs\RankingEntryDto.cs" />
     <Compile Include="DTOs\RankingResultDto.cs" />
+    <Compile Include="DTOs\RegisterAccountDto.cs" />
+    <Compile Include="DTOs\RegistrationResultDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
