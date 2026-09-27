@@ -19,14 +19,18 @@ namespace DominoAllFives.Client.WPF
             PlayerSession playerSession =
                 new PlayerSession();
 
+            MainWindowViewModel mainWindowViewModel =
+                new MainWindowViewModel(navigationService);
+
             ViewModelFactory viewModelFactory =
                 new ViewModelFactory(
                     navigationService,
+                    mainWindowViewModel.DialogService,
                     playerSession);
 
             navigationService.SetViewModelFactory(viewModelFactory);
 
-            DataContext = new MainWindowViewModel(navigationService);
+            DataContext = mainWindowViewModel;
 
             navigationService.NavigateTo<HomePageViewModel>();
         }

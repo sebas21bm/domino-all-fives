@@ -14,14 +14,19 @@ namespace DominoAllFives.Client.WPF.Services
     public class ViewModelFactory
     {
         private readonly IFrameNavigationService _navigationService;
+        private readonly IDialogService _dialogService;
         private readonly PlayerSession _playerSession;
 
         public ViewModelFactory(
             IFrameNavigationService navigationService,
+            IDialogService dialogService,
             PlayerSession playerSession)
         {
             _navigationService = navigationService
                 ?? throw new ArgumentNullException(nameof(navigationService));
+
+            _dialogService = dialogService
+                ?? throw new ArgumentNullException(nameof(dialogService));
 
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(nameof(playerSession));
@@ -30,6 +35,17 @@ namespace DominoAllFives.Client.WPF.Services
         public TViewModel Create<TViewModel>()
             where TViewModel : ViewModelBase
         {
+            if (typeof(TViewModel) == typeof(HomePageViewModel))
+            {
+                HomePageViewModel homePageViewModel =
+                    new HomePageViewModel(
+                        _navigationService,
+                        _dialogService,
+                        _playerSession);
+
+                return (TViewModel)(ViewModelBase)homePageViewModel;
+            }
+
             if (typeof(TViewModel) == typeof(RankingsViewModel))
             {
                 RankingResultDto rankingResult = GetRankingResult();
