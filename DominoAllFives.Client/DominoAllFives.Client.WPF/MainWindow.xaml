@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DominoAllFives.Client.WPF"
+        xmlns:controls="clr-namespace:DominoAllFives.Client.WPF.Controls"
         mc:Ignorable="d"
         Title="Domino All Fives" Height="720" Width="1280"
         WindowState="Maximized"
@@ -15,5 +16,7 @@
         <Frame x:Name="mainFrame" 
                NavigationUIVisibility="Hidden" 
                Source="Views/HomePage.xaml"/>
+        <controls:CustomMessage DataContext="{Binding CurrentDialogViewModel}"
+                               Visibility="{Binding IsDialogVisible, Converter={StaticResource BoolToVis}}"/>
     </Grid>
 </Window>
