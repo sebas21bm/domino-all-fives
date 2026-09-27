@@ -55,7 +55,7 @@
                                    Margin="0,0,30,0"/>
                     </Grid>
                 </Border>
-                
+
                 <Border Grid.Row="1" 
                         Background="{StaticResource GameBoardBackgroundBrush}" 
                         BorderBrush="{StaticResource HeaderLineBrush}" 
@@ -174,5 +174,14 @@
 
             </Grid>
         </Viewbox>
+
+        <Grid x:Name="ModalOverlay" 
+            Visibility="{Binding IsModalVisible, Converter={StaticResource BoolToVis}}"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+            <ContentControl Content="{Binding CurrentModal}" 
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"/>
+        </Grid>
     </Grid>
 </Page>

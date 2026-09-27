@@ -18,6 +18,19 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private string _roomCode;
         private bool _isHost = true;
+        private ViewModelBase _currentModal;
+        private bool _isModalVisible;
+        public ViewModelBase CurrentModal
+        {
+            get => _currentModal;
+            private set => SetProperty(ref _currentModal, value);
+        }
+
+        public bool IsModalVisible
+        {
+            get => _isModalVisible;
+            private set => SetProperty(ref _isModalVisible, value);
+        }
 
         public string RoomCode
         {
@@ -39,6 +52,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand ViewProfileCommand { get; }
         public RelayCommand KickPlayerCommand { get; }
 
+
         public LobbyViewModel(IFrameNavigationService navigationService)
         {
             _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
@@ -56,13 +70,19 @@ namespace DominoAllFives.Client.WPF.ViewModels
         }
         private void ExecuteInviteFriends()
         {
-            // Lógica para abrir el modal o pantalla de invitar amigos (CU-19)
+            CurrentModal = new InviteFriendsViewModel(CloseModal);
+            IsModalVisible = true;
+        }
+        private void CloseModal()
+        {
+            CurrentModal = null;
+            IsModalVisible = false;
         }
 
         private void ExecuteStartGame()
         {
-            // Lógica para iniciar la partida (CU-21)
-            // _navigationService?.NavigateTo<GameBoardViewModel>();
+            CurrentModal = new StartingGameViewModel();
+            IsModalVisible = true;
         }
 
         private void ExecuteViewProfile(object parameter)

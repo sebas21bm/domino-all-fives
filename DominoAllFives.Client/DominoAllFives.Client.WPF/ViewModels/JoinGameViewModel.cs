@@ -77,10 +77,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ExecuteSwitchMode()
         {
-            // Alterna entre la pestaña de Código e Invitaciones
             IsJoinByCodeMode = !IsJoinByCodeMode;
 
-            // Resetea errores al cambiar de vista
             HasError = false;
             ErrorMessage = string.Empty;
         }

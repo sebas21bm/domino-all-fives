@@ -27,4 +27,12 @@
         <controls:ChangePassword />
     </DataTemplate>
 
+    <DataTemplate DataType="{x:Type vm:InviteFriendsViewModel}">
+        <controls:InviteFriends />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:StartingGameViewModel}">
+        <controls:StartingGame/>
+    </DataTemplate>
+
 </ResourceDictionary>
