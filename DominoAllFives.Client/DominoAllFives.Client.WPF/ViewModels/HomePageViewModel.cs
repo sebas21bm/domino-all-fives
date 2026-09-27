@@ -1,14 +1,11 @@
-﻿using DominoAllFives.Client.WPF.Commands;
+﻿using DominoAllFives.BusinessLogic.Controllers;
+using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace DominoAllFives.Client.WPF.ViewModels
@@ -16,6 +13,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
     public class HomePageViewModel : ViewModelBase
     {
         private readonly IFrameNavigationService _navigationService;
+        private readonly IDialogService _dialogService;
+        private readonly PlayerSession _playerSession;
 
         private ViewModelBase _currentModal;
         private bool _isModalVisible;
@@ -23,14 +22,14 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public ViewModelBase CurrentModal
         {
-            get { return _currentModal; }
-            private set { SetProperty(ref _currentModal, value); }
+            get => _currentModal;
+            private set => SetProperty(ref _currentModal, value);
         }
 
         public bool IsModalVisible
         {
-            get { return _isModalVisible; }
-            private set { SetProperty(ref _isModalVisible, value); }
+            get => _isModalVisible;
+            private set => SetProperty(ref _isModalVisible, value);
         }
 
         public string SelectedLanguage
@@ -38,30 +37,55 @@ namespace DominoAllFives.Client.WPF.ViewModels
             get => _selectedLanguage;
             set
             {
-                if (SetProperty(ref _selectedLanguage, value) && !string.IsNullOrEmpty(value))
+                if (SetProperty(ref _selectedLanguage, value) &&
+                    !string.IsNullOrEmpty(value))
                 {
                     OnLanguageChanged(value);
                 }
             }
         }
+
         public List<LanguageOption> AvailableLanguages { get; }
 
         public RelayCommand ShowLoginCommand { get; }
         public RelayCommand PlayAsGuestCommand { get; }
         public RelayCommand ExitGameCommand { get; }
 
-        public HomePageViewModel(IFrameNavigationService navigationService)
+        public HomePageViewModel(
+            IFrameNavigationService navigationService,
+            IDialogService dialogService,
+            PlayerSession playerSession)
         {
-            _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
+            _navigationService = navigationService
+                ?? throw new ArgumentNullException(nameof(navigationService));
+
+            _dialogService = dialogService
+                ?? throw new ArgumentNullException(nameof(dialogService));
+
+            _playerSession = playerSession
+                ?? throw new ArgumentNullException(nameof(playerSession));
 
             AvailableLanguages = new List<LanguageOption>
             {
-                new LanguageOption { Code = "es-MX", DisplayName = "Español (MX)" },
-                new LanguageOption { Code = "en-US", DisplayName = "English (USA)" },
-                new LanguageOption { Code = "pt-BR", DisplayName = "Português (BR)" }
+                new LanguageOption
+                {
+                    Code = "es-MX",
+                    DisplayName = "Español (MX)"
+                },
+                new LanguageOption
+                {
+                    Code = "en-US",
+                    DisplayName = "English (USA)"
+                },
+                new LanguageOption
+                {
+                    Code = "pt-BR",
+                    DisplayName = "Português (BR)"
+                }
             };
 
-            _selectedLanguage = LanguageManager.Instance.CurrentLanguageCode;
+            _selectedLanguage =
+                LanguageManager.Instance.CurrentLanguageCode;
 
             ShowLoginCommand = new RelayCommand(OpenLoginModal);
             PlayAsGuestCommand = new RelayCommand(PlayAsGuest);
@@ -75,12 +99,18 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OpenLoginModal()
         {
+            AuthenticationController authenticationController =
+                new AuthenticationController();
+
             CurrentModal = new LoginViewModel(
-                onLoginSuccess: () => _navigationService.NavigateTo<MainMenuViewModel>(),
-                onCancel: CloseModal,
-                onGoToRegister: OpenRegisterModal,
-                onGoToRecover: OpenRecoverModal
-            );
+                _dialogService,
+                authenticationController,
+                _playerSession,
+                OnLoginSuccess,
+                CloseModal,
+                OpenRegisterModal,
+                OpenRecoverModal);
+
             IsModalVisible = true;
         }
 
@@ -90,12 +120,18 @@ namespace DominoAllFives.Client.WPF.ViewModels
             IsModalVisible = false;
         }
 
+        private void OnLoginSuccess()
+        {
+            CloseModal();
+
+            _navigationService.NavigateTo<MainMenuViewModel>();
+        }
+
         private void OpenRegisterModal()
         {
             CurrentModal = new RegisterAccountViewModel(
                 onGoToVerifyEmail: OpenVerifyEmailForRegistrationModal,
-                onCancel: CloseModal
-            );
+                onCancel: CloseModal);
 
             IsModalVisible = true;
         }
@@ -105,8 +141,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             CurrentModal = new VerifyEmailViewModel(
                 targetEmail: email,
                 onVerificationSuccess: OpenUploadProfilePictureModal,
-                onCancel: CloseModal
-            );
+                onCancel: CloseModal);
 
             IsModalVisible = true;
         }
@@ -115,8 +150,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             CurrentModal = new UploadProfilePictureViewModel(
                 onFinishRegistration: OnRegistrationSuccess,
-                onCancel: CloseModal
-            );
+                onCancel: CloseModal);
 
             IsModalVisible = true;
         }
@@ -124,6 +158,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void OnRegistrationSuccess()
         {
             CloseModal();
+
             _navigationService.NavigateTo<MainMenuViewModel>();
         }
 
@@ -131,8 +166,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             CurrentModal = new RecoverAccountViewModel(
                 onGoToVerifyEmail: OpenVerifyEmailForRecoveryModal,
-                onCancel: CloseModal
-            );
+                onCancel: CloseModal);
 
             IsModalVisible = true;
         }
@@ -142,8 +176,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             CurrentModal = new VerifyEmailViewModel(
                 targetEmail: email,
                 onVerificationSuccess: OpenChangePasswordModal,
-                onCancel: CloseModal
-            );
+                onCancel: CloseModal);
 
             IsModalVisible = true;
         }
@@ -152,8 +185,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             CurrentModal = new ChangePasswordViewModel(
                 onPasswordChangedSuccess: OnPasswordRecoverySuccess,
-                onCancel: CloseModal
-            );
+                onCancel: CloseModal);
 
             IsModalVisible = true;
         }
@@ -161,6 +193,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void OnPasswordRecoverySuccess()
         {
             CloseModal();
+
             _navigationService.NavigateTo<MainMenuViewModel>();
         }
 

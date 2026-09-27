@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DTOs\LoginResultDto.cs" />
     <Compile Include="DTOs\RankingEntryDto.cs" />
     <Compile Include="DTOs\RankingResultDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
