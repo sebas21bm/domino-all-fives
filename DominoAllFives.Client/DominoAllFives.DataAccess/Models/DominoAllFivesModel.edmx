@@ -1,0 +1,916 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="DominoAllFivesModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="FriendRequest">
+          <Key>
+            <PropertyRef Name="IdFriendRequest" />
+          </Key>
+          <Property Name="IdFriendRequest" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdSender" Type="int" Nullable="false" />
+          <Property Name="IdReceiver" Type="int" Nullable="false" />
+          <Property Name="State" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="Timestamp" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Friendship">
+          <Key>
+            <PropertyRef Name="IdPlayer1" />
+            <PropertyRef Name="IdPlayer2" />
+          </Key>
+          <Property Name="IdPlayer1" Type="int" Nullable="false" />
+          <Property Name="IdPlayer2" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="GameInvitation">
+          <Key>
+            <PropertyRef Name="IdInvitation" />
+          </Key>
+          <Property Name="IdInvitation" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdSender" Type="int" Nullable="false" />
+          <Property Name="IdReceiver" Type="int" Nullable="false" />
+          <Property Name="IdGame" Type="int" Nullable="false" />
+          <Property Name="Status" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="Timestamp" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Language">
+          <Key>
+            <PropertyRef Name="IdLanguage" />
+          </Key>
+          <Property Name="IdLanguage" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="LanguageName" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="MatchHistory">
+          <Key>
+            <PropertyRef Name="IdGame" />
+          </Key>
+          <Property Name="IdGame" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MaxPlayers" Type="tinyint" Nullable="false" />
+          <Property Name="RoomCode" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="TargetPoints" Type="smallint" Nullable="false" />
+          <Property Name="MatchDate" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="Status" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="MatchLog" Type="nvarchar(max)" />
+          <Property Name="IdHost" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="MatchParticipant">
+          <Key>
+            <PropertyRef Name="IdGame" />
+            <PropertyRef Name="IdPlayer" />
+          </Key>
+          <Property Name="IdGame" Type="int" Nullable="false" />
+          <Property Name="IdPlayer" Type="int" Nullable="false" />
+          <Property Name="Score" Type="smallint" Nullable="false" />
+          <Property Name="Position" Type="tinyint" />
+          <Property Name="WasKicked" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Player">
+          <Key>
+            <PropertyRef Name="IdPlayer" />
+          </Key>
+          <Property Name="IdPlayer" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Username" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="254" Nullable="false" />
+          <Property Name="PasswordHash" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="ProfilePicture" Type="nvarchar" MaxLength="500" />
+          <Property Name="Status" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="IsGuest" Type="bit" Nullable="false" />
+          <Property Name="SuspensionUntil" Type="datetime2" Precision="7" />
+          <Property Name="IsBanned" Type="bit" Nullable="false" />
+          <Property Name="PreferredLanguageId" Type="varchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PlayerStats">
+          <Key>
+            <PropertyRef Name="IdPlayer" />
+          </Key>
+          <Property Name="IdPlayer" Type="int" Nullable="false" />
+          <Property Name="GamesWon" Type="int" Nullable="false" />
+          <Property Name="GamesPlayed" Type="int" Nullable="false" />
+          <Property Name="TotalPointsScored" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Report">
+          <Key>
+            <PropertyRef Name="IdReport" />
+          </Key>
+          <Property Name="IdReport" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdReporter" Type="int" Nullable="false" />
+          <Property Name="IdReportedPlayer" Type="int" />
+          <Property Name="IdGame" Type="int" />
+          <Property Name="Reason" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Status" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="AdditionalInfo" Type="nvarchar" MaxLength="500" />
+          <Property Name="Timestamp" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="VerificationCode">
+          <Key>
+            <PropertyRef Name="IdVerificationCode" />
+          </Key>
+          <Property Name="IdVerificationCode" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TargetEmail" Type="nvarchar" MaxLength="254" Nullable="false" />
+          <Property Name="CodeHash" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="Purpose" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="ExpiresAt" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="IsUsed" Type="bit" Nullable="false" />
+          <Property Name="AttemptCount" Type="int" Nullable="false" />
+          <Property Name="IdPlayer" Type="int" />
+        </EntityType>
+        <Association Name="FK_FriendRequest_Receiver">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="FriendRequest" Type="Self.FriendRequest" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="FriendRequest">
+              <PropertyRef Name="IdReceiver" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FriendRequest_Sender">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="FriendRequest" Type="Self.FriendRequest" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="FriendRequest">
+              <PropertyRef Name="IdSender" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Friendship_Player">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="Friendship" Type="Self.Friendship" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="Friendship">
+              <PropertyRef Name="IdPlayer1" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Friendship_Player1">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="Friendship" Type="Self.Friendship" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="Friendship">
+              <PropertyRef Name="IdPlayer2" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GameInvitation_MatchHistory1">
+          <End Role="MatchHistory" Type="Self.MatchHistory" Multiplicity="1" />
+          <End Role="GameInvitation" Type="Self.GameInvitation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MatchHistory">
+              <PropertyRef Name="IdGame" />
+            </Principal>
+            <Dependent Role="GameInvitation">
+              <PropertyRef Name="IdGame" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GameInvitation_Player">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="GameInvitation" Type="Self.GameInvitation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="GameInvitation">
+              <PropertyRef Name="IdSender" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GameInvitation_Player1">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="GameInvitation" Type="Self.GameInvitation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="GameInvitation">
+              <PropertyRef Name="IdReceiver" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MatchHistory_Player">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="MatchHistory" Type="Self.MatchHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="MatchHistory">
+              <PropertyRef Name="IdHost" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MatchParticipant_MatchHistory1">
+          <End Role="MatchHistory" Type="Self.MatchHistory" Multiplicity="1" />
+          <End Role="MatchParticipant" Type="Self.MatchParticipant" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MatchHistory">
+              <PropertyRef Name="IdGame" />
+            </Principal>
+            <Dependent Role="MatchParticipant">
+              <PropertyRef Name="IdGame" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MatchParticipant_Player1">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="MatchParticipant" Type="Self.MatchParticipant" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="MatchParticipant">
+              <PropertyRef Name="IdPlayer" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Player_Language1">
+          <End Role="Language" Type="Self.Language" Multiplicity="1" />
+          <End Role="Player" Type="Self.Player" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Language">
+              <PropertyRef Name="IdLanguage" />
+            </Principal>
+            <Dependent Role="Player">
+              <PropertyRef Name="PreferredLanguageId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlayerStats_Player1">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="PlayerStats" Type="Self.PlayerStats" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="PlayerStats">
+              <PropertyRef Name="IdPlayer" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Report_MatchHistory1">
+          <End Role="MatchHistory" Type="Self.MatchHistory" Multiplicity="0..1" />
+          <End Role="Report" Type="Self.Report" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MatchHistory">
+              <PropertyRef Name="IdGame" />
+            </Principal>
+            <Dependent Role="Report">
+              <PropertyRef Name="IdGame" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Report_Player">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="Report" Type="Self.Report" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="Report">
+              <PropertyRef Name="IdReporter" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Report_ReportedPlayer">
+          <End Role="Player" Type="Self.Player" Multiplicity="0..1" />
+          <End Role="Report" Type="Self.Report" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="Report">
+              <PropertyRef Name="IdReportedPlayer" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_VerificationCode_Player1">
+          <End Role="Player" Type="Self.Player" Multiplicity="0..1" />
+          <End Role="VerificationCode" Type="Self.VerificationCode" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="VerificationCode">
+              <PropertyRef Name="IdPlayer" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="DominoAllFivesModelStoreContainer">
+          <EntitySet Name="FriendRequest" EntityType="Self.FriendRequest" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Friendship" EntityType="Self.Friendship" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="GameInvitation" EntityType="Self.GameInvitation" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Language" EntityType="Self.Language" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MatchHistory" EntityType="Self.MatchHistory" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MatchParticipant" EntityType="Self.MatchParticipant" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Player" EntityType="Self.Player" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PlayerStats" EntityType="Self.PlayerStats" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Report" EntityType="Self.Report" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="VerificationCode" EntityType="Self.VerificationCode" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_FriendRequest_Receiver" Association="Self.FK_FriendRequest_Receiver">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="FriendRequest" EntitySet="FriendRequest" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FriendRequest_Sender" Association="Self.FK_FriendRequest_Sender">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="FriendRequest" EntitySet="FriendRequest" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Friendship_Player" Association="Self.FK_Friendship_Player">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="Friendship" EntitySet="Friendship" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Friendship_Player1" Association="Self.FK_Friendship_Player1">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="Friendship" EntitySet="Friendship" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GameInvitation_MatchHistory1" Association="Self.FK_GameInvitation_MatchHistory1">
+            <End Role="MatchHistory" EntitySet="MatchHistory" />
+            <End Role="GameInvitation" EntitySet="GameInvitation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GameInvitation_Player" Association="Self.FK_GameInvitation_Player">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="GameInvitation" EntitySet="GameInvitation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GameInvitation_Player1" Association="Self.FK_GameInvitation_Player1">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="GameInvitation" EntitySet="GameInvitation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MatchHistory_Player" Association="Self.FK_MatchHistory_Player">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="MatchHistory" EntitySet="MatchHistory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MatchParticipant_MatchHistory1" Association="Self.FK_MatchParticipant_MatchHistory1">
+            <End Role="MatchHistory" EntitySet="MatchHistory" />
+            <End Role="MatchParticipant" EntitySet="MatchParticipant" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MatchParticipant_Player1" Association="Self.FK_MatchParticipant_Player1">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="MatchParticipant" EntitySet="MatchParticipant" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Player_Language1" Association="Self.FK_Player_Language1">
+            <End Role="Language" EntitySet="Language" />
+            <End Role="Player" EntitySet="Player" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlayerStats_Player1" Association="Self.FK_PlayerStats_Player1">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="PlayerStats" EntitySet="PlayerStats" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Report_MatchHistory1" Association="Self.FK_Report_MatchHistory1">
+            <End Role="MatchHistory" EntitySet="MatchHistory" />
+            <End Role="Report" EntitySet="Report" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Report_Player" Association="Self.FK_Report_Player">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="Report" EntitySet="Report" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Report_ReportedPlayer" Association="Self.FK_Report_ReportedPlayer">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="Report" EntitySet="Report" />
+          </AssociationSet>
+          <AssociationSet Name="FK_VerificationCode_Player1" Association="Self.FK_VerificationCode_Player1">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="VerificationCode" EntitySet="VerificationCode" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="DominoAllFivesModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="FriendRequest">
+          <Key>
+            <PropertyRef Name="IdFriendRequest" />
+          </Key>
+          <Property Name="IdFriendRequest" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdSender" Type="Int32" Nullable="false" />
+          <Property Name="IdReceiver" Type="Int32" Nullable="false" />
+          <Property Name="State" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Timestamp" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Player" Relationship="Self.FK_FriendRequest_Receiver" FromRole="FriendRequest" ToRole="Player" />
+          <NavigationProperty Name="Player1" Relationship="Self.FK_FriendRequest_Sender" FromRole="FriendRequest" ToRole="Player" />
+        </EntityType>
+        <EntityType Name="GameInvitation">
+          <Key>
+            <PropertyRef Name="IdInvitation" />
+          </Key>
+          <Property Name="IdInvitation" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdSender" Type="Int32" Nullable="false" />
+          <Property Name="IdReceiver" Type="Int32" Nullable="false" />
+          <Property Name="IdGame" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Timestamp" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="MatchHistory" Relationship="Self.FK_GameInvitation_MatchHistory1" FromRole="GameInvitation" ToRole="MatchHistory" />
+          <NavigationProperty Name="Player" Relationship="Self.FK_GameInvitation_Player" FromRole="GameInvitation" ToRole="Player" />
+          <NavigationProperty Name="Player1" Relationship="Self.FK_GameInvitation_Player1" FromRole="GameInvitation" ToRole="Player" />
+        </EntityType>
+        <EntityType Name="Language">
+          <Key>
+            <PropertyRef Name="IdLanguage" />
+          </Key>
+          <Property Name="IdLanguage" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="LanguageName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Player" Relationship="Self.FK_Player_Language1" FromRole="Language" ToRole="Player" />
+        </EntityType>
+        <EntityType Name="MatchHistory">
+          <Key>
+            <PropertyRef Name="IdGame" />
+          </Key>
+          <Property Name="IdGame" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MaxPlayers" Type="Byte" Nullable="false" />
+          <Property Name="RoomCode" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="TargetPoints" Type="Int16" Nullable="false" />
+          <Property Name="MatchDate" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="MatchLog" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IdHost" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="GameInvitation" Relationship="Self.FK_GameInvitation_MatchHistory1" FromRole="MatchHistory" ToRole="GameInvitation" />
+          <NavigationProperty Name="Player" Relationship="Self.FK_MatchHistory_Player" FromRole="MatchHistory" ToRole="Player" />
+          <NavigationProperty Name="MatchParticipant" Relationship="Self.FK_MatchParticipant_MatchHistory1" FromRole="MatchHistory" ToRole="MatchParticipant" />
+          <NavigationProperty Name="Report" Relationship="Self.FK_Report_MatchHistory1" FromRole="MatchHistory" ToRole="Report" />
+        </EntityType>
+        <EntityType Name="MatchParticipant">
+          <Key>
+            <PropertyRef Name="IdGame" />
+            <PropertyRef Name="IdPlayer" />
+          </Key>
+          <Property Name="IdGame" Type="Int32" Nullable="false" />
+          <Property Name="IdPlayer" Type="Int32" Nullable="false" />
+          <Property Name="Score" Type="Int16" Nullable="false" />
+          <Property Name="Position" Type="Byte" />
+          <Property Name="WasKicked" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="MatchHistory" Relationship="Self.FK_MatchParticipant_MatchHistory1" FromRole="MatchParticipant" ToRole="MatchHistory" />
+          <NavigationProperty Name="Player" Relationship="Self.FK_MatchParticipant_Player1" FromRole="MatchParticipant" ToRole="Player" />
+        </EntityType>
+        <EntityType Name="Player">
+          <Key>
+            <PropertyRef Name="IdPlayer" />
+          </Key>
+          <Property Name="IdPlayer" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Username" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Email" Type="String" MaxLength="254" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PasswordHash" Type="String" MaxLength="255" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ProfilePicture" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="IsGuest" Type="Boolean" Nullable="false" />
+          <Property Name="SuspensionUntil" Type="DateTime" Precision="7" />
+          <Property Name="IsBanned" Type="Boolean" Nullable="false" />
+          <Property Name="PreferredLanguageId" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="FriendRequest" Relationship="Self.FK_FriendRequest_Receiver" FromRole="Player" ToRole="FriendRequest" />
+          <NavigationProperty Name="FriendRequest1" Relationship="Self.FK_FriendRequest_Sender" FromRole="Player" ToRole="FriendRequest" />
+          <NavigationProperty Name="GameInvitation" Relationship="Self.FK_GameInvitation_Player" FromRole="Player" ToRole="GameInvitation" />
+          <NavigationProperty Name="GameInvitation1" Relationship="Self.FK_GameInvitation_Player1" FromRole="Player" ToRole="GameInvitation" />
+          <NavigationProperty Name="Language" Relationship="Self.FK_Player_Language1" FromRole="Player" ToRole="Language" />
+          <NavigationProperty Name="MatchHistory" Relationship="Self.FK_MatchHistory_Player" FromRole="Player" ToRole="MatchHistory" />
+          <NavigationProperty Name="MatchParticipant" Relationship="Self.FK_MatchParticipant_Player1" FromRole="Player" ToRole="MatchParticipant" />
+          <NavigationProperty Name="PlayerStats" Relationship="Self.FK_PlayerStats_Player1" FromRole="Player" ToRole="PlayerStats" />
+          <NavigationProperty Name="Report" Relationship="Self.FK_Report_Player" FromRole="Player" ToRole="Report" />
+          <NavigationProperty Name="Report1" Relationship="Self.FK_Report_ReportedPlayer" FromRole="Player" ToRole="Report" />
+          <NavigationProperty Name="VerificationCode" Relationship="Self.FK_VerificationCode_Player1" FromRole="Player" ToRole="VerificationCode" />
+          <NavigationProperty Name="Player1" Relationship="Self.Friendship" FromRole="Player" ToRole="Player1" />
+          <NavigationProperty Name="Player2" Relationship="Self.Friendship" FromRole="Player1" ToRole="Player" />
+        </EntityType>
+        <EntityType Name="PlayerStats">
+          <Key>
+            <PropertyRef Name="IdPlayer" />
+          </Key>
+          <Property Name="IdPlayer" Type="Int32" Nullable="false" />
+          <Property Name="GamesWon" Type="Int32" Nullable="false" />
+          <Property Name="GamesPlayed" Type="Int32" Nullable="false" />
+          <Property Name="TotalPointsScored" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Player" Relationship="Self.FK_PlayerStats_Player1" FromRole="PlayerStats" ToRole="Player" />
+        </EntityType>
+        <EntityType Name="Report">
+          <Key>
+            <PropertyRef Name="IdReport" />
+          </Key>
+          <Property Name="IdReport" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdReporter" Type="Int32" Nullable="false" />
+          <Property Name="IdReportedPlayer" Type="Int32" />
+          <Property Name="IdGame" Type="Int32" />
+          <Property Name="Reason" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="AdditionalInfo" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="Timestamp" Type="DateTime" Nullable="false" Precision="7" />
+          <NavigationProperty Name="MatchHistory" Relationship="Self.FK_Report_MatchHistory1" FromRole="Report" ToRole="MatchHistory" />
+          <NavigationProperty Name="Player" Relationship="Self.FK_Report_Player" FromRole="Report" ToRole="Player" />
+          <NavigationProperty Name="Player1" Relationship="Self.FK_Report_ReportedPlayer" FromRole="Report" ToRole="Player" />
+        </EntityType>
+        <EntityType Name="VerificationCode">
+          <Key>
+            <PropertyRef Name="IdVerificationCode" />
+          </Key>
+          <Property Name="IdVerificationCode" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TargetEmail" Type="String" MaxLength="254" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CodeHash" Type="String" MaxLength="255" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Purpose" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="ExpiresAt" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="IsUsed" Type="Boolean" Nullable="false" />
+          <Property Name="AttemptCount" Type="Int32" Nullable="false" />
+          <Property Name="IdPlayer" Type="Int32" />
+          <NavigationProperty Name="Player" Relationship="Self.FK_VerificationCode_Player1" FromRole="VerificationCode" ToRole="Player" />
+        </EntityType>
+        <Association Name="FK_FriendRequest_Receiver">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="FriendRequest" Type="Self.FriendRequest" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="FriendRequest">
+              <PropertyRef Name="IdReceiver" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_FriendRequest_Sender">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="FriendRequest" Type="Self.FriendRequest" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="FriendRequest">
+              <PropertyRef Name="IdSender" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GameInvitation_MatchHistory1">
+          <End Role="MatchHistory" Type="Self.MatchHistory" Multiplicity="1" />
+          <End Role="GameInvitation" Type="Self.GameInvitation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MatchHistory">
+              <PropertyRef Name="IdGame" />
+            </Principal>
+            <Dependent Role="GameInvitation">
+              <PropertyRef Name="IdGame" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GameInvitation_Player">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="GameInvitation" Type="Self.GameInvitation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="GameInvitation">
+              <PropertyRef Name="IdSender" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GameInvitation_Player1">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="GameInvitation" Type="Self.GameInvitation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="GameInvitation">
+              <PropertyRef Name="IdReceiver" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Player_Language1">
+          <End Role="Language" Type="Self.Language" Multiplicity="1" />
+          <End Role="Player" Type="Self.Player" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Language">
+              <PropertyRef Name="IdLanguage" />
+            </Principal>
+            <Dependent Role="Player">
+              <PropertyRef Name="PreferredLanguageId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MatchHistory_Player">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="MatchHistory" Type="Self.MatchHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="MatchHistory">
+              <PropertyRef Name="IdHost" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MatchParticipant_MatchHistory1">
+          <End Role="MatchHistory" Type="Self.MatchHistory" Multiplicity="1" />
+          <End Role="MatchParticipant" Type="Self.MatchParticipant" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MatchHistory">
+              <PropertyRef Name="IdGame" />
+            </Principal>
+            <Dependent Role="MatchParticipant">
+              <PropertyRef Name="IdGame" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Report_MatchHistory1">
+          <End Role="MatchHistory" Type="Self.MatchHistory" Multiplicity="0..1" />
+          <End Role="Report" Type="Self.Report" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MatchHistory">
+              <PropertyRef Name="IdGame" />
+            </Principal>
+            <Dependent Role="Report">
+              <PropertyRef Name="IdGame" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MatchParticipant_Player1">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="MatchParticipant" Type="Self.MatchParticipant" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="MatchParticipant">
+              <PropertyRef Name="IdPlayer" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PlayerStats_Player1">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="PlayerStats" Type="Self.PlayerStats" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="PlayerStats">
+              <PropertyRef Name="IdPlayer" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Report_Player">
+          <End Role="Player" Type="Self.Player" Multiplicity="1" />
+          <End Role="Report" Type="Self.Report" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="Report">
+              <PropertyRef Name="IdReporter" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Report_ReportedPlayer">
+          <End Role="Player" Type="Self.Player" Multiplicity="0..1" />
+          <End Role="Report" Type="Self.Report" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="Report">
+              <PropertyRef Name="IdReportedPlayer" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_VerificationCode_Player1">
+          <End Role="Player" Type="Self.Player" Multiplicity="0..1" />
+          <End Role="VerificationCode" Type="Self.VerificationCode" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="IdPlayer" />
+            </Principal>
+            <Dependent Role="VerificationCode">
+              <PropertyRef Name="IdPlayer" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Friendship">
+          <End Role="Player" Type="Self.Player" Multiplicity="*" />
+          <End Role="Player1" Type="Self.Player" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="DominoAllFivesEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="FriendRequest" EntityType="Self.FriendRequest" />
+          <EntitySet Name="GameInvitation" EntityType="Self.GameInvitation" />
+          <EntitySet Name="Language" EntityType="Self.Language" />
+          <EntitySet Name="MatchHistory" EntityType="Self.MatchHistory" />
+          <EntitySet Name="MatchParticipant" EntityType="Self.MatchParticipant" />
+          <EntitySet Name="Player" EntityType="Self.Player" />
+          <EntitySet Name="PlayerStats" EntityType="Self.PlayerStats" />
+          <EntitySet Name="Report" EntityType="Self.Report" />
+          <EntitySet Name="VerificationCode" EntityType="Self.VerificationCode" />
+          <AssociationSet Name="FK_FriendRequest_Receiver" Association="Self.FK_FriendRequest_Receiver">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="FriendRequest" EntitySet="FriendRequest" />
+          </AssociationSet>
+          <AssociationSet Name="FK_FriendRequest_Sender" Association="Self.FK_FriendRequest_Sender">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="FriendRequest" EntitySet="FriendRequest" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GameInvitation_MatchHistory1" Association="Self.FK_GameInvitation_MatchHistory1">
+            <End Role="MatchHistory" EntitySet="MatchHistory" />
+            <End Role="GameInvitation" EntitySet="GameInvitation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GameInvitation_Player" Association="Self.FK_GameInvitation_Player">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="GameInvitation" EntitySet="GameInvitation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GameInvitation_Player1" Association="Self.FK_GameInvitation_Player1">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="GameInvitation" EntitySet="GameInvitation" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Player_Language1" Association="Self.FK_Player_Language1">
+            <End Role="Language" EntitySet="Language" />
+            <End Role="Player" EntitySet="Player" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MatchHistory_Player" Association="Self.FK_MatchHistory_Player">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="MatchHistory" EntitySet="MatchHistory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MatchParticipant_MatchHistory1" Association="Self.FK_MatchParticipant_MatchHistory1">
+            <End Role="MatchHistory" EntitySet="MatchHistory" />
+            <End Role="MatchParticipant" EntitySet="MatchParticipant" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Report_MatchHistory1" Association="Self.FK_Report_MatchHistory1">
+            <End Role="MatchHistory" EntitySet="MatchHistory" />
+            <End Role="Report" EntitySet="Report" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MatchParticipant_Player1" Association="Self.FK_MatchParticipant_Player1">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="MatchParticipant" EntitySet="MatchParticipant" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PlayerStats_Player1" Association="Self.FK_PlayerStats_Player1">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="PlayerStats" EntitySet="PlayerStats" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Report_Player" Association="Self.FK_Report_Player">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="Report" EntitySet="Report" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Report_ReportedPlayer" Association="Self.FK_Report_ReportedPlayer">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="Report" EntitySet="Report" />
+          </AssociationSet>
+          <AssociationSet Name="FK_VerificationCode_Player1" Association="Self.FK_VerificationCode_Player1">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="VerificationCode" EntitySet="VerificationCode" />
+          </AssociationSet>
+          <AssociationSet Name="Friendship" Association="Self.Friendship">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="Player1" EntitySet="Player" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="DominoAllFivesModelStoreContainer" CdmEntityContainer="DominoAllFivesEntities">
+          <EntitySetMapping Name="FriendRequest">
+            <EntityTypeMapping TypeName="DominoAllFivesModel.FriendRequest">
+              <MappingFragment StoreEntitySet="FriendRequest">
+                <ScalarProperty Name="IdFriendRequest" ColumnName="IdFriendRequest" />
+                <ScalarProperty Name="IdSender" ColumnName="IdSender" />
+                <ScalarProperty Name="IdReceiver" ColumnName="IdReceiver" />
+                <ScalarProperty Name="State" ColumnName="State" />
+                <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GameInvitation">
+            <EntityTypeMapping TypeName="DominoAllFivesModel.GameInvitation">
+              <MappingFragment StoreEntitySet="GameInvitation">
+                <ScalarProperty Name="IdInvitation" ColumnName="IdInvitation" />
+                <ScalarProperty Name="IdSender" ColumnName="IdSender" />
+                <ScalarProperty Name="IdReceiver" ColumnName="IdReceiver" />
+                <ScalarProperty Name="IdGame" ColumnName="IdGame" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Language">
+            <EntityTypeMapping TypeName="DominoAllFivesModel.Language">
+              <MappingFragment StoreEntitySet="Language">
+                <ScalarProperty Name="IdLanguage" ColumnName="IdLanguage" />
+                <ScalarProperty Name="LanguageName" ColumnName="LanguageName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MatchHistory">
+            <EntityTypeMapping TypeName="DominoAllFivesModel.MatchHistory">
+              <MappingFragment StoreEntitySet="MatchHistory">
+                <ScalarProperty Name="IdGame" ColumnName="IdGame" />
+                <ScalarProperty Name="MaxPlayers" ColumnName="MaxPlayers" />
+                <ScalarProperty Name="RoomCode" ColumnName="RoomCode" />
+                <ScalarProperty Name="TargetPoints" ColumnName="TargetPoints" />
+                <ScalarProperty Name="MatchDate" ColumnName="MatchDate" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="MatchLog" ColumnName="MatchLog" />
+                <ScalarProperty Name="IdHost" ColumnName="IdHost" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MatchParticipant">
+            <EntityTypeMapping TypeName="DominoAllFivesModel.MatchParticipant">
+              <MappingFragment StoreEntitySet="MatchParticipant">
+                <ScalarProperty Name="IdGame" ColumnName="IdGame" />
+                <ScalarProperty Name="IdPlayer" ColumnName="IdPlayer" />
+                <ScalarProperty Name="Score" ColumnName="Score" />
+                <ScalarProperty Name="Position" ColumnName="Position" />
+                <ScalarProperty Name="WasKicked" ColumnName="WasKicked" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Player">
+            <EntityTypeMapping TypeName="DominoAllFivesModel.Player">
+              <MappingFragment StoreEntitySet="Player">
+                <ScalarProperty Name="IdPlayer" ColumnName="IdPlayer" />
+                <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
+                <ScalarProperty Name="ProfilePicture" ColumnName="ProfilePicture" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="IsGuest" ColumnName="IsGuest" />
+                <ScalarProperty Name="SuspensionUntil" ColumnName="SuspensionUntil" />
+                <ScalarProperty Name="IsBanned" ColumnName="IsBanned" />
+                <ScalarProperty Name="PreferredLanguageId" ColumnName="PreferredLanguageId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PlayerStats">
+            <EntityTypeMapping TypeName="DominoAllFivesModel.PlayerStats">
+              <MappingFragment StoreEntitySet="PlayerStats">
+                <ScalarProperty Name="IdPlayer" ColumnName="IdPlayer" />
+                <ScalarProperty Name="GamesWon" ColumnName="GamesWon" />
+                <ScalarProperty Name="GamesPlayed" ColumnName="GamesPlayed" />
+                <ScalarProperty Name="TotalPointsScored" ColumnName="TotalPointsScored" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Report">
+            <EntityTypeMapping TypeName="DominoAllFivesModel.Report">
+              <MappingFragment StoreEntitySet="Report">
+                <ScalarProperty Name="IdReport" ColumnName="IdReport" />
+                <ScalarProperty Name="IdReporter" ColumnName="IdReporter" />
+                <ScalarProperty Name="IdReportedPlayer" ColumnName="IdReportedPlayer" />
+                <ScalarProperty Name="IdGame" ColumnName="IdGame" />
+                <ScalarProperty Name="Reason" ColumnName="Reason" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="AdditionalInfo" ColumnName="AdditionalInfo" />
+                <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VerificationCode">
+            <EntityTypeMapping TypeName="DominoAllFivesModel.VerificationCode">
+              <MappingFragment StoreEntitySet="VerificationCode">
+                <ScalarProperty Name="IdVerificationCode" ColumnName="IdVerificationCode" />
+                <ScalarProperty Name="TargetEmail" ColumnName="TargetEmail" />
+                <ScalarProperty Name="CodeHash" ColumnName="CodeHash" />
+                <ScalarProperty Name="Purpose" ColumnName="Purpose" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="ExpiresAt" ColumnName="ExpiresAt" />
+                <ScalarProperty Name="IsUsed" ColumnName="IsUsed" />
+                <ScalarProperty Name="AttemptCount" ColumnName="AttemptCount" />
+                <ScalarProperty Name="IdPlayer" ColumnName="IdPlayer" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="Friendship" TypeName="DominoAllFivesModel.Friendship" StoreEntitySet="Friendship">
+            <EndProperty Name="Player">
+              <ScalarProperty Name="IdPlayer" ColumnName="IdPlayer1" />
+            </EndProperty>
+            <EndProperty Name="Player1">
+              <ScalarProperty Name="IdPlayer" ColumnName="IdPlayer2" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
