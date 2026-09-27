@@ -20,6 +20,10 @@
     public enum RegistrationFailureReason
     {
         None,
+        InvalidRegistrationData,
+        InvalidUsername,
+        InvalidEmail,
+        InvalidPassword,
         UsernameAlreadyExists,
         EmailAlreadyExists
     }
