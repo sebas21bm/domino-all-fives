@@ -33,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DominoAllFives.BusinessLogic\DominoAllFives.BusinessLogic.csproj" />
     <ProjectReference Include="..\DominoAllFives.Contracts\DominoAllFives.Contracts.csproj" />
     <ProjectReference Include="..\DominoAllFives.DataAccess\DominoAllFives.DataAccess.csproj" />
   </ItemGroup>

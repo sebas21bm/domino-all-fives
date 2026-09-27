@@ -44,5 +44,25 @@ namespace DominoAllFives.DataAccess.Repositories
         {
             _context.PlayerStats.Add(playerStatsToAdd);
         }
+
+        /// <inheritdoc />
+        public int GetRankByPlayerId(int playerId)
+        {
+            PlayerStats playerStats = GetByPlayerId(playerId);
+
+            if (playerStats == null)
+            {
+                return 0;
+            }
+
+            int playersAhead = _context.PlayerStats
+                .Count(stats => stats.Player.IsGuest == false &&
+                    (stats.GamesWon > playerStats.GamesWon ||
+                    (stats.GamesWon == playerStats.GamesWon &&
+                    stats.LastVictoryDate > playerStats.LastVictoryDate)));
+
+            // Rank is 1-based
+            return playersAhead + 1;
+        }
     }
 }
