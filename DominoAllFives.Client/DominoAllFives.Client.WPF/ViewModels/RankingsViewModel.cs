@@ -2,21 +2,22 @@
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
+using DominoAllFives.Contracts.DTOs;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using System.Windows.Navigation;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
-
+    /// <summary>
+    /// Provides ranking information for the rankings interface.
+    /// </summary>
     public class RankingsViewModel : ViewModelBase
     {
+        private const string DefaultProfilePicture =
+            "/Assets/Images/ProfilePictures/defaultProfilePic.png";
+
         private readonly IFrameNavigationService _navigationService;
+
         private ObservableCollection<PlayerRankingRecord> _leaderboard;
         private string _currentPlayerRank;
 
@@ -29,23 +30,59 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public string CurrentPlayerRank
         {
             get => _currentPlayerRank;
-            set
-            {
-                _currentPlayerRank = value;
-                OnPropertyChanged(nameof(CurrentPlayerRank));
-            }
+            set => SetProperty(ref _currentPlayerRank, value);
         }
 
         public RelayCommand GoBackCommand { get; }
-        public RankingsViewModel(IFrameNavigationService navigationService)
+
+        public RankingsViewModel(
+            IFrameNavigationService navigationService,
+            RankingResultDto rankingResult)
         {
-            _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
+            _navigationService = navigationService
+                ?? throw new ArgumentNullException(nameof(navigationService));
 
             _leaderboard = new ObservableCollection<PlayerRankingRecord>();
             _currentPlayerRank = string.Empty;
 
-            GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
+            GoBackCommand = new RelayCommand(
+                _ => _navigationService.GoBack());
+
+            LoadRanking(rankingResult);
         }
-        
+
+        private void LoadRanking(RankingResultDto rankingResult)
+        {
+            if (rankingResult == null)
+            {
+                return;
+            }
+
+            Leaderboard.Clear();
+
+            foreach (RankingEntryDto entry in rankingResult.TopPlayers)
+            {
+                Leaderboard.Add(new PlayerRankingRecord
+                {
+                    Rank = entry.Rank,
+                    Username = entry.Username,
+                    StatisticValue = entry.GamesWon,
+                    AvatarPath = GetProfilePicturePath(entry.ProfilePicture)
+                });
+            }
+
+            CurrentPlayerRank =
+                rankingResult.CurrentPlayerRank.ToString();
+        }
+
+        private string GetProfilePicturePath(string profilePicture)
+        {
+            if (string.IsNullOrWhiteSpace(profilePicture))
+            {
+                return DefaultProfilePicture;
+            }
+
+            return "/Assets/Images/ProfilePictures/" + profilePicture;
+        }
     }
 }

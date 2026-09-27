@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9E01A5C7-AEB0-4480-870E-429A5791399C}</ProjectGuid>
+    <ProjectGuid>{34F7B0CE-2282-4E94-BB0D-BC5D971D6EE1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DominoAllFives.Contracts</RootNamespace>
-    <AssemblyName>DominoAllFives.Contracts</AssemblyName>
+    <RootNamespace>DominoAllFives.BusinessLogic</RootNamespace>
+    <AssemblyName>DominoAllFives.BusinessLogic</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -41,10 +41,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DTOs\RankingEntryDto.cs" />
-    <Compile Include="DTOs\RankingResultDto.cs" />
+    <Compile Include="Controllers\RankingController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\DominoAllFives.Contracts\DominoAllFives.Contracts.csproj">
+      <Project>{9e01a5c7-aeb0-4480-870e-429a5791399c}</Project>
+      <Name>DominoAllFives.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DominoAllFives.DataAccess\DominoAllFives.DataAccess.csproj">
+      <Project>{7ec41d39-8132-4c47-a69f-64450a4347da}</Project>
+      <Name>DominoAllFives.DataAccess</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

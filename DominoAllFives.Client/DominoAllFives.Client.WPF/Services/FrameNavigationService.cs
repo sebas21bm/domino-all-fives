@@ -14,6 +14,7 @@ namespace DominoAllFives.Client.WPF.Services
     {
         private readonly Frame _navigationFrame;
         private readonly Dictionary<Type, Type> _viewModelToPageMap;
+        private ViewModelFactory _viewModelFactory;
 
         public bool CanGoBack => _navigationFrame != null && _navigationFrame.CanGoBack;
         public FrameNavigationService(Frame navigationFrame)
@@ -52,23 +53,39 @@ namespace DominoAllFives.Client.WPF.Services
             {
                 if (parameter != null)
                 {
-                    viewModelInstance = (ViewModelBase)Activator.CreateInstance(viewModelType, this, parameter);
+                    viewModelInstance = (ViewModelBase)Activator.CreateInstance(
+                        viewModelType,
+                        this,
+                        parameter);
                 }
                 else
                 {
-                    viewModelInstance = (ViewModelBase)Activator.CreateInstance(viewModelType, this);
+                    if (_viewModelFactory == null)
+                    {
+                        throw new InvalidOperationException(
+                            "The ViewModelFactory has not been configured.");
+                    }
+
+                    viewModelInstance = _viewModelFactory.Create<TViewModel>();
                 }
             }
             catch (MissingMethodException ex)
             {
                 throw new InvalidOperationException(
-                    $"The ViewModel {viewModelType.Name} must have a constructor accepting IFrameNavigationService.", ex);
+                    $"The ViewModel {viewModelType.Name} must have a constructor accepting IFrameNavigationService.",
+                    ex);
             }
 
             Page pageInstance = (Page)Activator.CreateInstance(pageType);
             pageInstance.DataContext = viewModelInstance;
 
             _navigationFrame.Navigate(pageInstance);
+        }
+
+        public void SetViewModelFactory(ViewModelFactory viewModelFactory)
+        {
+            _viewModelFactory = viewModelFactory
+                ?? throw new ArgumentNullException(nameof(viewModelFactory));
         }
 
         private void RegisterRoutes()

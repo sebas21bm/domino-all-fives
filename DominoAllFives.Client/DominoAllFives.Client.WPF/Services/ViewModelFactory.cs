@@ -1,0 +1,71 @@
+﻿using DominoAllFives.BusinessLogic.Controllers;
+using DominoAllFives.Client.WPF.ViewModels;
+using DominoAllFives.Client.WPF.ViewModels.Base;
+using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.DataAccess.Models;
+using DominoAllFives.DataAccess.Repositories;
+using System;
+
+namespace DominoAllFives.Client.WPF.Services
+{
+    /// <summary>
+    /// Creates view models with their required dependencies.
+    /// </summary>
+    public class ViewModelFactory
+    {
+        private readonly IFrameNavigationService _navigationService;
+        private readonly PlayerSession _playerSession;
+
+        public ViewModelFactory(
+            IFrameNavigationService navigationService,
+            PlayerSession playerSession)
+        {
+            _navigationService = navigationService
+                ?? throw new ArgumentNullException(nameof(navigationService));
+
+            _playerSession = playerSession
+                ?? throw new ArgumentNullException(nameof(playerSession));
+        }
+
+        public TViewModel Create<TViewModel>()
+            where TViewModel : ViewModelBase
+        {
+            if (typeof(TViewModel) == typeof(RankingsViewModel))
+            {
+                RankingResultDto rankingResult = GetRankingResult();
+
+                RankingsViewModel rankingsViewModel =
+                    new RankingsViewModel(
+                        _navigationService,
+                        rankingResult);
+
+                return (TViewModel)(ViewModelBase)rankingsViewModel;
+            }
+
+            return (TViewModel)Activator.CreateInstance(
+                typeof(TViewModel),
+                _navigationService);
+        }
+
+        private RankingResultDto GetRankingResult()
+        {
+            if (!_playerSession.PlayerId.HasValue)
+            {
+                return null;
+            }
+
+            using (DominoAllFivesEntities context =
+                new DominoAllFivesEntities())
+            {
+                PlayerStatsRepository playerStatsRepository =
+                    new PlayerStatsRepository(context);
+
+                RankingController rankingController =
+                    new RankingController(playerStatsRepository);
+
+                return rankingController.GetRanking(
+                    _playerSession.PlayerId.Value);
+            }
+        }
+    }
+}

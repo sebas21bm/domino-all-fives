@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="DominoAllFives.BusinessLogic/DominoAllFives.BusinessLogic.csproj" Id="34f7b0ce-2282-4e94-bb0d-bc5d971d6ee1" />
   <Project Path="DominoAllFives.Client.WPF/DominoAllFives.Client.WPF.csproj" />
   <Project Path="DominoAllFives.Contracts/DominoAllFives.Contracts.csproj" Id="9e01a5c7-aeb0-4480-870e-429a5791399c" />
   <Project Path="DominoAllFives.DataAccess/DominoAllFives.DataAccess.csproj" Id="7ec41d39-8132-4c47-a69f-64450a4347da" />
