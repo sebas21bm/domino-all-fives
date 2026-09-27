@@ -27,5 +27,12 @@ namespace DominoAllFives.DataAccess.Interfaces
         /// </summary>
         /// <param name="playerStatsToAdd">The player statistics to add.</param>
         void Add(PlayerStats playerStatsToAdd);
+
+        /// <summary>
+        /// Gets the ranking position of a player.
+        /// </summary>
+        /// <param name="playerId">The player identifier.</param>
+        /// <returns>The player's position in the ranking.</returns>
+        int GetRankByPlayerId(int playerId);
     }
 }

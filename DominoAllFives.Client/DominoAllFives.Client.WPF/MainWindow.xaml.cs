@@ -1,15 +1,6 @@
 ﻿using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF
 {
@@ -21,7 +12,20 @@ namespace DominoAllFives.Client.WPF
         public MainWindow()
         {
             InitializeComponent();
-            IFrameNavigationService navigationService = new FrameNavigationService(mainFrame);
+
+            FrameNavigationService navigationService =
+                new FrameNavigationService(mainFrame);
+
+            PlayerSession playerSession =
+                new PlayerSession();
+
+            ViewModelFactory viewModelFactory =
+                new ViewModelFactory(
+                    navigationService,
+                    playerSession);
+
+            navigationService.SetViewModelFactory(viewModelFactory);
+
             DataContext = new MainWindowViewModel(navigationService);
 
             navigationService.NavigateTo<HomePageViewModel>();
