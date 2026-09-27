@@ -1,0 +1,92 @@
+﻿<Page x:Class="DominoAllFives.Client.WPF.Views.CreateGame"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:DominoAllFives.Client.WPF.Views"
+      xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization"
+      mc:Ignorable="d" 
+      d:DesignHeight="900" d:DesignWidth="1600"
+      Title="Create Game"
+      UseLayoutRounding="True"
+      SnapsToDevicePixels="True">
+
+    <Grid Background="{StaticResource DarkBgBrush}">
+        <Viewbox Stretch="Uniform">
+            <Grid Width="1600" Height="900" Background="{StaticResource DarkBgBrush}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="78"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Style="{StaticResource HeaderBarStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="310"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button x:Name="btnBack"
+                                Grid.Column="0"
+                                Margin="10,7,0,7"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource BackButton}"
+                                ToolTip="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnBack]}"
+                                Command="{Binding GoBackCommand}"/>
+
+                        <Image Grid.Column="2"
+                            Source="../Assets/Images/logoShort.png"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource ShortLogoStyle}"/>
+                    </Grid>
+                </Border>
+                <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,50">
+
+                    <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[CreateGame_lblTitle]}" 
+                               Style="{StaticResource PageTitleText}" 
+                               FontSize="48"
+                               Foreground="{StaticResource CreamLightBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,60"/>
+
+
+                    <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[CreateGame_lblWinningScore]}" 
+                               Style="{StaticResource SectionTitleText}" 
+                               FontSize="24"
+                               Foreground="{StaticResource CreamLightBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,50">
+                        <RadioButton x:Name="rdoPoints100" Content="100" GroupName="PointsGroup" Style="{StaticResource SelectableButtonStyle}" Width="120" Height="45" Margin="0,0,15,0" IsChecked="{Binding Is100PointsSelected}"/>
+                        <RadioButton x:Name="rdoPoints150" Content="150" GroupName="PointsGroup" Style="{StaticResource SelectableButtonStyle}" Width="120" Height="45" Margin="0,0,15,0" IsChecked="{Binding Is150PointsSelected}"/>
+                        <RadioButton x:Name="rdoPoints200" Content="200" GroupName="PointsGroup" Style="{StaticResource SelectableButtonStyle}" Width="120" Height="45" Margin="0,0,15,0" IsChecked="{Binding Is200PointsSelected}"/>
+                        <RadioButton x:Name="rdoPoints250" Content="250" GroupName="PointsGroup" Style="{StaticResource SelectableButtonStyle}" Width="120" Height="45" IsChecked="{Binding Is250PointsSelected}"/>
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[CreateGame_lblNumberOfPlayers]}" 
+                               Style="{StaticResource SectionTitleText}" 
+                               FontSize="24"
+                               Foreground="{StaticResource CreamLightBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,80">
+                        <RadioButton x:Name="rdoPlayers2" Content="2" GroupName="PlayersGroup" Style="{StaticResource SelectableButtonStyle}" Width="120" Height="45" Margin="0,0,15,0" IsChecked="{Binding Is2PlayersSelected}"/>
+                        <RadioButton x:Name="rdoPlayers3" Content="3" GroupName="PlayersGroup" Style="{StaticResource SelectableButtonStyle}" Width="120" Height="45" Margin="0,0,15,0" IsChecked="{Binding Is3PlayersSelected}"/>
+                        <RadioButton x:Name="rdoPlayers4" Content="4" GroupName="PlayersGroup" Style="{StaticResource SelectableButtonStyle}" Width="120" Height="45" IsChecked="{Binding Is4PlayersSelected}"/>
+                    </StackPanel>
+
+                    <Button x:Name="btnCreateGame"
+                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[CreateGame_btnCreate]}"
+                            Style="{StaticResource PrimaryButton}"
+                            Width="400" Height="50"
+                            Command="{Binding CreateGameCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Viewbox>
+    </Grid>
+</Page>

@@ -808,6 +808,15 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a PARTIDA.
+        /// </summary>
+        public static string Lobby_lblGame {
+            get {
+                return ResourceManager.GetString("Lobby_lblGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Código de la sala.
         /// </summary>
         public static string Lobby_lblRoomCode {
@@ -817,7 +826,7 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Iniciando partida.
+        ///   Busca una cadena traducida similar a INICIANDO.
         /// </summary>
         public static string Lobby_lblStarting {
             get {

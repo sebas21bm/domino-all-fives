@@ -90,12 +90,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
             IsModalVisible = false;
         }
 
-        private void OnLoginSuccess()
-        {
-            CloseModal();
-            _navigationService.NavigateTo<MainMenuViewModel>();
-        }
-
         private void OpenRegisterModal()
         {
             CurrentModal = new RegisterAccountViewModel(
