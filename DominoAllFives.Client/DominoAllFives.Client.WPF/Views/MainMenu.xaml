@@ -55,7 +55,7 @@
 
                         <Button x:Name="btnJoinGame"
                             Style="{StaticResource OutlineButton}" 
-             
+                            Command="{Binding GoToJoinRoomCommand}"
                             Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[MainMenu_btnJoinGame]}"
                             MinHeight="54" 
                             Margin="0,0,0,10"/>

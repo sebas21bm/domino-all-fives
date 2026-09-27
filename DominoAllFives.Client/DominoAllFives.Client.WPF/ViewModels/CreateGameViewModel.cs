@@ -14,7 +14,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
     public class CreateGameViewModel : ViewModelBase
     {
         private readonly IFrameNavigationService _navigationService;
-        private readonly IDialogService _dialogService;
 
         private bool _is100PointsSelected = true;
         public bool Is100PointsSelected

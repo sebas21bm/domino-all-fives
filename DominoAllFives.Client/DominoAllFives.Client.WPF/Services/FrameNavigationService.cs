@@ -81,6 +81,7 @@ namespace DominoAllFives.Client.WPF.Services
             _viewModelToPageMap.Add(typeof(HowToPlayViewModel), typeof(HowToPlay));
             _viewModelToPageMap.Add(typeof(RankingsViewModel), typeof(Rankings));
             _viewModelToPageMap.Add(typeof(CreateGameViewModel), typeof(CreateGame));
+            _viewModelToPageMap.Add(typeof(JoinGameViewModel), typeof(JoinGame));
         }
     }
 }
