@@ -27,7 +27,10 @@ namespace DominoAllFives.Client.WPF.Services
 
         public void GoBack()
         {
-            throw new NotImplementedException();
+            if (_navigationFrame != null && _navigationFrame.CanGoBack)
+            {
+                _navigationFrame.GoBack();
+            }
         }
 
         public void NavigateTo<TViewModel>() where TViewModel : ViewModelBase
@@ -75,6 +78,8 @@ namespace DominoAllFives.Client.WPF.Services
             _viewModelToPageMap.Add(typeof(GameSettingsViewModel), typeof(GameSettings));
             _viewModelToPageMap.Add(typeof(ProfileViewModel), typeof(Profile));
             _viewModelToPageMap.Add(typeof(FriendsViewModel), typeof(Friends));
+            _viewModelToPageMap.Add(typeof(HowToPlayViewModel), typeof(HowToPlay));
+            _viewModelToPageMap.Add(typeof(RankingsViewModel), typeof(Rankings));
         }
     }
 }

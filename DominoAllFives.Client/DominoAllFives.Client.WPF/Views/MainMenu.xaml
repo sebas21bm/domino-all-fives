@@ -69,13 +69,15 @@
                         <Button x:Name="btnScores"
                             Style="{StaticResource OutlineButton}" 
                             Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[MainMenu_btnScores]}" 
+                            Command="{Binding ShowLeaderboardCommand}"
                             MinHeight="54" 
                             Margin="0,0,0,10"/>
 
                         <Button x:Name="btnHowToPlay"
                             Style="{StaticResource OutlineButton}" 
                             Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[MainMenu_btnHowToPlay]}" 
-                            MinHeight="54" 
+                            MinHeight="54"
+                            Command="{Binding ShowHowToPlayCommand}"
                             Margin="0,0,0,10"/>
 
                         <Button x:Name="btnSettings"

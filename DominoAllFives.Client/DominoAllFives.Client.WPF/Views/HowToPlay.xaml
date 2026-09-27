@@ -1,0 +1,227 @@
+﻿<Page x:Class="DominoAllFives.Client.WPF.Views.HowToPlay"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:DominoAllFives.Client.WPF.Views"
+      xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization"
+      xmlns:controls="clr-namespace:DominoAllFives.Client.WPF.Controls"
+      mc:Ignorable="d" 
+      Title="Rules"
+      d:DesignHeight="720" d:DesignWidth="1280"
+      Background="{StaticResource DarkBgBrush}">
+
+    <Grid>
+        <Image Source="/Assets/Images/backgroundDominoPattern.png" 
+               Style="{StaticResource BackgroundDominoPatternStyle}"/>
+
+        <Viewbox Stretch="Uniform">
+            <Grid Width="1280" Height="720" Margin="40,20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Encabezado: Botón de regreso y Títulos -->
+                <Grid Grid.Row="0" Margin="0,10,0,20">
+                    <Button x:Name="btnBack"
+                            Style="{StaticResource BackButton}"
+                            Command="{Binding NavigateBackCommand}"
+                            ToolTip="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnBackToolTip]}"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"/>
+
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock x:Name="lblTitle"
+                                   Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[HowToPlay_lblTitle]}"
+                                   Style="{StaticResource PageTitleText}"
+                                   HorizontalAlignment="Center"/>
+
+                        <TextBlock x:Name="lblRules"
+                                   Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[HowToPlay_lblRules]}"
+                                   Style="{StaticResource SectionTitleText}"
+                                   Foreground="{StaticResource MutedTextBrush}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Contenido Principal -->
+                <Grid Grid.Row="1" Margin="30,10,30,10">
+                    <Grid.ColumnDefinitions>
+                        <!-- Usamos proporciones relativas para evitar que la imagen aplaste al texto -->
+                        <ColumnDefinition Width="1.1*"/>
+                        <!-- Columna Izquierda -->
+                        <ColumnDefinition Width="60"/>
+                        <!-- Espacio central más amplio -->
+                        <ColumnDefinition Width="0.9*"/>
+                        <!-- Columna Derecha -->
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Columna Izquierda: Reglas Base -->
+                    <Grid Grid.Column="0" VerticalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="50"/>
+                            <!-- Separación entre reglas base -->
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Regla 1: Colocar ficha -->
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*"/>
+                                <!-- Más espacio al texto -->
+                                <ColumnDefinition Width="2.2*"/>
+                                <!-- Contenedor controlado para imagen -->
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock x:Name="lblPlaceTile"
+                                       Grid.Column="0"
+                                       Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[HowToPlay_lblPlaceTile]}"
+                                       Style="{StaticResource BodyText}"
+                                       FontSize="15"
+                                       LineHeight="22"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,20,0"/>
+
+                            <Image x:Name="imgValidPlayExample"
+                                   Grid.Column="1"
+                                   Source="pack://application:,,,/Assets/Images/examplePlayValid.png"
+                                   Stretch="Uniform"
+                                   HorizontalAlignment="Center"
+                                   SnapsToDevicePixels="True"/>
+                        </Grid>
+
+                        <!-- Regla 2: Múltiplos de 5 -->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="2.2*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock x:Name="lblScoreMultipleFive"
+                                       Grid.Column="0"
+                                       Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[HowToPlay_lblScoreMultipleFive]}"
+                                       Style="{StaticResource BodyText}"
+                                       FontSize="15"
+                                       LineHeight="22"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,20,0"/>
+
+                            <!-- Stretch="Uniform" dentro de una columna proporcional contendrá el resplandor -->
+                            <Image x:Name="imgMultipleFiveExample"
+                                   Grid.Column="1"
+                                   Source="pack://application:,,,/Assets/Images/examplePointsSum.png"
+                                   Stretch="Uniform"
+                                   HorizontalAlignment="Center"
+                                   SnapsToDevicePixels="True"/>
+                        </Grid>
+                    </Grid>
+
+                    <!-- Columna Derecha: Objetivo y Comodines -->
+                    <Grid Grid.Column="2" VerticalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="60"/>
+                            <!-- Separador vertical mayor -->
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Meta Ganadora -->
+                        <TextBlock x:Name="lblWinningScore"
+                                   Grid.Row="0"
+                                   Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[HowToPlay_lblWinningScore]}"
+                                   Style="{StaticResource SectionTitleText}"
+                                   FontSize="20"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   HorizontalAlignment="Center"/>
+
+                        <!-- Subtítulo Comodines -->
+                        <TextBlock x:Name="lblWildcards"
+                                   Grid.Row="2"
+                                   Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[HowToPlay_lblWildcards]}"
+                                   Style="{StaticResource SectionTitleText}"
+                                   FontSize="18"
+                                   HorizontalAlignment="Left"
+                                   Margin="0,0,0,25"/>
+
+                        <!-- Lista de Comodines estructurada en FILAS para dar espacio infinito al texto a lo ancho -->
+                        <Grid Grid.Row="3">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="25"/>
+                                <!-- Separación entre ambos comodines -->
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Comodín Rojo: Puntos Dobles -->
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <controls:DominoTile Grid.Column="0"
+                                                     TopValue="2" 
+                                                     BottomValue="5" 
+                                                     TileType="DoublePoints" 
+                                                     Margin="0,0,20,0"/>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock x:Name="lblDoublePointsTitle"
+                                               Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[HowToPlay_lblDoublePointsTitle]}"
+                                               Style="{StaticResource FieldLabelText}"
+                                               FontSize="16"
+                                               Foreground="{StaticResource PrimaryRedBrush}"
+                                               Margin="0,0,0,8"/>
+
+                                    <TextBlock x:Name="lblDoublePoints"
+                                               Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[HowToPlay_lblDoublePoints]}"
+                                               Style="{StaticResource BodyText}"
+                                               FontSize="14"
+                                               LineHeight="20"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Comodín Morado: Bloqueo de Extremo -->
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <controls:DominoTile Grid.Column="0"
+                                                     TopValue="1" 
+                                                     BottomValue="4" 
+                                                     TileType="Block" 
+                                                     Margin="0,0,20,0"/>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock x:Name="lblBlockEndTitle"
+                                               Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[HowToPlay_lblBlockEndTitle]}"
+                                               Style="{StaticResource FieldLabelText}"
+                                               FontSize="16"
+                                               Foreground="{StaticResource BlockPurpleBrush}"
+                                               Margin="0,0,0,8"/>
+
+                                    <TextBlock x:Name="lblBlockEnd"
+                                               Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[HowToPlay_lblBlockEnd]}"
+                                               Style="{StaticResource BodyText}"
+                                               FontSize="14"
+                                               LineHeight="20"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Viewbox>
+    </Grid>
+</Page>

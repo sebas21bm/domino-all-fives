@@ -51,7 +51,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             ShowFriendsListCommand = new RelayCommand(_ => ExecuteShowFriendsList());
             ShowAddFriendsCommand = new RelayCommand(_ => ExecuteShowAddFriends());
             ShowFriendRequestsCommand = new RelayCommand(_ => ExecuteShowFriendRequests());
-            GoBackCommand = new RelayCommand(_ => _navigationService.NavigateTo<MainMenuViewModel>());
+            GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
         }
 
         private void ExecuteShowFriendsList()

@@ -74,7 +74,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             SelectLanguageCommand = new RelayCommand(ExecuteSelectLanguage);
             SaveLanguageCommand = new RelayCommand(_ => ExecuteSaveLanguage());
 
-            GoBackCommand = new RelayCommand(_ => _navigationService.NavigateTo<MainMenuViewModel>());
+            GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
             LogoutCommand = new RelayCommand(_ => ExecuteLogout());
         }
 

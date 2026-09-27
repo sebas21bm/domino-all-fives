@@ -64,7 +64,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             TotalPoints = 5800;
             GamesPlayed = 45;
 
-            GoBackCommand = new RelayCommand(_ => _navigationService.NavigateTo<MainMenuViewModel>());
+            GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
             GoToEditProfileCommand = new RelayCommand(_ => ExecuteGoToEditProfile());
             GoToMatchHistoryCommand = new RelayCommand(_ => ExecuteGoToMatchHistory());
         }
