@@ -49,6 +49,7 @@
                         <Button x:Name="btnCreateGame"
                             Style="{StaticResource PrimaryButton}" 
                             Content="{x:Static loc:Resources.MainMenu_btnCreateGame}" 
+                            Command="{Binding GoToCreateGameCommand}"
                             MinHeight="54" 
                             Margin="0,0,0,10"/>
 
