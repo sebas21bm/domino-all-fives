@@ -19,6 +19,7 @@
     <None Remove="Assets\Images\examplePlayValid.png" />
     <None Remove="Assets\Images\examplePointsSum.png" />
     <None Remove="Assets\Images\logoFull.png" />
+    <None Remove="Assets\Images\ProfilePictures\defaultProfilePic.png" />
     <None Remove="Configuration\DatabaseConnection.config" />
   </ItemGroup>
 
@@ -77,6 +78,7 @@
     <Resource Include="Assets\Images\logoFull.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Assets\Images\ProfilePictures\defaultProfilePic.png" />
   </ItemGroup>
 
   <ItemGroup>
