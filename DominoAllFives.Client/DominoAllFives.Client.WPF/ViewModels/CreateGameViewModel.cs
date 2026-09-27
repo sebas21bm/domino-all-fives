@@ -85,6 +85,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             int selectedPoints = GetSelectedPoints();
             int selectedPlayers = GetSelectedPlayers();
 
+            _navigationService.NavigateTo<LobbyViewModel>();
         }
 
         private int GetSelectedPoints()

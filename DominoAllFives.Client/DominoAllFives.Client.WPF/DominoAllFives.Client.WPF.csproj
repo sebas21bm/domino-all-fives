@@ -18,6 +18,7 @@
     <None Remove="Assets\Images\dominoDecorativeLarge.png" />
     <None Remove="Assets\Images\examplePlayValid.png" />
     <None Remove="Assets\Images\examplePointsSum.png" />
+    <None Remove="Assets\Images\gameBoardBackground.png" />
     <None Remove="Assets\Images\logoFull.png" />
     <None Remove="Configuration\DatabaseConnection.config" />
   </ItemGroup>
@@ -73,6 +74,7 @@
     <Resource Include="Assets\Images\examplePointsSum.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Assets\Images\gameBoardBackground.png" />
     <Resource Include="Assets\Images\logoFull.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
