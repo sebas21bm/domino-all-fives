@@ -19,6 +19,22 @@
     <None Remove="Assets\Images\examplePlayValid.png" />
     <None Remove="Assets\Images\examplePointsSum.png" />
     <None Remove="Assets\Images\logoFull.png" />
+    <None Remove="Configuration\DatabaseConnection.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Configuration\DatabaseConnection.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EntityFramework" Version="6.5.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DominoAllFives.Contracts\DominoAllFives.Contracts.csproj" />
+    <ProjectReference Include="..\DominoAllFives.DataAccess\DominoAllFives.DataAccess.csproj" />
   </ItemGroup>
 
   <ItemGroup>

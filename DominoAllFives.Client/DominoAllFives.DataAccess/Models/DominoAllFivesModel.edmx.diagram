@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="6959710d2bcf45a2aadd3a3ac9b821b1" Name="Diagram1" ZoomLevel="133">
+        <EntityTypeShape EntityType="DominoAllFivesModel.FriendRequest" Width="1.5" PointX="5.25" PointY="5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DominoAllFivesModel.GameInvitation" Width="1.5" PointX="7.5" PointY="10.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DominoAllFivesModel.Language" Width="1.5" PointX="0.75" PointY="10.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DominoAllFivesModel.MatchHistory" Width="1.5" PointX="5.25" PointY="11.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DominoAllFivesModel.MatchParticipant" Width="1.5" PointX="10.5" PointY="10.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DominoAllFivesModel.Player" Width="1.5" PointX="3" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DominoAllFivesModel.PlayerStats" Width="1.5" PointX="5.25" PointY="15.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DominoAllFivesModel.Report" Width="1.5" PointX="7.5" PointY="14.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DominoAllFivesModel.VerificationCode" Width="1.5" PointX="5.25" PointY="18.375" IsExpanded="true" />
+        <AssociationConnector Association="DominoAllFivesModel.FK_FriendRequest_Receiver" ManuallyRouted="false" />
+        <AssociationConnector Association="DominoAllFivesModel.FK_FriendRequest_Sender" ManuallyRouted="false" />
+        <AssociationConnector Association="DominoAllFivesModel.FK_GameInvitation_MatchHistory1" ManuallyRouted="false" />
+        <AssociationConnector Association="DominoAllFivesModel.FK_GameInvitation_Player" ManuallyRouted="false" />
+        <AssociationConnector Association="DominoAllFivesModel.FK_GameInvitation_Player1" ManuallyRouted="false" />
+        <AssociationConnector Association="DominoAllFivesModel.FK_Player_Language1" ManuallyRouted="false" />
+        <AssociationConnector Association="DominoAllFivesModel.FK_MatchHistory_Player" ManuallyRouted="false" />
+        <AssociationConnector Association="DominoAllFivesModel.FK_MatchParticipant_MatchHistory1" ManuallyRouted="false" />
+        <AssociationConnector Association="DominoAllFivesModel.FK_Report_MatchHistory1" ManuallyRouted="false" />
+        <AssociationConnector Association="DominoAllFivesModel.FK_MatchParticipant_Player1" ManuallyRouted="false" />
+        <AssociationConnector Association="DominoAllFivesModel.FK_PlayerStats_Player1" ManuallyRouted="false" />
+        <AssociationConnector Association="DominoAllFivesModel.FK_Report_Player" ManuallyRouted="false" />
+        <AssociationConnector Association="DominoAllFivesModel.FK_Report_ReportedPlayer" ManuallyRouted="false" />
+        <AssociationConnector Association="DominoAllFivesModel.FK_VerificationCode_Player1" ManuallyRouted="false" />
+        <AssociationConnector Association="DominoAllFivesModel.Friendship" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
