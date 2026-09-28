@@ -957,4 +957,7 @@
   <data name="Lobby_lblGame" xml:space="preserve">
     <value>PARTIDA</value>
   </data>
+  <data name="Login_lblIdentifier" xml:space="preserve">
+    <value>E-mail ou nome de usuário</value>
+  </data>
 </root>
