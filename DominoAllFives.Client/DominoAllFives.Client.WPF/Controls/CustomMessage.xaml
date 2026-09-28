@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:DominoAllFives.Client.WPF.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="900" d:DesignWidth="1600">
+
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
@@ -26,24 +27,33 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,25">
+                <StackPanel Grid.Row="0"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,25">
+
                     <Image x:Name="imgDialogIcon" 
                            Source="{Binding IconPath}" 
-                           Width="64" Height="64" Stretch="Uniform" 
+                           Width="64"
+                           Height="64"
+                           Stretch="Uniform" 
                            Margin="0,0,20,0"/>
 
                     <TextBlock x:Name="txbDialogTitle" 
                                Text="{Binding Title}" 
-                               Style="{StaticResource SectionTitleText}" 
+                               Style="{StaticResource SectionTitleText}"
+                               Foreground="{StaticResource DarkBgBrush}"
                                VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <TextBlock x:Name="txbDialogMessage" 
                            Grid.Row="1" 
                            Text="{Binding Message}" 
-                           Style="{StaticResource BodyText}" 
+                           Style="{StaticResource BodyText}"
+                           Foreground="{StaticResource DarkBgBrush}"
                            FontSize="14"
-                           TextAlignment="Left" 
+                           TextAlignment="Left"
+                           TextWrapping="Wrap"
                            Margin="30,10,30,30"/>
 
                 <Border Grid.Row="2" 
@@ -58,14 +68,18 @@
                             Content="{Binding AcceptButtonText}" 
                             Command="{Binding AcceptCommand}" 
                             Style="{StaticResource DarkButton}" 
-                            MinHeight="40" MinWidth="160" Margin="15,0"/>
+                            MinHeight="40"
+                            MinWidth="160"
+                            Margin="15,0"/>
 
                     <Button x:Name="btnCancel" 
                             Content="{Binding CancelButtonText}" 
                             Command="{Binding CancelCommand}" 
                             Visibility="{Binding IsCancelVisible, Converter={StaticResource BoolToVis}}" 
                             Style="{StaticResource DarkButton}" 
-                            MinHeight="40" MinWidth="160" Margin="15,0"/>
+                            MinHeight="40"
+                            MinWidth="160"
+                            Margin="15,0"/>
                 </StackPanel>
             </Grid>
         </Border>

@@ -14,10 +14,10 @@
         WindowStartupLocation="CenterScreen">
     <Grid>
         <Frame x:Name="mainFrame" 
-               NavigationUIVisibility="Hidden" 
-               Source="Views/HomePage.xaml"/>
-        <controls:CustomMessage DataContext="{Binding CurrentDialogViewModel}"
-                               Visibility="{Binding IsDialogVisible, Converter={StaticResource BoolToVis}, 
-                                            FallbackValue=Collapsed, TargetNullValue=Collapsed}"/>
+           NavigationUIVisibility="Hidden"/>
+        <Grid Visibility="{Binding IsDialogVisible, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed, TargetNullValue=Collapsed}"
+      Panel.ZIndex="999">
+            <controls:CustomMessage DataContext="{Binding CurrentDialogViewModel}"/>
+        </Grid>
     </Grid>
 </Window>
