@@ -136,6 +136,21 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 _dialogService,
                 registrationController,
                 _playerSession,
+                OpenUploadProfilePictureModal,
+                CloseModal);
+
+            IsModalVisible = true;
+        }
+
+        private void OpenUploadProfilePictureModal()
+        {
+            ProfilePictureController profilePictureController =
+                new ProfilePictureController();
+
+            CurrentModal = new UploadProfilePictureViewModel(
+                _dialogService,
+                profilePictureController,
+                _playerSession,
                 OnRegistrationSuccess,
                 CloseModal);
 
