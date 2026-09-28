@@ -2,8 +2,6 @@
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.DTOs;
-using DominoAllFives.DataAccess.Models;
-using DominoAllFives.DataAccess.Repositories;
 using System;
 
 namespace DominoAllFives.Client.WPF.Services
@@ -23,19 +21,23 @@ namespace DominoAllFives.Client.WPF.Services
             PlayerSession playerSession)
         {
             _navigationService = navigationService
-                ?? throw new ArgumentNullException(nameof(navigationService));
+                ?? throw new ArgumentNullException(
+                    nameof(navigationService));
 
             _dialogService = dialogService
-                ?? throw new ArgumentNullException(nameof(dialogService));
+                ?? throw new ArgumentNullException(
+                    nameof(dialogService));
 
             _playerSession = playerSession
-                ?? throw new ArgumentNullException(nameof(playerSession));
+                ?? throw new ArgumentNullException(
+                    nameof(playerSession));
         }
 
         public TViewModel Create<TViewModel>()
             where TViewModel : ViewModelBase
         {
-            if (typeof(TViewModel) == typeof(HomePageViewModel))
+            if (typeof(TViewModel) ==
+                typeof(HomePageViewModel))
             {
                 HomePageViewModel homePageViewModel =
                     new HomePageViewModel(
@@ -43,7 +45,8 @@ namespace DominoAllFives.Client.WPF.Services
                         _dialogService,
                         _playerSession);
 
-                return (TViewModel)(ViewModelBase)homePageViewModel;
+                return (TViewModel)(ViewModelBase)
+                    homePageViewModel;
             }
 
             if (typeof(TViewModel) == typeof(MainMenuViewModel))
@@ -69,40 +72,30 @@ namespace DominoAllFives.Client.WPF.Services
 
             if (typeof(TViewModel) == typeof(RankingsViewModel))
             {
-                RankingResultDto rankingResult = GetRankingResult();
+                RankingController rankingController =
+                    new RankingController();
+
+                RankingResultDto rankingResult = null;
+
+                if (_playerSession.PlayerId.HasValue)
+                {
+                    rankingResult =
+                        rankingController.GetRanking(
+                            _playerSession.PlayerId.Value);
+                }
 
                 RankingsViewModel rankingsViewModel =
                     new RankingsViewModel(
                         _navigationService,
                         rankingResult);
 
-                return (TViewModel)(ViewModelBase)rankingsViewModel;
+                return (TViewModel)(ViewModelBase)
+                    rankingsViewModel;
             }
 
             return (TViewModel)Activator.CreateInstance(
                 typeof(TViewModel),
                 _navigationService);
-        }
-
-        private RankingResultDto GetRankingResult()
-        {
-            if (!_playerSession.PlayerId.HasValue)
-            {
-                return null;
-            }
-
-            using (DominoAllFivesEntities context =
-                new DominoAllFivesEntities())
-            {
-                PlayerStatsRepository playerStatsRepository =
-                    new PlayerStatsRepository(context);
-
-                RankingController rankingController =
-                    new RankingController(playerStatsRepository);
-
-                return rankingController.GetRanking(
-                    _playerSession.PlayerId.Value);
-            }
         }
     }
 }

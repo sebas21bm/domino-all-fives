@@ -5,6 +5,7 @@ using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.DTOs;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -16,6 +17,12 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private const string DefaultProfilePicture =
             "/Assets/Images/ProfilePictures/defaultProfilePic.png";
 
+        private const string ApplicationFolderName =
+            "DominoAllFives";
+
+        private const string ProfilePicturesFolderName =
+            "ProfilePictures";
+
         private readonly IFrameNavigationService _navigationService;
 
         private ObservableCollection<PlayerRankingRecord> _leaderboard;
@@ -24,13 +31,17 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public ObservableCollection<PlayerRankingRecord> Leaderboard
         {
             get => _leaderboard;
-            set => SetProperty(ref _leaderboard, value);
+            set => SetProperty(
+                ref _leaderboard,
+                value);
         }
 
         public string CurrentPlayerRank
         {
             get => _currentPlayerRank;
-            set => SetProperty(ref _currentPlayerRank, value);
+            set => SetProperty(
+                ref _currentPlayerRank,
+                value);
         }
 
         public RelayCommand GoBackCommand { get; }
@@ -40,18 +51,23 @@ namespace DominoAllFives.Client.WPF.ViewModels
             RankingResultDto rankingResult)
         {
             _navigationService = navigationService
-                ?? throw new ArgumentNullException(nameof(navigationService));
+                ?? throw new ArgumentNullException(
+                    nameof(navigationService));
 
-            _leaderboard = new ObservableCollection<PlayerRankingRecord>();
+            _leaderboard =
+                new ObservableCollection<PlayerRankingRecord>();
+
             _currentPlayerRank = string.Empty;
 
-            GoBackCommand = new RelayCommand(
-                _ => _navigationService.GoBack());
+            GoBackCommand =
+                new RelayCommand(
+                    _ => _navigationService.GoBack());
 
             LoadRanking(rankingResult);
         }
 
-        private void LoadRanking(RankingResultDto rankingResult)
+        private void LoadRanking(
+            RankingResultDto rankingResult)
         {
             if (rankingResult == null)
             {
@@ -60,29 +76,53 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             Leaderboard.Clear();
 
-            foreach (RankingEntryDto entry in rankingResult.TopPlayers)
+            foreach (RankingEntryDto entry
+                in rankingResult.TopPlayers)
             {
-                Leaderboard.Add(new PlayerRankingRecord
-                {
-                    Rank = entry.Rank,
-                    Username = entry.Username,
-                    StatisticValue = entry.GamesWon,
-                    AvatarPath = GetProfilePicturePath(entry.ProfilePicture)
-                });
+                Leaderboard.Add(
+                    new PlayerRankingRecord
+                    {
+                        Rank = entry.Rank,
+                        Username = entry.Username,
+                        StatisticValue = entry.GamesWon,
+                        AvatarPath =
+                            GetProfilePicturePath(
+                                entry.ProfilePicture)
+                    });
             }
 
             CurrentPlayerRank =
-                rankingResult.CurrentPlayerRank.ToString();
+                rankingResult.CurrentPlayerRank > 0
+                    ? rankingResult.CurrentPlayerRank.ToString()
+                    : "-";
         }
 
-        private string GetProfilePicturePath(string profilePicture)
+        private string GetProfilePicturePath(
+            string profilePicture)
         {
-            if (string.IsNullOrWhiteSpace(profilePicture))
+            if (string.IsNullOrWhiteSpace(
+                profilePicture))
             {
                 return DefaultProfilePicture;
             }
 
-            return "/Assets/Images/ProfilePictures/" + profilePicture;
+            string localApplicationData =
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData);
+
+            string profilePicturePath =
+                Path.Combine(
+                    localApplicationData,
+                    ApplicationFolderName,
+                    ProfilePicturesFolderName,
+                    profilePicture);
+
+            if (!File.Exists(profilePicturePath))
+            {
+                return DefaultProfilePicture;
+            }
+
+            return profilePicturePath;
         }
     }
 }

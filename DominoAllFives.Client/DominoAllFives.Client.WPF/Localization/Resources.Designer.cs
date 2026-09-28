@@ -871,6 +871,15 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Correo electrónico o Usuario.
+        /// </summary>
+        public static string Login_lblIdentifier {
+            get {
+                return ResourceManager.GetString("Login_lblIdentifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Crear partida.
         /// </summary>
         public static string MainMenu_btnCreateGame {
