@@ -129,28 +129,30 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OpenRegisterModal()
         {
+            RegistrationController registrationController =
+                new RegistrationController();
+
             CurrentModal = new RegisterAccountViewModel(
-                onGoToVerifyEmail: OpenVerifyEmailForRegistrationModal,
-                onCancel: CloseModal);
-
-            IsModalVisible = true;
-        }
-
-        private void OpenVerifyEmailForRegistrationModal(string email)
-        {
-            CurrentModal = new VerifyEmailViewModel(
-                targetEmail: email,
-                onVerificationSuccess: OpenUploadProfilePictureModal,
-                onCancel: CloseModal);
+                _dialogService,
+                registrationController,
+                _playerSession,
+                OpenUploadProfilePictureModal,
+                CloseModal);
 
             IsModalVisible = true;
         }
 
         private void OpenUploadProfilePictureModal()
         {
+            ProfilePictureController profilePictureController =
+                new ProfilePictureController();
+
             CurrentModal = new UploadProfilePictureViewModel(
-                onFinishRegistration: OnRegistrationSuccess,
-                onCancel: CloseModal);
+                _dialogService,
+                profilePictureController,
+                _playerSession,
+                OnRegistrationSuccess,
+                CloseModal);
 
             IsModalVisible = true;
         }
