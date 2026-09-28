@@ -92,7 +92,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             CurrentPlayerRank =
-                rankingResult.CurrentPlayerRank.ToString();
+                rankingResult.CurrentPlayerRank > 0
+                    ? rankingResult.CurrentPlayerRank.ToString()
+                    : "-";
         }
 
         private string GetProfilePicturePath(

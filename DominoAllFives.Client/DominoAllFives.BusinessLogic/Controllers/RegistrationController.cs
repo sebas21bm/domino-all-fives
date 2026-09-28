@@ -38,6 +38,9 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 IPlayerRepository playerRepository =
                     new PlayerRepository(context);
 
+                IPlayerStatsRepository playerStatsRepository =
+                    new PlayerStatsRepository(context);
+
                 if (playerRepository.UsernameExists(
                     registrationData.Username))
                 {
@@ -67,7 +70,17 @@ namespace DominoAllFives.BusinessLogic.Controllers
                         registrationData.PreferredLanguageId
                 };
 
+                PlayerStats playerStats = new PlayerStats
+                {
+                    GamesWon = 0,
+                    GamesPlayed = 0,
+                    TotalPointsScored = 0,
+                    LastVictoryDate = null,
+                    Player = player
+                };
+
                 playerRepository.Add(player);
+                playerStatsRepository.Add(playerStats);
 
                 context.SaveChanges();
 
