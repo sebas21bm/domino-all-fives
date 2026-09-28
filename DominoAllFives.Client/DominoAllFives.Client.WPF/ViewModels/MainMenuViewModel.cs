@@ -15,6 +15,12 @@ namespace DominoAllFives.Client.WPF.ViewModels
     public class MainMenuViewModel : ViewModelBase
     {
         private readonly IFrameNavigationService _navigationService;
+        private readonly IDialogService _dialogService;
+        private readonly PlayerSession _playerSession;
+
+        public string Username { get; private set; }
+        public bool IsGuest => !_playerSession.IsAuthenticated;
+        public Visibility AccountFeaturesVisibility => IsGuest ? Visibility.Collapsed : Visibility.Visible;
 
         public RelayCommand GoToProfileCommand { get; }
         public RelayCommand GoToFriendsCommand { get; }
@@ -25,9 +31,12 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand GoToCreateGameCommand {  get; }
         public RelayCommand GoToJoinRoomCommand { get; }
 
-        public MainMenuViewModel(IFrameNavigationService navigationService)
+        public MainMenuViewModel(IFrameNavigationService navigationService, IDialogService dialogService, 
+            PlayerSession playerSession)
         {
             _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
+            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            _playerSession = playerSession ?? throw new ArgumentNullException(nameof(playerSession));
 
             GoToProfileCommand = new RelayCommand(_ => _navigationService.NavigateTo<ProfileViewModel>());
             GoToFriendsCommand = new RelayCommand(_ => _navigationService.NavigateTo<FriendsViewModel>());

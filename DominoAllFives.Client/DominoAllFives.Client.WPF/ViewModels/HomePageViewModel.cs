@@ -199,7 +199,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void PlayAsGuest()
         {
-            // TODO: Implement guest logic and navigate to MainMenu
+            _playerSession.Clear();
             _navigationService.NavigateTo<MainMenuViewModel>();
         }
 

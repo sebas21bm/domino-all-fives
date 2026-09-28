@@ -46,6 +46,17 @@ namespace DominoAllFives.Client.WPF.Services
                 return (TViewModel)(ViewModelBase)homePageViewModel;
             }
 
+            if (typeof(TViewModel) == typeof(MainMenuViewModel))
+            {
+                MainMenuViewModel mainMenuViewModel =
+                    new MainMenuViewModel(
+                        _navigationService,
+                        _dialogService,
+                        _playerSession);
+
+                return (TViewModel)(ViewModelBase)mainMenuViewModel;
+            }
+
             if (typeof(TViewModel) == typeof(RankingsViewModel))
             {
                 RankingResultDto rankingResult = GetRankingResult();
