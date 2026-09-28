@@ -6,17 +6,22 @@ using DominoAllFives.DataAccess.Models;
 namespace DominoAllFives.DataAccess.Repositories
 {
     /// <summary>
-    /// Provides Entity Framework persistence operations for player statistics.
+    /// Provides Entity Framework persistence operations
+    /// for player statistics.
     /// </summary>
     public class PlayerStatsRepository : IPlayerStatsRepository
     {
         private readonly DominoAllFivesEntities _context;
 
         /// <summary>
-        /// Initializes a new instance of the repository with the specified database context.
+        /// Initializes a new repository with the specified
+        /// database context.
         /// </summary>
-        /// <param name="databaseContext">The database context used by the repository.</param>
-        public PlayerStatsRepository(DominoAllFivesEntities databaseContext)
+        /// <param name="databaseContext">
+        /// The database context used by the repository.
+        /// </param>
+        public PlayerStatsRepository(
+            DominoAllFivesEntities databaseContext)
         {
             _context = databaseContext;
         }
@@ -32,7 +37,9 @@ namespace DominoAllFives.DataAccess.Repositories
         public IEnumerable<PlayerStats> GetTopByGamesWon(int limit)
         {
             return _context.PlayerStats
-                .Where(stats => stats.Player.IsGuest == false)
+                .Where(stats =>
+                    stats.Player.IsGuest == false &&
+                    stats.GamesWon > 0)
                 .OrderByDescending(stats => stats.GamesWon)
                 .ThenByDescending(stats => stats.LastVictoryDate)
                 .Take(limit)
@@ -48,20 +55,25 @@ namespace DominoAllFives.DataAccess.Repositories
         /// <inheritdoc />
         public int GetRankByPlayerId(int playerId)
         {
-            PlayerStats playerStats = GetByPlayerId(playerId);
+            PlayerStats playerStats =
+                GetByPlayerId(playerId);
 
-            if (playerStats == null)
+            if (playerStats == null ||
+                playerStats.GamesWon <= 0)
             {
                 return 0;
             }
 
-            int playersAhead = _context.PlayerStats
-                .Count(stats => stats.Player.IsGuest == false &&
-                    (stats.GamesWon > playerStats.GamesWon ||
-                    (stats.GamesWon == playerStats.GamesWon &&
-                    stats.LastVictoryDate > playerStats.LastVictoryDate)));
+            int playersAhead =
+                _context.PlayerStats.Count(
+                    stats =>
+                        stats.Player.IsGuest == false &&
+                        stats.GamesWon > 0 &&
+                        (stats.GamesWon > playerStats.GamesWon ||
+                        (stats.GamesWon == playerStats.GamesWon &&
+                         stats.LastVictoryDate >
+                         playerStats.LastVictoryDate)));
 
-            // Rank is 1-based
             return playersAhead + 1;
         }
     }
