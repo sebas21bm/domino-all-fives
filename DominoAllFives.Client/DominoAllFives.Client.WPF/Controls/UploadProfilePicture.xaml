@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:DominoAllFives.Client.WPF.Controls"
              xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization;assembly=DominoAllFives.Client.WPF"
              Background="Transparent">
+
     <Border Style="{StaticResource RoundedPanelStyle}" 
             Width="650" 
             Padding="30,40"
@@ -38,13 +39,15 @@
                         Style="{StaticResource IconButton}" 
                         HorizontalAlignment="Center" 
                         Margin="0,0,0,45" 
-                        Command="{Binding SelectImageCommand}">
+                        Command="{Binding SelectPhotoCommand}">
+
                     <Grid>
                         <Ellipse Fill="{StaticResource DarkBgBrush}" 
                                  Stroke="{StaticResource CreamLightBrush}" 
                                  StrokeThickness="4"/>
 
-                        <Image x:Name="imgProfileAvatar" 
+                        <Image x:Name="imgProfileAvatar"
+                               Source="{Binding ProfilePicturePreview}"
                                Stretch="UniformToFill">
                             <Image.Clip>
                                 <EllipseGeometry Center="90,90" RadiusX="86" RadiusY="86"/>
@@ -52,19 +55,21 @@
                         </Image>
                     </Grid>
                 </Button>
+
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button x:Name="btnAddPhoto"
                             Style="{StaticResource PrimaryButton}"
                             Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[UploadProfilePicture_btnAddPhoto]}"
                             Width="180" Height="54"
                             Margin="0,0,15,0"
-                            Command="{Binding UploadCommand}"/>
+                            Command="{Binding AddPhotoCommand}"/>
+
                     <Button x:Name="btnSkipPhoto"
                             Style="{StaticResource OutlineButton}"
                             Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[UploadProfilePicture_btnSkipPhoto]}"
                             Width="180" Height="54"
                             Margin="15,0,0,0"
-                            Command="{Binding SkipCommand}"/>
+                            Command="{Binding SkipPhotoCommand}"/>
                 </StackPanel>
             </StackPanel>
         </Grid>
