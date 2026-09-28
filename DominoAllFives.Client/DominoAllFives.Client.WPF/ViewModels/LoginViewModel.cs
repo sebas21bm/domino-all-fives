@@ -114,12 +114,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
                         Email.Trim(),
                         Password);
 
-                _dialogService.ShowDialog(
-                    DialogType.Error,
-                    "MessageAuthentication_msgConnectionErrorTitle",
-                    "MessageAuthentication_msgConnectionError",
-                    () => { });
-
                 if (!result.IsSuccessful)
                 {
                     ShowLoginFailure(result.FailureReason);
