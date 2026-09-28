@@ -49,8 +49,28 @@ namespace DominoAllFives.Client.WPF.Services
                     homePageViewModel;
             }
 
-            if (typeof(TViewModel) ==
-                typeof(RankingsViewModel))
+            if (typeof(TViewModel) == typeof(MainMenuViewModel))
+            {
+                MainMenuViewModel mainMenuViewModel =
+                    new MainMenuViewModel(
+                        _navigationService,
+                        _dialogService,
+                        _playerSession);
+
+                return (TViewModel)(ViewModelBase)mainMenuViewModel;
+            }
+
+            if (typeof(TViewModel) == typeof(GameSettingsViewModel))
+            {
+                GameSettingsViewModel gameSettingsViewModel =
+                    new GameSettingsViewModel(
+                        _navigationService,
+                        _playerSession);
+
+                return (TViewModel)(ViewModelBase)gameSettingsViewModel;
+            }
+
+            if (typeof(TViewModel) == typeof(RankingsViewModel))
             {
                 RankingController rankingController =
                     new RankingController();

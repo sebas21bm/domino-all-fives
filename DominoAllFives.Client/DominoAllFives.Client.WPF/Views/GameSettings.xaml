@@ -88,7 +88,8 @@
                                     Padding="20,12"
                                     HorizontalAlignment="Left"
                                     Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Settings_btnAccount], Mode=OneWay}"
-                                    Command="{Binding ShowAccountSectionCommand}">
+                                    Command="{Binding ShowAccountSectionCommand}"
+                                    Visibility="{Binding AccountFeaturesVisibility}">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource NavigationTabButton}">
                                         <Style.Triggers>
@@ -203,6 +204,7 @@
                                         Padding="20,12"
                                         Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Settings_btnChange]}"
                                         Style="{StaticResource PrimaryButton}"
+                                        Command="{Binding GoToChangePassword}"
                                         VerticalAlignment="Center"/>
 
                                 <TextBlock Grid.Row="2"
@@ -239,6 +241,7 @@
                                         Padding="22,12"
                                         HorizontalAlignment="Center"
                                         Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Settings_btnDeleteAccount]}"
+                                        Command="{Binding GoToDeleteAccount}"
                                         Style="{StaticResource OutlineButton}"
                                         FontSize="11"/>
 
@@ -348,5 +351,14 @@
                 </Grid>
             </Grid>
         </Viewbox>
+
+        <Grid x:Name="ModalOverlay" 
+            Visibility="{Binding IsModalVisible, Converter={StaticResource BoolToVis}}"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+            <ContentControl Content="{Binding CurrentModal}" 
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Center"/>
+        </Grid>
     </Grid>
 </Page>

@@ -35,4 +35,8 @@
         <controls:StartingGame/>
     </DataTemplate>
 
+    <DataTemplate DataType="{x:Type vm:DeleteAccountViewModel}">
+        <controls:DeleteAccount/>
+    </DataTemplate>
+
 </ResourceDictionary>

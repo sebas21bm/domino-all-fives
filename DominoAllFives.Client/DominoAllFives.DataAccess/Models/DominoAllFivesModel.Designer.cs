@@ -1,4 +1,4 @@
-﻿// La generación de código T4 está habilitada para el modelo 'C:\Users\macol\Documents\00 Tecno\DominoAllFivesVS\domino-all-fives\DominoAllFives.Client\DominoAllFives.DataAccess\Models\DominoAllFivesModel.edmx'. 
+﻿// La generación de código T4 está habilitada para el modelo 'C:\Users\sebas\Documents\5to semestre\Tecnologias para la construcción de software\domino-all-fives\DominoAllFives.Client\DominoAllFives.DataAccess\Models\DominoAllFivesModel.edmx'. 
 // Para habilitar la generación de código heredada, cambie el valor de la propiedad del diseñador 'Estrategia de generación de código'
 // por 'ObjectContext heredado'. Esta propiedad está disponible en la ventana Propiedades cuando se abre
 // el modelo en el diseñador.
