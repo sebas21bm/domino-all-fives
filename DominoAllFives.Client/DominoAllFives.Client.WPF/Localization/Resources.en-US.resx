@@ -957,4 +957,7 @@
   <data name="Lobby_lblGame" xml:space="preserve">
     <value>MATCH</value>
   </data>
+  <data name="Login_lblIdentifier" xml:space="preserve">
+    <value>Email or username</value>
+  </data>
 </root>
