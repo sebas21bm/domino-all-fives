@@ -71,12 +71,12 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ExecuteGoToEditProfile()
         {
-            // TODO: Navegar a EditProfileViewModel cuando se implemente la pantalla de edición (CU-07)
+            _navigationService.NavigateTo<EditProfileViewModel>();
         }
 
         private void ExecuteGoToMatchHistory()
         {
-            // TODO: Navegar a MatchHistoryViewModel cuando se implemente el historial
+            _navigationService.NavigateTo<MatchHistoryViewModel>();
         }
     }
 }

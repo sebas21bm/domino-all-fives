@@ -18,6 +18,20 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private bool _isLanguageSectionVisible;
         private string _selectedLanguageCode;
 
+        private ViewModelBase _currentModal;
+        private bool _isModalVisible;
+
+        public ViewModelBase CurrentModal
+        {
+            get => _currentModal;
+            private set => SetProperty(ref _currentModal, value);
+        }
+
+        public bool IsModalVisible
+        {
+            get { return _isModalVisible; }
+            private set { SetProperty(ref _isModalVisible, value); }
+        }
         public bool IsAccountSectionVisible
         {
             get => _isAccountSectionVisible;
@@ -54,6 +68,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand SaveLanguageCommand { get; }
         public RelayCommand GoBackCommand { get; }
         public RelayCommand LogoutCommand { get; }
+        public RelayCommand GoToChangePassword {  get; }
+        public RelayCommand GoToDeleteAccount { get; }
 
 
         public GameSettingsViewModel(IFrameNavigationService navigationService)
@@ -73,6 +89,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             ShowLanguageSectionCommand = new RelayCommand(_ => ExecuteShowLanguageSection());
             SelectLanguageCommand = new RelayCommand(ExecuteSelectLanguage);
             SaveLanguageCommand = new RelayCommand(_ => ExecuteSaveLanguage());
+            GoToChangePassword = new RelayCommand(_ => OpenChangePasswordModal());
+            GoToDeleteAccount = new RelayCommand(_ => OpenDeleteAccount());
 
             GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
             LogoutCommand = new RelayCommand(_ => ExecuteLogout());
@@ -104,6 +122,44 @@ namespace DominoAllFives.Client.WPF.ViewModels
             {
                 LanguageManager.Instance.ChangeLanguage(SelectedLanguageCode);
             }
+        }
+
+        private void OpenChangePasswordModal()
+        {
+            CurrentModal = new ChangePasswordViewModel(
+                onPasswordChangedSuccess: OnPasswordChangeFromSettingsSuccess,
+                onCancel: CloseModal,
+                isFromSettings: true
+            );
+
+            IsModalVisible = true;
+        }
+
+        private void OnPasswordChangeFromSettingsSuccess()
+        {
+            CloseModal();
+        }
+
+        private void OpenDeleteAccount()
+        {
+            CurrentModal = new DeleteAccountViewModel(
+                onAccountDeletedSuccess: OnAccountDeletedSuccess,
+                onCancel: CloseModal
+            );
+            IsModalVisible = true;
+        }
+
+        private void OnAccountDeletedSuccess()
+        {
+            CloseModal();
+            // TODO: Eliminar el registro en la BD
+            _navigationService.NavigateTo<HomePageViewModel>();
+        }
+
+        private void CloseModal()
+        {
+            CurrentModal = null;
+            IsModalVisible = false;
         }
 
         private void ExecuteLogout()
