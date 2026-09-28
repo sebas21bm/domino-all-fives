@@ -7,12 +7,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class GameSettingsViewModel : ViewModelBase
     {
         private readonly IFrameNavigationService _navigationService;
+        private readonly PlayerSession _playerSession;
+
+
 
         private bool _isAccountSectionVisible;
         private bool _isLanguageSectionVisible;
@@ -20,6 +24,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private ViewModelBase _currentModal;
         private bool _isModalVisible;
+        
 
         public ViewModelBase CurrentModal
         {
@@ -62,6 +67,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public bool IsEnglishSelected => SelectedLanguageCode == "en-US";
         public bool IsPortugueseSelected => SelectedLanguageCode == "pt-BR";
 
+        public bool IsGuest => !_playerSession.IsAuthenticated;
+        public Visibility AccountFeaturesVisibility => IsGuest ? Visibility.Collapsed : Visibility.Visible;
+
         public RelayCommand ShowAccountSectionCommand { get; }
         public RelayCommand ShowLanguageSectionCommand { get; }
         public RelayCommand SelectLanguageCommand { get; }
@@ -72,9 +80,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand GoToDeleteAccount { get; }
 
 
-        public GameSettingsViewModel(IFrameNavigationService navigationService)
+        public GameSettingsViewModel(IFrameNavigationService navigationService, PlayerSession playerSession)
         {
             _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
+            _playerSession = playerSession;
 
             _selectedLanguageCode = LanguageManager.Instance.CurrentLanguageCode;
             if (string.IsNullOrWhiteSpace(_selectedLanguageCode))
@@ -82,8 +91,16 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 _selectedLanguageCode = "es-MX";
             }
 
-            _isAccountSectionVisible = true;
-            _isLanguageSectionVisible = false;
+            if (IsGuest)
+            {
+                _isAccountSectionVisible = false;
+                _isLanguageSectionVisible = true;
+            }
+            else
+            {
+                _isAccountSectionVisible = true;
+                _isLanguageSectionVisible = false;
+            }
 
             ShowAccountSectionCommand = new RelayCommand(_ => ExecuteShowAccountSection());
             ShowLanguageSectionCommand = new RelayCommand(_ => ExecuteShowLanguageSection());

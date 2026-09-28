@@ -57,6 +57,16 @@ namespace DominoAllFives.Client.WPF.Services
                 return (TViewModel)(ViewModelBase)mainMenuViewModel;
             }
 
+            if (typeof(TViewModel) == typeof(GameSettingsViewModel))
+            {
+                GameSettingsViewModel gameSettingsViewModel =
+                    new GameSettingsViewModel(
+                        _navigationService,
+                        _playerSession);
+
+                return (TViewModel)(ViewModelBase)gameSettingsViewModel;
+            }
+
             if (typeof(TViewModel) == typeof(RankingsViewModel))
             {
                 RankingResultDto rankingResult = GetRankingResult();

@@ -6,6 +6,7 @@ using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.DTOs;
 using System;
+using System.Data.SqlClient;
 using System.Windows.Controls;
 
 namespace DominoAllFives.Client.WPF.ViewModels
@@ -153,7 +154,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     "MessageAccount_msgAccountCreated",
                     _onRegistrationSuccess);
             }
-            catch (Exception)
+            catch (SqlException)
             {
                 _dialogService.ShowDialog(
                     DialogType.Error,

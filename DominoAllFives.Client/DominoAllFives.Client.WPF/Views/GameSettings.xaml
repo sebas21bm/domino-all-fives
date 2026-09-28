@@ -88,7 +88,8 @@
                                     Padding="20,12"
                                     HorizontalAlignment="Left"
                                     Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Settings_btnAccount], Mode=OneWay}"
-                                    Command="{Binding ShowAccountSectionCommand}">
+                                    Command="{Binding ShowAccountSectionCommand}"
+                                    Visibility="{Binding AccountFeaturesVisibility}">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource NavigationTabButton}">
                                         <Style.Triggers>
