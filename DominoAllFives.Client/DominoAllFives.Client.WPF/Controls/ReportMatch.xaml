@@ -4,9 +4,71 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DominoAllFives.Client.WPF.Controls"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+             xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization;assembly=DominoAllFives.Client.WPF"
+             mc:Ignorable="d"
+             Background="Transparent">
+
+    <Border Style="{StaticResource RoundedPanelStyle}"
+            Width="800"
+            Padding="45,35">
+
+        <Grid>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[ReportMatch_lblTitle]}"
+                       Style="{StaticResource SectionTitleText}"
+                       FontSize="18"
+                       HorizontalAlignment="Left"
+                       Margin="0,0,0,30"/>
+            <TextBlock Grid.Row="1"
+                       Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_lblAdditionalDetails]}"
+                       Style="{StaticResource FieldLabelText}"
+                       FontSize="15"
+                       HorizontalAlignment="Left"
+                       Margin="0,0,0,15"/>
+            <TextBox x:Name="txtAdditionalDetails"
+                     Grid.Row="2"
+                     MinHeight="140"
+                     Margin="0,0,0,35"
+                     Style="{StaticResource CreamTextBox}"
+                     Text="{Binding AdditionalDetails, UpdateSourceTrigger=PropertyChanged}"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     VerticalContentAlignment="Top"
+                     Padding="15,12"
+                     FontSize="13"/>
+            <Grid Grid.Row="3" HorizontalAlignment="Center">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="220"/>
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="btnSendReport"
+                        Grid.Column="0"
+                        Style="{StaticResource PrimaryButton}"
+                        MinHeight="52"
+                        Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnSendReport]}"
+                        Command="{Binding SendReportCommand}"/>
+
+                <Button x:Name="btnBack"
+                        Grid.Column="2"
+                        Style="{StaticResource OutlineButton}"
+                        MinHeight="52"
+                        Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnBack]}"
+                        Command="{Binding BackCommand}"/>
+
+            </Grid>
+
+        </Grid>
+
+    </Border>
 </UserControl>

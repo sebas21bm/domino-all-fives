@@ -4,9 +4,134 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DominoAllFives.Client.WPF.Controls"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+             xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization;assembly=DominoAllFives.Client.WPF"
+             mc:Ignorable="d"
+             Background="Transparent">
+
+    <Border Style="{StaticResource RoundedPanelStyle}"
+            Width="850"
+            Padding="45,35">
+
+        <Grid>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="0,0,0,25">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="65"/>
+                    <ColumnDefinition Width="320"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0" Width="58" Height="58" HorizontalAlignment="Left">
+                    <Ellipse Style="{StaticResource SmallAvatarBorderStyle}"/>
+                    <Image Source="{Binding AvatarSource}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Style="{StaticResource SmallAvatarImageStyle}">
+                        <Image.Clip>
+                            <EllipseGeometry Center="27,27" RadiusX="27" RadiusY="27"/>
+                        </Image.Clip>
+                    </Image>
+                </Grid>
+
+                <Border Grid.Column="1"
+                        MinHeight="54"
+                        Style="{StaticResource OutlinedListItemStyle}">
+                    <TextBlock Text="{Binding Username}"
+                               Style="{StaticResource TextCream}"
+                               FontSize="13"
+                               TextAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_lblDate]}"
+                               Style="{StaticResource TextCream}"
+                               FontSize="14"
+                               Margin="0,0,8,0"/>
+                    <TextBlock Text="{Binding ReportDate}"
+                               Style="{StaticResource TextCream}"
+                               FontSize="14"/>
+                </StackPanel>
+
+            </Grid>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20">
+                <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_lblReason]}"
+                           Style="{StaticResource FieldLabelText}"
+                           FontSize="15"
+                           Margin="0,0,10,0"/>
+                <TextBlock Text="{Binding ReasonText}"
+                           Style="{StaticResource TextCream}"
+                           FontSize="15"/>
+            </StackPanel>
+
+            <Border Grid.Row="2"
+                    MinHeight="140"
+                    Margin="0,0,0,25"
+                    Padding="20"
+                    BorderBrush="{StaticResource CreamLightBrush}"
+                    BorderThickness="2"
+                    Background="Transparent">
+                <TextBlock Text="{Binding Description}"
+                           Style="{StaticResource TextCream}"
+                           FontSize="13"
+                           TextWrapping="Wrap"/>
+            </Border>
+
+            <StackPanel Grid.Row="3" HorizontalAlignment="Center" Margin="0,0,0,30">
+
+                <Button x:Name="btnMatchReplay"
+                        Style="{StaticResource DarkButton}"
+                        MinWidth="360" MinHeight="52"
+                        Margin="0,0,0,12"
+                        Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnMatchReplay]}"
+                        Command="{Binding ViewMatchReplayCommand}"/>
+
+                <Button x:Name="btnViewChatHistory"
+                        Style="{StaticResource DarkButton}"
+                        MinWidth="360" MinHeight="52"
+                        Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[PlayerReportInfo_btnViewChatHistory]}"
+                        Command="{Binding ViewChatHistoryCommand}"/>
+
+            </StackPanel>
+
+            <Grid Grid.Row="4" HorizontalAlignment="Center">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="220"/>
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="btnResolve"
+                        Grid.Column="0"
+                        Style="{StaticResource PrimaryButton}"
+                        MinHeight="54"
+                        Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnResolve]}"
+                        Command="{Binding ResolveCommand}"/>
+
+                <Button x:Name="btnCancel"
+                        Grid.Column="2"
+                        Style="{StaticResource OutlineButton}"
+                        MinHeight="54"
+                        Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnCancel]}"
+                        Command="{Binding CancelCommand}"/>
+
+            </Grid>
+
+        </Grid>
+
+    </Border>
 </UserControl>

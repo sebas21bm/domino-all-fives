@@ -4,9 +4,158 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DominoAllFives.Client.WPF.Controls"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+             xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization;assembly=DominoAllFives.Client.WPF"
+             mc:Ignorable="d"
+             Background="Transparent">
+
+    <Border Style="{StaticResource RoundedPanelStyle}"
+            Width="820"
+            Padding="45,35">
+
+        <Grid>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0"
+                       Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[ReportPlayer_lblTitle]}"
+                       Style="{StaticResource SectionTitleText}"
+                       FontSize="18"
+                       HorizontalAlignment="Left"
+                       Margin="0,0,0,25"/>
+            <Grid Grid.Row="1" Margin="0,0,0,25">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="65"/>
+                    <ColumnDefinition Width="320"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" Width="58" Height="58" HorizontalAlignment="Left">
+                    <Ellipse Style="{StaticResource SmallAvatarBorderStyle}"/>
+                    <Image Source="{Binding AvatarSource}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Style="{StaticResource SmallAvatarImageStyle}">
+                        <Image.Clip>
+                            <EllipseGeometry Center="27,27" RadiusX="27" RadiusY="27"/>
+                        </Image.Clip>
+                    </Image>
+                </Grid>
+
+
+                <Border Grid.Column="1"
+                        MinHeight="52"
+                        Style="{StaticResource OutlinedListItemStyle}">
+                    <TextBlock Text="{Binding Username}"
+                               Style="{StaticResource TextCream}"
+                               FontSize="13"
+                               TextAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+
+            </Grid>
+            <TextBlock Grid.Row="2"
+                       Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_lblReason]}"
+                       Style="{StaticResource FieldLabelText}"
+                       FontSize="15"
+                       HorizontalAlignment="Left"
+                       Margin="0,0,0,15"/>
+
+            <Grid Grid.Row="3" Margin="0,0,0,25">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="35"/>
+                    <ColumnDefinition Width="380"/>
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="btnCheating"
+                        Grid.Column="0"
+                        MinHeight="54"
+                        Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[ReportPlayer_btnCheating]}"
+                        Command="{Binding SelectCheatingReasonCommand}"
+                        FontSize="11">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsCheatingSelected}" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource PrimaryRedBrush}"/>
+                                    <Setter Property="BorderBrush" Value="{StaticResource DarkRedBrush}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource CreamLightBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button x:Name="btnInappropriateBehavior"
+                        Grid.Column="2"
+                        MinHeight="54"
+                        Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[ReportPlayer_btnInappropriateBehavior]}"
+                        Command="{Binding SelectInappropriateBehaviorReasonCommand}"
+                        FontSize="11">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsInappropriateBehaviorSelected}" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource PrimaryRedBrush}"/>
+                                    <Setter Property="BorderBrush" Value="{StaticResource DarkRedBrush}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource CreamLightBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+            </Grid>
+
+            <StackPanel Grid.Row="4" Margin="0,0,0,30">
+
+                <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_lblAdditionalDetails]}"
+                           Style="{StaticResource FieldLabelText}"
+                           FontSize="15"
+                           HorizontalAlignment="Left"
+                           Margin="0,0,0,12"/>
+
+                <TextBox x:Name="txtAdditionalDetails"
+                         MinHeight="120"
+                         Style="{StaticResource CreamTextBox}"
+                         Text="{Binding AdditionalDetails, UpdateSourceTrigger=PropertyChanged}"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         VerticalContentAlignment="Top"
+                         Padding="15,12"
+                         FontSize="13"/>
+
+            </StackPanel>
+            <Grid Grid.Row="5" HorizontalAlignment="Center">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="220"/>
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="btnSendReport"
+                        Grid.Column="0"
+                        Style="{StaticResource PrimaryButton}"
+                        MinHeight="52"
+                        Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnSendReport]}"
+                        Command="{Binding SendReportCommand}"/>
+
+                <Button x:Name="btnBack"
+                        Grid.Column="2"
+                        Style="{StaticResource OutlineButton}"
+                        MinHeight="52"
+                        Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnBack]}"
+                        Command="{Binding BackCommand}"/>
+
+            </Grid>
+
+        </Grid>
+
+    </Border>
 </UserControl>

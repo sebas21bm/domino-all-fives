@@ -4,9 +4,103 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DominoAllFives.Client.WPF.Controls"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+             xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization;assembly=DominoAllFives.Client.WPF"
+             mc:Ignorable="d"
+             Background="Transparent">
+
+    <Border Style="{StaticResource RoundedPanelStyle}"
+            Width="820"
+            Padding="45,35">
+
+        <Grid>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Contenedor del Chat -->
+            <Border Grid.Row="0"
+                    Height="380"
+                    Margin="0,0,0,30"
+                    Padding="30,25"
+                    Background="#181818"
+                    BorderBrush="{StaticResource DarkRedBrush}"
+                    BorderThickness="1">
+
+                <Grid>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Título CHAT -->
+                    <TextBlock Grid.Row="0"
+                               Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_lblChat]}"
+                               Style="{StaticResource SectionTitleText}"
+                               FontSize="16"
+                               HorizontalAlignment="Left"
+                               Margin="0,0,0,20"/>
+
+                    <!-- Lista con scroll para los mensajes -->
+                    <ScrollViewer Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+
+                        <ItemsControl x:Name="lstChatMessages"
+                                      ItemsSource="{Binding ChatMessages}">
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+
+                                    <Grid Margin="0,0,0,18">
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="140"/>
+                                            <ColumnDefinition Width="20"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Nombre del Jugador (En rojo) -->
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding SenderUsername}"
+                                                   Style="{StaticResource TextRed}"
+                                                   FontSize="13"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   VerticalAlignment="Top"/>
+
+                                        <!-- Mensaje (En color crema/claro) -->
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding MessageText}"
+                                                   Style="{StaticResource TextCream}"
+                                                   FontSize="13"
+                                                   TextWrapping="Wrap"
+                                                   VerticalAlignment="Top"/>
+
+                                    </Grid>
+
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+                        </ItemsControl>
+
+                    </ScrollViewer>
+
+                </Grid>
+
+            </Border>
+
+            <!-- Botón REGRESAR -->
+            <Button x:Name="btnBack"
+                    Grid.Row="1"
+                    Style="{StaticResource OutlineButton}"
+                    MinWidth="220" MinHeight="52"
+                    HorizontalAlignment="Right"
+                    Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnBack]}"
+                    Command="{Binding BackCommand}"/>
+
+        </Grid>
+
+    </Border>
 </UserControl>

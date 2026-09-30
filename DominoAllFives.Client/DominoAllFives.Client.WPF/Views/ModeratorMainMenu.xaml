@@ -4,11 +4,89 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:DominoAllFives.Client.WPF.Views"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="ModeratorMainMenu">
+      xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization"
+      mc:Ignorable="d"
+      Title="ModeratorMainMenu" 
+      Background="{StaticResource DarkBgBrush}">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Page.Resources>
 
     <Grid>
-        
+        <!-- Fondo con patrón de dominó decorativo -->
+        <Image Source="/Assets/Images/backgroundDominoPattern.png" 
+               Style="{StaticResource BackgroundDominoPatternStyle}"/>
+
+        <Viewbox Stretch="Uniform">
+            <Grid Width="1600" Height="900" Margin="40,20">
+
+                <Grid VerticalAlignment="Top" Height="80">
+                    <Button x:Name="btnExitGame"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource OutlineButton}"
+                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnExitGame]}"
+                            MinWidth="200" MinHeight="54"
+                            Command="{Binding ExitGameCommand}"/>
+                </Grid>
+
+                <Grid Margin="60,100,60,40">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1.2*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" 
+                                HorizontalAlignment="Left" 
+                                VerticalAlignment="Center"
+                                Margin="40,0,0,0">
+
+                        <Image Source="/Assets/Images/logoFull.png" 
+                               Style="{StaticResource FullLogoStyle}"
+                               Width="560" Height="175" 
+                               HorizontalAlignment="Left" 
+                               Margin="0,0,0,80"/>
+
+                        <StackPanel Width="320" HorizontalAlignment="Left">
+                            <Button x:Name="btnViewReports"
+                                    Style="{StaticResource PrimaryButton}"
+                                    Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[MainMenu_btnViewReports]}"
+                                    MinHeight="64"
+                                    Margin="0,0,0,28"
+                                    FontSize="18"
+                                    Command="{Binding GoToReportsCommand}"/>
+
+                            <Button x:Name="btnSettings"
+                                    Style="{StaticResource DarkButton}"
+                                    Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnSettings]}"
+                                    MinHeight="64"
+                                    FontSize="18"
+                                    Command="{Binding GoToSettingsCommand}"/>
+
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Grid Grid.Row="1" Grid.Column="1" 
+                        HorizontalAlignment="Right" 
+                        VerticalAlignment="Center" 
+                        Margin="0,0,10,0">
+                        <Image Source="/Assets/Images/dominoDecorativeLarge.png" 
+                            Style="{StaticResource DecorativeDominoLargeStyle}" 
+                            Width="520" Height="620"/>
+                    </Grid>
+                </Grid>
+
+            </Grid>
+        </Viewbox>
+
+        <Grid x:Name="ModalOverlay" 
+              Visibility="{Binding IsModalVisible, Converter={StaticResource BoolToVis}}"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            <ContentControl Content="{Binding CurrentModal}" 
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"/>
+        </Grid>
     </Grid>
 </Page>
