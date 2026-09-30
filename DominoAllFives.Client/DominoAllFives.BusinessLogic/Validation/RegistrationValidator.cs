@@ -11,12 +11,13 @@ namespace DominoAllFives.BusinessLogic.Validation
     public static class RegistrationValidator
     {
         private const int MaximumUsernameLength = 64;
-
         private const string EmailPattern =
             @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
-
         private const string PasswordPattern =
             @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$";
+
+        private static readonly TimeSpan RegexTimeout =
+            TimeSpan.FromMilliseconds(250);
 
         private static readonly HashSet<string> ValidEmailDomains =
             new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -74,7 +75,11 @@ namespace DominoAllFives.BusinessLogic.Validation
         private static bool IsEmailValid(string email)
         {
             if (string.IsNullOrWhiteSpace(email) ||
-                !Regex.IsMatch(email, EmailPattern))
+                !Regex.IsMatch(
+                    email,
+                    EmailPattern,
+                    RegexOptions.None,
+                    RegexTimeout))
             {
                 return false;
             }
@@ -94,7 +99,11 @@ namespace DominoAllFives.BusinessLogic.Validation
         private static bool IsPasswordValid(string password)
         {
             return !string.IsNullOrWhiteSpace(password) &&
-                   Regex.IsMatch(password, PasswordPattern);
+                   Regex.IsMatch(
+                       password,
+                       PasswordPattern,
+                       RegexOptions.None,
+                       RegexTimeout);
         }
     }
 }
