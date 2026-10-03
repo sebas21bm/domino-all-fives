@@ -8,6 +8,7 @@
         None,
         InvalidCredentials,
         Banned,
-        Suspended
+        Suspended,
+        ServiceUnavailable
     }
 }

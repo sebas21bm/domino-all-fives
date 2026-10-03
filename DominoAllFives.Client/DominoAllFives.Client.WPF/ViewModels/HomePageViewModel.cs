@@ -1,12 +1,13 @@
-﻿using DominoAllFives.BusinessLogic.Controllers;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows;
+using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using System;
-using System.Collections.Generic;
-using System.Windows;
+using DominoAllFives.Contracts.Services;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -14,6 +15,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
     {
         private readonly IFrameNavigationService _navigationService;
         private readonly IDialogService _dialogService;
+        private readonly IAccountService _accountService;
         private readonly PlayerSession _playerSession;
 
         private ViewModelBase _currentModal;
@@ -54,7 +56,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public HomePageViewModel(
             IFrameNavigationService navigationService,
             IDialogService dialogService,
-            PlayerSession playerSession)
+            PlayerSession playerSession,
+            IAccountService accountService)
         {
             _navigationService = navigationService
                 ?? throw new ArgumentNullException(nameof(navigationService));
@@ -64,6 +67,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(nameof(playerSession));
+
+            _accountService = accountService
+                ?? throw new ArgumentNullException(nameof(accountService));
 
             AvailableLanguages = new List<LanguageOption>
             {
@@ -99,12 +105,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OpenLoginModal()
         {
-            AuthenticationController authenticationController =
-                new AuthenticationController();
 
             CurrentModal = new LoginViewModel(
                 _dialogService,
-                authenticationController,
+                _accountService,
                 _playerSession,
                 OnLoginSuccess,
                 CloseModal,

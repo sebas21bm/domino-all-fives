@@ -1,8 +1,10 @@
-﻿using DominoAllFives.BusinessLogic.Controllers;
+﻿using System;
+using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.DTOs;
-using System;
+using DominoAllFives.Contracts.Services;
+
 
 namespace DominoAllFives.Client.WPF.Services
 {
@@ -13,11 +15,13 @@ namespace DominoAllFives.Client.WPF.Services
     {
         private readonly IFrameNavigationService _navigationService;
         private readonly IDialogService _dialogService;
+        private readonly IAccountService _accountService;
         private readonly PlayerSession _playerSession;
 
         public ViewModelFactory(
             IFrameNavigationService navigationService,
             IDialogService dialogService,
+            IAccountService accountService,
             PlayerSession playerSession)
         {
             _navigationService = navigationService
@@ -27,6 +31,10 @@ namespace DominoAllFives.Client.WPF.Services
             _dialogService = dialogService
                 ?? throw new ArgumentNullException(
                     nameof(dialogService));
+            
+            _accountService = accountService
+                ?? throw new ArgumentNullException(
+                    nameof(accountService));
 
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(
@@ -43,7 +51,8 @@ namespace DominoAllFives.Client.WPF.Services
                     new HomePageViewModel(
                         _navigationService,
                         _dialogService,
-                        _playerSession);
+                        _playerSession,
+                        _accountService);
 
                 return (TViewModel)(ViewModelBase)
                     homePageViewModel;

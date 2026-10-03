@@ -229,16 +229,16 @@
     <value>As senhas não coincidem. Verifique se as duas senhas são iguais e tente novamente.</value>
   </data>
   <data name="MessageAuthentication_msgConnectionErrorTitle" xml:space="preserve">
-    <value>Erro de login</value>
+    <value>Erro de conexão</value>
   </data>
   <data name="MessageAuthentication_msgConnectionError" xml:space="preserve">
     <value>Não é possível entrar neste momento. Tente novamente.</value>
   </data>
-  <data name="MessageAuthentication_msgDisabledAccountTitle" xml:space="preserve">
-    <value>Conta desativada</value>
+  <data name="MessageAuthentication_msgBannedAccountTitle" xml:space="preserve">
+    <value>Conta banida</value>
   </data>
-  <data name="MessageAuthentication_msgDisabledAccount" xml:space="preserve">
-    <value>Não é possível entrar com esta conta.</value>
+  <data name="MessageAuthentication_msgBannedAccount" xml:space="preserve">
+    <value>Não é possível fazer login. A conta foi banida. Tente com outra conta..</value>
   </data>
   <data name="MessageAuthentication_msgInvalidCredentialsTitle" xml:space="preserve">
     <value>Credenciais inválidas</value>
@@ -959,5 +959,17 @@
   </data>
   <data name="Login_lblIdentifier" xml:space="preserve">
     <value>E-mail ou nome de usuário</value>
+  </data>
+  <data name="MessageAuthentication_msgSuspendedAccount" xml:space="preserve">
+    <value>Não é possível fazer login. A conta está suspensa. Tente novamente mais tarde.</value>
+  </data>
+  <data name="MessageAuthentication_msgSuspendedAccountTitle" xml:space="preserve">
+    <value>Suspensão</value>
+  </data>
+  <data name="Global_msgDefaultError" xml:space="preserve">
+    <value>Não é possível continuar. Erro desconhecido. Tente novamente.</value>
+  </data>
+  <data name="Global_msgDefaultErrorTitle" xml:space="preserve">
+    <value>Erro</value>
   </data>
 </root>

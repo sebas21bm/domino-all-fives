@@ -592,6 +592,24 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a No es posible continuar. Error desconocido. Intente nuevamente..
+        /// </summary>
+        public static string Global_msgDefaultError {
+            get {
+                return ResourceManager.GetString("Global_msgDefaultError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Error.
+        /// </summary>
+        public static string Global_msgDefaultErrorTitle {
+            get {
+                return ResourceManager.GetString("Global_msgDefaultErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Escribe un mensaje....
         /// </summary>
         public static string Global_txtChatPlaceholder {
@@ -1150,6 +1168,24 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a No es posible iniciar sesión. La cuenta ha sido baneada. Intenta con otra cuenta..
+        /// </summary>
+        public static string MessageAuthentication_msgBannedAccount {
+            get {
+                return ResourceManager.GetString("MessageAuthentication_msgBannedAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Cuenta baneada.
+        /// </summary>
+        public static string MessageAuthentication_msgBannedAccountTitle {
+            get {
+                return ResourceManager.GetString("MessageAuthentication_msgBannedAccountTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a No es posible iniciar sesión en este momento. Intenta nuevamente..
         /// </summary>
         public static string MessageAuthentication_msgConnectionError {
@@ -1159,29 +1195,11 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Error de inicio de sesión.
+        ///   Busca una cadena traducida similar a Error de conexión.
         /// </summary>
         public static string MessageAuthentication_msgConnectionErrorTitle {
             get {
                 return ResourceManager.GetString("MessageAuthentication_msgConnectionErrorTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Busca una cadena traducida similar a No es posible iniciar sesión con esta cuenta..
-        /// </summary>
-        public static string MessageAuthentication_msgDisabledAccount {
-            get {
-                return ResourceManager.GetString("MessageAuthentication_msgDisabledAccount", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Busca una cadena traducida similar a Cuenta deshabilitada.
-        /// </summary>
-        public static string MessageAuthentication_msgDisabledAccountTitle {
-            get {
-                return ResourceManager.GetString("MessageAuthentication_msgDisabledAccountTitle", resourceCulture);
             }
         }
         
@@ -1200,6 +1218,24 @@ namespace DominoAllFives.Client.WPF.Localization {
         public static string MessageAuthentication_msgInvalidCredentialsTitle {
             get {
                 return ResourceManager.GetString("MessageAuthentication_msgInvalidCredentialsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No es posible iniciar sesión. La cuenta está suspendida. Intenta de nuevo en otro momento..
+        /// </summary>
+        public static string MessageAuthentication_msgSuspendedAccount {
+            get {
+                return ResourceManager.GetString("MessageAuthentication_msgSuspendedAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Suspensión.
+        /// </summary>
+        public static string MessageAuthentication_msgSuspendedAccountTitle {
+            get {
+                return ResourceManager.GetString("MessageAuthentication_msgSuspendedAccountTitle", resourceCulture);
             }
         }
         
