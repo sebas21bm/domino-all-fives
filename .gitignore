@@ -430,3 +430,6 @@ FodyWeavers.xsd
 
 # Local database connection configuration
 **/Configuration/DatabaseConnection.config
+
+# SonarQube analysis files
+.sonarqube/
