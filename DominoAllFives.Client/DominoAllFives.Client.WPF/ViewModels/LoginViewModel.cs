@@ -4,6 +4,7 @@ using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Enums;
 using System;
 using System.Windows.Controls;
 

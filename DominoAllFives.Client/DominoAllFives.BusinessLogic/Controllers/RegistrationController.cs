@@ -1,6 +1,7 @@
 ﻿using DominoAllFives.BusinessLogic.Security;
 using DominoAllFives.BusinessLogic.Validation;
 using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;

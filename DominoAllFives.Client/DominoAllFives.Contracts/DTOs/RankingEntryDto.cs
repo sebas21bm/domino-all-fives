@@ -12,5 +12,7 @@
         public int GamesWon { get; set; }
 
         public string ProfilePicture { get; set; }
+
+        //public byte[] ProfilePicture { get; set; }
     }
 }
