@@ -169,7 +169,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void OnAccountDeletedSuccess()
         {
             CloseModal();
-            // TODO: Eliminar el registro en la BD
             _navigationService.NavigateTo<HomePageViewModel>();
         }
 
@@ -181,7 +180,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ExecuteLogout()
         {
-            // TODO: Invalidad sesión en el cliente
             _navigationService.NavigateTo<HomePageViewModel>();
         }
     }

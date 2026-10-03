@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Views
 {
-    /// <summary>
-    /// Lógica de interacción para ModeratorMainMenu.xaml
-    /// </summary>
     public partial class ModeratorMainMenu : Page
     {
         public ModeratorMainMenu()

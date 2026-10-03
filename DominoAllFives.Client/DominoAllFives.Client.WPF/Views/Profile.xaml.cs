@@ -12,9 +12,6 @@ using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Views
 {
-    /// <summary>
-    /// Lógica de interacción para ProfileView.xaml
-    /// </summary>
     public partial class Profile : Page
     {
         public Profile()

@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Views
 {
-    /// <summary>
-    /// Lógica de interacción para Rules.xaml
-    /// </summary>
     public partial class HowToPlay : Page
     {
         public HowToPlay()

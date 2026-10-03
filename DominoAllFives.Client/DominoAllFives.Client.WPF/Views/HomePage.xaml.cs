@@ -14,9 +14,6 @@ using DominoAllFives.Client.WPF.Services;
 
 namespace DominoAllFives.Client.WPF.Views
 {
-    /// <summary>
-    /// Lógica de interacción para HomePage.xaml
-    /// </summary>
     public partial class HomePage : Page
     {
         public HomePage()

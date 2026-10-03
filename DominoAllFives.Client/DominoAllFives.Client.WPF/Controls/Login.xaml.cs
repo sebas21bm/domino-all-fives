@@ -15,9 +15,7 @@ using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Controls
 {
-    /// <summary>
-    /// Lógica de interacción para Login.xaml
-    /// </summary>
+
     public partial class Login : UserControl
     {
         public Login()

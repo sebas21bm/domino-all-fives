@@ -36,7 +36,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ExecuteChangePassword(object parameter)
         {
-            // TODO: Validar formato seguro de contraseña (RV-02) y actualizar en WCF
             _onPasswordChangedSuccess?.Invoke();
         }
     }

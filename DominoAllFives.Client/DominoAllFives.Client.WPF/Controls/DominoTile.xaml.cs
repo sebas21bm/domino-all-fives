@@ -21,50 +21,46 @@ namespace DominoAllFives.Client.WPF.Controls
         DoublePoints,
         Block
     }
-
-    /// <summary>
-    /// Lógica de interacción para DominoTile.xaml
-    /// </summary>
     public partial class DominoTile : UserControl
     {
-        public static readonly DependencyProperty TopValueProperty =
+        public static readonly DependencyProperty topValueProperty =
         DependencyProperty.Register(nameof(TopValue), typeof(int), typeof(DominoTile),
             new PropertyMetadata(0, OnTilePropertyChanged));
 
-        public static readonly DependencyProperty BottomValueProperty =
+        public static readonly DependencyProperty bottomValueProperty =
             DependencyProperty.Register(nameof(BottomValue), typeof(int), typeof(DominoTile),
                 new PropertyMetadata(0, OnTilePropertyChanged));
 
-        public static readonly DependencyProperty TileTypeProperty =
+        public static readonly DependencyProperty tileTypeProperty =
             DependencyProperty.Register(nameof(TileType), typeof(DominoTileType), typeof(DominoTile),
                 new PropertyMetadata(DominoTileType.Normal, OnTilePropertyChanged));
 
-        public static readonly DependencyProperty PipBrushProperty =
+        public static readonly DependencyProperty pipBrushProperty =
             DependencyProperty.Register(nameof(PipBrush), typeof(Brush), typeof(DominoTile),
                 new PropertyMetadata(Brushes.Black));
 
         public int TopValue
         {
-            get => (int)GetValue(TopValueProperty);
-            set => SetValue(TopValueProperty, value);
+            get => (int)GetValue(topValueProperty);
+            set => SetValue(topValueProperty, value);
         }
 
         public int BottomValue
         {
-            get => (int)GetValue(BottomValueProperty);
-            set => SetValue(BottomValueProperty, value);
+            get => (int)GetValue(bottomValueProperty);
+            set => SetValue(bottomValueProperty, value);
         }
 
         public DominoTileType TileType
         {
-            get => (DominoTileType)GetValue(TileTypeProperty);
-            set => SetValue(TileTypeProperty, value);
+            get => (DominoTileType)GetValue(tileTypeProperty);
+            set => SetValue(tileTypeProperty, value);
         }
 
         public Brush PipBrush
         {
-            get => (Brush)GetValue(PipBrushProperty);
-            set => SetValue(PipBrushProperty, value);
+            get => (Brush)GetValue(pipBrushProperty);
+            set => SetValue(pipBrushProperty, value);
         }
 
         public DominoTile()

@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="120" d:DesignWidth="60">
 
-    <Border x:Name="bdrTileFrame"
+    <Border x:Name="borTileFrame"
             Width="56"
             Height="112"
             Background="{StaticResource CreamLightBrush}"

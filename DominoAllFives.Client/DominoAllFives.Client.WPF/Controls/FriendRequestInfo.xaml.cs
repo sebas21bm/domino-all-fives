@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Controls
 {
-    /// <summary>
-    /// Lógica de interacción para FriendRequestInfo.xaml
-    /// </summary>
     public partial class FriendRequestInfo : UserControl
     {
         public FriendRequestInfo()

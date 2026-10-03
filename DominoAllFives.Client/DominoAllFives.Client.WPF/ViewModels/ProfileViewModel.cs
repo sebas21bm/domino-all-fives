@@ -57,7 +57,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
 
-            // TODO: Cargar datos reales desde el servicio de sesión WCF
             Username = "nickname31";
             ProfilePicturePath = "/Assets/Images/default_avatar.png";
             Wins = 10;

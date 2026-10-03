@@ -13,9 +13,6 @@ using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Controls
 {
-    /// <summary>
-    /// Lógica de interacción para ChangePassword.xaml
-    /// </summary>
     public partial class ChangePassword : UserControl
     {
         public ChangePassword()

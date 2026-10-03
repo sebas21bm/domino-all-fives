@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Views
 {
-    /// <summary>
-    /// Lógica de interacción para Reports.xaml
-    /// </summary>
     public partial class Reports : Page
     {
         public Reports()

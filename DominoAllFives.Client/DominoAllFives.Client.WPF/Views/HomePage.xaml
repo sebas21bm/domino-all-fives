@@ -23,7 +23,7 @@
                             Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnExitGame]}"
                             MinWidth="200" MinHeight="54"
                             Command="{Binding ExitGameCommand}"/>
-                    <ComboBox x:Name="cbLanguageSelector"
+                    <ComboBox x:Name="cbxLanguageSelector"
                               HorizontalAlignment="Right"
                               Style="{StaticResource DarkComboBox}"
                               Width="220" MinHeight="54"
@@ -64,7 +64,7 @@
             </Grid>
         </Viewbox>
 
-        <Grid x:Name="ModalOverlay" 
+        <Grid x:Name="grdModalOveral" 
               Visibility="{Binding IsModalVisible, Converter={StaticResource BoolToVis}}"
               HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch">

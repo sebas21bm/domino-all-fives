@@ -46,12 +46,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ExecuteChangePicture(object parameter)
         {
-            // TODO: Lógica de selección de imagen en futuras iteraciones
         }
 
         private void ExecuteSave(object parameter)
         {
-            // TODO: Lógica de guardado en futuras iteraciones
             _navigationService.GoBack();
         }
 

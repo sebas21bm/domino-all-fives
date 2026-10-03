@@ -18,12 +18,12 @@ namespace DominoAllFives.Client.WPF.Localization
         private const string EnglishLanguageCode = "en-US";
         private const string PortugueseLanguageCode = "pt-BR";
 
-        private static readonly Lazy<LanguageManager> _instance = new Lazy<LanguageManager>(() => new LanguageManager());
+        private static readonly Lazy<LanguageManager> instance = new Lazy<LanguageManager>(() => new LanguageManager());
 
         private readonly ResourceManager _resourceManager;
         private string _currentLanguageCode;
 
-        public static LanguageManager Instance => _instance.Value;
+        public static LanguageManager Instance => instance.Value;
 
         public string CurrentLanguageCode => _currentLanguageCode;
 

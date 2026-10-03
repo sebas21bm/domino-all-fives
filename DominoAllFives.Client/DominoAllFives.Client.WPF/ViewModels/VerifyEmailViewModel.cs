@@ -53,7 +53,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ExecuteResendCode()
         {
-            // TODO: Solicitar reenvío de código al servidor WCF
+
         }
     }
 }

@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Controls
 {
-    /// <summary>
-    /// Lógica de interacción para InviteFriends.xaml
-    /// </summary>
     public partial class InviteFriends : UserControl
     {
         public InviteFriends()

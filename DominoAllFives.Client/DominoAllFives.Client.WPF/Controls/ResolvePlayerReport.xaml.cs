@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Controls
 {
-    /// <summary>
-    /// Lógica de interacción para ResolvePlayerReport.xaml
-    /// </summary>
     public partial class ResolvePlayerReport : UserControl
     {
         public ResolvePlayerReport()

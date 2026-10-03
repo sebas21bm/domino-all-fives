@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Views
 {
-    /// <summary>
-    /// Lógica de interacción para JoinGame.xaml
-    /// </summary>
     public partial class JoinGame : Page
     {
         public JoinGame()

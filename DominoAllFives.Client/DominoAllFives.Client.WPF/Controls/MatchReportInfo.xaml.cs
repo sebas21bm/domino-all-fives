@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Controls
 {
-    /// <summary>
-    /// Lógica de interacción para MatchReportInfo.xaml
-    /// </summary>
     public partial class MatchReportInfo : UserControl
     {
         public MatchReportInfo()

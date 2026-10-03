@@ -12,9 +12,6 @@ using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Views
 {
-    /// <summary>
-    /// Lógica de interacción para MainMenu.xaml
-    /// </summary>
     public partial class MainMenu : Page
     {
         public MainMenu()
