@@ -13,9 +13,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
     /// </summary>
     public class AuthenticationController
     {
-        public LoginResultDto Login(
-            string usernameOrEmail,
-            string password)
+        public LoginResultDto Login(LoginRequestDto loginRequest)
         {
             using (DominoAllFivesEntities context =
                 new DominoAllFivesEntities())
@@ -24,11 +22,11 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     new PlayerRepository(context);
 
                 Player player =
-                    playerRepository.GetByUsernameOrEmail(usernameOrEmail);
+                    playerRepository.GetByUsernameOrEmail(loginRequest.EmailOrUsername);
 
                 if (player == null ||
                     !PasswordHasher.VerifyPassword(
-                        password,
+                        loginRequest.Password,
                         player.PasswordHash))
                 {
                     return CreateFailureResult(

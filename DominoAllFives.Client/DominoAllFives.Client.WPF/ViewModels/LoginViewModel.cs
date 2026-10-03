@@ -110,10 +110,14 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             try
             {
+                LoginRequestDto request = new LoginRequestDto
+                {
+                    EmailOrUsername = Email.Trim(),
+                    Password = Password
+                };
+
                 LoginResultDto result =
-                    _authenticationController.Login(
-                        Email.Trim(),
-                        Password);
+                    _authenticationController.Login(request);
 
                 if (!result.IsSuccessful)
                 {

@@ -12,6 +12,12 @@ namespace DominoAllFives.Contracts.Services
     /// </summary>
     public interface IRankingService
     {
-        RankingResultDto GetRanking(int playerId);
+        /// <summary>
+        /// Retrieves the ranking information for the top players and the current player's rank.
+        /// </summary>
+        /// <param name="playerId">The ID of the player for whom 
+        /// to retrieve ranking information.</param>
+        /// <returns>The ranking result.</returns>
+        RankingResultDto GetTopRanking(int playerId);
     }
 }
