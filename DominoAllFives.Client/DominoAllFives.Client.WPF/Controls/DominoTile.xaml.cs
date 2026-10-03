@@ -1,39 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace DominoAllFives.Client.WPF.Controls
 {
+    /// <summary>
+    /// Enumeration that represents the different types of domino tiles that exist
+    /// in the game.
+    /// </summary>
     public enum DominoTileType
     {
         Normal,
         DoublePoints,
         Block
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class DominoTile : UserControl
     {
-        public static readonly DependencyProperty topValueProperty =
+        public static readonly DependencyProperty TopValueProperty =
         DependencyProperty.Register(nameof(TopValue), typeof(int), typeof(DominoTile),
             new PropertyMetadata(0, OnTilePropertyChanged));
 
-        public static readonly DependencyProperty bottomValueProperty =
+        public static readonly DependencyProperty BottomValueProperty =
             DependencyProperty.Register(nameof(BottomValue), typeof(int), typeof(DominoTile),
                 new PropertyMetadata(0, OnTilePropertyChanged));
 
-        public static readonly DependencyProperty tileTypeProperty =
-            DependencyProperty.Register(nameof(TileType), typeof(DominoTileType), typeof(DominoTile),
-                new PropertyMetadata(DominoTileType.Normal, OnTilePropertyChanged));
+        public static readonly DependencyProperty TileTypeProperty =
+            DependencyProperty.Register(nameof(TileType), typeof(DominoTileType), 
+                typeof(DominoTile), new PropertyMetadata(DominoTileType.Normal, 
+                                                        OnTilePropertyChanged));
 
         public static readonly DependencyProperty pipBrushProperty =
             DependencyProperty.Register(nameof(PipBrush), typeof(Brush), typeof(DominoTile),
@@ -41,20 +40,20 @@ namespace DominoAllFives.Client.WPF.Controls
 
         public int TopValue
         {
-            get => (int)GetValue(topValueProperty);
-            set => SetValue(topValueProperty, value);
+            get => (int)GetValue(TopValueProperty);
+            set => SetValue(TopValueProperty, value);
         }
 
         public int BottomValue
         {
-            get => (int)GetValue(bottomValueProperty);
-            set => SetValue(bottomValueProperty, value);
+            get => (int)GetValue(BottomValueProperty);
+            set => SetValue(BottomValueProperty, value);
         }
 
         public DominoTileType TileType
         {
-            get => (DominoTileType)GetValue(tileTypeProperty);
-            set => SetValue(tileTypeProperty, value);
+            get => (DominoTileType)GetValue(TileTypeProperty);
+            set => SetValue(TileTypeProperty, value);
         }
 
         public Brush PipBrush
@@ -69,7 +68,8 @@ namespace DominoAllFives.Client.WPF.Controls
             UpdateTileAppearance();
         }
 
-        private static void OnTilePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnTilePropertyChanged(DependencyObject d, 
+            DependencyPropertyChangedEventArgs e)
         {
             if (d is DominoTile tile)
             {
@@ -79,7 +79,7 @@ namespace DominoAllFives.Client.WPF.Controls
 
         private void UpdateTileAppearance()
         {
-            if (bdrTileFrame == null)
+            if (borTileFrame == null)
             {
                 return;
             }
@@ -89,21 +89,24 @@ namespace DominoAllFives.Client.WPF.Controls
             switch (TileType)
             {
                 case DominoTileType.DoublePoints:
-                    bdrTileFrame.Background = (Brush)FindResource("PrimaryRedBrush");
+                    borTileFrame.Background = (Brush)FindResource("PrimaryRedBrush");
                     break;
                 case DominoTileType.Block:
-                    bdrTileFrame.Background = (Brush)FindResource("BlockPurpleBrush");
+                    borTileFrame.Background = (Brush)FindResource("BlockPurpleBrush");
                     break;
                 default:
-                    bdrTileFrame.Background = (Brush)FindResource("CreamLightBrush");
+                    borTileFrame.Background = (Brush)FindResource("CreamLightBrush");
                     break;
             }
 
-            RenderPips(TopValue, pipTopTL, pipTopTR, pipTopML, pipTopC, pipTopMR, pipTopBL, pipTopBR);
-            RenderPips(BottomValue, pipBottomTL, pipBottomTR, pipBottomML, pipBottomC, pipBottomMR, pipBottomBL, pipBottomBR);
+            RenderPips(TopValue, pipTopTL, pipTopTR, pipTopML, pipTopC, 
+                        pipTopMR, pipTopBL, pipTopBR);
+            RenderPips(BottomValue, pipBottomTL, pipBottomTR, pipBottomML, pipBottomC, 
+                        pipBottomMR, pipBottomBL, pipBottomBR);
         }
 
-        private static void RenderPips(int value, Ellipse tl, Ellipse tr, Ellipse ml, Ellipse c, Ellipse mr, Ellipse bl, Ellipse br)
+        private static void RenderPips(int value, Ellipse tl, Ellipse tr, Ellipse ml, 
+                                        Ellipse c, Ellipse mr, Ellipse bl, Ellipse br)
         {
             tl.Visibility = Visibility.Collapsed;
             tr.Visibility = Visibility.Collapsed;

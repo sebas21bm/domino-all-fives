@@ -1,12 +1,10 @@
-﻿using DominoAllFives.Client.WPF.ViewModels;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows.Controls;
+
+using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Client.WPF.Views;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 
 namespace DominoAllFives.Client.WPF.Services
 {
@@ -19,7 +17,8 @@ namespace DominoAllFives.Client.WPF.Services
         public bool CanGoBack => _navigationFrame != null && _navigationFrame.CanGoBack;
         public FrameNavigationService(Frame navigationFrame)
         {
-            _navigationFrame = navigationFrame ?? throw new ArgumentNullException(nameof(navigationFrame));
+            _navigationFrame = navigationFrame ?? throw new ArgumentNullException(
+                nameof(navigationFrame));
             _viewModelToPageMap = new Dictionary<Type, Type>();
 
             RegisterRoutes();
@@ -45,7 +44,8 @@ namespace DominoAllFives.Client.WPF.Services
 
             if (!_viewModelToPageMap.TryGetValue(viewModelType, out Type pageType))
             {
-                throw new InvalidOperationException($"No page registered for ViewModel type: {viewModelType.FullName}");
+                throw new InvalidOperationException($"No page registered for ViewModel type: " +
+                    $"{viewModelType.FullName}");
             }
 
             ViewModelBase viewModelInstance;
@@ -72,7 +72,8 @@ namespace DominoAllFives.Client.WPF.Services
             catch (MissingMethodException ex)
             {
                 throw new InvalidOperationException(
-                    $"The ViewModel {viewModelType.Name} must have a constructor accepting IFrameNavigationService.",
+                    $"The ViewModel {viewModelType.Name} must have a " +
+                    $"constructor accepting IFrameNavigationService.",
                     ex);
             }
 

@@ -1,11 +1,12 @@
-﻿using DominoAllFives.Client.WPF.Commands;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.IO;
+
+using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.DTOs;
-using System;
-using System.Collections.ObjectModel;
-using System.IO;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {

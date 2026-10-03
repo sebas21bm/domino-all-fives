@@ -1,14 +1,10 @@
-﻿using DominoAllFives.Client.WPF.Commands;
+﻿using System;
+using System.Collections.ObjectModel;
+
+using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -55,7 +51,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public LobbyViewModel(IFrameNavigationService navigationService)
         {
-            _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
+            _navigationService = navigationService ?? 
+                throw new ArgumentNullException(nameof(navigationService));
 
             GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
             InviteFriendsCommand = new RelayCommand(ExecuteInviteFriends);

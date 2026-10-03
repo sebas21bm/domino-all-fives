@@ -1,11 +1,8 @@
-﻿using DominoAllFives.Client.WPF.Localization;
+﻿using System;
+
+using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DominoAllFives.Client.WPF.Services
 {
@@ -22,7 +19,8 @@ namespace DominoAllFives.Client.WPF.Services
             _showDialogCallback = showDialogCallback;
         }
 
-        public void ShowDialog(DialogType type, string titleKey, string messageKey, Action onAccept, Action onCancel = null)
+        public void ShowDialog(DialogType type, string titleKey, string messageKey, 
+            Action onAccept, Action onCancel = null)
         {
             string title = LanguageManager.Instance[titleKey] ?? titleKey;
             string message = LanguageManager.Instance[messageKey] ?? messageKey;

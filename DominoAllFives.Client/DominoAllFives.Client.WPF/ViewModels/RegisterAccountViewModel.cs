@@ -1,13 +1,14 @@
-﻿using DominoAllFives.BusinessLogic.Controllers;
+﻿using System;
+using System.Data.SqlClient;
+using System.Windows.Controls;
+
+using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.DTOs;
-using System;
-using System.Data.SqlClient;
-using System.Windows.Controls;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {

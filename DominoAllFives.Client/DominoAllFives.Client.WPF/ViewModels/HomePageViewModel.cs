@@ -1,12 +1,13 @@
-﻿using DominoAllFives.BusinessLogic.Controllers;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows;
+
+using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using System;
-using System.Collections.Generic;
-using System.Windows;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {

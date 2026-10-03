@@ -1,12 +1,14 @@
-﻿using DominoAllFives.BusinessLogic.Controllers;
+﻿using System;
+using System.Windows.Media.Imaging;
+
+using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Validation;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using Microsoft.Win32;
-using System;
-using System.Windows.Media.Imaging;
+
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {

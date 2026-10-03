@@ -1,6 +1,8 @@
-﻿using DominoAllFives.Client.WPF.Services;
+﻿using System.Windows;
+
+using DominoAllFives.Client.WPF.Models;
+using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels;
-using System.Windows;
 
 namespace DominoAllFives.Client.WPF
 {

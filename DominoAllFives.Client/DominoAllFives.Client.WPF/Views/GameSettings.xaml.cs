@@ -1,7 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using DominoAllFives.Client.WPF.Localization;
+﻿using System.Windows.Controls;
 
 namespace DominoAllFives.Client.WPF.Views
 {

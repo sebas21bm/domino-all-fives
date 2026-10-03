@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DominoAllFives.Client.WPF.Models
+﻿namespace DominoAllFives.Client.WPF.Models
 {
+    /// <summary>
+    /// Enumeration for the different message types that can be displayed 
+    /// with the CustomMessage control.
+    /// </summary>
     public enum DialogType
     {
         Success,

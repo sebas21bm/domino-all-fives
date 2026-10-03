@@ -1,16 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace DominoAllFives.Client.WPF.Commands
 {
+    /// <summary>
+    /// Implements interface ICommand to delegate actions to UI view Commands
+    /// </summary>
     public class RelayCommand : ICommand
     {
         private readonly Action<object> _execute;
         private readonly Predicate<object> _canExecute;
+
+        public RelayCommand()
+        {
+        }
 
         public RelayCommand(Action<object> execute, Predicate<object> canExecute = null)
         {

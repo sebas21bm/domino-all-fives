@@ -1,7 +1,8 @@
-﻿using DominoAllFives.Contracts.DTOs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+
+using DominoAllFives.Contracts.DTOs;
 
 namespace DominoAllFives.BusinessLogic.Validation
 {

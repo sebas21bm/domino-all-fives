@@ -1,11 +1,8 @@
-﻿using DominoAllFives.Client.WPF.Commands;
+﻿using System;
+
+using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
+
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -61,8 +58,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public RelayCommand CancelCommand { get; }
 
-        public CustomMessageViewModel(string title, string message, string iconPath, string acceptButtonText,
-                                    Action onAcceptAction, string cancelButtonText, Action onCancelAction)
+        public CustomMessageViewModel(string title, string message, string iconPath, 
+                    string acceptButtonText, Action onAcceptAction, string cancelButtonText, 
+                    Action onCancelAction)
         {
             if (string.IsNullOrEmpty(title))
             {

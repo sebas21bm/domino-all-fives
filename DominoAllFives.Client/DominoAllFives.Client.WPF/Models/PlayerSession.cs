@@ -1,4 +1,4 @@
-﻿namespace DominoAllFives.Client.WPF.Services
+﻿namespace DominoAllFives.Client.WPF.Models
 {
     /// <summary>
     /// Stores information about the player authenticated in the current session.
