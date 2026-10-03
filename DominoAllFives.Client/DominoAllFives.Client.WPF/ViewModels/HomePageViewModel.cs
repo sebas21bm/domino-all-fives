@@ -133,12 +133,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OpenRegisterModal()
         {
-            RegistrationController registrationController =
-                new RegistrationController();
-
             CurrentModal = new RegisterAccountViewModel(
                 _dialogService,
-                registrationController,
+                _accountService,
                 _playerSession,
                 OpenUploadProfilePictureModal,
                 CloseModal);

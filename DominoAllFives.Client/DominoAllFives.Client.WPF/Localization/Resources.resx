@@ -228,10 +228,10 @@
   <data name="MessageAccount_msgIncorrectPassword" xml:space="preserve">
     <value>Las contraseñas no coinciden. Cambia la contraseña e intenta nuevamente.</value>
   </data>
-  <data name="MessageAuthentication_msgConnectionErrorTitle" xml:space="preserve">
+  <data name="Global_msgConnectionErrorTitle" xml:space="preserve">
     <value>Error de conexión</value>
   </data>
-  <data name="MessageAuthentication_msgConnectionError" xml:space="preserve">
+  <data name="Global_msgConnectionError" xml:space="preserve">
     <value>No es posible iniciar sesión en este momento. Intenta nuevamente.</value>
   </data>
   <data name="MessageAuthentication_msgBannedAccountTitle" xml:space="preserve">
@@ -250,7 +250,7 @@
     <value>Creación de cuenta fallida</value>
   </data>
   <data name="MessageAccount_msgAccountCreationError" xml:space="preserve">
-    <value>No se pudo crear la cuenta. Ocurrió un error. Intenta nuevamente.</value>
+    <value>No se pudo crear la cuenta. Ocurrió un error de conexión. Intenta nuevamente.</value>
   </data>
   <data name="MessageAccount_msgAccountCreatedTitle" xml:space="preserve">
     <value>Cuenta creada</value>
@@ -971,5 +971,18 @@
   </data>
   <data name="Global_msgDefaultErrorTitle" xml:space="preserve">
     <value>Error</value>
+  </data>
+  <data name="MessageAccount_msgInvalidUsername" xml:space="preserve">
+    <value>El usuario no debe superar los 64 carácteres.</value>
+  </data>
+  <data name="MessageAccount_msgInvalidUsernameTitle" xml:space="preserve">
+    <value>Usuario inválido</value>
+  </data>
+  <data name="MessageAccount_msgInvalidEmail" xml:space="preserve">
+    <value>El correo electrónico debe ser de la forma @dominio.com
+Los dominios válidos son: gmail, hotmail, outlook</value>
+  </data>
+  <data name="MessageAccount_msgInvalidEmailTitle" xml:space="preserve">
+    <value>Correo electrónico inválido</value>
   </data>
 </root>

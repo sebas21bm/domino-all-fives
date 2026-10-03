@@ -1,4 +1,6 @@
-﻿using DominoAllFives.BusinessLogic.Controllers;
+﻿using System;
+using System.Data.SqlClient;
+using System.Windows.Controls;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
@@ -6,16 +8,14 @@ using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Enums;
-using System;
-using System.Data.SqlClient;
-using System.Windows.Controls;
+using DominoAllFives.Contracts.Services;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class RegisterAccountViewModel : ViewModelBase
     {
         private readonly IDialogService _dialogService;
-        private readonly RegistrationController _registrationController;
+        private readonly IAccountService _accountService;
         private readonly PlayerSession _playerSession;
         private readonly Action _onRegistrationSuccess;
         private readonly Action _onCancel;
@@ -70,7 +70,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public RegisterAccountViewModel(
             IDialogService dialogService,
-            RegistrationController registrationController,
+            IAccountService accountService,
             PlayerSession playerSession,
             Action onRegistrationSuccess,
             Action onCancel)
@@ -78,9 +78,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _dialogService = dialogService
                 ?? throw new ArgumentNullException(nameof(dialogService));
 
-            _registrationController = registrationController
-                ?? throw new ArgumentNullException(
-                    nameof(registrationController));
+            _accountService = accountService
+                ?? throw new ArgumentNullException(nameof(accountService));
 
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(nameof(playerSession));
@@ -133,36 +132,21 @@ namespace DominoAllFives.Client.WPF.ViewModels
                         LanguageManager.Instance.CurrentLanguageCode
                 };
 
-            try
+            RegistrationResultDto result =_accountService.Register(registrationData);
+
+            if (!result.IsSuccessful)
             {
-                RegistrationResultDto result =
-                    _registrationController.Register(
-                        registrationData);
-
-                if (!result.IsSuccessful)
-                {
-                    ShowRegistrationFailure(
-                        result.FailureReason);
-
-                    return;
-                }
-
-                _playerSession.Start(result.PlayerId);
-
-                _dialogService.ShowDialog(
-                    DialogType.Success,
-                    "MessageAccount_msgAccountCreatedTitle",
-                    "MessageAccount_msgAccountCreated",
-                    _onRegistrationSuccess);
+                ShowRegistrationFailure(result.FailureReason);
+                return;
             }
-            catch (SqlException)
-            {
-                _dialogService.ShowDialog(
-                    DialogType.Error,
-                    "MessageAccount_msgAccountCreationErrorTitle",
-                    "MessageAccount_msgAccountCreationError",
-                    () => { });
-            }
+
+            _playerSession.Start(result.PlayerId);
+
+            _dialogService.ShowDialog(
+                DialogType.Success,
+                "MessageAccount_msgAccountCreatedTitle",
+                "MessageAccount_msgAccountCreated",
+                _onRegistrationSuccess);
         }
 
         private bool ValidateRequiredFields(
@@ -226,13 +210,39 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     break;
 
                 case RegistrationFailureReason.InvalidUsername:
+                    _dialogService.ShowDialog(
+                        DialogType.Warning,
+                        "MessageAccount_msgInvalidUsernameTitle",
+                        "MessageAccount_msgInvalidUsername",
+                        () => { });
+                    break;
                 case RegistrationFailureReason.InvalidEmail:
+                    _dialogService.ShowDialog(
+                        DialogType.Warning,
+                        "MessageAccount_msgInvalidEmailTitle",
+                        "MessageAccount_msgInvalidEmail",
+                        () => { });
+                    break;
                 case RegistrationFailureReason.InvalidRegistrationData:
-                default:
                     _dialogService.ShowDialog(
                         DialogType.Warning,
                         "MessageAccount_msgInvalidDataTitle",
                         "MessageAccount_msgInvalidData",
+                        () => { });
+                    break;
+
+                case RegistrationFailureReason.ServiceUnavailable:
+                    _dialogService.ShowDialog(
+                        DialogType.Error,
+                        "MessageAccount_msgAccountCreationErrorTitle",
+                        "MessageAccount_msgAccountCreationError",
+                        () => { });
+                    break;
+                default:
+                    _dialogService.ShowDialog(
+                        DialogType.Error,
+                        "Global_msgDefaultErrorTitle",
+                        "Global_msgDefaultError",
                         () => { });
                     break;
             }

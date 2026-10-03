@@ -592,6 +592,24 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a No es posible iniciar sesión en este momento. Intenta nuevamente..
+        /// </summary>
+        public static string Global_msgConnectionError {
+            get {
+                return ResourceManager.GetString("Global_msgConnectionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Error de conexión.
+        /// </summary>
+        public static string Global_msgConnectionErrorTitle {
+            get {
+                return ResourceManager.GetString("Global_msgConnectionErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a No es posible continuar. Error desconocido. Intente nuevamente..
         /// </summary>
         public static string Global_msgDefaultError {
@@ -997,7 +1015,7 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a No se pudo crear la cuenta. Ocurrió un error. Intenta nuevamente..
+        ///   Busca una cadena traducida similar a No se pudo crear la cuenta. Ocurrió un error de conexión. Intenta nuevamente..
         /// </summary>
         public static string MessageAccount_msgAccountCreationError {
             get {
@@ -1114,6 +1132,43 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a El correo electrónico debe ser de la forma @dominio.com
+        ///Los dominios válidos son: gmail, hotmail, outlook.
+        /// </summary>
+        public static string MessageAccount_msgInvalidEmail {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgInvalidEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Correo electrónico inválido.
+        /// </summary>
+        public static string MessageAccount_msgInvalidEmailTitle {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgInvalidEmailTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El usuario no debe superar los 64 carácteres..
+        /// </summary>
+        public static string MessageAccount_msgInvalidUsername {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgInvalidUsername", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Usuario inválido.
+        /// </summary>
+        public static string MessageAccount_msgInvalidUsernameTitle {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgInvalidUsernameTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a La contraseña fue actualizada correctamente..
         /// </summary>
         public static string MessageAccount_msgPasswordChanged {
@@ -1182,24 +1237,6 @@ namespace DominoAllFives.Client.WPF.Localization {
         public static string MessageAuthentication_msgBannedAccountTitle {
             get {
                 return ResourceManager.GetString("MessageAuthentication_msgBannedAccountTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Busca una cadena traducida similar a No es posible iniciar sesión en este momento. Intenta nuevamente..
-        /// </summary>
-        public static string MessageAuthentication_msgConnectionError {
-            get {
-                return ResourceManager.GetString("MessageAuthentication_msgConnectionError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Busca una cadena traducida similar a Error de conexión.
-        /// </summary>
-        public static string MessageAuthentication_msgConnectionErrorTitle {
-            get {
-                return ResourceManager.GetString("MessageAuthentication_msgConnectionErrorTitle", resourceCulture);
             }
         }
         

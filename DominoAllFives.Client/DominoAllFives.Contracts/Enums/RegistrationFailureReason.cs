@@ -11,6 +11,7 @@
         InvalidEmail,
         InvalidPassword,
         UsernameAlreadyExists,
-        EmailAlreadyExists
+        EmailAlreadyExists,
+        ServiceUnavailable
     }
 }

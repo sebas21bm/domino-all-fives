@@ -9,6 +9,6 @@
         FileTooLarge,
         InvalidImage,
         PlayerNotFound,
-        PersistenceError
+        ServiceUnavailable
     }
 }

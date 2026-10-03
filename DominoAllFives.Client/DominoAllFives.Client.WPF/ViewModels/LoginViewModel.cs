@@ -162,8 +162,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 case LoginFailureReason.ServiceUnavailable:
                     _dialogService.ShowDialog(
                         DialogType.Error,
-                        "MessageAuthentication_msgConnectionErrorTitle",
-                        "MessageAuthentication_msgConnectionError",
+                        "Global_msgConnectionError",
+                        "Global_msgConnectionError",
                         () => { });
                     break;
                 case LoginFailureReason.InvalidCredentials:
