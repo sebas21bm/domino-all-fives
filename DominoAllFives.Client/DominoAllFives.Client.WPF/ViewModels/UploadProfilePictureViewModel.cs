@@ -1,12 +1,14 @@
-﻿using DominoAllFives.BusinessLogic.Controllers;
+﻿using System;
+using System.Windows.Media.Imaging;
+
+using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Validation;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using Microsoft.Win32;
-using System;
-using System.Windows.Media.Imaging;
+
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -86,7 +88,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             bool? result = fileDialog.ShowDialog();
 
-            if (result != true)
+            if (!(result ?? true))
             {
                 return;
             }
@@ -185,29 +187,32 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ShowInvalidFormatMessage()
         {
-            _dialogService.ShowDialog(
-                DialogType.Warning,
-                "MessageProfile_msgPhotoInvalidFormatTitle",
-                "MessageProfile_msgPhotoInvalidFormat",
-                () => { });
+            _dialogService.ShowDialog(new DialogRequest
+            {
+                Type = DialogType.Warning,
+                TitleKey = "MessageProfile_msgPhotoInvalidFormatTitle",
+                MessageKey = "MessageProfile_msgPhotoInvalidFormat"
+            });
         }
 
         private void ShowPhotoTooLargeMessage()
         {
-            _dialogService.ShowDialog(
-                DialogType.Warning,
-                "MessageProfile_msgPhotoTooLargeTitle",
-                "MessageProfile_msgPhotoTooLarge",
-                () => { });
+            _dialogService.ShowDialog(new DialogRequest
+            {
+                Type = DialogType.Warning,
+                TitleKey = "MessageProfile_msgPhotoTooLargeTitle",
+                MessageKey = "MessageProfile_msgPhotoTooLarge"
+            });
         }
 
         private void ShowPhotoCannotBeUploadedMessage()
         {
-            _dialogService.ShowDialog(
-                DialogType.Error,
-                "MessageProfile_msgPhotoCannotBeUploadedTitle",
-                "MessageProfile_msgPhotoCannotBeUploaded",
-                () => { });
+            _dialogService.ShowDialog(new DialogRequest
+            {
+                Type = DialogType.Error,
+                TitleKey = "MessageProfile_msgPhotoCannotBeUploadedTitle",
+                MessageKey = "MessageProfile_msgPhotoCannotBeUploaded"
+            });
         }
     }
 }

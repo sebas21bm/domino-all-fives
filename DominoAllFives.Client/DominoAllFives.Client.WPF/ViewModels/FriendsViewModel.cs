@@ -1,11 +1,8 @@
-﻿using DominoAllFives.Client.WPF.Commands;
+﻿using System;
+
+using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -42,7 +39,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public FriendsViewModel(IFrameNavigationService navigationService)
         {
-            _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
+            _navigationService = navigationService ?? 
+                throw new ArgumentNullException(nameof(navigationService));
 
             _isFriendsListVisible = true;
             _isAddFriendsVisible = false;

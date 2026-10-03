@@ -1,8 +1,9 @@
-﻿using DominoAllFives.Contracts.DTOs;
+﻿using System.Collections.Generic;
+
+using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;
-using System.Collections.Generic;
 
 namespace DominoAllFives.BusinessLogic.Controllers
 {

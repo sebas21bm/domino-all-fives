@@ -1,11 +1,12 @@
-﻿using DominoAllFives.BusinessLogic.Controllers;
+﻿using System;
+using System.Windows.Controls;
+
+using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.DTOs;
-using System;
-using System.Windows.Controls;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -126,11 +127,12 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
             catch (Exception)
             {
-                _dialogService.ShowDialog(
-                    DialogType.Error,
-                    "MessageAuthentication_msgConnectionErrorTitle",
-                    "MessageAuthentication_msgConnectionError",
-                    () => { });
+                _dialogService.ShowDialog(new DialogRequest
+                {
+                    Type = DialogType.Error,
+                    TitleKey = "MessageAuthentication_msgConnectionErrorTitle",
+                    MessageKey = "MessageAuthentication_msgConnectionError"
+                });
             }
         }
 
@@ -153,20 +155,22 @@ namespace DominoAllFives.Client.WPF.ViewModels
             {
                 case LoginFailureReason.Banned:
                 case LoginFailureReason.Suspended:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageAuthentication_msgDisabledAccountTitle",
-                        "MessageAuthentication_msgDisabledAccount",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageAuthentication_msgDisabledAccountTitle",
+                        MessageKey = "MessageAuthentication_msgDisabledAccount"
+                    });
                     break;
 
                 case LoginFailureReason.InvalidCredentials:
                 default:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageAuthentication_msgInvalidCredentialsTitle",
-                        "MessageAuthentication_msgInvalidCredentials",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageAuthentication_msgInvalidCredentialsTitle",
+                        MessageKey = "MessageAuthentication_msgInvalidCredentials"
+                    });
                     break;
             }
         }

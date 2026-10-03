@@ -18,12 +18,13 @@ namespace DominoAllFives.Client.WPF.Localization
         private const string EnglishLanguageCode = "en-US";
         private const string PortugueseLanguageCode = "pt-BR";
 
-        private static readonly Lazy<LanguageManager> _instance = new Lazy<LanguageManager>(() => new LanguageManager());
+        private static readonly Lazy<LanguageManager> instance = 
+            new Lazy<LanguageManager>(() => new LanguageManager());
 
         private readonly ResourceManager _resourceManager;
         private string _currentLanguageCode;
 
-        public static LanguageManager Instance => _instance.Value;
+        public static LanguageManager Instance => instance.Value;
 
         public string CurrentLanguageCode => _currentLanguageCode;
 
@@ -33,8 +34,8 @@ namespace DominoAllFives.Client.WPF.Localization
 
         private LanguageManager()
         {
-            _resourceManager = new ResourceManager("DominoAllFives.Client.WPF.Localization.Resources",
-                typeof(Resources).Assembly);
+            _resourceManager = new ResourceManager(
+                "DominoAllFives.Client.WPF.Localization.Resources", typeof(Resources).Assembly);
 
             string savedLanguage = Settings.Default.LanguageCode;
             if (string.IsNullOrWhiteSpace(savedLanguage) || !IsSupportedLanguage(savedLanguage))
@@ -54,7 +55,8 @@ namespace DominoAllFives.Client.WPF.Localization
                     return string.Empty;
                 }
 
-                string translation = _resourceManager.GetString(key, Thread.CurrentThread.CurrentUICulture);
+                string translation = _resourceManager.GetString(key, 
+                    Thread.CurrentThread.CurrentUICulture);
                 return translation ?? $"[{key}]";
             }
         }

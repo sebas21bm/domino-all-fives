@@ -80,7 +80,7 @@
             </Grid>
         </Viewbox>
 
-        <Grid x:Name="ModalOverlay" 
+        <Grid x:Name="grdModalOveral" 
               Visibility="{Binding IsModalVisible, Converter={StaticResource BoolToVis}}"
               HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch">

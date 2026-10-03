@@ -1,10 +1,7 @@
-﻿using DominoAllFives.Client.WPF.Commands;
+﻿using System;
+
+using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -20,7 +17,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             Action onAccountDeletedSuccess,
             Action onCancel)
         {
-            _onAccountDeletedSuccess = onAccountDeletedSuccess ?? throw new ArgumentNullException(nameof(onAccountDeletedSuccess));
+            _onAccountDeletedSuccess = onAccountDeletedSuccess ?? 
+                throw new ArgumentNullException(nameof(onAccountDeletedSuccess));
             _onCancel = onCancel ?? throw new ArgumentNullException(nameof(onCancel));
 
             ConfirmDeleteCommand = new RelayCommand(ExecuteConfirmDelete);

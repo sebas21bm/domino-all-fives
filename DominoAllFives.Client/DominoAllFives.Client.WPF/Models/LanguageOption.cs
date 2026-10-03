@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DominoAllFives.Client.WPF.Models
+﻿namespace DominoAllFives.Client.WPF.Models
 {
+    /// <summary>
+    /// Represents the language options available.
+    /// </summary>
     public class LanguageOption
     {
         public string Code { get; set; }

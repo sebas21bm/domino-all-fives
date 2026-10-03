@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DominoAllFives.Client.WPF.Models
+﻿namespace DominoAllFives.Client.WPF.Models
 {
+    /// <summary>
+    /// Represents a player that is displayed in the InviteFriends interface.
+    /// </summary>
     public class GameInvitationRecord
     {
         public string Username { get; set; }

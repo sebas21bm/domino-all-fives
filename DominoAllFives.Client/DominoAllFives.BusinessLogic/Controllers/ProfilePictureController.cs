@@ -1,9 +1,10 @@
-﻿using DominoAllFives.BusinessLogic.Validation;
+﻿using System;
+using System.IO;
+
+using DominoAllFives.BusinessLogic.Validation;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;
-using System;
-using System.IO;
 
 namespace DominoAllFives.BusinessLogic.Controllers
 {

@@ -1,11 +1,8 @@
-﻿using DominoAllFives.Client.WPF.Commands;
+﻿using System;
+
+using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -55,14 +52,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public ProfileViewModel(IFrameNavigationService navigationService)
         {
-            _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
-
-            // TODO: Cargar datos reales desde el servicio de sesión WCF
-            Username = "nickname31";
-            ProfilePicturePath = "/Assets/Images/default_avatar.png";
-            Wins = 10;
-            TotalPoints = 5800;
-            GamesPlayed = 45;
+            _navigationService = navigationService ?? 
+                throw new ArgumentNullException(nameof(navigationService));
 
             GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
             GoToEditProfileCommand = new RelayCommand(_ => ExecuteGoToEditProfile());

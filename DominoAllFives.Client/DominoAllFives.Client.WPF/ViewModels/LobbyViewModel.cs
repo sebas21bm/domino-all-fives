@@ -1,14 +1,10 @@
-﻿using DominoAllFives.Client.WPF.Commands;
+﻿using System;
+using System.Collections.ObjectModel;
+
+using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -55,7 +51,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public LobbyViewModel(IFrameNavigationService navigationService)
         {
-            _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
+            _navigationService = navigationService ?? 
+                throw new ArgumentNullException(nameof(navigationService));
 
             GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
             InviteFriendsCommand = new RelayCommand(ExecuteInviteFriends);
@@ -64,9 +61,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
             KickPlayerCommand = new RelayCommand(ExecuteKickPlayer);
 
             Players = new ObservableCollection<LobbyPlayerRecord>();
-
-            // Cargar datos mockup de 4 jugadores para pruebas
-            LoadMockPlayers();
         }
         private void ExecuteInviteFriends()
         {
@@ -89,7 +83,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             if (parameter is LobbyPlayerRecord player)
             {
-                // Lógica para abrir el perfil del jugador seleccionado (HU-CU-11)
+
             }
         }
 
@@ -97,48 +91,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             if (parameter is LobbyPlayerRecord player)
             {
-                // Remover jugador de la lista dinámica de prueba (CU-20)
+
                 Players.Remove(player);
             }
         }
 
-        private void LoadMockPlayers()
-        {
-            // Jugador 1: Anfitrión y usuario local
-            Players.Add(new LobbyPlayerRecord
-            {
-                Username = "pepe123",
-                AvatarPath = "/Assets/Images/Avatars/avatar1.png",
-                IsHost = true,
-                IsCurrentPlayer = true
-            });
-
-            // Jugador 2: Invitado
-            Players.Add(new LobbyPlayerRecord
-            {
-                Username = "nickname29",
-                AvatarPath = "/Assets/Images/Avatars/avatar2.png",
-                IsHost = false,
-                IsCurrentPlayer = false
-            });
-
-            // Jugador 3: Invitado
-            Players.Add(new LobbyPlayerRecord
-            {
-                Username = "sebas_wow",
-                AvatarPath = "/Assets/Images/Avatars/avatar3.png",
-                IsHost = false,
-                IsCurrentPlayer = false
-            });
-
-            // Jugador 4: Invitado
-            Players.Add(new LobbyPlayerRecord
-            {
-                Username = "vegeta777",
-                AvatarPath = "/Assets/Images/Avatars/avatar4.png",
-                IsHost = false,
-                IsCurrentPlayer = false
-            });
-        }
     }
 }

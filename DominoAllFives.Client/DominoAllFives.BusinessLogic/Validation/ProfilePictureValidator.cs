@@ -13,7 +13,7 @@ namespace DominoAllFives.BusinessLogic.Validation
             1024 * 1024;
 
         private static readonly HashSet<string>
-            AllowedExtensions =
+            allowedExtensions = 
                 new HashSet<string>(
                     StringComparer.OrdinalIgnoreCase)
                 {
@@ -42,7 +42,7 @@ namespace DominoAllFives.BusinessLogic.Validation
             string extension =
                 Path.GetExtension(filePath);
 
-            return AllowedExtensions.Contains(extension);
+            return allowedExtensions.Contains(extension);
         }
 
         /// <summary>

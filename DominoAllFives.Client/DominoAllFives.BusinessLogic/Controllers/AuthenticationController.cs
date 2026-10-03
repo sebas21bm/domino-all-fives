@@ -1,9 +1,10 @@
-﻿using DominoAllFives.BusinessLogic.Security;
+﻿using System;
+
+using DominoAllFives.BusinessLogic.Security;
 using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;
-using System;
 
 namespace DominoAllFives.BusinessLogic.Controllers
 {

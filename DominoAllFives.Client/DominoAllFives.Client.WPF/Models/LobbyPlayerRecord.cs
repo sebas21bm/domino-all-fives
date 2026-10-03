@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DominoAllFives.Client.WPF.Models
+﻿namespace DominoAllFives.Client.WPF.Models
 {
+    /// <summary>
+    /// Represents a player displayed in the lobby.
+    /// </summary>
     public class LobbyPlayerRecord
     {
         public string Username { get; set; } = string.Empty;

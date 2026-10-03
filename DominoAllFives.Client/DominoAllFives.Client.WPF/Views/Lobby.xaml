@@ -101,7 +101,7 @@
                                             </ContextMenu>
                                         </Grid.ContextMenu>
 
-                                        <Ellipse x:Name="imgPlayerAvatar" Width="210" Height="210" Stroke="{StaticResource CreamLightBrush}" StrokeThickness="4">
+                                        <Ellipse x:Name="ellPlayerAvatar" Width="210" Height="210" Stroke="{StaticResource CreamLightBrush}" StrokeThickness="4">
                                             <Ellipse.Fill>
                                                 <ImageBrush ImageSource="{Binding AvatarPath}"/>
                                             </Ellipse.Fill>
@@ -109,7 +109,7 @@
                                     </Grid>
 
                                     <Ellipse Fill="#2A000000" Width="160" Height="22" Margin="0,15,0,10"/>
-                                    <TextBlock x:Name="lblPlayerName" 
+                                    <TextBlock x:Name="txbPlayerName" 
                                                Text="{Binding Username}" 
                                                Style="{StaticResource SectionTitleText}" 
                                                HorizontalAlignment="Center"/>
@@ -117,9 +117,9 @@
 
                                 <DataTemplate.Triggers>
                                     <DataTrigger Binding="{Binding IsHost}" Value="True">
-                                        <Setter TargetName="imgPlayerAvatar" Property="Effect" Value="{StaticResource RedGlowEffect}"/>
-                                        <Setter TargetName="imgPlayerAvatar" Property="Stroke" Value="{StaticResource PrimaryRedBrush}"/>
-                                        <Setter TargetName="lblPlayerName" Property="Foreground" Value="{StaticResource PrimaryRedBrush}"/>
+                                        <Setter TargetName="ellPlayerAvatar" Property="Effect" Value="{StaticResource RedGlowEffect}"/>
+                                        <Setter TargetName="ellPlayerAvatar" Property="Stroke" Value="{StaticResource PrimaryRedBrush}"/>
+                                        <Setter TargetName="txbPlayerName" Property="Foreground" Value="{StaticResource PrimaryRedBrush}"/>
                                     </DataTrigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>
@@ -175,7 +175,7 @@
             </Grid>
         </Viewbox>
 
-        <Grid x:Name="ModalOverlay" 
+        <Grid x:Name="grdModalOveral" 
             Visibility="{Binding IsModalVisible, Converter={StaticResource BoolToVis}}"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch">

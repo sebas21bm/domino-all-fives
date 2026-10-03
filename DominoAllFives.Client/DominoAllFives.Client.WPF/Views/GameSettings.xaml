@@ -352,7 +352,7 @@
             </Grid>
         </Viewbox>
 
-        <Grid x:Name="ModalOverlay" 
+        <Grid x:Name="grdModalOverlay" 
             Visibility="{Binding IsModalVisible, Converter={StaticResource BoolToVis}}"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch">
