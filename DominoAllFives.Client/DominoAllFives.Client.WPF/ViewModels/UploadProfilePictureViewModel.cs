@@ -187,29 +187,32 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ShowInvalidFormatMessage()
         {
-            _dialogService.ShowDialog(
-                DialogType.Warning,
-                "MessageProfile_msgPhotoInvalidFormatTitle",
-                "MessageProfile_msgPhotoInvalidFormat",
-                () => { });
+            _dialogService.ShowDialog(new DialogRequest
+            {
+                Type = DialogType.Warning,
+                TitleKey = "MessageProfile_msgPhotoInvalidFormatTitle",
+                MessageKey = "MessageProfile_msgPhotoInvalidFormat"
+            });
         }
 
         private void ShowPhotoTooLargeMessage()
         {
-            _dialogService.ShowDialog(
-                DialogType.Warning,
-                "MessageProfile_msgPhotoTooLargeTitle",
-                "MessageProfile_msgPhotoTooLarge",
-                () => { });
+            _dialogService.ShowDialog(new DialogRequest
+            {
+                Type = DialogType.Warning,
+                TitleKey = "MessageProfile_msgPhotoTooLargeTitle",
+                MessageKey = "MessageProfile_msgPhotoTooLarge"
+            });
         }
 
         private void ShowPhotoCannotBeUploadedMessage()
         {
-            _dialogService.ShowDialog(
-                DialogType.Error,
-                "MessageProfile_msgPhotoCannotBeUploadedTitle",
-                "MessageProfile_msgPhotoCannotBeUploaded",
-                () => { });
+            _dialogService.ShowDialog(new DialogRequest
+            {
+                Type = DialogType.Error,
+                TitleKey = "MessageProfile_msgPhotoCannotBeUploadedTitle",
+                MessageKey = "MessageProfile_msgPhotoCannotBeUploaded"
+            });
         }
     }
 }

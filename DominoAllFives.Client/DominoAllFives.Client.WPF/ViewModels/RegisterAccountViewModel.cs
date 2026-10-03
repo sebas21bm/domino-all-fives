@@ -149,19 +149,22 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
                 _playerSession.Start(result.PlayerId);
 
-                _dialogService.ShowDialog(
-                    DialogType.Success,
-                    "MessageAccount_msgAccountCreatedTitle",
-                    "MessageAccount_msgAccountCreated",
-                    _onRegistrationSuccess);
+                _dialogService.ShowDialog(new DialogRequest
+                {
+                    Type = DialogType.Success,
+                    TitleKey = "MessageAccount_msgAccountCreatedTitle",
+                    MessageKey = "MessageAccount_msgAccountCreated",
+                    OnAccept = _onRegistrationSuccess
+                });
             }
             catch (SqlException)
             {
-                _dialogService.ShowDialog(
-                    DialogType.Error,
-                    "MessageAccount_msgAccountCreationErrorTitle",
-                    "MessageAccount_msgAccountCreationError",
-                    () => { });
+                _dialogService.ShowDialog(new DialogRequest
+                {
+                    Type = DialogType.Error,
+                    TitleKey = "MessageAccount_msgAccountCreationErrorTitle",
+                    MessageKey = "MessageAccount_msgAccountCreationError"
+                });
             }
         }
 
@@ -189,11 +192,12 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ShowIncorrectPasswordMessage()
         {
-            _dialogService.ShowDialog(
-                DialogType.Warning,
-                "MessageAccount_msgIncorrectPasswordTitle",
-                "MessageAccount_msgIncorrectPassword",
-                () => { });
+            _dialogService.ShowDialog(new DialogRequest
+            {
+                Type = DialogType.Warning,
+                TitleKey = "MessageAccount_msgIncorrectPasswordTitle",
+                MessageKey = "MessageAccount_msgIncorrectPassword"
+            });
         }
 
         private void ShowRegistrationFailure(
@@ -202,38 +206,42 @@ namespace DominoAllFives.Client.WPF.ViewModels
             switch (failureReason)
             {
                 case RegistrationFailureReason.InvalidPassword:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageAccount_msgUnsafePasswordTitle",
-                        "MessageAccount_msgUnsafePassword",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageAccount_msgUnsafePasswordTitle",
+                        MessageKey = "MessageAccount_msgUnsafePassword"
+                    });
                     break;
 
                 case RegistrationFailureReason.UsernameAlreadyExists:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageAccount_msgUsernameUsedTitle",
-                        "MessageAccount_msgUsernameUsed",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageAccount_msgUsernameUsedTitle",
+                        MessageKey = "MessageAccount_msgUsernameUsed"
+                    });
                     break;
 
                 case RegistrationFailureReason.EmailAlreadyExists:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageAccount_msgEmailUsedTitle",
-                        "MessageAccount_msgEmailUsed",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageAccount_msgEmailUsedTitle",
+                        MessageKey = "MessageAccount_msgEmailUsed"
+                    });
                     break;
 
                 case RegistrationFailureReason.InvalidUsername:
                 case RegistrationFailureReason.InvalidEmail:
                 case RegistrationFailureReason.InvalidRegistrationData:
                 default:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageAccount_msgInvalidDataTitle",
-                        "MessageAccount_msgInvalidData",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageAccount_msgInvalidDataTitle",
+                        MessageKey = "MessageAccount_msgInvalidData"
+                    });
                     break;
             }
         }
