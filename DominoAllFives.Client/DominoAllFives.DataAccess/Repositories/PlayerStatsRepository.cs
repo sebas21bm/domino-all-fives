@@ -39,7 +39,7 @@ namespace DominoAllFives.DataAccess.Repositories
         {
             return _context.PlayerStats
                 .Where(stats =>
-                    stats.Player.IsGuest == false &&
+                    !stats.Player.IsGuest &&
                     stats.GamesWon > 0)
                 .OrderByDescending(stats => stats.GamesWon)
                 .ThenByDescending(stats => stats.LastVictoryDate)
@@ -68,7 +68,7 @@ namespace DominoAllFives.DataAccess.Repositories
             int playersAhead =
                 _context.PlayerStats.Count(
                     stats =>
-                        stats.Player.IsGuest == false &&
+                        !stats.Player.IsGuest &&
                         stats.GamesWon > 0 &&
                         (stats.GamesWon > playerStats.GamesWon ||
                         (stats.GamesWon == playerStats.GamesWon &&
