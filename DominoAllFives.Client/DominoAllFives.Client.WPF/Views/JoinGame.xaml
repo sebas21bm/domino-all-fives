@@ -74,7 +74,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <StackPanel x:Name="pnlCodeMode" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <StackPanel x:Name="staCodeMode" VerticalAlignment="Center" HorizontalAlignment="Center">
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
                                     <Setter Property="Visibility" Value="Visible"/>
@@ -114,7 +114,7 @@
                                     Command="{Binding JoinRoomCommand}"/>
                         </StackPanel>
 
-                        <Grid x:Name="pnlInvitationsMode">
+                        <Grid x:Name="grdInvitationsMode">
                             <Grid.Style>
                                 <Style TargetType="Grid">
                                     <Setter Property="Visibility" Value="Collapsed"/>

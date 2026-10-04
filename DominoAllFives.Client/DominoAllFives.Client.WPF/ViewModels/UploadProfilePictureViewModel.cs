@@ -99,7 +99,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             bool? result = fileDialog.ShowDialog();
 
-            if (result != true)
+            if (!(result ?? true))
             {
                 return;
             }

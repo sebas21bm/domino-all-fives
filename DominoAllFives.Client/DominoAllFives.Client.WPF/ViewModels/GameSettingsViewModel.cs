@@ -1,13 +1,11 @@
-﻿using DominoAllFives.Client.WPF.Commands;
+﻿using System;
+using System.Windows;
+
+using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
+using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -68,7 +66,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public bool IsPortugueseSelected => SelectedLanguageCode == "pt-BR";
 
         public bool IsGuest => !_playerSession.IsAuthenticated;
-        public Visibility AccountFeaturesVisibility => IsGuest ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility AccountFeaturesVisibility => IsGuest ? 
+            Visibility.Collapsed : Visibility.Visible;
 
         public RelayCommand ShowAccountSectionCommand { get; }
         public RelayCommand ShowLanguageSectionCommand { get; }
@@ -80,9 +79,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand GoToDeleteAccount { get; }
 
 
-        public GameSettingsViewModel(IFrameNavigationService navigationService, PlayerSession playerSession)
+        public GameSettingsViewModel(IFrameNavigationService navigationService, 
+            PlayerSession playerSession)
         {
-            _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
+            _navigationService = navigationService ?? 
+                throw new ArgumentNullException(nameof(navigationService));
             _playerSession = playerSession;
 
             _selectedLanguageCode = LanguageManager.Instance.CurrentLanguageCode;
@@ -169,7 +170,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void OnAccountDeletedSuccess()
         {
             CloseModal();
-            // TODO: Eliminar el registro en la BD
             _navigationService.NavigateTo<HomePageViewModel>();
         }
 
@@ -181,7 +181,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ExecuteLogout()
         {
-            // TODO: Invalidad sesión en el cliente
             _navigationService.NavigateTo<HomePageViewModel>();
         }
     }

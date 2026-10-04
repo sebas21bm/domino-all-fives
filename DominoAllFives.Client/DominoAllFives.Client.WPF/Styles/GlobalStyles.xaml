@@ -19,7 +19,7 @@
 
     <!-- Plantilla base de botones -->
     <ControlTemplate x:Key="StandardButtonTemplate" TargetType="{x:Type Button}">
-        <Border x:Name="buttonBorder"
+        <Border x:Name="borButton"
                 Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
@@ -34,15 +34,15 @@
 
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="buttonBorder" Property="Opacity" Value="0.85"/>
+                <Setter TargetName="borButton" Property="Opacity" Value="0.85"/>
             </Trigger>
 
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="buttonBorder" Property="Opacity" Value="0.68"/>
+                <Setter TargetName="borButton" Property="Opacity" Value="0.68"/>
             </Trigger>
 
             <Trigger Property="IsEnabled" Value="False">
-                <Setter TargetName="buttonBorder" Property="Opacity" Value="0.45"/>
+                <Setter TargetName="borButton" Property="Opacity" Value="0.45"/>
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -114,7 +114,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="backButtonBorder"
+                    <Border x:Name="borBackButton"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
@@ -137,15 +137,15 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="backButtonBorder" Property="Opacity" Value="0.85"/>
+                            <Setter TargetName="borBackButton" Property="Opacity" Value="0.85"/>
                         </Trigger>
 
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="backButtonBorder" Property="Opacity" Value="0.65"/>
+                            <Setter TargetName="borBackButton" Property="Opacity" Value="0.65"/>
                         </Trigger>
 
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="backButtonBorder" Property="Opacity" Value="0.40"/>
+                            <Setter TargetName="borBackButton" Property="Opacity" Value="0.40"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -185,7 +185,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
-                    <Border x:Name="textBoxBorder"
+                    <Border x:Name="borTextBox"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
@@ -198,12 +198,12 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="textBoxBorder" Property="BorderBrush" Value="{StaticResource PrimaryRedBrush}"/>
+                            <Setter TargetName="borTextBox" Property="BorderBrush" Value="{StaticResource PrimaryRedBrush}"/>
                         </Trigger>
 
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource DisabledGrayBrush}"/>
-                            <Setter TargetName="textBoxBorder" Property="Opacity" Value="0.60"/>
+                            <Setter TargetName="borTextBox" Property="Opacity" Value="0.60"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -227,7 +227,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="PasswordBox">
-                    <Border x:Name="passwordBoxBorder"
+                    <Border x:Name="borPasswordBox"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
@@ -240,12 +240,12 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="passwordBoxBorder" Property="BorderBrush" Value="{StaticResource PrimaryRedBrush}"/>
+                            <Setter TargetName="borPasswordBox" Property="BorderBrush" Value="{StaticResource PrimaryRedBrush}"/>
                         </Trigger>
 
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource DisabledGrayBrush}"/>
-                            <Setter TargetName="passwordBoxBorder" Property="Opacity" Value="0.60"/>
+                            <Setter TargetName="borPasswordBox" Property="Opacity" Value="0.60"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -452,7 +452,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBoxItem">
-                    <Border x:Name="ItemBorder"
+                    <Border x:Name="borItem"
                         Background="{TemplateBinding Background}"
                         Padding="{TemplateBinding Padding}"
                         SnapsToDevicePixels="True">
@@ -462,11 +462,11 @@
                     <ControlTemplate.Triggers>
                         <!-- Selected Item -->
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource GrayPanelBrush}"/>
+                            <Setter TargetName="borItem" Property="Background" Value="{StaticResource GrayPanelBrush}"/>
                         </Trigger>
                         <!-- Hovered Item -->
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource HeaderLineBrush}"/>
+                            <Setter TargetName="borItem" Property="Background" Value="{StaticResource HeaderLineBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -490,7 +490,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
                     <Grid>
-                        <ToggleButton x:Name="ToggleButton"
+                        <ToggleButton x:Name="togButton"
                                   BorderBrush="{TemplateBinding BorderBrush}"
                                   Background="{TemplateBinding Background}"
                                   BorderThickness="{TemplateBinding BorderThickness}"
@@ -511,18 +511,18 @@
                             </ToggleButton.Template>
                         </ToggleButton>
 
-                        <ContentPresenter x:Name="ContentSite"
+                        <ContentPresenter x:Name="conSite"
                                       IsHitTestVisible="False"
                                       Content="{TemplateBinding SelectionBoxItem}"
                                       Margin="{TemplateBinding Padding}"
                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
-                        <Popup x:Name="Popup"
+                        <Popup x:Name="dlgPopup"
                            Placement="Bottom"
                            IsOpen="{TemplateBinding IsDropDownOpen}"
                            AllowsTransparency="True"
                            Focusable="False">
-                            <Border x:Name="DropDownBorder"
+                            <Border x:Name="borDropDown"
                                 Background="{StaticResource DarkBgBrush}"
                                 BorderBrush="{StaticResource GrayPanelBrush}"
                                 BorderThickness="2,0,2,2"
@@ -536,7 +536,7 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ToggleButton" Property="Opacity" Value="0.85"/>
+                            <Setter TargetName="togButton" Property="Opacity" Value="0.85"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -611,7 +611,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="MenuItem">
-                    <Border x:Name="MenuItemBorder" 
+                    <Border x:Name="borMenuItem" 
                             Background="{TemplateBinding Background}" 
                             CornerRadius="6"
                             Padding="{TemplateBinding Padding}">
@@ -621,7 +621,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter TargetName="MenuItemBorder" Property="Background" Value="#4A4A4A"/>
+                            <Setter TargetName="borMenuItem" Property="Background" Value="#4A4A4A"/>
                             <Setter Property="Foreground" Value="{StaticResource PureWhiteBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">

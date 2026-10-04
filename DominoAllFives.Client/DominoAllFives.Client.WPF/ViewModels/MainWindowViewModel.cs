@@ -28,7 +28,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public MainWindowViewModel(IFrameNavigationService navigationService)
         {
-            _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
+            _navigationService = navigationService ?? 
+                throw new ArgumentNullException(nameof(navigationService));
 
             DialogService = new DialogService(dialogVm =>
             {

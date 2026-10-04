@@ -1,15 +1,9 @@
-﻿using DominoAllFives.Client.WPF.Commands;
-using DominoAllFives.Client.WPF.Models;
-using DominoAllFives.Client.WPF.Services;
-using DominoAllFives.Client.WPF.ViewModels.Base;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Navigation;
+
+using DominoAllFives.Client.WPF.Commands;
+using DominoAllFives.Client.WPF.Models;
+using DominoAllFives.Client.WPF.ViewModels.Base;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -41,8 +35,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             CloseInviteModalCommand = new RelayCommand(ExecuteCloseInviteModal);
             SendInviteCommand = new RelayCommand(ExecuteSendInvite);
-
-            LoadMockFriends();
         }
 
         private void ExecuteCloseInviteModal()
@@ -57,30 +49,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 friend.IsInvited = true;
             }
             
-        }
-
-        private void LoadMockFriends()
-        {
-            OnlineFriends.Add(new FriendRecord
-            {
-                Username = "pepe123",
-                AvatarPath = "pack://application:,,,/Assets/Images/Avatars/avatar1.png",
-                IsInvited = true
-            });
-
-            OnlineFriends.Add(new FriendRecord
-            {
-                Username = "sebas_wow",
-                AvatarPath = "pack://application:,,,/Assets/Images/Avatars/avatar3.png",
-                IsInvited = false
-            });
-
-            OfflineFriends.Add(new FriendRecord
-            {
-                Username = "loulou",
-                AvatarPath = "pack://application:,,,/Assets/Images/Avatars/avatar5.png",
-                IsInvited = false
-            });
         }
     }
 }

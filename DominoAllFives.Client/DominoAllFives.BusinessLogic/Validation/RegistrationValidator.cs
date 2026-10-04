@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
+using DominoAllFives.Contracts.DTOs;
+
 namespace DominoAllFives.BusinessLogic.Validation
 {
     /// <summary>
@@ -17,10 +19,10 @@ namespace DominoAllFives.BusinessLogic.Validation
         private const string PasswordPattern =
             @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$";
 
-        private static readonly TimeSpan RegexTimeout =
+        private static readonly TimeSpan regexTimeout =
             TimeSpan.FromMilliseconds(250);
 
-        private static readonly HashSet<string> ValidEmailDomains =
+        private static readonly HashSet<string> validEmailDomains =
             new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "gmail.com",
@@ -80,7 +82,7 @@ namespace DominoAllFives.BusinessLogic.Validation
                     email,
                     EmailPattern,
                     RegexOptions.None,
-                    RegexTimeout))
+                    regexTimeout))
             {
                 return false;
             }
@@ -94,7 +96,7 @@ namespace DominoAllFives.BusinessLogic.Validation
 
             string domain = email.Substring(atIndex + 1);
 
-            return ValidEmailDomains.Contains(domain);
+            return validEmailDomains.Contains(domain);
         }
 
         private static bool IsPasswordValid(string password)
@@ -104,7 +106,7 @@ namespace DominoAllFives.BusinessLogic.Validation
                        password,
                        PasswordPattern,
                        RegexOptions.None,
-                       RegexTimeout);
+                       regexTimeout);
         }
     }
 }

@@ -111,7 +111,7 @@
             </Grid>
         </Viewbox>
 
-        <Grid x:Name="ModalOverlay" 
+        <Grid x:Name="grdModalOveral" 
               Background="#CC000000" 
               Visibility="Collapsed">
         </Grid>
