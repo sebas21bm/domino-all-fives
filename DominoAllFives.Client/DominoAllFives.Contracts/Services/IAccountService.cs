@@ -28,5 +28,12 @@ namespace DominoAllFives.Contracts.Services
         /// <param name="profilePicture">The profile picture data.</param>
         /// <returns>The result of setting the profile picture.</returns>
         ProfilePictureResultDto SetProfilePicture(ProfilePictureDto profilePicture);
+
+        /// <summary>
+        /// Removes the profile picture for the specified player.
+        /// </summary>
+        /// <param name="playerId">The ID of the player.</param>
+        /// <returns>The result of removing the profile picture.</returns>
+        ProfilePictureResultDto RemoveProfilePicture(int playerId);
     }
 }

@@ -1,19 +1,24 @@
-﻿using DominoAllFives.BusinessLogic.Controllers;
-using DominoAllFives.BusinessLogic.Validation;
+﻿using System;
+using System.IO;
+using System.Windows.Media.Imaging;
+using Microsoft.Win32;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using Microsoft.Win32;
-using System;
-using System.Windows.Media.Imaging;
+using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Enums;
+using DominoAllFives.Contracts.Services;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
+    /// <summary>
+    /// Manages the profile picture upload process during account registration
+    /// </summary>
     public class UploadProfilePictureViewModel : ViewModelBase
     {
         private readonly IDialogService _dialogService;
-        private readonly ProfilePictureController _profilePictureController;
+        private readonly IAccountService _accountService;
         private readonly PlayerSession _playerSession;
         private readonly Action _onFinishRegistration;
         private readonly Action _onCancel;
@@ -29,49 +34,58 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 value);
         }
 
+        /// <summary>
+        /// Gets the command used to select a profile picture.
+        /// </summary>
         public RelayCommand SelectPhotoCommand { get; }
+
+        /// <summary>
+        /// Gets the command used to add the selected profile picture.
+        /// </summary>
         public RelayCommand AddPhotoCommand { get; }
+
+        /// <summary>
+        /// Gets the command used to skip profile picture selection.
+        /// </summary>
         public RelayCommand SkipPhotoCommand { get; }
+
+        /// <summary>
+        /// Gets the command used to cancel profile picture selection.
+        /// </summary>
         public RelayCommand CancelCommand { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the profile picture view model.
+        /// </summary>
         public UploadProfilePictureViewModel(
             IDialogService dialogService,
-            ProfilePictureController profilePictureController,
+            IAccountService accountService,
             PlayerSession playerSession,
             Action onFinishRegistration,
             Action onCancel)
         {
             _dialogService = dialogService
-                ?? throw new ArgumentNullException(
-                    nameof(dialogService));
+                ?? throw new ArgumentNullException(nameof(dialogService));
 
-            _profilePictureController = profilePictureController
-                ?? throw new ArgumentNullException(
-                    nameof(profilePictureController));
+            _accountService = accountService
+                ?? throw new ArgumentNullException(nameof(accountService));
 
             _playerSession = playerSession
-                ?? throw new ArgumentNullException(
-                    nameof(playerSession));
+                ?? throw new ArgumentNullException(nameof(playerSession));
 
             _onFinishRegistration = onFinishRegistration
-                ?? throw new ArgumentNullException(
-                    nameof(onFinishRegistration));
+                ?? throw new ArgumentNullException(nameof(onFinishRegistration));
 
             _onCancel = onCancel
-                ?? throw new ArgumentNullException(
-                    nameof(onCancel));
+                ?? throw new ArgumentNullException(nameof(onCancel));
 
-            SelectPhotoCommand =
-                new RelayCommand(SelectPhoto);
+            SelectPhotoCommand = new RelayCommand(SelectPhoto);
 
-            AddPhotoCommand =
-                new RelayCommand(AddPhoto);
+            AddPhotoCommand = new RelayCommand(AddPhoto);
 
-            SkipPhotoCommand =
-                new RelayCommand(SkipPhoto);
+            SkipPhotoCommand = new RelayCommand(SkipPhoto);
 
-            CancelCommand =
-                new RelayCommand(_onCancel);
+            CancelCommand = new RelayCommand(_onCancel);
         }
 
         private void SelectPhoto()
@@ -79,8 +93,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             OpenFileDialog fileDialog =
                 new OpenFileDialog
                 {
-                    Filter =
-                        "Image files (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png",
+                    Filter = "Image files (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png",
                     Multiselect = false
                 };
 
@@ -91,26 +104,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            string selectedFilePath =
-                fileDialog.FileName;
-
-            if (!ProfilePictureValidator.HasValidExtension(
-                selectedFilePath))
-            {
-                ShowInvalidFormatMessage();
-                return;
-            }
-
-            if (!ProfilePictureValidator.HasValidFileSize(
-                selectedFilePath))
-            {
-                ShowPhotoTooLargeMessage();
-                return;
-            }
+            string selectedFilePath = fileDialog.FileName;
 
             if (!LoadPreview(selectedFilePath))
             {
-                ShowInvalidFormatMessage();
+                ShowProfilePictureFailure(ProfilePictureFailureReason.InvalidImage);
                 return;
             }
 
@@ -119,27 +117,44 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void AddPhoto()
         {
-            if (string.IsNullOrWhiteSpace(
-                _selectedFilePath))
+            if (string.IsNullOrWhiteSpace(_selectedFilePath))
             {
-                ShowInvalidFormatMessage();
+                ShowProfilePictureFailure(ProfilePictureFailureReason.InvalidImage);
                 return;
             }
 
             if (!_playerSession.PlayerId.HasValue)
             {
-                ShowPhotoCannotBeUploadedMessage();
+                ShowProfilePictureFailure(ProfilePictureFailureReason.ServiceUnavailable);
                 return;
             }
 
-            bool wasSaved =
-                _profilePictureController.SetProfilePicture(
-                    _playerSession.PlayerId.Value,
-                    _selectedFilePath);
+            byte[] imageData;
 
-            if (!wasSaved)
+            try
             {
-                ShowPhotoCannotBeUploadedMessage();
+                imageData = File.ReadAllBytes(_selectedFilePath);
+            }
+            catch (Exception ex) when (ex is IOException ||
+                                       ex is UnauthorizedAccessException)
+            {
+                ShowProfilePictureFailure(ProfilePictureFailureReason.ServiceUnavailable);
+                return;
+            }
+
+            ProfilePictureDto profilePicture =
+                new ProfilePictureDto
+                {
+                    PlayerId = _playerSession.PlayerId.Value,
+                    FileName = Path.GetFileName(_selectedFilePath),
+                    ImageData = imageData
+                };
+
+            ProfilePictureResultDto result = _accountService.SetProfilePicture(profilePicture);
+
+            if (!result.IsSuccessful)
+            {
+                ShowProfilePictureFailure(result.FailureReason);
                 return;
             }
 
@@ -155,13 +170,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             try
             {
-                BitmapImage image =
-                    new BitmapImage();
+                BitmapImage image = new BitmapImage();
 
                 image.BeginInit();
 
-                image.CacheOption =
-                    BitmapCacheOption.OnLoad;
+                image.CacheOption = BitmapCacheOption.OnLoad;
 
                 image.UriSource =
                     new Uri(
@@ -175,7 +188,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
                 return true;
             }
-            catch
+            catch (Exception ex) when (ex is ArgumentException ||
+                                       ex is InvalidOperationException ||
+                                       ex is NotSupportedException ||
+                                       ex is IOException)
             {
                 ProfilePicturePreview = null;
 
@@ -183,31 +199,52 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
         }
 
-        private void ShowInvalidFormatMessage()
+        private void ShowProfilePictureFailure(
+            ProfilePictureFailureReason failureReason)
         {
-            _dialogService.ShowDialog(
-                DialogType.Warning,
-                "MessageProfile_msgPhotoInvalidFormatTitle",
-                "MessageProfile_msgPhotoInvalidFormat",
-                () => { });
-        }
+            switch (failureReason)
+            {
+                case ProfilePictureFailureReason.InvalidFormat:
+                    _dialogService.ShowDialog(
+                        DialogType.Warning,
+                        "MessageProfile_msgPhotoInvalidFormatTitle",
+                        "MessageProfile_msgPhotoInvalidFormat",
+                        () => { });
+                    break;
 
-        private void ShowPhotoTooLargeMessage()
-        {
-            _dialogService.ShowDialog(
-                DialogType.Warning,
-                "MessageProfile_msgPhotoTooLargeTitle",
-                "MessageProfile_msgPhotoTooLarge",
-                () => { });
-        }
+                case ProfilePictureFailureReason.InvalidImage:
+                    _dialogService.ShowDialog(
+                        DialogType.Warning,
+                        "MessageProfile_msgPhotoInvalidTitle",
+                        "MessageProfile_msgPhotoInvalid",
+                        () => { });
+                    break;
 
-        private void ShowPhotoCannotBeUploadedMessage()
-        {
-            _dialogService.ShowDialog(
-                DialogType.Error,
-                "MessageProfile_msgPhotoCannotBeUploadedTitle",
-                "MessageProfile_msgPhotoCannotBeUploaded",
-                () => { });
+                case ProfilePictureFailureReason.FileTooLarge:
+                    _dialogService.ShowDialog(
+                        DialogType.Warning,
+                        "MessageProfile_msgPhotoTooLargeTitle",
+                        "MessageProfile_msgPhotoTooLarge",
+                        () => { });
+                    break;
+
+                case ProfilePictureFailureReason.PlayerNotFound:
+                case ProfilePictureFailureReason.ServiceUnavailable:
+                    _dialogService.ShowDialog(
+                        DialogType.Error,
+                        "MessageProfile_msgPhotoCannotBeUploadedTitle",
+                        "MessageProfile_msgPhotoCannotBeUploaded",
+                        () => { });
+                    break;
+
+                default:
+                    _dialogService.ShowDialog(
+                        DialogType.Error,
+                        "Global_msgDefaultErrorTitle",
+                        "Global_msgDefaultError",
+                        () => { });
+                    break;
+            }
         }
     }
 }

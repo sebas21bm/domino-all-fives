@@ -1763,7 +1763,16 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a El archivo seleccionado no tiene un formato válido para la foto de perfil..
+        ///   Busca una cadena traducida similar a No es posible utilizar este archivo. El archivo seleccionado no tiene un formato válido para la foto de perfil..
+        /// </summary>
+        public static string MessageProfile_msgPhotoInvalid {
+            get {
+                return ResourceManager.GetString("MessageProfile_msgPhotoInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No es posible utilizar este archivo. El archivo tiene una extensión no admitida..
         /// </summary>
         public static string MessageProfile_msgPhotoInvalidFormat {
             get {
@@ -1772,11 +1781,20 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Foto de perfil inválida.
+        ///   Busca una cadena traducida similar a Extensión inválida.
         /// </summary>
         public static string MessageProfile_msgPhotoInvalidFormatTitle {
             get {
                 return ResourceManager.GetString("MessageProfile_msgPhotoInvalidFormatTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Foto de perfil inválida.
+        /// </summary>
+        public static string MessageProfile_msgPhotoInvalidTitle {
+            get {
+                return ResourceManager.GetString("MessageProfile_msgPhotoInvalidTitle", resourceCulture);
             }
         }
         

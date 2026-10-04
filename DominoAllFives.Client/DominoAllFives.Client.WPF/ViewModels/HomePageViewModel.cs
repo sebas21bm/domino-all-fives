@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
@@ -145,12 +144,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OpenUploadProfilePictureModal()
         {
-            ProfilePictureController profilePictureController =
-                new ProfilePictureController();
-
             CurrentModal = new UploadProfilePictureViewModel(
                 _dialogService,
-                profilePictureController,
+                _accountService,
                 _playerSession,
                 OnRegistrationSuccess,
                 CloseModal);

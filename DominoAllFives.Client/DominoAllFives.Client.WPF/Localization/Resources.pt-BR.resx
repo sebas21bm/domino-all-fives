@@ -282,11 +282,11 @@
   <data name="MessageAccount_msgUsernameUsed" xml:space="preserve">
     <value>O nome de usuário já está em uso.</value>
   </data>
-  <data name="MessageProfile_msgPhotoInvalidFormatTitle" xml:space="preserve">
+  <data name="MessageProfile_msgPhotoInvalidTitle" xml:space="preserve">
     <value>Foto de perfil inválida</value>
   </data>
-  <data name="MessageProfile_msgPhotoInvalidFormat" xml:space="preserve">
-    <value>O arquivo selecionado não possui um formato válido para a foto de perfil.</value>
+  <data name="MessageProfile_msgPhotoInvalid" xml:space="preserve">
+    <value>Não é possível usar esta arquivo. O arquivo selecionado não tem um formato válido para a foto de perfil.</value>
   </data>
   <data name="MessageProfile_msgPhotoCannotBeUploadedTitle" xml:space="preserve">
     <value>Erro ao enviar foto</value>
@@ -984,5 +984,12 @@ Os domínios válidos são: gmail, hotmail, outlook</value>
   </data>
   <data name="MessageAccount_msgInvalidEmailTitle" xml:space="preserve">
     <value>E-mail inválido</value>
+  </data>
+  <data name="MessageProfile_msgPhotoInvalidFormat" xml:space="preserve">
+    <value>Não é possível utilizar este arquivo. O arquivo tem uma extensão não suportada.
+Somente é possível utilizar: .png, .jpg, .jpeg</value>
+  </data>
+  <data name="MessageProfile_msgPhotoInvalidFormatTitle" xml:space="preserve">
+    <value>Extensão inválida</value>
   </data>
 </root>

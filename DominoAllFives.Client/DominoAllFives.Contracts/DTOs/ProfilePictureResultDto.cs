@@ -3,7 +3,7 @@
 namespace DominoAllFives.Contracts.DTOs
 {
     /// <summary>
-    /// Represents the result of a profile picture retrieval operation.
+    /// Represents the result of setting a profile picture
     /// </summary>
     public class ProfilePictureResultDto
     {

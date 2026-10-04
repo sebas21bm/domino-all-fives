@@ -58,5 +58,20 @@ namespace DominoAllFives.DataAccess.Interfaces
         /// The player to add.
         /// </param>
         void Add(Player playerToAdd);
+
+        /// <summary>
+        /// Updates the profile picture assigned to a player.
+        /// </summary>
+        /// <param name="playerId">
+        /// The identifier of the player.
+        /// </param>
+        /// <param name="profilePictureFileName">
+        /// The name of the stored profile picture file.
+        /// </param>
+        /// <returns>
+        /// True when the player exists and the profile picture
+        /// was updated; otherwise, false.
+        /// </returns>
+        bool UpdateProfilePicture(int playerId, string profilePictureFileName);
     }
 }

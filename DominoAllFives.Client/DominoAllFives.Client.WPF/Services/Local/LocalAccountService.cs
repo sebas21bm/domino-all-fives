@@ -41,9 +41,13 @@ namespace DominoAllFives.Client.WPF.Services.Local
         /// <inheritdoc/>
         public ProfilePictureResultDto SetProfilePicture(ProfilePictureDto profilePicture)
         {
-            // TODO: Implement logic to set the profile picture using the ProfilePictureController
-            
-            throw new System.NotImplementedException();
+            return _profilePictureController.SetProfilePicture(profilePicture);
+        }
+
+        /// <inheritdoc/>
+        public ProfilePictureResultDto RemoveProfilePicture(int playerId)
+        {
+            return _profilePictureController.RemoveProfilePicture(playerId);
         }
     }
 }

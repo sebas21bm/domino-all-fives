@@ -1,8 +1,8 @@
 ﻿using System.Windows;
-using DominoAllFives.Client.WPF.Services;
-using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.BusinessLogic.Controllers;
+using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Local;
+using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Contracts.Services;
 
 namespace DominoAllFives.Client.WPF
