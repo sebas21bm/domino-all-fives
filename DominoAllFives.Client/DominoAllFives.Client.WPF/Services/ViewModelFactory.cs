@@ -4,7 +4,7 @@ using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.Services;
-
+using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.Services
 {

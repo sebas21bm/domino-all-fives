@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
-using DominoAllFives.Client.WPF.Commands;
+﻿using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.Services;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Windows;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -104,11 +105,14 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OpenLoginModal()
         {
+            ILogger<LoginViewModel> logger =
+                LoggerFactoryProvider.CreateLogger<LoginViewModel>();
 
             CurrentModal = new LoginViewModel(
                 _dialogService,
                 _accountService,
                 _playerSession,
+                logger,
                 OnLoginSuccess,
                 CloseModal,
                 OpenRegisterModal,
