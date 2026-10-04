@@ -228,17 +228,17 @@
   <data name="MessageAccount_msgIncorrectPassword" xml:space="preserve">
     <value>As senhas não coincidem. Verifique se as duas senhas são iguais e tente novamente.</value>
   </data>
-  <data name="MessageAuthentication_msgConnectionErrorTitle" xml:space="preserve">
-    <value>Erro de login</value>
+  <data name="Global_msgConnectionErrorTitle" xml:space="preserve">
+    <value>Erro de conexão</value>
   </data>
-  <data name="MessageAuthentication_msgConnectionError" xml:space="preserve">
+  <data name="Global_msgConnectionError" xml:space="preserve">
     <value>Não é possível entrar neste momento. Tente novamente.</value>
   </data>
-  <data name="MessageAuthentication_msgDisabledAccountTitle" xml:space="preserve">
-    <value>Conta desativada</value>
+  <data name="MessageAuthentication_msgBannedAccountTitle" xml:space="preserve">
+    <value>Conta banida</value>
   </data>
-  <data name="MessageAuthentication_msgDisabledAccount" xml:space="preserve">
-    <value>Não é possível entrar com esta conta.</value>
+  <data name="MessageAuthentication_msgBannedAccount" xml:space="preserve">
+    <value>Não é possível fazer login. A conta foi banida. Tente com outra conta..</value>
   </data>
   <data name="MessageAuthentication_msgInvalidCredentialsTitle" xml:space="preserve">
     <value>Credenciais inválidas</value>
@@ -250,7 +250,7 @@
     <value>Falha ao criar conta</value>
   </data>
   <data name="MessageAccount_msgAccountCreationError" xml:space="preserve">
-    <value>Não foi possível criar a conta. Ocorreu um erro. Tente novamente.</value>
+    <value>Não foi possível criar a conta. Ocorreu um erro de conexão. Tente novamente.</value>
   </data>
   <data name="MessageAccount_msgAccountCreatedTitle" xml:space="preserve">
     <value>Conta criada</value>
@@ -282,11 +282,11 @@
   <data name="MessageAccount_msgUsernameUsed" xml:space="preserve">
     <value>O nome de usuário já está em uso.</value>
   </data>
-  <data name="MessageProfile_msgPhotoInvalidFormatTitle" xml:space="preserve">
+  <data name="MessageProfile_msgPhotoInvalidTitle" xml:space="preserve">
     <value>Foto de perfil inválida</value>
   </data>
-  <data name="MessageProfile_msgPhotoInvalidFormat" xml:space="preserve">
-    <value>O arquivo selecionado não possui um formato válido para a foto de perfil.</value>
+  <data name="MessageProfile_msgPhotoInvalid" xml:space="preserve">
+    <value>Não é possível usar esta arquivo. O arquivo selecionado não tem um formato válido para a foto de perfil.</value>
   </data>
   <data name="MessageProfile_msgPhotoCannotBeUploadedTitle" xml:space="preserve">
     <value>Erro ao enviar foto</value>
@@ -959,5 +959,37 @@
   </data>
   <data name="Login_lblIdentifier" xml:space="preserve">
     <value>E-mail ou nome de usuário</value>
+  </data>
+  <data name="MessageAuthentication_msgSuspendedAccount" xml:space="preserve">
+    <value>Não é possível fazer login. A conta está suspensa. Tente novamente mais tarde.</value>
+  </data>
+  <data name="MessageAuthentication_msgSuspendedAccountTitle" xml:space="preserve">
+    <value>Suspensão</value>
+  </data>
+  <data name="Global_msgDefaultError" xml:space="preserve">
+    <value>Não é possível continuar. Erro desconhecido. Tente novamente.</value>
+  </data>
+  <data name="Global_msgDefaultErrorTitle" xml:space="preserve">
+    <value>Erro</value>
+  </data>
+  <data name="MessageAccount_msgInvalidUsername" xml:space="preserve">
+    <value>O usuário não deve exceder 64 caracteres.</value>
+  </data>
+  <data name="MessageAccount_msgInvalidUsernameTitle" xml:space="preserve">
+    <value>Usuário inválido</value>
+  </data>
+  <data name="MessageAccount_msgInvalidEmail" xml:space="preserve">
+    <value>O e-mail deve estar no formato @dominio.com
+Os domínios válidos são: gmail, hotmail, outlook</value>
+  </data>
+  <data name="MessageAccount_msgInvalidEmailTitle" xml:space="preserve">
+    <value>E-mail inválido</value>
+  </data>
+  <data name="MessageProfile_msgPhotoInvalidFormat" xml:space="preserve">
+    <value>Não é possível utilizar este arquivo. O arquivo tem uma extensão não suportada.
+Somente é possível utilizar: .png, .jpg, .jpeg</value>
+  </data>
+  <data name="MessageProfile_msgPhotoInvalidFormatTitle" xml:space="preserve">
+    <value>Extensão inválida</value>
   </data>
 </root>

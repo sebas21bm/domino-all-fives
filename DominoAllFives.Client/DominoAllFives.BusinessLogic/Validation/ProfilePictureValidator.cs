@@ -26,21 +26,15 @@ namespace DominoAllFives.BusinessLogic.Validation
         /// Determines whether a profile picture has an allowed
         /// file extension.
         /// </summary>
-        /// <param name="filePath">
-        /// The path of the profile picture.
-        /// </param>
-        /// <returns>
-        /// True when the extension is allowed; otherwise, false.
-        /// </returns>
-        public static bool HasValidExtension(string filePath)
+        public static bool HasValidExtension(string fileName)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
+            if (string.IsNullOrWhiteSpace(fileName))
             {
                 return false;
             }
 
             string extension =
-                Path.GetExtension(filePath);
+                Path.GetExtension(fileName);
 
             return allowedExtensions.Contains(extension);
         }
@@ -49,43 +43,21 @@ namespace DominoAllFives.BusinessLogic.Validation
         /// Determines whether a profile picture is within the
         /// maximum allowed file size.
         /// </summary>
-        /// <param name="filePath">
-        /// The path of the profile picture.
-        /// </param>
-        /// <returns>
-        /// True when the file does not exceed one megabyte;
-        /// otherwise, false.
-        /// </returns>
-        public static bool HasValidFileSize(string filePath)
+        public static bool HasValidFileSize(byte[] imageData)
         {
-            if (string.IsNullOrWhiteSpace(filePath) ||
-                !File.Exists(filePath))
-            {
-                return false;
-            }
-
-            FileInfo fileInformation =
-                new FileInfo(filePath);
-
-            return fileInformation.Length <=
-                   MaximumFileSizeInBytes;
+            return imageData != null && 
+                   imageData.Length > 0 && 
+                   imageData.Length <= MaximumFileSizeInBytes;
         }
 
         /// <summary>
         /// Determines whether the selected profile picture
         /// satisfies all profile picture business rules.
         /// </summary>
-        /// <param name="filePath">
-        /// The path of the selected profile picture.
-        /// </param>
-        /// <returns>
-        /// True when the profile picture is valid;
-        /// otherwise, false.
-        /// </returns>
-        public static bool IsValid(string filePath)
+        public static bool IsValid(string fileName, byte[] imageData)
         {
-            return HasValidExtension(filePath) &&
-                   HasValidFileSize(filePath);
+            return HasValidExtension(fileName) &&
+                   HasValidFileSize(imageData);
         }
     }
 }

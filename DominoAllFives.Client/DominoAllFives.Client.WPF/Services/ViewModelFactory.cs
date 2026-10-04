@@ -1,10 +1,8 @@
 ﻿using System;
-
-using DominoAllFives.BusinessLogic.Controllers;
-using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Services;
+
 
 namespace DominoAllFives.Client.WPF.Services
 {
@@ -15,11 +13,15 @@ namespace DominoAllFives.Client.WPF.Services
     {
         private readonly IFrameNavigationService _navigationService;
         private readonly IDialogService _dialogService;
+        private readonly IAccountService _accountService;
+        private readonly IRankingService _rankingService;
         private readonly PlayerSession _playerSession;
 
         public ViewModelFactory(
             IFrameNavigationService navigationService,
             IDialogService dialogService,
+            IAccountService accountService,
+            IRankingService rankingService,
             PlayerSession playerSession)
         {
             _navigationService = navigationService
@@ -29,6 +31,14 @@ namespace DominoAllFives.Client.WPF.Services
             _dialogService = dialogService
                 ?? throw new ArgumentNullException(
                     nameof(dialogService));
+            
+            _accountService = accountService
+                ?? throw new ArgumentNullException(
+                    nameof(accountService));
+
+            _rankingService = rankingService
+                ?? throw new ArgumentNullException(
+                    nameof(rankingService));    
 
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(
@@ -45,7 +55,8 @@ namespace DominoAllFives.Client.WPF.Services
                     new HomePageViewModel(
                         _navigationService,
                         _dialogService,
-                        _playerSession);
+                        _playerSession,
+                        _accountService);
 
                 return (TViewModel)(ViewModelBase)
                     homePageViewModel;
@@ -74,22 +85,11 @@ namespace DominoAllFives.Client.WPF.Services
 
             if (typeof(TViewModel) == typeof(RankingsViewModel))
             {
-                RankingController rankingController =
-                    new RankingController();
-
-                RankingResultDto rankingResult = null;
-
-                if (_playerSession.PlayerId.HasValue)
-                {
-                    rankingResult =
-                        rankingController.GetRanking(
-                            _playerSession.PlayerId.Value);
-                }
-
                 RankingsViewModel rankingsViewModel =
                     new RankingsViewModel(
                         _navigationService,
-                        rankingResult);
+                        _rankingService,
+                        _playerSession);
 
                 return (TViewModel)(ViewModelBase)
                     rankingsViewModel;

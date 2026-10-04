@@ -58,5 +58,20 @@ namespace DominoAllFives.DataAccess.Repositories
         {
             _context.Player.Add(playerToAdd);
         }
+
+        /// <inheritdoc />
+        public bool UpdateProfilePicture(int playerId, string profilePictureFileName)
+        {
+            Player player = _context.Player.FirstOrDefault(
+                currentPlayer => currentPlayer.IdPlayer == playerId);
+
+            if (player == null)
+            {
+                return false;
+            }
+
+            player.ProfilePicture = profilePictureFileName;
+            return true;
+        }
     }
 }

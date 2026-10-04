@@ -592,6 +592,42 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a No es posible iniciar sesión en este momento. Intenta nuevamente..
+        /// </summary>
+        public static string Global_msgConnectionError {
+            get {
+                return ResourceManager.GetString("Global_msgConnectionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Error de conexión.
+        /// </summary>
+        public static string Global_msgConnectionErrorTitle {
+            get {
+                return ResourceManager.GetString("Global_msgConnectionErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No es posible continuar. Error desconocido. Intente nuevamente..
+        /// </summary>
+        public static string Global_msgDefaultError {
+            get {
+                return ResourceManager.GetString("Global_msgDefaultError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Error.
+        /// </summary>
+        public static string Global_msgDefaultErrorTitle {
+            get {
+                return ResourceManager.GetString("Global_msgDefaultErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Escribe un mensaje....
         /// </summary>
         public static string Global_txtChatPlaceholder {
@@ -979,7 +1015,7 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a No se pudo crear la cuenta. Ocurrió un error. Intenta nuevamente..
+        ///   Busca una cadena traducida similar a No se pudo crear la cuenta. Ocurrió un error de conexión. Intenta nuevamente..
         /// </summary>
         public static string MessageAccount_msgAccountCreationError {
             get {
@@ -1096,6 +1132,43 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a El correo electrónico debe ser de la forma @dominio.com
+        ///Los dominios válidos son: gmail, hotmail, outlook.
+        /// </summary>
+        public static string MessageAccount_msgInvalidEmail {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgInvalidEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Correo electrónico inválido.
+        /// </summary>
+        public static string MessageAccount_msgInvalidEmailTitle {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgInvalidEmailTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El usuario no debe superar los 64 carácteres..
+        /// </summary>
+        public static string MessageAccount_msgInvalidUsername {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgInvalidUsername", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Usuario inválido.
+        /// </summary>
+        public static string MessageAccount_msgInvalidUsernameTitle {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgInvalidUsernameTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a La contraseña fue actualizada correctamente..
         /// </summary>
         public static string MessageAccount_msgPasswordChanged {
@@ -1150,38 +1223,20 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a No es posible iniciar sesión en este momento. Intenta nuevamente..
+        ///   Busca una cadena traducida similar a No es posible iniciar sesión. La cuenta ha sido baneada. Intenta con otra cuenta..
         /// </summary>
-        public static string MessageAuthentication_msgConnectionError {
+        public static string MessageAuthentication_msgBannedAccount {
             get {
-                return ResourceManager.GetString("MessageAuthentication_msgConnectionError", resourceCulture);
+                return ResourceManager.GetString("MessageAuthentication_msgBannedAccount", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Error de inicio de sesión.
+        ///   Busca una cadena traducida similar a Cuenta baneada.
         /// </summary>
-        public static string MessageAuthentication_msgConnectionErrorTitle {
+        public static string MessageAuthentication_msgBannedAccountTitle {
             get {
-                return ResourceManager.GetString("MessageAuthentication_msgConnectionErrorTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Busca una cadena traducida similar a No es posible iniciar sesión con esta cuenta..
-        /// </summary>
-        public static string MessageAuthentication_msgDisabledAccount {
-            get {
-                return ResourceManager.GetString("MessageAuthentication_msgDisabledAccount", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Busca una cadena traducida similar a Cuenta deshabilitada.
-        /// </summary>
-        public static string MessageAuthentication_msgDisabledAccountTitle {
-            get {
-                return ResourceManager.GetString("MessageAuthentication_msgDisabledAccountTitle", resourceCulture);
+                return ResourceManager.GetString("MessageAuthentication_msgBannedAccountTitle", resourceCulture);
             }
         }
         
@@ -1200,6 +1255,24 @@ namespace DominoAllFives.Client.WPF.Localization {
         public static string MessageAuthentication_msgInvalidCredentialsTitle {
             get {
                 return ResourceManager.GetString("MessageAuthentication_msgInvalidCredentialsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No es posible iniciar sesión. La cuenta está suspendida. Intenta de nuevo en otro momento..
+        /// </summary>
+        public static string MessageAuthentication_msgSuspendedAccount {
+            get {
+                return ResourceManager.GetString("MessageAuthentication_msgSuspendedAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Suspensión.
+        /// </summary>
+        public static string MessageAuthentication_msgSuspendedAccountTitle {
+            get {
+                return ResourceManager.GetString("MessageAuthentication_msgSuspendedAccountTitle", resourceCulture);
             }
         }
         
@@ -1690,7 +1763,16 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a El archivo seleccionado no tiene un formato válido para la foto de perfil..
+        ///   Busca una cadena traducida similar a No es posible utilizar este archivo. El archivo seleccionado no tiene un formato válido para la foto de perfil..
+        /// </summary>
+        public static string MessageProfile_msgPhotoInvalid {
+            get {
+                return ResourceManager.GetString("MessageProfile_msgPhotoInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No es posible utilizar este archivo. El archivo tiene una extensión no admitida..
         /// </summary>
         public static string MessageProfile_msgPhotoInvalidFormat {
             get {
@@ -1699,11 +1781,20 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Foto de perfil inválida.
+        ///   Busca una cadena traducida similar a Extensión inválida.
         /// </summary>
         public static string MessageProfile_msgPhotoInvalidFormatTitle {
             get {
                 return ResourceManager.GetString("MessageProfile_msgPhotoInvalidFormatTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Foto de perfil inválida.
+        /// </summary>
+        public static string MessageProfile_msgPhotoInvalidTitle {
+            get {
+                return ResourceManager.GetString("MessageProfile_msgPhotoInvalidTitle", resourceCulture);
             }
         }
         

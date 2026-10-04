@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 

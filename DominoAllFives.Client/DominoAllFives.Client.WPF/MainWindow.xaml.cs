@@ -1,8 +1,9 @@
 ﻿using System.Windows;
-
-using DominoAllFives.Client.WPF.Models;
+using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.Client.WPF.Services;
+using DominoAllFives.Client.WPF.Services.Local;
 using DominoAllFives.Client.WPF.ViewModels;
+using DominoAllFives.Contracts.Services;
 
 namespace DominoAllFives.Client.WPF
 {
@@ -24,10 +25,37 @@ namespace DominoAllFives.Client.WPF
             MainWindowViewModel mainWindowViewModel =
                 new MainWindowViewModel(navigationService);
 
+
+            // Initialize controllers and services temporarily for local testing,
+            // these will be replaced with remote implementations later.
+            AuthenticationController authenticationController =
+                new AuthenticationController();
+
+            RegistrationController registrationController =
+                new RegistrationController();
+
+            ProfilePictureController profilePictureController =
+                new ProfilePictureController();
+
+            RankingController rankingController =
+                new RankingController();
+
+            IAccountService accountService =
+                new LocalAccountService(
+                    authenticationController,
+                    registrationController,
+                    profilePictureController);
+
+            IRankingService rankingService =
+                new LocalRankingService(
+                    rankingController);
+
             ViewModelFactory viewModelFactory =
                 new ViewModelFactory(
                     navigationService,
                     mainWindowViewModel.DialogService,
+                    accountService,
+                    rankingService,
                     playerSession);
 
             navigationService.SetViewModelFactory(viewModelFactory);

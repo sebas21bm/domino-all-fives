@@ -1,4 +1,6 @@
-﻿namespace DominoAllFives.Contracts.DTOs
+﻿using DominoAllFives.Contracts.Enums;
+
+namespace DominoAllFives.Contracts.DTOs
 {
     /// <summary>
     /// Represents the result of a player login attempt.
@@ -12,16 +14,5 @@
         public string Username { get; set; }
 
         public LoginFailureReason FailureReason { get; set; }
-    }
-
-    /// <summary>
-    /// Defines the possible reasons for a failed login attempt.
-    /// </summary>
-    public enum LoginFailureReason
-    {
-        None,
-        InvalidCredentials,
-        Banned,
-        Suspended
     }
 }

@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Windows.Controls;
-
-using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Enums;
+using DominoAllFives.Contracts.Services;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class LoginViewModel : ViewModelBase
     {
         private readonly IDialogService _dialogService;
-        private readonly AuthenticationController _authenticationController;
+        private readonly IAccountService _accountService;
         private readonly PlayerSession _playerSession;
 
         private readonly Action _onLoginSuccess;
@@ -57,7 +57,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public LoginViewModel(
             IDialogService dialogService,
-            AuthenticationController authenticationController,
+            IAccountService accountService,
             PlayerSession playerSession,
             Action onLoginSuccess,
             Action onCancel,
@@ -67,8 +67,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _dialogService = dialogService
                 ?? throw new ArgumentNullException(nameof(dialogService));
 
-            _authenticationController = authenticationController
-                ?? throw new ArgumentNullException(nameof(authenticationController));
+            _accountService = accountService
+                ?? throw new ArgumentNullException(nameof(accountService));
 
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(nameof(playerSession));
@@ -108,32 +108,23 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            try
+            LoginRequestDto request = new LoginRequestDto
             {
-                LoginResultDto result =
-                    _authenticationController.Login(
-                        Email.Trim(),
-                        Password);
+                EmailOrUsername = Email.Trim(),
+                Password = Password
+            };
 
-                if (!result.IsSuccessful)
-                {
-                    ShowLoginFailure(result.FailureReason);
-                    return;
-                }
+            LoginResultDto result = _accountService.Login(request);
 
-                _playerSession.Start(result.PlayerId);
-
-                _onLoginSuccess.Invoke();
-            }
-            catch (Exception)
+            if (!result.IsSuccessful)
             {
-                _dialogService.ShowDialog(new DialogRequest
-                {
-                    Type = DialogType.Error,
-                    TitleKey = "MessageAuthentication_msgConnectionErrorTitle",
-                    MessageKey = "MessageAuthentication_msgConnectionError"
-                });
+                ShowLoginFailure(result.FailureReason);
+                return;
             }
+
+            _playerSession.Start(result.PlayerId);
+
+            _onLoginSuccess.Invoke();
         }
 
         private bool ValidateInput()
@@ -154,24 +145,42 @@ namespace DominoAllFives.Client.WPF.ViewModels
             switch (failureReason)
             {
                 case LoginFailureReason.Banned:
+                    _dialogService.ShowDialog(
+                        DialogType.Warning,
+                        "MessageAuthentication_msgBannedAccountTitle",
+                        "MessageAuthentication_msgBannedAccount",
+                        () => { });
+                    break;
                 case LoginFailureReason.Suspended:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Warning,
-                        TitleKey = "MessageAuthentication_msgDisabledAccountTitle",
-                        MessageKey = "MessageAuthentication_msgDisabledAccount"
-                    });
+                    _dialogService.ShowDialog(
+                        DialogType.Warning,
+                        "MessageAuthentication_msgSuspendedAccountTitle",
+                        "MessageAuthentication_msgSuspendedAccount",
+                        () => { });
                     break;
 
-                case LoginFailureReason.InvalidCredentials:
-                default:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Warning,
-                        TitleKey = "MessageAuthentication_msgInvalidCredentialsTitle",
-                        MessageKey = "MessageAuthentication_msgInvalidCredentials"
-                    });
+                case LoginFailureReason.ServiceUnavailable:
+                    _dialogService.ShowDialog(
+                        DialogType.Error,
+                        "Global_msgConnectionError",
+                        "Global_msgConnectionError",
+                        () => { });
                     break;
+                case LoginFailureReason.InvalidCredentials:
+                    _dialogService.ShowDialog(
+                        DialogType.Warning,
+                        "MessageAuthentication_msgInvalidCredentialsTitle",
+                        "MessageAuthentication_msgInvalidCredentials",
+                        () => { });
+                    break;
+                default:
+                    _dialogService.ShowDialog(
+                        DialogType.Error,
+                        "Global_msgDefaultErrorTitle",
+                        "Global_msgDefaultError",
+                        () => { });
+                    break;
+
             }
         }
     }

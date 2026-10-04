@@ -1,6 +1,10 @@
-﻿using DominoAllFives.BusinessLogic.Security;
+﻿using System.Data.Entity.Core;
+using System.Data.Entity.Infrastructure;
+using System.Data.SqlClient;
+using DominoAllFives.BusinessLogic.Security;
 using DominoAllFives.BusinessLogic.Validation;
 using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;
@@ -32,65 +36,83 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 return CreateFailureResult(validationResult);
             }
 
-            using (DominoAllFivesEntities context =
-                new DominoAllFivesEntities())
+            try 
             {
-                IPlayerRepository playerRepository =
-                    new PlayerRepository(context);
-
-                IPlayerStatsRepository playerStatsRepository =
-                    new PlayerStatsRepository(context);
-
-                if (playerRepository.UsernameExists(
-                    registrationData.Username))
+                using (DominoAllFivesEntities context =
+                    new DominoAllFivesEntities())
                 {
-                    return CreateFailureResult(
-                        RegistrationFailureReason.UsernameAlreadyExists);
+                    IPlayerRepository playerRepository =
+                        new PlayerRepository(context);
+
+                    IPlayerStatsRepository playerStatsRepository =
+                        new PlayerStatsRepository(context);
+
+                    if (playerRepository.UsernameExists(
+                        registrationData.Username))
+                    {
+                        return CreateFailureResult(
+                            RegistrationFailureReason.UsernameAlreadyExists);
+                    }
+
+                    if (playerRepository.EmailExists(
+                        registrationData.Email))
+                    {
+                        return CreateFailureResult(
+                            RegistrationFailureReason.EmailAlreadyExists);
+                    }
+
+                    Player player = new Player
+                    {
+                        Username = registrationData.Username,
+                        Email = registrationData.Email,
+                        PasswordHash = PasswordHasher.HashPassword(
+                            registrationData.Password),
+                        ProfilePicture = null,
+                        Status = "Offline",
+                        IsGuest = false,
+                        SuspensionUntil = null,
+                        IsBanned = false,
+                        PreferredLanguageId =
+                            registrationData.PreferredLanguageId
+                    };
+
+                    PlayerStats playerStats = new PlayerStats
+                    {
+                        GamesWon = 0,
+                        GamesPlayed = 0,
+                        TotalPointsScored = 0,
+                        LastVictoryDate = null,
+                        Player = player
+                    };
+
+                    playerRepository.Add(player);
+                    playerStatsRepository.Add(playerStats);
+
+                    context.SaveChanges();
+
+                    return new RegistrationResultDto
+                    {
+                        IsSuccessful = true,
+                        PlayerId = player.IdPlayer,
+                        Username = player.Username,
+                        FailureReason = RegistrationFailureReason.None
+                    };
                 }
-
-                if (playerRepository.EmailExists(
-                    registrationData.Email))
-                {
-                    return CreateFailureResult(
-                        RegistrationFailureReason.EmailAlreadyExists);
-                }
-
-                Player player = new Player
-                {
-                    Username = registrationData.Username,
-                    Email = registrationData.Email,
-                    PasswordHash = PasswordHasher.HashPassword(
-                        registrationData.Password),
-                    ProfilePicture = null,
-                    Status = "Offline",
-                    IsGuest = false,
-                    SuspensionUntil = null,
-                    IsBanned = false,
-                    PreferredLanguageId =
-                        registrationData.PreferredLanguageId
-                };
-
-                PlayerStats playerStats = new PlayerStats
-                {
-                    GamesWon = 0,
-                    GamesPlayed = 0,
-                    TotalPointsScored = 0,
-                    LastVictoryDate = null,
-                    Player = player
-                };
-
-                playerRepository.Add(player);
-                playerStatsRepository.Add(playerStats);
-
-                context.SaveChanges();
-
-                return new RegistrationResultDto
-                {
-                    IsSuccessful = true,
-                    PlayerId = player.IdPlayer,
-                    Username = player.Username,
-                    FailureReason = RegistrationFailureReason.None
-                };
+            }
+            catch (SqlException)
+            {
+                return CreateFailureResult(
+                    RegistrationFailureReason.ServiceUnavailable);
+            }
+            catch (EntityException)
+            {
+                return CreateFailureResult(
+                    RegistrationFailureReason.ServiceUnavailable);
+            }
+            catch (DbUpdateException)
+            {
+                return CreateFailureResult(
+                    RegistrationFailureReason.ServiceUnavailable);
             }
         }
 

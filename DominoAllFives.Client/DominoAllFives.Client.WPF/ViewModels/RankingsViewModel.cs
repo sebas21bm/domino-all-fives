@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.IO;
-
+using System.Windows.Media.Imaging;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Services;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -16,15 +17,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
     public class RankingsViewModel : ViewModelBase
     {
         private const string DefaultProfilePicture =
-            "/Assets/Images/ProfilePictures/defaultProfilePic.png";
-
-        private const string ApplicationFolderName =
-            "DominoAllFives";
-
-        private const string ProfilePicturesFolderName =
-            "ProfilePictures";
+            "pack://application:,,,/Assets/Images/ProfilePictures/defaultProfilePic.png";
 
         private readonly IFrameNavigationService _navigationService;
+        private readonly IRankingService _rankingService;
+        private readonly PlayerSession _playerSession;
 
         private ObservableCollection<PlayerRankingRecord> _leaderboard;
         private string _currentPlayerRank;
@@ -32,44 +29,49 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public ObservableCollection<PlayerRankingRecord> Leaderboard
         {
             get => _leaderboard;
-            set => SetProperty(
-                ref _leaderboard,
-                value);
+            set => SetProperty(ref _leaderboard, value);
         }
 
         public string CurrentPlayerRank
         {
             get => _currentPlayerRank;
-            set => SetProperty(
-                ref _currentPlayerRank,
-                value);
+            set => SetProperty(ref _currentPlayerRank, value);
         }
 
         public RelayCommand GoBackCommand { get; }
 
         public RankingsViewModel(
             IFrameNavigationService navigationService,
-            RankingResultDto rankingResult)
+            IRankingService rankingService,
+            PlayerSession playerSession)
         {
             _navigationService = navigationService
-                ?? throw new ArgumentNullException(
-                    nameof(navigationService));
+                ?? throw new ArgumentNullException(nameof(navigationService));
 
-            _leaderboard =
-                new ObservableCollection<PlayerRankingRecord>();
+            _rankingService = rankingService
+                ?? throw new ArgumentNullException(nameof(rankingService));
 
+            _playerSession = playerSession
+                ?? throw new ArgumentNullException(nameof(playerSession));
+
+            _leaderboard = new ObservableCollection<PlayerRankingRecord>();
             _currentPlayerRank = string.Empty;
 
-            GoBackCommand =
-                new RelayCommand(
-                    _ => _navigationService.GoBack());
+            GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
 
-            LoadRanking(rankingResult);
+            LoadRanking();
         }
 
-        private void LoadRanking(
-            RankingResultDto rankingResult)
+        private void LoadRanking()
         {
+            if (!_playerSession.PlayerId.HasValue)
+            {
+                return;
+            }
+
+            RankingResultDto rankingResult =
+                _rankingService.GetTopRanking(_playerSession.PlayerId.Value);
+
             if (rankingResult == null)
             {
                 return;
@@ -77,8 +79,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             Leaderboard.Clear();
 
-            foreach (RankingEntryDto entry
-                in rankingResult.TopPlayers)
+            foreach (RankingEntryDto entry in rankingResult.TopPlayers)
             {
                 Leaderboard.Add(
                     new PlayerRankingRecord
@@ -86,44 +87,56 @@ namespace DominoAllFives.Client.WPF.ViewModels
                         Rank = entry.Rank,
                         Username = entry.Username,
                         StatisticValue = entry.GamesWon,
-                        AvatarPath =
-                            GetProfilePicturePath(
-                                entry.ProfilePicture)
+                        Avatar = GetProfilePicture(entry.ProfilePictureData)
                     });
             }
 
-            CurrentPlayerRank =
-                rankingResult.CurrentPlayerRank > 0
-                    ? rankingResult.CurrentPlayerRank.ToString()
-                    : "-";
+            CurrentPlayerRank = rankingResult.CurrentPlayerRank > 0
+                ? rankingResult.CurrentPlayerRank.ToString()
+                : "-";
         }
 
-        private string GetProfilePicturePath(
-            string profilePicture)
+        private BitmapImage GetProfilePicture(byte[] profilePictureData)
         {
-            if (string.IsNullOrWhiteSpace(
-                profilePicture))
+            if (profilePictureData == null || profilePictureData.Length == 0)
             {
-                return DefaultProfilePicture;
+                return GetDefaultProfilePicture();
             }
 
-            string localApplicationData =
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.LocalApplicationData);
-
-            string profilePicturePath =
-                Path.Combine(
-                    localApplicationData,
-                    ApplicationFolderName,
-                    ProfilePicturesFolderName,
-                    profilePicture);
-
-            if (!File.Exists(profilePicturePath))
+            try
             {
-                return DefaultProfilePicture;
-            }
+                using (MemoryStream imageStream = new MemoryStream(profilePictureData))
+                {
+                    BitmapImage image = new BitmapImage();
 
-            return profilePicturePath;
+                    image.BeginInit();
+                    image.CacheOption = BitmapCacheOption.OnLoad;
+                    image.StreamSource = imageStream;
+                    image.EndInit();
+                    image.Freeze();
+
+                    return image;
+                }
+            }
+            catch (Exception ex) when (ex is ArgumentException ||
+                                       ex is InvalidOperationException ||
+                                       ex is NotSupportedException)
+            {
+                return GetDefaultProfilePicture();
+            }
+        }
+
+        private BitmapImage GetDefaultProfilePicture()
+        {
+            BitmapImage defaultImage = new BitmapImage();
+
+            defaultImage.BeginInit();
+            defaultImage.CacheOption = BitmapCacheOption.OnLoad;
+            defaultImage.UriSource = new Uri(DefaultProfilePicture, UriKind.Absolute);
+            defaultImage.EndInit();
+            defaultImage.Freeze();
+
+            return defaultImage;
         }
     }
 }

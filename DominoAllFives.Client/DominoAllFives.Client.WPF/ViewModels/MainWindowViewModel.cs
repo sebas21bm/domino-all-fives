@@ -1,5 +1,4 @@
 ﻿using System;
-
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 
