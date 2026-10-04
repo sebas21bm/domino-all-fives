@@ -1,6 +1,7 @@
 ﻿using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Services;
+using System;
 
 namespace DominoAllFives.Client.WPF.Services.Local
 {
@@ -10,7 +11,8 @@ namespace DominoAllFives.Client.WPF.Services.Local
 
         public LocalRankingService(RankingController rankingController)
         {
-            _rankingController = rankingController;
+            _rankingController = rankingController
+                ?? throw new ArgumentNullException(nameof(rankingController));
         }
 
         /// <inheritdoc/>

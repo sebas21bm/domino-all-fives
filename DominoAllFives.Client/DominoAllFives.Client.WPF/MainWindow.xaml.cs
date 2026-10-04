@@ -37,17 +37,25 @@ namespace DominoAllFives.Client.WPF
             ProfilePictureController profilePictureController =
                 new ProfilePictureController();
 
+            RankingController rankingController =
+                new RankingController();
+
             IAccountService accountService =
                 new LocalAccountService(
                     authenticationController,
                     registrationController,
                     profilePictureController);
 
+            IRankingService rankingService =
+                new LocalRankingService(
+                    rankingController);
+
             ViewModelFactory viewModelFactory =
                 new ViewModelFactory(
                     navigationService,
                     mainWindowViewModel.DialogService,
                     accountService,
+                    rankingService,
                     playerSession);
 
             navigationService.SetViewModelFactory(viewModelFactory);

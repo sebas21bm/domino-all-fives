@@ -1,12 +1,12 @@
-﻿using DominoAllFives.Client.WPF.Commands;
+﻿using System;
+using System.Windows.Controls;
+using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Contracts.Services;
-using System;
-using System.Windows.Controls;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {

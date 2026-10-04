@@ -1,4 +1,6 @@
-﻿namespace DominoAllFives.Client.WPF.Models
+﻿using System.Windows.Media.Imaging;
+
+namespace DominoAllFives.Client.WPF.Models
 {
     /// <summary>
     /// Represents a player displayed in the rankings interface.
@@ -11,6 +13,6 @@
 
         public int StatisticValue { get; set; }
 
-        public string AvatarPath { get; set; }
+        public BitmapImage Avatar { get; set; }
     }
 }

@@ -101,7 +101,7 @@
 
                                         <Grid Grid.Column="1" Width="58" Height="58" HorizontalAlignment="Left">
                                             <Ellipse Style="{StaticResource SmallAvatarBorderStyle}"/>
-                                            <Image Style="{StaticResource SmallAvatarImageStyle}" Source="{Binding AvatarPath}">
+                                            <Image Style="{StaticResource SmallAvatarImageStyle}" Source="{Binding Avatar}">
                                                 <Image.Clip>
                                                     <EllipseGeometry Center="27,27" RadiusX="27" RadiusY="27"/>
                                                 </Image.Clip>
