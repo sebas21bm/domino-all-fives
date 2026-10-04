@@ -4,7 +4,7 @@ namespace DominoAllFives.Contracts.Services
 {
     /// <summary>
     /// Represents the service responsible for handling account-related operations,
-    /// sucha as login, registration, and profile picture management.
+    /// such as login, registration, and profile picture management.
     /// </summary>
     public interface IAccountService
     {
