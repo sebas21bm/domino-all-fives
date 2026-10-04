@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
+
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
@@ -145,42 +146,49 @@ namespace DominoAllFives.Client.WPF.ViewModels
             switch (failureReason)
             {
                 case LoginFailureReason.Banned:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageAuthentication_msgBannedAccountTitle",
-                        "MessageAuthentication_msgBannedAccount",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageAuthentication_msgBannedAccountTitle",
+                        MessageKey = "MessageAuthentication_msgBannedAccount"
+                    });
                     break;
+
                 case LoginFailureReason.Suspended:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageAuthentication_msgSuspendedAccountTitle",
-                        "MessageAuthentication_msgSuspendedAccount",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageAuthentication_msgSuspendedAccountTitle",
+                        MessageKey = "MessageAuthentication_msgSuspendedAccount"
+                    });
                     break;
 
                 case LoginFailureReason.ServiceUnavailable:
-                    _dialogService.ShowDialog(
-                        DialogType.Error,
-                        "Global_msgConnectionError",
-                        "Global_msgConnectionError",
-                        () => { });
-                    break;
-                case LoginFailureReason.InvalidCredentials:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageAuthentication_msgInvalidCredentialsTitle",
-                        "MessageAuthentication_msgInvalidCredentials",
-                        () => { });
-                    break;
-                default:
-                    _dialogService.ShowDialog(
-                        DialogType.Error,
-                        "Global_msgDefaultErrorTitle",
-                        "Global_msgDefaultError",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Error,
+                        TitleKey = "Global_msgConnectionError",
+                        MessageKey = "Global_msgConnectionError"
+                    });
                     break;
 
+                case LoginFailureReason.InvalidCredentials:
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageAuthentication_msgInvalidCredentialsTitle",
+                        MessageKey = "MessageAuthentication_msgInvalidCredentials"
+                    });
+                    break;
+
+                default:
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Error,
+                        TitleKey = "Global_msgDefaultErrorTitle",
+                        MessageKey = "Global_msgDefaultError"
+                    });
+                    break;
             }
         }
     }

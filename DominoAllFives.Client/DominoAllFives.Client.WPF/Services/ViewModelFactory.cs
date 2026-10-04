@@ -1,4 +1,6 @@
 ﻿using System;
+
+using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.Services;

@@ -1,7 +1,8 @@
-﻿using DominoAllFives.BusinessLogic.Controllers;
+﻿using System;
+
+using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Services;
-using System;
 
 namespace DominoAllFives.Client.WPF.Services.Local
 {

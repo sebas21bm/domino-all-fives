@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
+
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
@@ -205,44 +206,49 @@ namespace DominoAllFives.Client.WPF.ViewModels
             switch (failureReason)
             {
                 case ProfilePictureFailureReason.InvalidFormat:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageProfile_msgPhotoInvalidFormatTitle",
-                        "MessageProfile_msgPhotoInvalidFormat",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageProfile_msgPhotoInvalidFormatTitle",
+                        MessageKey = "MessageProfile_msgPhotoInvalidFormat"
+                    });
                     break;
 
                 case ProfilePictureFailureReason.InvalidImage:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageProfile_msgPhotoInvalidTitle",
-                        "MessageProfile_msgPhotoInvalid",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageProfile_msgPhotoInvalidTitle",
+                        MessageKey = "MessageProfile_msgPhotoInvalid"
+                    });
                     break;
 
                 case ProfilePictureFailureReason.FileTooLarge:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageProfile_msgPhotoTooLargeTitle",
-                        "MessageProfile_msgPhotoTooLarge",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageProfile_msgPhotoTooLargeTitle",
+                        MessageKey = "MessageProfile_msgPhotoTooLarge"
+                    });
                     break;
 
                 case ProfilePictureFailureReason.PlayerNotFound:
                 case ProfilePictureFailureReason.ServiceUnavailable:
-                    _dialogService.ShowDialog(
-                        DialogType.Error,
-                        "MessageProfile_msgPhotoCannotBeUploadedTitle",
-                        "MessageProfile_msgPhotoCannotBeUploaded",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Error,
+                        TitleKey = "MessageProfile_msgPhotoCannotBeUploadedTitle",
+                        MessageKey = "MessageProfile_msgPhotoCannotBeUploaded"
+                    });
                     break;
 
                 default:
-                    _dialogService.ShowDialog(
-                        DialogType.Error,
-                        "Global_msgDefaultErrorTitle",
-                        "Global_msgDefaultError",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Error,
+                        TitleKey = "Global_msgDefaultErrorTitle",
+                        MessageKey = "Global_msgDefaultError"
+                    });
                     break;
             }
         }

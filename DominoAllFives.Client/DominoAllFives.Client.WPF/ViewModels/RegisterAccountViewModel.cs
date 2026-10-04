@@ -142,11 +142,13 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             _playerSession.Start(result.PlayerId);
 
-            _dialogService.ShowDialog(
-                DialogType.Success,
-                "MessageAccount_msgAccountCreatedTitle",
-                "MessageAccount_msgAccountCreated",
-                _onRegistrationSuccess);
+            _dialogService.ShowDialog(new DialogRequest
+            {
+                Type = DialogType.Success,
+                TitleKey = "MessageAccount_msgAccountCreatedTitle",
+                MessageKey = "MessageAccount_msgAccountCreated",
+                OnAccept = _onRegistrationSuccess
+            });
         }
 
         private bool ValidateRequiredFields(
@@ -214,40 +216,48 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     break;
 
                 case RegistrationFailureReason.InvalidUsername:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageAccount_msgInvalidUsernameTitle",
-                        "MessageAccount_msgInvalidUsername",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageAccount_msgInvalidUsernameTitle",
+                        MessageKey = "MessageAccount_msgInvalidUsername"
+                    });
                     break;
+
                 case RegistrationFailureReason.InvalidEmail:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageAccount_msgInvalidEmailTitle",
-                        "MessageAccount_msgInvalidEmail",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageAccount_msgInvalidEmailTitle",
+                        MessageKey = "MessageAccount_msgInvalidEmail"
+                    });
                     break;
+
                 case RegistrationFailureReason.InvalidRegistrationData:
-                    _dialogService.ShowDialog(
-                        DialogType.Warning,
-                        "MessageAccount_msgInvalidDataTitle",
-                        "MessageAccount_msgInvalidData",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Warning,
+                        TitleKey = "MessageAccount_msgInvalidDataTitle",
+                        MessageKey = "MessageAccount_msgInvalidData"
+                    });
                     break;
 
                 case RegistrationFailureReason.ServiceUnavailable:
-                    _dialogService.ShowDialog(
-                        DialogType.Error,
-                        "MessageAccount_msgAccountCreationErrorTitle",
-                        "MessageAccount_msgAccountCreationError",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Error,
+                        TitleKey = "MessageAccount_msgAccountCreationErrorTitle",
+                        MessageKey = "MessageAccount_msgAccountCreationError"
+                    });
                     break;
+
                 default:
-                    _dialogService.ShowDialog(
-                        DialogType.Error,
-                        "Global_msgDefaultErrorTitle",
-                        "Global_msgDefaultError",
-                        () => { });
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Error,
+                        TitleKey = "Global_msgDefaultErrorTitle",
+                        MessageKey = "Global_msgDefaultError"
+                    });
                     break;
             }
         }

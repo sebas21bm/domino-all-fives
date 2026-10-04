@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using DominoAllFives.BusinessLogic.Controllers;
+using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Local;
 using DominoAllFives.Client.WPF.ViewModels;
