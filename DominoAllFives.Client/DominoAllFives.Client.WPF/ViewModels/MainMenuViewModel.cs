@@ -13,8 +13,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private readonly IFrameNavigationService _navigationService;
         private readonly IDialogService _dialogService;
         private readonly PlayerSession _playerSession;
-
-        public string Username { get; private set; }
+        public string Username => _playerSession.Username;
         public bool IsGuest => !_playerSession.IsAuthenticated;
         public Visibility AccountFeaturesVisibility => IsGuest ? 
             Visibility.Collapsed : Visibility.Visible;

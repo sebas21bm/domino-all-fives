@@ -18,13 +18,16 @@ namespace DominoAllFives.Client.WPF.Services
         private readonly IAccountService _accountService;
         private readonly IRankingService _rankingService;
         private readonly PlayerSession _playerSession;
-
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ProfilePictureImageService _profilePictureImageService;
         public ViewModelFactory(
             IFrameNavigationService navigationService,
             IDialogService dialogService,
             IAccountService accountService,
             IRankingService rankingService,
-            PlayerSession playerSession)
+            PlayerSession playerSession,
+            ILoggerFactory loggerFactory,
+            ProfilePictureImageService profilePictureImageService)
         {
             _navigationService = navigationService
                 ?? throw new ArgumentNullException(
@@ -33,18 +36,26 @@ namespace DominoAllFives.Client.WPF.Services
             _dialogService = dialogService
                 ?? throw new ArgumentNullException(
                     nameof(dialogService));
-            
+
             _accountService = accountService
                 ?? throw new ArgumentNullException(
                     nameof(accountService));
 
             _rankingService = rankingService
                 ?? throw new ArgumentNullException(
-                    nameof(rankingService));    
+                    nameof(rankingService));
 
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(
                     nameof(playerSession));
+
+            _loggerFactory = loggerFactory
+                ?? throw new ArgumentNullException(
+                    nameof(loggerFactory));
+
+            _profilePictureImageService = profilePictureImageService
+                ?? throw new ArgumentNullException(
+                    nameof(profilePictureImageService));
         }
 
         public TViewModel Create<TViewModel>()
@@ -58,13 +69,15 @@ namespace DominoAllFives.Client.WPF.Services
                         _navigationService,
                         _dialogService,
                         _playerSession,
-                        _accountService);
+                        _accountService,
+                        _loggerFactory);
 
                 return (TViewModel)(ViewModelBase)
                     homePageViewModel;
             }
 
-            if (typeof(TViewModel) == typeof(MainMenuViewModel))
+            if (typeof(TViewModel) ==
+                typeof(MainMenuViewModel))
             {
                 MainMenuViewModel mainMenuViewModel =
                     new MainMenuViewModel(
@@ -72,26 +85,46 @@ namespace DominoAllFives.Client.WPF.Services
                         _dialogService,
                         _playerSession);
 
-                return (TViewModel)(ViewModelBase)mainMenuViewModel;
+                return (TViewModel)(ViewModelBase)
+                    mainMenuViewModel;
             }
 
-            if (typeof(TViewModel) == typeof(GameSettingsViewModel))
+            if (typeof(TViewModel) ==
+                typeof(GameSettingsViewModel))
             {
                 GameSettingsViewModel gameSettingsViewModel =
                     new GameSettingsViewModel(
                         _navigationService,
                         _playerSession);
 
-                return (TViewModel)(ViewModelBase)gameSettingsViewModel;
+                return (TViewModel)(ViewModelBase)
+                    gameSettingsViewModel;
             }
 
-            if (typeof(TViewModel) == typeof(RankingsViewModel))
+            if (typeof(TViewModel) ==
+                typeof(ProfileViewModel))
+            {
+                ProfileViewModel profileViewModel =
+                    new ProfileViewModel(
+                        _navigationService,
+                        _accountService,
+                        _dialogService,
+                        _playerSession,
+                        _profilePictureImageService);
+
+                return (TViewModel)(ViewModelBase)
+                    profileViewModel;
+            }
+
+            if (typeof(TViewModel) ==
+                typeof(RankingsViewModel))
             {
                 RankingsViewModel rankingsViewModel =
                     new RankingsViewModel(
                         _navigationService,
                         _rankingService,
-                        _playerSession);
+                        _playerSession,
+                        _profilePictureImageService);
 
                 return (TViewModel)(ViewModelBase)
                     rankingsViewModel;

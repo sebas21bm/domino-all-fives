@@ -231,7 +231,7 @@
   <data name="Global_msgConnectionErrorTitle" xml:space="preserve">
     <value>Erro de conexão</value>
   </data>
-  <data name="Global_msgConnectionError" xml:space="preserve">
+  <data name="MessageAuthentication_msgConnectionError" xml:space="preserve">
     <value>Não é possível entrar neste momento. Tente novamente.</value>
   </data>
   <data name="MessageAuthentication_msgBannedAccountTitle" xml:space="preserve">
@@ -991,5 +991,14 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
   </data>
   <data name="MessageProfile_msgPhotoInvalidFormatTitle" xml:space="preserve">
     <value>Extensão inválida</value>
+  </data>
+  <data name="Global_msgConnectionError" xml:space="preserve">
+    <value>Não é possível recuperar as informações. Erro de conexão. Tente novamente mais tarde.</value>
+  </data>
+  <data name="Global_msgNotFound" xml:space="preserve">
+    <value>Não é possível encontrar as informações deste jogador. Tente novamente mais tarde.</value>
+  </data>
+  <data name="Global_msgNotFoundTitle" xml:space="preserve">
+    <value>Jogador não encontrado</value>
   </data>
 </root>

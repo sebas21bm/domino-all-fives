@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Windows.Controls;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
@@ -140,7 +139,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            _playerSession.Start(result.PlayerId);
+            _playerSession.Start(result.PlayerId, result.Username);
 
             _dialogService.ShowDialog(new DialogRequest
             {

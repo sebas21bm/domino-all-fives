@@ -231,7 +231,7 @@
   <data name="Global_msgConnectionErrorTitle" xml:space="preserve">
     <value>Error de conexión</value>
   </data>
-  <data name="Global_msgConnectionError" xml:space="preserve">
+  <data name="MessageAuthentication_msgConnectionError" xml:space="preserve">
     <value>No es posible iniciar sesión en este momento. Intenta nuevamente.</value>
   </data>
   <data name="MessageAuthentication_msgBannedAccountTitle" xml:space="preserve">
@@ -990,5 +990,14 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
   </data>
   <data name="MessageProfile_msgPhotoInvalidFormatTitle" xml:space="preserve">
     <value>Extensión inválida</value>
+  </data>
+  <data name="Global_msgConnectionError" xml:space="preserve">
+    <value>No es posible recuperar la información. Error de conexión. Intente en otro momento.</value>
+  </data>
+  <data name="Global_msgNotFound" xml:space="preserve">
+    <value>No es posible encontrar la información de este jugador. Intenta de nuevo en otro momento.</value>
+  </data>
+  <data name="Global_msgNotFoundTitle" xml:space="preserve">
+    <value>Jugador no encontrado</value>
   </data>
 </root>

@@ -592,7 +592,7 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a No es posible iniciar sesión en este momento. Intenta nuevamente..
+        ///   Busca una cadena traducida similar a No es posible recuperar la información. Error de conexión. Intente en otro momento..
         /// </summary>
         public static string Global_msgConnectionError {
             get {
@@ -624,6 +624,24 @@ namespace DominoAllFives.Client.WPF.Localization {
         public static string Global_msgDefaultErrorTitle {
             get {
                 return ResourceManager.GetString("Global_msgDefaultErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No es posible encontrar la información de este jugador. Intenta de nuevo en otro momento..
+        /// </summary>
+        public static string Global_msgNotFound {
+            get {
+                return ResourceManager.GetString("Global_msgNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Jugador no encontrado.
+        /// </summary>
+        public static string Global_msgNotFoundTitle {
+            get {
+                return ResourceManager.GetString("Global_msgNotFoundTitle", resourceCulture);
             }
         }
         
@@ -1237,6 +1255,15 @@ namespace DominoAllFives.Client.WPF.Localization {
         public static string MessageAuthentication_msgBannedAccountTitle {
             get {
                 return ResourceManager.GetString("MessageAuthentication_msgBannedAccountTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No es posible iniciar sesión en este momento. Intenta nuevamente..
+        /// </summary>
+        public static string MessageAuthentication_msgConnectionError {
+            get {
+                return ResourceManager.GetString("MessageAuthentication_msgConnectionError", resourceCulture);
             }
         }
         

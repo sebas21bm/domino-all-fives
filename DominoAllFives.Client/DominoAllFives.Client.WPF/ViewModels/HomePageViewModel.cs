@@ -1,13 +1,14 @@
-﻿using DominoAllFives.Client.WPF.Commands;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows;
+
+using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.Services;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Windows;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -17,6 +18,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private readonly IDialogService _dialogService;
         private readonly IAccountService _accountService;
         private readonly PlayerSession _playerSession;
+        private readonly ILoggerFactory _loggerFactory;
 
         private ViewModelBase _currentModal;
         private bool _isModalVisible;
@@ -57,19 +59,28 @@ namespace DominoAllFives.Client.WPF.ViewModels
             IFrameNavigationService navigationService,
             IDialogService dialogService,
             PlayerSession playerSession,
-            IAccountService accountService)
+            IAccountService accountService,
+            ILoggerFactory loggerFactory)
         {
             _navigationService = navigationService
-                ?? throw new ArgumentNullException(nameof(navigationService));
+                ?? throw new ArgumentNullException(
+                    nameof(navigationService));
 
             _dialogService = dialogService
-                ?? throw new ArgumentNullException(nameof(dialogService));
+                ?? throw new ArgumentNullException(
+                    nameof(dialogService));
 
             _playerSession = playerSession
-                ?? throw new ArgumentNullException(nameof(playerSession));
+                ?? throw new ArgumentNullException(
+                    nameof(playerSession));
 
             _accountService = accountService
-                ?? throw new ArgumentNullException(nameof(accountService));
+                ?? throw new ArgumentNullException(
+                    nameof(accountService));
+
+            _loggerFactory = loggerFactory
+                ?? throw new ArgumentNullException(
+                    nameof(loggerFactory));
 
             AvailableLanguages = new List<LanguageOption>
             {
@@ -105,14 +116,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OpenLoginModal()
         {
-            ILogger<LoginViewModel> logger =
-                LoggerFactoryProvider.CreateLogger<LoginViewModel>();
-
             CurrentModal = new LoginViewModel(
                 _dialogService,
                 _accountService,
                 _playerSession,
-                logger,
+                _loggerFactory.CreateLogger<LoginViewModel>(),
                 OnLoginSuccess,
                 CloseModal,
                 OpenRegisterModal,
@@ -203,6 +211,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void PlayAsGuest()
         {
             _playerSession.Clear();
+
             _navigationService.NavigateTo<MainMenuViewModel>();
         }
 
