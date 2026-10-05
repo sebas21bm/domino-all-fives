@@ -1,6 +1,7 @@
 ﻿using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Services;
+using System;
 
 namespace DominoAllFives.Client.WPF.Services.Local
 {
@@ -15,15 +16,29 @@ namespace DominoAllFives.Client.WPF.Services.Local
         private readonly AuthenticationController _authenticationController;
         private readonly RegistrationController _registrationController;
         private readonly ProfilePictureController _profilePictureController;
+        private readonly ProfileController _profileController;
 
         public LocalAccountService(
-            AuthenticationController authenticationController, 
-            RegistrationController registrationController, 
-            ProfilePictureController profilePictureController)
+            AuthenticationController authenticationController,
+            RegistrationController registrationController,
+            ProfilePictureController profilePictureController,
+            ProfileController profileController)
         {
-            _authenticationController = authenticationController;
-            _registrationController = registrationController;
-            _profilePictureController = profilePictureController;
+            _authenticationController = authenticationController
+                ?? throw new ArgumentNullException(
+                    nameof(authenticationController));
+
+            _registrationController = registrationController
+                ?? throw new ArgumentNullException(
+                    nameof(registrationController));
+
+            _profilePictureController = profilePictureController
+                ?? throw new ArgumentNullException(
+                    nameof(profilePictureController));
+
+            _profileController = profileController
+                ?? throw new ArgumentNullException(
+                    nameof(profileController));
         }
 
         /// <inheritdoc/>
@@ -48,6 +63,12 @@ namespace DominoAllFives.Client.WPF.Services.Local
         public ProfilePictureResultDto RemoveProfilePicture(int playerId)
         {
             return _profilePictureController.RemoveProfilePicture(playerId);
+        }
+
+        /// <inheritdoc/>
+        public ProfileDto GetProfile(int playerId)
+        {
+            return _profileController.GetProfile(playerId);
         }
     }
 }

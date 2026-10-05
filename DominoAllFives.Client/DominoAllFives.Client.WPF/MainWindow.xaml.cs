@@ -26,9 +26,11 @@ namespace DominoAllFives.Client.WPF
             MainWindowViewModel mainWindowViewModel =
                 new MainWindowViewModel(navigationService);
 
+            /*
+             * Initialize controllers and services temporarily for local testing,
+             * these will be replaced with remote implementations later.
+             */
 
-            // Initialize controllers and services temporarily for local testing,
-            // these will be replaced with remote implementations later.
             AuthenticationController authenticationController =
                 new AuthenticationController();
 
@@ -41,11 +43,15 @@ namespace DominoAllFives.Client.WPF
             RankingController rankingController =
                 new RankingController();
 
+            ProfileController profileController =
+                new ProfileController();
+
             IAccountService accountService =
                 new LocalAccountService(
                     authenticationController,
                     registrationController,
-                    profilePictureController);
+                    profilePictureController,
+                    profileController);
 
             IRankingService rankingService =
                 new LocalRankingService(

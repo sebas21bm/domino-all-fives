@@ -85,6 +85,19 @@ namespace DominoAllFives.Client.WPF.Services
                 return (TViewModel)(ViewModelBase)gameSettingsViewModel;
             }
 
+            if (typeof(TViewModel) == typeof(ProfileViewModel))
+            {
+                ProfileViewModel profileViewModel =
+                    new ProfileViewModel(
+                        _navigationService,
+                        _accountService,
+                        _dialogService,
+                        _playerSession);
+
+                return (TViewModel)(ViewModelBase)
+                    profileViewModel;
+            }
+
             if (typeof(TViewModel) == typeof(RankingsViewModel))
             {
                 RankingsViewModel rankingsViewModel =

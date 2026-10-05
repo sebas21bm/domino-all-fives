@@ -181,8 +181,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Error,
-                        TitleKey = "Global_msgConnectionError",
-                        MessageKey = "Global_msgConnectionError"
+                        TitleKey = "Global_msgConnectionErrorTitle",
+                        MessageKey = "MessageAuthentication_msgConnectionError"
                     });
                     break;
 

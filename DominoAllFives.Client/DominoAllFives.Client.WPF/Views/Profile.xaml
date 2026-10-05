@@ -125,7 +125,7 @@
                                Canvas.Top="524"
                                Width="470"
                                Height="45"
-                               Text="nickname31"
+                               Text="{Binding Username}"
                                Style="{StaticResource TextRed}"
                                FontSize="25"
                                TextAlignment="Center"
@@ -162,7 +162,7 @@
                         <TextBlock x:Name="txbWins"
                                    Grid.Row="0"
                                    Grid.Column="1"
-                                   Text="10"
+                                   Text="{Binding Wins}"
                                    Style="{StaticResource DataValueText}"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"/>
@@ -177,7 +177,7 @@
                         <TextBlock x:Name="txbTotalPoints"
                                    Grid.Row="1"
                                    Grid.Column="1"
-                                   Text="5800"
+                                   Text="{Binding TotalPoints}"
                                    Style="{StaticResource DataValueText}"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"/>
@@ -192,7 +192,7 @@
                         <TextBlock x:Name="txbGamesPlayed"
                                    Grid.Row="2"
                                    Grid.Column="1"
-                                   Text="45"
+                                   Text="{Binding GamesPlayed}"
                                    Style="{StaticResource DataValueText}"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"/>
