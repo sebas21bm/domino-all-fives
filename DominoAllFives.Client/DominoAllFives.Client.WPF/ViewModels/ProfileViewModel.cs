@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Media.Imaging;
 
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
@@ -19,10 +20,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private readonly IFrameNavigationService _navigationService;
         private readonly IAccountService _accountService;
         private readonly IDialogService _dialogService;
+        private readonly ProfilePictureImageService _profilePictureImageService;
         private readonly PlayerSession _playerSession;
 
         private string _username;
-        private byte[] _profilePictureData;
+        private BitmapImage _profilePicture;
         private int _wins;
         private int _totalPoints;
         private int _gamesPlayed;
@@ -33,10 +35,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
             private set => SetProperty(ref _username, value);
         }
 
-        public byte[] ProfilePictureData
+        public BitmapImage ProfilePicture
         {
-            get => _profilePictureData;
-            private set => SetProperty(ref _profilePictureData, value);
+            get => _profilePicture;
+            private set => SetProperty(ref _profilePicture, value);
         }
 
         public int Wins
@@ -67,7 +69,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             IFrameNavigationService navigationService,
             IAccountService accountService,
             IDialogService dialogService,
-            PlayerSession playerSession)
+            PlayerSession playerSession,
+            ProfilePictureImageService profilePictureImageService)
         {
             _navigationService = navigationService
                 ?? throw new ArgumentNullException(nameof(navigationService));
@@ -80,6 +83,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(nameof(playerSession));
+
+            _profilePictureImageService = profilePictureImageService
+                ?? throw new ArgumentNullException(nameof(profilePictureImageService));
 
             GoBackCommand =
                 new RelayCommand(
@@ -129,7 +135,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             Username = profile.Username;
-            ProfilePictureData = profile.ProfilePictureData;
+            ProfilePicture =
+                _profilePictureImageService.GetProfilePicture(profile.ProfilePictureData);
             Wins = profile.Wins;
             TotalPoints = profile.TotalPoints;
             GamesPlayed = profile.GamesPlayed;

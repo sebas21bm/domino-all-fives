@@ -32,6 +32,10 @@ namespace DominoAllFives.Client.WPF
             ILoggerFactory loggerFactory =
                 LoggerFactoryProvider.Instance;
 
+            ProfilePictureImageService profilePictureImageService =
+                new ProfilePictureImageService(
+                    loggerFactory.CreateLogger<ProfilePictureImageService>());
+
             /*
              * Initialize controllers and services temporarily for local testing,
              * these will be replaced with remote implementations later.
@@ -79,7 +83,8 @@ namespace DominoAllFives.Client.WPF
                     accountService,
                     rankingService,
                     playerSession,
-                    loggerFactory);
+                    loggerFactory,
+                    profilePictureImageService);
 
             navigationService.SetViewModelFactory(viewModelFactory);
 

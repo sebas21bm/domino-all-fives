@@ -89,7 +89,8 @@
                                Height="352"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
-                               Stretch="UniformToFill">
+                               Stretch="UniformToFill"
+                               Source="{Binding ProfilePicture}">
 
                             <Image.Clip>
                                 <EllipseGeometry Center="176,176"

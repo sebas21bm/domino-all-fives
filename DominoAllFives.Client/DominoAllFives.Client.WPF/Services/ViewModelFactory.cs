@@ -19,14 +19,15 @@ namespace DominoAllFives.Client.WPF.Services
         private readonly IRankingService _rankingService;
         private readonly PlayerSession _playerSession;
         private readonly ILoggerFactory _loggerFactory;
-
+        private readonly ProfilePictureImageService _profilePictureImageService;
         public ViewModelFactory(
             IFrameNavigationService navigationService,
             IDialogService dialogService,
             IAccountService accountService,
             IRankingService rankingService,
             PlayerSession playerSession,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            ProfilePictureImageService profilePictureImageService)
         {
             _navigationService = navigationService
                 ?? throw new ArgumentNullException(
@@ -51,6 +52,10 @@ namespace DominoAllFives.Client.WPF.Services
             _loggerFactory = loggerFactory
                 ?? throw new ArgumentNullException(
                     nameof(loggerFactory));
+
+            _profilePictureImageService = profilePictureImageService
+                ?? throw new ArgumentNullException(
+                    nameof(profilePictureImageService));
         }
 
         public TViewModel Create<TViewModel>()
@@ -104,7 +109,8 @@ namespace DominoAllFives.Client.WPF.Services
                         _navigationService,
                         _accountService,
                         _dialogService,
-                        _playerSession);
+                        _playerSession,
+                        _profilePictureImageService);
 
                 return (TViewModel)(ViewModelBase)
                     profileViewModel;
@@ -117,7 +123,8 @@ namespace DominoAllFives.Client.WPF.Services
                     new RankingsViewModel(
                         _navigationService,
                         _rankingService,
-                        _playerSession);
+                        _playerSession,
+                        _profilePictureImageService);
 
                 return (TViewModel)(ViewModelBase)
                     rankingsViewModel;
