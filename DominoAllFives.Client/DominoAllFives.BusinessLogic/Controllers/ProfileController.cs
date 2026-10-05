@@ -1,28 +1,54 @@
-﻿using DominoAllFives.Contracts.DTOs;
+﻿using System;
+using System.Data.Entity.Core;
+using System.Data.SqlClient;
+
+using DominoAllFives.BusinessLogic.Storage;
+using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;
-using System;
-using System.Data.Entity.Core;
-using System.Data.Entity.Infrastructure;
-using System.Data.SqlClient;
-using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.BusinessLogic.Controllers
 {
     /// <summary>
-    /// Cordinates profile operations for everything related to the profile of a uses, 
-    /// including: viewing, editing, and deleting the profile.
+    /// Coordinates operations related to player profile information.
     /// </summary>
     public class ProfileController
     {
-        private const string ApplicationFolderName = "DominoAllFives";
+        private readonly ProfilePictureStorage _profilePictureStorage;
+        private readonly ILogger<ProfileController> _logger;
 
-        private const string ProfilePicturesFolderName = "ProfilePictures";
+        public ProfileController(
+            ProfilePictureStorage profilePictureStorage,
+            ILogger<ProfileController> logger)
+        {
+            _profilePictureStorage = profilePictureStorage
+                ?? throw new ArgumentNullException(
+                    nameof(profilePictureStorage));
 
+            _logger = logger
+                ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <summary>
+        /// Retrieves the profile information of the specified player.
+        /// </summary>
+        /// <param name="playerId">
+        /// The identifier of the player whose profile will be retrieved.
+        /// </param>
+        /// <returns>
+        /// The profile information and the result of the retrieval operation.
+        /// </returns>
         public ProfileDto GetProfile(int playerId)
         {
+            if (playerId <= 0)
+            {
+                return CreateFailureResult(
+                    RetrieveInformationFailureReason.NotFound);
+            }
+
             try
             {
                 using (DominoAllFivesEntities context = new DominoAllFivesEntities())
@@ -32,81 +58,48 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     Player player = playerRepository.GetById(playerId);
 
                     if (player == null ||
-                       player.PlayerStats == null)
+                        player.PlayerStats == null)
                     {
-                        return CreateFailureResult(RetrieveInformationFailureReason.NotFound);
+                        return CreateFailureResult(
+                            RetrieveInformationFailureReason.NotFound);
                     }
 
                     return new ProfileDto
                     {
                         Username = player.Username,
-                        ProfilePictureData = GetProfilePictureData(player.ProfilePicture),
+                        ProfilePictureData = _profilePictureStorage.GetProfilePictureData(
+                                                                        player.ProfilePicture),
                         Wins = player.PlayerStats.GamesWon,
                         TotalPoints = player.PlayerStats.TotalPointsScored,
                         GamesPlayed = player.PlayerStats.GamesPlayed,
                         FailureReason = RetrieveInformationFailureReason.None
                     };
-
                 }
             }
-            catch (Exception ex) when (ex is SqlException ||
-                                       ex is EntityException)
+            catch (SqlException ex)
             {
+                _logger.LogError(
+                    ex,
+                    "Unable to retrieve profile for player {PlayerId}.",
+                    playerId);
+
+                return CreateFailureResult(
+                    RetrieveInformationFailureReason.ServiceUnavailable);
+            }
+            catch (EntityException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unable to retrieve profile for player {PlayerId}.",
+                    playerId);
+
                 return CreateFailureResult(
                     RetrieveInformationFailureReason.ServiceUnavailable);
             }
         }
 
-        /// <summary>
-        /// Gets the profile picture data from the stored
-        /// profile picture file.
-        /// </summary>
-        /// <param name="profilePictureFileName">
-        /// The stored profile picture file name.
-        /// </param>
-        /// <returns>
-        /// The profile picture data, or null when the player
-        /// does not have an available profile picture.
-        /// </returns>
-        private byte[] GetProfilePictureData(
-            string profilePictureFileName)
-        {
-            if (string.IsNullOrWhiteSpace(profilePictureFileName))
-            {
-                return null;
-            }
-
-            string localApplicationData =
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-
-            string profilePicturePath =
-                Path.Combine(
-                    localApplicationData,
-                    ApplicationFolderName,
-                    ProfilePicturesFolderName,
-                    profilePictureFileName);
-
-            if (!File.Exists(profilePicturePath))
-            {
-                return null;
-            }
-
-            try
-            {
-                return File.ReadAllBytes(
-                    profilePicturePath);
-            }
-            catch (Exception ex) when (
-                ex is UnauthorizedAccessException ||
-                ex is PathTooLongException ||
-                ex is DirectoryNotFoundException ||
-                ex is IOException)
-            {
-                return null;
-            }
-        }
-
-        private ProfileDto CreateFailureResult(RetrieveInformationFailureReason reason)
+        private ProfileDto CreateFailureResult(
+            RetrieveInformationFailureReason reason)
         {
             return new ProfileDto
             {

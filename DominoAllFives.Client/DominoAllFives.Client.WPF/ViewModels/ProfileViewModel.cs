@@ -27,38 +27,40 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private int _totalPoints;
         private int _gamesPlayed;
 
-        private string Username
+        public string Username
         {
             get => _username;
-            set => SetProperty(ref _username, value);
+            private set => SetProperty(ref _username, value);
         }
 
-        private byte[] ProfilePictureData
+        public byte[] ProfilePictureData
         {
             get => _profilePictureData;
-            set => SetProperty(ref _profilePictureData, value);
+            private set => SetProperty(ref _profilePictureData, value);
         }
 
-        private int Wins
+        public int Wins
         {
             get => _wins;
-            set => SetProperty(ref _wins, value);
+            private set => SetProperty(ref _wins, value);
         }
 
-        private int TotalPoints
+        public int TotalPoints
         {
             get => _totalPoints;
-            set => SetProperty(ref _totalPoints, value);
+            private set => SetProperty(ref _totalPoints, value);
         }
 
-        private int GamesPlayed
+        public int GamesPlayed
         {
             get => _gamesPlayed;
-            set => SetProperty(ref _gamesPlayed, value);
+            private set => SetProperty(ref _gamesPlayed, value);
         }
 
         public RelayCommand GoBackCommand { get; }
+
         public RelayCommand GoToEditProfileCommand { get; }
+
         public RelayCommand GoToMatchHistoryCommand { get; }
 
         public ProfileViewModel(
@@ -67,7 +69,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             IDialogService dialogService,
             PlayerSession playerSession)
         {
-            _navigationService = navigationService 
+            _navigationService = navigationService
                 ?? throw new ArgumentNullException(nameof(navigationService));
 
             _accountService = accountService
@@ -79,9 +81,17 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(nameof(playerSession));
 
-            GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
-            GoToEditProfileCommand = new RelayCommand(_ => ExecuteGoToEditProfile());
-            GoToMatchHistoryCommand = new RelayCommand(_ => ExecuteGoToMatchHistory());
+            GoBackCommand =
+                new RelayCommand(
+                    _ => _navigationService.GoBack());
+
+            GoToEditProfileCommand =
+                new RelayCommand(
+                    _ => ExecuteGoToEditProfile());
+
+            GoToMatchHistoryCommand =
+                new RelayCommand(
+                    _ => ExecuteGoToMatchHistory());
 
             ShowProfileInformation();
         }
@@ -102,15 +112,19 @@ namespace DominoAllFives.Client.WPF.ViewModels
             {
                 ShowRetrieveInformationFailure(
                     RetrieveInformationFailureReason.NotFound);
+
                 return;
             }
 
-            ProfileDto profile =
+            ProfileDto profile = 
                 _accountService.GetProfile(_playerSession.PlayerId.Value);
 
-            if (profile.FailureReason != RetrieveInformationFailureReason.None)
+            if (profile.FailureReason !=
+                RetrieveInformationFailureReason.None)
             {
-                ShowRetrieveInformationFailure(profile.FailureReason);
+                ShowRetrieveInformationFailure(
+                    profile.FailureReason);
+
                 return;
             }
 
@@ -127,33 +141,35 @@ namespace DominoAllFives.Client.WPF.ViewModels
             switch (reason)
             {
                 case RetrieveInformationFailureReason.NotFound:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Error,
-                        TitleKey = "Global_msgNotFoundTitle",
-                        MessageKey = "Global_msgNotFound"
-                    });
+                    _dialogService.ShowDialog(
+                        new DialogRequest
+                        {
+                            Type = DialogType.Error,
+                            TitleKey = "Global_msgNotFoundTitle",
+                            MessageKey = "Global_msgNotFound"
+                        });
                     break;
+
                 case RetrieveInformationFailureReason.ServiceUnavailable:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Error,
-                        TitleKey = "Global_msgConnectionErrorTitle",
-                        MessageKey = "Global_msgConnectionError"
-                    });
+                    _dialogService.ShowDialog(
+                        new DialogRequest
+                        {
+                            Type = DialogType.Error,
+                            TitleKey = "Global_msgConnectionErrorTitle",
+                            MessageKey = "Global_msgConnectionError"
+                        });
                     break;
+
                 default:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Error,
-                        TitleKey = "Global_msgDefaultErrorTitle",
-                        MessageKey = "Global_msgDefaultError"
-                    });
+                    _dialogService.ShowDialog(
+                        new DialogRequest
+                        {
+                            Type = DialogType.Error,
+                            TitleKey = "Global_msgDefaultErrorTitle",
+                            MessageKey = "Global_msgDefaultError"
+                        });
                     break;
             }
         }
-
-
-
     }
 }

@@ -18,13 +18,15 @@ namespace DominoAllFives.Client.WPF.Services
         private readonly IAccountService _accountService;
         private readonly IRankingService _rankingService;
         private readonly PlayerSession _playerSession;
+        private readonly ILoggerFactory _loggerFactory;
 
         public ViewModelFactory(
             IFrameNavigationService navigationService,
             IDialogService dialogService,
             IAccountService accountService,
             IRankingService rankingService,
-            PlayerSession playerSession)
+            PlayerSession playerSession,
+            ILoggerFactory loggerFactory)
         {
             _navigationService = navigationService
                 ?? throw new ArgumentNullException(
@@ -33,18 +35,22 @@ namespace DominoAllFives.Client.WPF.Services
             _dialogService = dialogService
                 ?? throw new ArgumentNullException(
                     nameof(dialogService));
-            
+
             _accountService = accountService
                 ?? throw new ArgumentNullException(
                     nameof(accountService));
 
             _rankingService = rankingService
                 ?? throw new ArgumentNullException(
-                    nameof(rankingService));    
+                    nameof(rankingService));
 
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(
                     nameof(playerSession));
+
+            _loggerFactory = loggerFactory
+                ?? throw new ArgumentNullException(
+                    nameof(loggerFactory));
         }
 
         public TViewModel Create<TViewModel>()
@@ -58,13 +64,15 @@ namespace DominoAllFives.Client.WPF.Services
                         _navigationService,
                         _dialogService,
                         _playerSession,
-                        _accountService);
+                        _accountService,
+                        _loggerFactory);
 
                 return (TViewModel)(ViewModelBase)
                     homePageViewModel;
             }
 
-            if (typeof(TViewModel) == typeof(MainMenuViewModel))
+            if (typeof(TViewModel) ==
+                typeof(MainMenuViewModel))
             {
                 MainMenuViewModel mainMenuViewModel =
                     new MainMenuViewModel(
@@ -72,20 +80,24 @@ namespace DominoAllFives.Client.WPF.Services
                         _dialogService,
                         _playerSession);
 
-                return (TViewModel)(ViewModelBase)mainMenuViewModel;
+                return (TViewModel)(ViewModelBase)
+                    mainMenuViewModel;
             }
 
-            if (typeof(TViewModel) == typeof(GameSettingsViewModel))
+            if (typeof(TViewModel) ==
+                typeof(GameSettingsViewModel))
             {
                 GameSettingsViewModel gameSettingsViewModel =
                     new GameSettingsViewModel(
                         _navigationService,
                         _playerSession);
 
-                return (TViewModel)(ViewModelBase)gameSettingsViewModel;
+                return (TViewModel)(ViewModelBase)
+                    gameSettingsViewModel;
             }
 
-            if (typeof(TViewModel) == typeof(ProfileViewModel))
+            if (typeof(TViewModel) ==
+                typeof(ProfileViewModel))
             {
                 ProfileViewModel profileViewModel =
                     new ProfileViewModel(
@@ -98,7 +110,8 @@ namespace DominoAllFives.Client.WPF.Services
                     profileViewModel;
             }
 
-            if (typeof(TViewModel) == typeof(RankingsViewModel))
+            if (typeof(TViewModel) ==
+                typeof(RankingsViewModel))
             {
                 RankingsViewModel rankingsViewModel =
                     new RankingsViewModel(
