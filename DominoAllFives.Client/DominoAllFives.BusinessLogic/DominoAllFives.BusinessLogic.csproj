@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\AuthenticationController.cs" />
+    <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\ProfilePictureController.cs" />
     <Compile Include="Controllers\RankingController.cs" />
     <Compile Include="Controllers\RegistrationController.cs" />

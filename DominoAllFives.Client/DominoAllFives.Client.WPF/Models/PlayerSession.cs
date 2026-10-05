@@ -7,19 +7,23 @@
     {
         public int? PlayerId { get; private set; }
 
+        public string Username { get; private set; }
+
         public bool IsAuthenticated
         {
             get => PlayerId.HasValue;
         }
 
-        public void Start(int playerId)
+        public void Start(int playerId, string username)
         {
             PlayerId = playerId;
+            Username = username;
         }
 
         public void Clear()
         {
             PlayerId = null;
+            Username = null;
         }
     }
 }

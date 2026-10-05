@@ -135,7 +135,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            _playerSession.Start(result.PlayerId);
+            _playerSession.Start(result.PlayerId, result.Username);
             _logger.LogInformation("User {EmailOrUsername} logged in successfully with " +
                 "PlayerId: {PlayerId}", Email.Trim(), result.PlayerId);
 
