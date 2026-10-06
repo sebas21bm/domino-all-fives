@@ -3,6 +3,7 @@ using System.Data.Entity.Core;
 using System.Data.SqlClient;
 
 using DominoAllFives.BusinessLogic.Storage;
+using DominoAllFives.BusinessLogic.Validation;
 using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Interfaces;
@@ -98,6 +99,102 @@ namespace DominoAllFives.BusinessLogic.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Updates the editable profile information of the specified player.
+        /// </summary>
+        /// <param name="profileData">
+        /// The profile information to update.
+        /// </param>
+        /// <returns>
+        /// The result of the profile update operation.
+        /// </returns>
+        public UpdateProfileResultDto UpdateProfile(
+            UpdateProfileDto profileData)
+        {
+            if (profileData == null ||
+                profileData.PlayerId <= 0)
+            {
+                return CreateUpdateFailureResult(
+                    UpdateProfileFailureReason.PlayerNotFound);
+            }
+
+            if (!UsernameValidator.IsValid(profileData.Username))
+            {
+                return CreateUpdateFailureResult(
+                    UpdateProfileFailureReason.InvalidUsername);
+            }
+
+            try
+            {
+                using (DominoAllFivesEntities context =
+                    new DominoAllFivesEntities())
+                {
+                    IPlayerRepository playerRepository =
+                        new PlayerRepository(context);
+
+                    Player player =
+                        playerRepository.GetById(profileData.PlayerId);
+
+                    if (player == null)
+                    {
+                        return CreateUpdateFailureResult(
+                            UpdateProfileFailureReason.PlayerNotFound);
+                    }
+
+                    if (player.Username == profileData.Username)
+                    {
+                        return CreateUpdateFailureResult(
+                            UpdateProfileFailureReason.SameUsername);
+                    }
+
+                    if (playerRepository.UsernameExists(
+                        profileData.Username))
+                    {
+                        return CreateUpdateFailureResult(
+                            UpdateProfileFailureReason.UsernameAlreadyExists);
+                    }
+
+                    bool wasUpdated =
+                        playerRepository.UpdateUsername(
+                            profileData.PlayerId,
+                            profileData.Username);
+
+                    if (!wasUpdated)
+                    {
+                        return CreateUpdateFailureResult(
+                            UpdateProfileFailureReason.PlayerNotFound);
+                    }
+
+                    context.SaveChanges();
+
+                    return CreateUpdateSuccessResult();
+                }
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unable to update profile for player {PlayerId}.",
+                    profileData.PlayerId);
+
+                return CreateUpdateFailureResult(
+                    UpdateProfileFailureReason.ServiceUnavailable);
+            }
+            catch (EntityException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unable to update profile for player {PlayerId}.",
+                    profileData.PlayerId);
+
+                return CreateUpdateFailureResult(
+                    UpdateProfileFailureReason.ServiceUnavailable);
+            }
+        }
+
+
+
         private ProfileDto CreateFailureResult(
             RetrieveInformationFailureReason reason)
         {
@@ -108,6 +205,25 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 Wins = 0,
                 TotalPoints = 0,
                 GamesPlayed = 0,
+                FailureReason = reason
+            };
+        }
+
+        private UpdateProfileResultDto CreateUpdateSuccessResult()
+        {
+            return new UpdateProfileResultDto
+            {
+                IsSuccessful = true,
+                FailureReason = UpdateProfileFailureReason.None
+            };
+        }
+
+        private UpdateProfileResultDto CreateUpdateFailureResult(
+            UpdateProfileFailureReason reason)
+        {
+            return new UpdateProfileResultDto
+            {
+                IsSuccessful = false,
                 FailureReason = reason
             };
         }

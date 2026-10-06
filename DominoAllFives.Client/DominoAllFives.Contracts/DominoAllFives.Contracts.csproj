@@ -50,10 +50,13 @@
     <Compile Include="DTOs\RankingResultDto.cs" />
     <Compile Include="DTOs\RegisterAccountDto.cs" />
     <Compile Include="DTOs\RegistrationResultDto.cs" />
+    <Compile Include="DTOs\UpdateProfileDto.cs" />
+    <Compile Include="DTOs\UpdateProfileResult.cs" />
     <Compile Include="Enums\LoginFailureReason.cs" />
     <Compile Include="Enums\ProfilePictureFailureReason.cs" />
     <Compile Include="Enums\RetrieveInformationFailureReason.cs" />
     <Compile Include="Enums\RegistrationFailureReason.cs" />
+    <Compile Include="Enums\UpdateProfileFailureReason.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\IAccountService.cs" />
     <Compile Include="Services\IRankingService.cs" />

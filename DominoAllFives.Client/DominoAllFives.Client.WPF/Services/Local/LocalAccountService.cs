@@ -70,5 +70,11 @@ namespace DominoAllFives.Client.WPF.Services.Local
         {
             return _profileController.GetProfile(playerId);
         }
+
+        /// <inheritdoc/>
+        public UpdateProfileResultDto UpdateProfile(UpdateProfileDto profileData)
+        {
+            return _profileController.UpdateProfile(profileData);
+        }
     }
 }

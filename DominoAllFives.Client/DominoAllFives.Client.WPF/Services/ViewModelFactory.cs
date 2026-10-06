@@ -1,6 +1,7 @@
 ﻿using System;
 
 using DominoAllFives.Client.WPF.Models;
+using DominoAllFives.Client.WPF.Services.ProfilePicture;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.Services;
@@ -20,6 +21,7 @@ namespace DominoAllFives.Client.WPF.Services
         private readonly PlayerSession _playerSession;
         private readonly ILoggerFactory _loggerFactory;
         private readonly ProfilePictureImageService _profilePictureImageService;
+        private readonly ProfilePictureFileService _profilePictureFileService;
         public ViewModelFactory(
             IFrameNavigationService navigationService,
             IDialogService dialogService,
@@ -27,7 +29,8 @@ namespace DominoAllFives.Client.WPF.Services
             IRankingService rankingService,
             PlayerSession playerSession,
             ILoggerFactory loggerFactory,
-            ProfilePictureImageService profilePictureImageService)
+            ProfilePictureImageService profilePictureImageService,
+            ProfilePictureFileService profilePictureFileService)
         {
             _navigationService = navigationService
                 ?? throw new ArgumentNullException(
@@ -56,6 +59,10 @@ namespace DominoAllFives.Client.WPF.Services
             _profilePictureImageService = profilePictureImageService
                 ?? throw new ArgumentNullException(
                     nameof(profilePictureImageService));
+
+            _profilePictureFileService = profilePictureFileService
+                ?? throw new ArgumentNullException(
+                    nameof(profilePictureFileService));
         }
 
         public TViewModel Create<TViewModel>()
@@ -114,6 +121,22 @@ namespace DominoAllFives.Client.WPF.Services
 
                 return (TViewModel)(ViewModelBase)
                     profileViewModel;
+            }
+
+            if (typeof(TViewModel) ==
+                typeof(EditProfileViewModel))
+            {
+                EditProfileViewModel editProfileViewModel =
+                    new EditProfileViewModel(
+                        _navigationService,
+                        _accountService,
+                        _dialogService,
+                        _playerSession,
+                        _profilePictureImageService,
+                        _profilePictureFileService);
+
+                return (TViewModel)(ViewModelBase)
+                    editProfileViewModel;
             }
 
             if (typeof(TViewModel) ==

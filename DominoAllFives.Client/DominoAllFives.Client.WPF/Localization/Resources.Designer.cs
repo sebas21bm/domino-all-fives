@@ -1862,6 +1862,24 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a El perfil fue actualizado correctamente.
+        /// </summary>
+        public static string MessageProfile_msgProfileUpdated {
+            get {
+                return ResourceManager.GetString("MessageProfile_msgProfileUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Perfil actualizado.
+        /// </summary>
+        public static string MessageProfile_msgProfileUpdatedTitle {
+            get {
+                return ResourceManager.GetString("MessageProfile_msgProfileUpdatedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a No es posible guardar los cambios en este momento. Intenta nuevamente..
         /// </summary>
         public static string MessageProfile_msgUpdateProfileError {

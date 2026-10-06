@@ -60,6 +60,21 @@ namespace DominoAllFives.DataAccess.Repositories
         }
 
         /// <inheritdoc />
+        public bool UpdateUsername(int playerId, string username)
+        {
+            Player player = _context.Player.FirstOrDefault(
+                currentPlayer => currentPlayer.IdPlayer == playerId);
+
+            if (player == null)
+            {
+                return false;
+            }
+
+            player.Username = username;
+            return true;
+        }
+
+        /// <inheritdoc />
         public bool UpdateProfilePicture(int playerId, string profilePictureFileName)
         {
             Player player = _context.Player.FirstOrDefault(

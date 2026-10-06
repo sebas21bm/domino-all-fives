@@ -70,12 +70,35 @@
 
                             </Ellipse>
 
-                            <Border Width="300" Height="300" CornerRadius="150" 
-                                    BorderBrush="{StaticResource CreamLightBrush}" BorderThickness="8" 
-                                    Background="{StaticResource DarkBgBrush}" ClipToBounds="True" 
-                                    HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <Image x:Name="imgProfileAvatar" Stretch="UniformToFill" />
-                            </Border>
+                        <Grid Width="320"
+                                Height="320"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+
+                            <Ellipse Fill="{StaticResource DarkBgBrush}"/>
+
+                            <Image x:Name="imgProfileAvatar"
+                                    Width="302"
+                                    Height="302"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Stretch="UniformToFill"
+                                    Source="{Binding ProfilePicture}">
+
+                                <Image.Clip>
+                                    <EllipseGeometry Center="151,151"
+                                                        RadiusX="151"
+                                                        RadiusY="151"/>
+                                </Image.Clip>
+
+                            </Image>
+
+                            <Ellipse Fill="Transparent"
+                                        Stroke="{StaticResource CreamLightBrush}"
+                                        StrokeThickness="8"
+                                        IsHitTestVisible="False"/>
+
+                        </Grid>
 
                             <Button x:Name="btnChangePicture" 
                                     Command="{Binding ChangePictureCommand}"

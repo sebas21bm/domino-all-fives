@@ -60,6 +60,21 @@ namespace DominoAllFives.DataAccess.Interfaces
         void Add(Player playerToAdd);
 
         /// <summary>
+        /// Updates the username assigned to a player.
+        /// </summary>
+        /// <param name="playerId">
+        /// The identifier of the player.
+        /// </param>
+        /// <param name="username">
+        /// The new username to assign.
+        /// </param>
+        /// <returns>
+        /// True when the player exists and the username was updated;
+        /// otherwise, false.
+        /// </returns>
+        bool UpdateUsername(int playerId, string username);
+
+        /// <summary>
         /// Updates the profile picture assigned to a player.
         /// </summary>
         /// <param name="playerId">
