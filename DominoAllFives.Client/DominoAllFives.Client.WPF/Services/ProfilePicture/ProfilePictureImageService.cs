@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Media.Imaging;
-
 using Microsoft.Extensions.Logging;
 
-namespace DominoAllFives.Client.WPF.Services
+namespace DominoAllFives.Client.WPF.Services.ProfilePicture
 {
     /// <summary>
     /// Converts profile picture data into images that can be displayed

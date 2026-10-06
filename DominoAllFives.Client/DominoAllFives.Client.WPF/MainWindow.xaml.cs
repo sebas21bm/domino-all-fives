@@ -5,6 +5,7 @@ using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Local;
+using DominoAllFives.Client.WPF.Services.ProfilePicture;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Contracts.Services;
 using Microsoft.Extensions.Logging;
@@ -35,6 +36,10 @@ namespace DominoAllFives.Client.WPF
             ProfilePictureImageService profilePictureImageService =
                 new ProfilePictureImageService(
                     loggerFactory.CreateLogger<ProfilePictureImageService>());
+
+            ProfilePictureFileService profilePictureFileService =
+                new ProfilePictureFileService(
+                    loggerFactory.CreateLogger<ProfilePictureFileService>());
 
             /*
              * Initialize controllers and services temporarily for local testing,
@@ -84,7 +89,8 @@ namespace DominoAllFives.Client.WPF
                     rankingService,
                     playerSession,
                     loggerFactory,
-                    profilePictureImageService);
+                    profilePictureImageService,
+                    profilePictureFileService);
 
             navigationService.SetViewModelFactory(viewModelFactory);
 

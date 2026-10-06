@@ -12,7 +12,6 @@ namespace DominoAllFives.BusinessLogic.Validation
     /// </summary>
     public static class RegistrationValidator
     {
-        private const int MaximumUsernameLength = 64;
         private const string EmailPattern =
             @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
         private const string PasswordPattern =
@@ -50,7 +49,7 @@ namespace DominoAllFives.BusinessLogic.Validation
                 return RegistrationFailureReason.InvalidRegistrationData;
             }
 
-            if (!IsUsernameValid(registrationData.Username))
+            if (!UsernameValidator.IsValid(registrationData.Username))
             {
                 return RegistrationFailureReason.InvalidUsername;
             }
@@ -66,12 +65,6 @@ namespace DominoAllFives.BusinessLogic.Validation
             }
 
             return RegistrationFailureReason.None;
-        }
-
-        private static bool IsUsernameValid(string username)
-        {
-            return !string.IsNullOrWhiteSpace(username) &&
-                   username.Length <= MaximumUsernameLength;
         }
 
         private static bool IsEmailValid(string email)

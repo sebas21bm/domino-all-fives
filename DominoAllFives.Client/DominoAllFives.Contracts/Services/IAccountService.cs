@@ -42,5 +42,16 @@ namespace DominoAllFives.Contracts.Services
         /// <param name="playerId">The ID of the player.</param>
         /// <returns>The profile information including username and statistics.</returns>
         ProfileDto GetProfile(int playerId);
+
+        /// <summary>
+        /// Updates the editable profile information of a player.
+        /// </summary>
+        /// <param name="profileData">
+        /// The profile information to update.
+        /// </param>
+        /// <returns>
+        /// The result of the profile update operation.
+        /// </returns>
+        UpdateProfileResultDto UpdateProfile(UpdateProfileDto profileData);
     }
 }

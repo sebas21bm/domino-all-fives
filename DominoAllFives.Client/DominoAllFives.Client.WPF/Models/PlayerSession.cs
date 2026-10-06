@@ -14,12 +14,27 @@
             get => PlayerId.HasValue;
         }
 
+        /// <summary>
+        /// Starts a new player session with the provided player ID and username.
+        /// </summary>
         public void Start(int playerId, string username)
         {
             PlayerId = playerId;
             Username = username;
         }
 
+
+        /// <summary>
+        /// Updates the username of the player in the current session.
+        /// </summary>
+        public void UpdateUsername(string username)
+        {
+            Username = username;
+        }
+
+        /// <summary>
+        /// Clears the player session, effectively logging out the player.
+        /// </summary>
         public void Clear()
         {
             PlayerId = null;

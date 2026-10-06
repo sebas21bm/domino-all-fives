@@ -1001,4 +1001,10 @@ Only the following are allowed: .png, .jpg, .jpeg.</value>
   <data name="Global_msgNotFoundTitle" xml:space="preserve">
     <value>Player not found</value>
   </data>
+  <data name="MessageProfile_msgProfileUpdated" xml:space="preserve">
+    <value>The profile was updated successfully</value>
+  </data>
+  <data name="MessageProfile_msgProfileUpdatedTitle" xml:space="preserve">
+    <value>Profile updated</value>
+  </data>
 </root>
