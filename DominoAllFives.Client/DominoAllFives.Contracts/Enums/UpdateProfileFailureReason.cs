@@ -10,6 +10,9 @@
         InvalidUsername,
         SameUsername,
         UsernameAlreadyExists,
+        InvalidProfilePictureFormat,
+        ProfilePictureTooLarge,
+        InvalidProfilePicture,
         PlayerNotFound,
         ServiceUnavailable
     }

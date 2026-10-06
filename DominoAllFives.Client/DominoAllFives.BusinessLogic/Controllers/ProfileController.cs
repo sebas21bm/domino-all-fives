@@ -1,15 +1,16 @@
-﻿using System;
-using System.Data.Entity.Core;
-using System.Data.SqlClient;
-
-using DominoAllFives.BusinessLogic.Storage;
+﻿using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.BusinessLogic.Validation;
 using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Enums;
+using DominoAllFives.DataAccess;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Data.Entity.Core;
+using System.Data.SqlClient;
+using System.IO;
 
 namespace DominoAllFives.BusinessLogic.Controllers
 {
@@ -34,95 +35,14 @@ namespace DominoAllFives.BusinessLogic.Controllers
         }
 
         /// <summary>
-        /// Retrieves the profile information of the specified player.
+        /// Gets the profile information of a player.
         /// </summary>
-        /// <param name="playerId">
-        /// The identifier of the player whose profile will be retrieved.
-        /// </param>
-        /// <returns>
-        /// The profile information and the result of the retrieval operation.
-        /// </returns>
         public ProfileDto GetProfile(int playerId)
         {
             if (playerId <= 0)
             {
-                return CreateFailureResult(
+                return CreateProfileFailureResult(
                     RetrieveInformationFailureReason.NotFound);
-            }
-
-            try
-            {
-                using (DominoAllFivesEntities context = new DominoAllFivesEntities())
-                {
-                    IPlayerRepository playerRepository = new PlayerRepository(context);
-
-                    Player player = playerRepository.GetById(playerId);
-
-                    if (player == null ||
-                        player.PlayerStats == null)
-                    {
-                        return CreateFailureResult(
-                            RetrieveInformationFailureReason.NotFound);
-                    }
-
-                    return new ProfileDto
-                    {
-                        Username = player.Username,
-                        ProfilePictureData = _profilePictureStorage.GetProfilePictureData(
-                                                                        player.ProfilePicture),
-                        Wins = player.PlayerStats.GamesWon,
-                        TotalPoints = player.PlayerStats.TotalPointsScored,
-                        GamesPlayed = player.PlayerStats.GamesPlayed,
-                        FailureReason = RetrieveInformationFailureReason.None
-                    };
-                }
-            }
-            catch (SqlException ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Unable to retrieve profile for player {PlayerId}.",
-                    playerId);
-
-                return CreateFailureResult(
-                    RetrieveInformationFailureReason.ServiceUnavailable);
-            }
-            catch (EntityException ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Unable to retrieve profile for player {PlayerId}.",
-                    playerId);
-
-                return CreateFailureResult(
-                    RetrieveInformationFailureReason.ServiceUnavailable);
-            }
-        }
-
-
-        /// <summary>
-        /// Updates the editable profile information of the specified player.
-        /// </summary>
-        /// <param name="profileData">
-        /// The profile information to update.
-        /// </param>
-        /// <returns>
-        /// The result of the profile update operation.
-        /// </returns>
-        public UpdateProfileResultDto UpdateProfile(
-            UpdateProfileDto profileData)
-        {
-            if (profileData == null ||
-                profileData.PlayerId <= 0)
-            {
-                return CreateUpdateFailureResult(
-                    UpdateProfileFailureReason.PlayerNotFound);
-            }
-
-            if (!UsernameValidator.IsValid(profileData.Username))
-            {
-                return CreateUpdateFailureResult(
-                    UpdateProfileFailureReason.InvalidUsername);
             }
 
             try
@@ -134,68 +54,333 @@ namespace DominoAllFives.BusinessLogic.Controllers
                         new PlayerRepository(context);
 
                     Player player =
-                        playerRepository.GetById(profileData.PlayerId);
+                        playerRepository.GetById(playerId);
 
-                    if (player == null)
+                    if (player == null ||
+                        player.PlayerStats == null)
                     {
-                        return CreateUpdateFailureResult(
-                            UpdateProfileFailureReason.PlayerNotFound);
+                        return CreateProfileFailureResult(
+                            RetrieveInformationFailureReason.NotFound);
                     }
 
-                    if (player.Username == profileData.Username)
+                    return new ProfileDto
                     {
-                        return CreateUpdateFailureResult(
-                            UpdateProfileFailureReason.SameUsername);
-                    }
-
-                    if (playerRepository.UsernameExists(
-                        profileData.Username))
-                    {
-                        return CreateUpdateFailureResult(
-                            UpdateProfileFailureReason.UsernameAlreadyExists);
-                    }
-
-                    bool wasUpdated =
-                        playerRepository.UpdateUsername(
-                            profileData.PlayerId,
-                            profileData.Username);
-
-                    if (!wasUpdated)
-                    {
-                        return CreateUpdateFailureResult(
-                            UpdateProfileFailureReason.PlayerNotFound);
-                    }
-
-                    context.SaveChanges();
-
-                    return CreateUpdateSuccessResult();
+                        Username = player.Username,
+                        ProfilePictureData =
+                            _profilePictureStorage
+                                .GetProfilePictureData(
+                                    player.ProfilePicture),
+                        Wins = player.PlayerStats.GamesWon,
+                        TotalPoints =
+                            player.PlayerStats.TotalPointsScored,
+                        GamesPlayed =
+                            player.PlayerStats.GamesPlayed,
+                        FailureReason =
+                            RetrieveInformationFailureReason.None
+                    };
                 }
             }
             catch (SqlException ex)
             {
                 _logger.LogError(
                     ex,
-                    "Unable to update profile for player {PlayerId}.",
-                    profileData.PlayerId);
+                    "Unable to retrieve profile for player {PlayerId}.",
+                    playerId);
 
-                return CreateUpdateFailureResult(
-                    UpdateProfileFailureReason.ServiceUnavailable);
+                return CreateProfileFailureResult(
+                    RetrieveInformationFailureReason
+                        .ServiceUnavailable);
             }
             catch (EntityException ex)
             {
+                _logger.LogError(
+                    ex,
+                    "Unable to retrieve profile for player {PlayerId}.",
+                    playerId);
+
+                return CreateProfileFailureResult(
+                    RetrieveInformationFailureReason
+                        .ServiceUnavailable);
+            }
+        }
+
+        /// <summary>
+        /// Updates the editable profile information of a player.
+        /// </summary>
+        public UpdateProfileResultDto UpdateProfile(
+            UpdateProfileDto profileData)
+        {
+            if (profileData == null ||
+                profileData.PlayerId <= 0)
+            {
+                return CreateUpdateFailureResult(
+                    UpdateProfileFailureReason.PlayerNotFound);
+            }
+
+            string newProfilePictureFileName = null;
+
+            try
+            {
+                using (DominoAllFivesEntities context =
+                    new DominoAllFivesEntities())
+                {
+                    IPlayerRepository playerRepository =
+                        new PlayerRepository(context);
+
+                    Player player =
+                        playerRepository.GetById(
+                            profileData.PlayerId);
+
+                    if (player == null)
+                    {
+                        return CreateUpdateFailureResult(
+                            UpdateProfileFailureReason
+                                .PlayerNotFound);
+                    }
+
+                    bool usernameChanged =
+                        player.Username != profileData.Username;
+
+                    bool profilePictureChanged =
+                        profileData.ProfilePictureChanged;
+
+                    if (!usernameChanged &&
+                        !profilePictureChanged)
+                    {
+                        return CreateUpdateFailureResult(
+                            UpdateProfileFailureReason
+                                .SameUsername);
+                    }
+
+                    if (usernameChanged)
+                    {
+                        UpdateProfileFailureReason
+                            usernameValidationFailure =
+                                ValidateUsername(
+                                    profileData,
+                                    playerRepository);
+
+                        if (usernameValidationFailure !=
+                            UpdateProfileFailureReason.None)
+                        {
+                            return CreateUpdateFailureResult(
+                                usernameValidationFailure);
+                        }
+                    }
+
+                    if (profilePictureChanged)
+                    {
+                        UpdateProfileFailureReason
+                            profilePictureValidationFailure =
+                                ValidateProfilePicture(
+                                    profileData);
+
+                        if (profilePictureValidationFailure !=
+                            UpdateProfileFailureReason.None)
+                        {
+                            return CreateUpdateFailureResult(
+                                profilePictureValidationFailure);
+                        }
+                    }
+
+                    string previousProfilePictureFileName =
+                        player.ProfilePicture;
+
+                    if (profilePictureChanged)
+                    {
+                        newProfilePictureFileName =
+                            _profilePictureStorage
+                                .GenerateFileName(
+                                    profileData.PlayerId,
+                                    profileData
+                                        .ProfilePictureFileName);
+
+                        _profilePictureStorage.SaveProfilePicture(
+                            newProfilePictureFileName,
+                            profileData.ProfilePictureData);
+                    }
+
+                    if (usernameChanged)
+                    {
+                        bool usernameUpdated =
+                            playerRepository.UpdateUsername(
+                                profileData.PlayerId,
+                                profileData.Username);
+
+                        if (!usernameUpdated)
+                        {
+                            DeleteNewProfilePictureIfNecessary(
+                                newProfilePictureFileName);
+
+                            return CreateUpdateFailureResult(
+                                UpdateProfileFailureReason
+                                    .PlayerNotFound);
+                        }
+                    }
+
+                    if (profilePictureChanged)
+                    {
+                        bool profilePictureUpdated =
+                            playerRepository.UpdateProfilePicture(
+                                profileData.PlayerId,
+                                newProfilePictureFileName);
+
+                        if (!profilePictureUpdated)
+                        {
+                            DeleteNewProfilePictureIfNecessary(
+                                newProfilePictureFileName);
+
+                            return CreateUpdateFailureResult(
+                                UpdateProfileFailureReason
+                                    .PlayerNotFound);
+                        }
+                    }
+
+                    context.SaveChanges();
+
+                    if (profilePictureChanged)
+                    {
+                        DeletePreviousProfilePicture(
+                            previousProfilePictureFileName);
+                    }
+
+                    return CreateUpdateSuccessResult();
+                }
+            }
+            catch (SqlException ex)
+            {
+                DeleteNewProfilePictureIfNecessary(
+                    newProfilePictureFileName);
+
                 _logger.LogError(
                     ex,
                     "Unable to update profile for player {PlayerId}.",
                     profileData.PlayerId);
 
                 return CreateUpdateFailureResult(
-                    UpdateProfileFailureReason.ServiceUnavailable);
+                    UpdateProfileFailureReason
+                        .ServiceUnavailable);
+            }
+            catch (EntityException ex)
+            {
+                DeleteNewProfilePictureIfNecessary(
+                    newProfilePictureFileName);
+
+                _logger.LogError(
+                    ex,
+                    "Unable to update profile for player {PlayerId}.",
+                    profileData.PlayerId);
+
+                return CreateUpdateFailureResult(
+                    UpdateProfileFailureReason
+                        .ServiceUnavailable);
+            }
+            catch (Exception ex) when (
+                ex is UnauthorizedAccessException ||
+                ex is PathTooLongException ||
+                ex is DirectoryNotFoundException ||
+                ex is IOException)
+            {
+                DeleteNewProfilePictureIfNecessary(
+                    newProfilePictureFileName);
+
+                _logger.LogError(
+                    ex,
+                    "Unable to update profile picture for player {PlayerId}.",
+                    profileData.PlayerId);
+
+                return CreateUpdateFailureResult(
+                    UpdateProfileFailureReason
+                        .ServiceUnavailable);
             }
         }
 
+        private UpdateProfileFailureReason ValidateUsername(
+            UpdateProfileDto profileData,
+            IPlayerRepository playerRepository)
+        {
+            if (!UsernameValidator.IsValid(
+                profileData.Username))
+            {
+                return UpdateProfileFailureReason
+                    .InvalidUsername;
+            }
 
+            if (playerRepository.UsernameExists(
+                profileData.Username))
+            {
+                return UpdateProfileFailureReason
+                    .UsernameAlreadyExists;
+            }
 
-        private ProfileDto CreateFailureResult(
+            return UpdateProfileFailureReason.None;
+        }
+
+        private UpdateProfileFailureReason
+            ValidateProfilePicture(
+                UpdateProfileDto profileData)
+        {
+            if (profileData.ProfilePictureData == null ||
+                profileData.ProfilePictureData.Length == 0)
+            {
+                return UpdateProfileFailureReason
+                    .InvalidProfilePicture;
+            }
+
+            if (!ProfilePictureValidator.HasValidExtension(
+                profileData.ProfilePictureFileName))
+            {
+                return UpdateProfileFailureReason
+                    .InvalidProfilePictureFormat;
+            }
+
+            if (!ProfilePictureValidator.HasValidFileSize(
+                profileData.ProfilePictureData))
+            {
+                return UpdateProfileFailureReason
+                    .ProfilePictureTooLarge;
+            }
+
+            return UpdateProfileFailureReason.None;
+        }
+
+        private void DeleteNewProfilePictureIfNecessary(
+            string profilePictureFileName)
+        {
+            if (string.IsNullOrWhiteSpace(
+                profilePictureFileName))
+            {
+                return;
+            }
+
+            _profilePictureStorage.TryDeleteProfilePicture(
+                profilePictureFileName);
+        }
+
+        private void DeletePreviousProfilePicture(
+            string profilePictureFileName)
+        {
+            if (string.IsNullOrWhiteSpace(
+                profilePictureFileName))
+            {
+                return;
+            }
+
+            bool wasDeleted =
+                _profilePictureStorage
+                    .TryDeleteProfilePicture(
+                        profilePictureFileName);
+
+            if (!wasDeleted)
+            {
+                _logger.LogWarning(
+                    "The previous profile picture file " +
+                    "{ProfilePictureFileName} could not be deleted.",
+                    profilePictureFileName);
+            }
+        }
+
+        private ProfileDto CreateProfileFailureResult(
             RetrieveInformationFailureReason reason)
         {
             return new ProfileDto
@@ -209,17 +394,20 @@ namespace DominoAllFives.BusinessLogic.Controllers
             };
         }
 
-        private UpdateProfileResultDto CreateUpdateSuccessResult()
+        private UpdateProfileResultDto
+            CreateUpdateSuccessResult()
         {
             return new UpdateProfileResultDto
             {
                 IsSuccessful = true,
-                FailureReason = UpdateProfileFailureReason.None
+                FailureReason =
+                    UpdateProfileFailureReason.None
             };
         }
 
-        private UpdateProfileResultDto CreateUpdateFailureResult(
-            UpdateProfileFailureReason reason)
+        private UpdateProfileResultDto
+            CreateUpdateFailureResult(
+                UpdateProfileFailureReason reason)
         {
             return new UpdateProfileResultDto
             {

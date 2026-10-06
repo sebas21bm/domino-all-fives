@@ -139,9 +139,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            bool usernameChanged = Username != _originalUsername;
+            bool usernameChanged =
+                Username != _originalUsername;
 
-            bool profilePictureChanged = _selectedProfilePictureData != null;
+            bool profilePictureChanged =
+                _selectedProfilePictureData != null;
 
             if (!usernameChanged &&
                 !profilePictureChanged)
@@ -149,15 +151,25 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            if (usernameChanged &&
-                !UpdateUsername())
-            {
-                return;
-            }
+            UpdateProfileDto profileData =
+                new UpdateProfileDto
+                {
+                    PlayerId = _playerSession.PlayerId.Value,
+                    Username = Username,
+                    ProfilePictureChanged = profilePictureChanged,
+                    ProfilePictureFileName =
+                        _selectedProfilePictureFileName,
+                    ProfilePictureData =
+                        _selectedProfilePictureData
+                };
 
-            if (profilePictureChanged &&
-                !UpdateProfilePicture())
+            UpdateProfileResultDto result =
+                _accountService.UpdateProfile(profileData);
+
+            if (!result.IsSuccessful)
             {
+                ShowUpdateProfileFailure(
+                    result.FailureReason);
                 return;
             }
 
@@ -169,9 +181,12 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _dialogService.ShowDialog(new DialogRequest
             {
                 Type = DialogType.Information,
-                TitleKey = "MessageProfile_msgProfileUpdatedTitle",
-                MessageKey = "MessageProfile_msgProfileUpdated",
-                OnAccept = () => _navigationService.NavigateTo<ProfileViewModel>()
+                TitleKey =
+                    "MessageProfile_msgProfileUpdatedTitle",
+                MessageKey =
+                    "MessageProfile_msgProfileUpdated",
+                OnAccept = () =>
+                    _navigationService.NavigateTo<ProfileViewModel>()
             });
         }
 
@@ -208,53 +223,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 _profilePictureImageService.GetProfilePicture(
                     profile.ProfilePictureData);
         }
-
-        private bool UpdateUsername()
-        {
-            UpdateProfileDto profileData =
-                new UpdateProfileDto
-                {
-                    PlayerId = _playerSession.PlayerId.Value,
-                    Username = Username
-                };
-
-            UpdateProfileResultDto result =
-                _accountService.UpdateProfile(profileData);
-
-            if (!result.IsSuccessful)
-            {
-                ShowUpdateProfileFailure(
-                    result.FailureReason);
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool UpdateProfilePicture()
-        {
-            ProfilePictureDto profilePicture =
-                new ProfilePictureDto
-                {
-                    PlayerId = _playerSession.PlayerId.Value,
-                    FileName = _selectedProfilePictureFileName,
-                    ImageData = _selectedProfilePictureData
-                };
-
-            ProfilePictureResultDto result =
-                _accountService.SetProfilePicture(
-                    profilePicture);
-
-            if (!result.IsSuccessful)
-            {
-                ShowProfilePictureFailure(
-                    result.FailureReason);
-                return false;
-            }
-
-            return true;
-        }
-
 
         private void ShowRetrieveInformationFailure(
             RetrieveInformationFailureReason reason)
@@ -309,8 +277,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
-                        TitleKey = "MessageAccount_msgInvalidUsernameTitle",
-                        MessageKey = "MessageAccount_msgInvalidUsername"
+                        TitleKey =
+                            "MessageAccount_msgInvalidUsernameTitle",
+                        MessageKey =
+                            "MessageAccount_msgInvalidUsername"
                     });
                     break;
 
@@ -318,41 +288,14 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
-                        TitleKey = "MessageAccount_msgUsernameUsedTitle",
-                        MessageKey = "MessageAccount_msgUsernameUsed"
+                        TitleKey =
+                            "MessageAccount_msgUsernameUsedTitle",
+                        MessageKey =
+                            "MessageAccount_msgUsernameUsed"
                     });
                     break;
 
-                case UpdateProfileFailureReason.SameUsername:
-                    break;
-
-                case UpdateProfileFailureReason.PlayerNotFound:
-                case UpdateProfileFailureReason.ServiceUnavailable:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Error,
-                        TitleKey = "MessageProfile_msgUpdateProfileErrorTitle",
-                        MessageKey = "MessageProfile_msgUpdateProfileError"
-                    });
-                    break;
-
-                default:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Error,
-                        TitleKey = "Global_msgDefaultErrorTitle",
-                        MessageKey = "Global_msgDefaultError"
-                    });
-                    break;
-            }
-        }
-
-        private void ShowProfilePictureFailure(
-            ProfilePictureFailureReason failureReason)
-        {
-            switch (failureReason)
-            {
-                case ProfilePictureFailureReason.InvalidFormat:
+                case UpdateProfileFailureReason.InvalidProfilePictureFormat:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -363,7 +306,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case ProfilePictureFailureReason.InvalidImage:
+                case UpdateProfileFailureReason.InvalidProfilePicture:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -374,7 +317,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case ProfilePictureFailureReason.FileTooLarge:
+                case UpdateProfileFailureReason.ProfilePictureTooLarge:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -385,24 +328,29 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case ProfilePictureFailureReason.PlayerNotFound:
-                case ProfilePictureFailureReason.ServiceUnavailable:
+                case UpdateProfileFailureReason.PlayerNotFound:
+                case UpdateProfileFailureReason.ServiceUnavailable:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Error,
                         TitleKey =
-                            "MessageProfile_msgPhotoCannotBeUploadedTitle",
+                            "MessageProfile_msgUpdateProfileErrorTitle",
                         MessageKey =
-                            "MessageProfile_msgPhotoCannotBeUploaded"
+                            "MessageProfile_msgUpdateProfileError"
                     });
+                    break;
+
+                case UpdateProfileFailureReason.SameUsername:
                     break;
 
                 default:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Error,
-                        TitleKey = "Global_msgDefaultErrorTitle",
-                        MessageKey = "Global_msgDefaultError"
+                        TitleKey =
+                            "Global_msgDefaultErrorTitle",
+                        MessageKey =
+                            "Global_msgDefaultError"
                     });
                     break;
             }

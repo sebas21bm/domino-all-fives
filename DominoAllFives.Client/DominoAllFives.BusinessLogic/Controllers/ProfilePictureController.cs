@@ -92,9 +92,9 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     }
 
                     profilePictureFileName =
-                        GenerateProfilePictureFileName(
-                            profilePicture.PlayerId,
-                            profilePicture.FileName);
+                    _profilePictureStorage.GenerateFileName(
+                        profilePicture.PlayerId,
+                        profilePicture.FileName);
 
                     _profilePictureStorage.SaveProfilePicture(
                         profilePictureFileName,
@@ -238,24 +238,6 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 previousProfilePicture);
 
             return CreateSuccessResult();
-        }
-
-        /// <summary>
-        /// Generates a unique file name for a profile picture.
-        /// </summary>
-        private string GenerateProfilePictureFileName(
-            int playerId,
-            string originalFileName)
-        {
-            string extension =
-                Path.GetExtension(originalFileName)
-                    .ToLowerInvariant();
-
-            return string.Format(
-                "player_{0}_{1}{2}",
-                playerId,
-                Guid.NewGuid().ToString("N"),
-                extension);
         }
 
         /// <summary>

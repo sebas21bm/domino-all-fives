@@ -23,6 +23,32 @@ namespace DominoAllFives.BusinessLogic.Storage
         }
 
         /// <summary>
+        /// Generates a unique file name for a player's profile picture.
+        /// </summary>
+        /// <param name="playerId">
+        /// Identifier of the player who owns the profile picture.
+        /// </param>
+        /// <param name="originalFileName">
+        /// Original name of the selected image file.
+        /// </param>
+        /// <returns>
+        /// A unique file name for storing the profile picture.
+        /// </returns>
+        public string GenerateFileName(
+            int playerId,
+            string originalFileName)
+        {
+            string extension =
+                Path.GetExtension(originalFileName).ToLowerInvariant();
+
+            return string.Format(
+                "player_{0}_{1}{2}",
+                playerId,
+                Guid.NewGuid().ToString("N"),
+                extension);
+        }
+
+        /// <summary>
         /// Gets the data of a stored profile picture.
         /// </summary>
         /// <param name="profilePictureFileName">
