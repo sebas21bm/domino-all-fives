@@ -68,94 +68,61 @@ namespace DominoAllFives.Client.WPF.Services
         public TViewModel Create<TViewModel>()
             where TViewModel : ViewModelBase
         {
-            if (typeof(TViewModel) ==
-                typeof(HomePageViewModel))
+            ViewModelBase viewModel = null;
+
+            switch(typeof(TViewModel).Name)
             {
-                HomePageViewModel homePageViewModel =
-                    new HomePageViewModel(
+                case nameof(HomePageViewModel):
+                    viewModel = new HomePageViewModel(
                         _navigationService,
                         _dialogService,
                         _playerSession,
                         _accountService,
                         _loggerFactory);
-
-                return (TViewModel)(ViewModelBase)
-                    homePageViewModel;
-            }
-
-            if (typeof(TViewModel) ==
-                typeof(MainMenuViewModel))
-            {
-                MainMenuViewModel mainMenuViewModel =
-                    new MainMenuViewModel(
+                    break;
+                case nameof(MainMenuViewModel):
+                    viewModel = new MainMenuViewModel(
                         _navigationService,
                         _dialogService,
                         _playerSession);
-
-                return (TViewModel)(ViewModelBase)
-                    mainMenuViewModel;
-            }
-
-            if (typeof(TViewModel) ==
-                typeof(GameSettingsViewModel))
-            {
-                GameSettingsViewModel gameSettingsViewModel =
-                    new GameSettingsViewModel(
+                    break;
+                case nameof(GameSettingsViewModel):
+                    viewModel = new GameSettingsViewModel(
                         _navigationService,
                         _playerSession);
-
-                return (TViewModel)(ViewModelBase)
-                    gameSettingsViewModel;
-            }
-
-            if (typeof(TViewModel) ==
-                typeof(ProfileViewModel))
-            {
-                ProfileViewModel profileViewModel =
-                    new ProfileViewModel(
+                    break;
+                case nameof(ProfileViewModel):
+                    viewModel = new ProfileViewModel(
                         _navigationService,
                         _accountService,
                         _dialogService,
                         _playerSession,
                         _profilePictureImageService);
-
-                return (TViewModel)(ViewModelBase)
-                    profileViewModel;
-            }
-
-            if (typeof(TViewModel) ==
-                typeof(EditProfileViewModel))
-            {
-                EditProfileViewModel editProfileViewModel =
-                    new EditProfileViewModel(
+                    break;
+                case nameof(EditProfileViewModel):
+                    viewModel = new EditProfileViewModel(
                         _navigationService,
                         _accountService,
                         _dialogService,
                         _playerSession,
                         _profilePictureImageService,
                         _profilePictureFileService);
-
-                return (TViewModel)(ViewModelBase)
-                    editProfileViewModel;
-            }
-
-            if (typeof(TViewModel) ==
-                typeof(RankingsViewModel))
-            {
-                RankingsViewModel rankingsViewModel =
-                    new RankingsViewModel(
+                    break;
+                case nameof(RankingsViewModel):
+                    viewModel = new RankingsViewModel(
                         _navigationService,
                         _rankingService,
                         _playerSession,
                         _profilePictureImageService);
-
-                return (TViewModel)(ViewModelBase)
-                    rankingsViewModel;
+                    break;
+                default:
+                    viewModel = (TViewModel)Activator.CreateInstance(
+                        typeof(TViewModel),
+                        _navigationService);
+                    break;
             }
 
-            return (TViewModel)Activator.CreateInstance(
-                typeof(TViewModel),
-                _navigationService);
+            return viewModel as TViewModel;
         }
     }
 }

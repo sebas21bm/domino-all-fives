@@ -62,31 +62,40 @@ namespace DominoAllFives.DataAccess.Repositories
         /// <inheritdoc />
         public bool UpdateUsername(int playerId, string username)
         {
+            bool WasUpdated = true;
+
             Player player = _context.Player.FirstOrDefault(
                 currentPlayer => currentPlayer.IdPlayer == playerId);
 
             if (player == null)
             {
-                return false;
+                WasUpdated = false;
+            }
+            else
+            {
+                player.Username = username;
             }
 
-            player.Username = username;
-            return true;
+            return WasUpdated;
         }
 
         /// <inheritdoc />
         public bool UpdateProfilePicture(int playerId, string profilePictureFileName)
         {
+            bool wasUpdated = true;
             Player player = _context.Player.FirstOrDefault(
                 currentPlayer => currentPlayer.IdPlayer == playerId);
 
             if (player == null)
             {
-                return false;
+                wasUpdated = false;
+            }
+            else
+            {
+                player.ProfilePicture = profilePictureFileName;
             }
 
-            player.ProfilePicture = profilePictureFileName;
-            return true;
+            return wasUpdated;
         }
     }
 }

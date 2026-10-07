@@ -53,6 +53,7 @@
     <Compile Include="DTOs\UpdateProfileDto.cs" />
     <Compile Include="DTOs\UpdateProfileResult.cs" />
     <Compile Include="Enums\LoginFailureReason.cs" />
+    <Compile Include="Enums\PlayerStatus.cs" />
     <Compile Include="Enums\ProfilePictureFailureReason.cs" />
     <Compile Include="Enums\RetrieveInformationFailureReason.cs" />
     <Compile Include="Enums\RegistrationFailureReason.cs" />
