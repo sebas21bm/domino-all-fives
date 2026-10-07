@@ -1,4 +1,5 @@
-﻿using System.Data.Entity.Core;
+﻿using System;
+using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
 using DominoAllFives.BusinessLogic.Security;
@@ -8,6 +9,7 @@ using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.BusinessLogic.Controllers
 {
@@ -16,6 +18,13 @@ namespace DominoAllFives.BusinessLogic.Controllers
     /// </summary>
     public class RegistrationController
     {
+        private readonly ILogger<RegistrationController> _logger;
+
+        public RegistrationController(ILogger<RegistrationController> logger)
+        {
+            _logger = logger;
+        }
+
         /// <summary>
         /// Registers a new player account.
         /// </summary>
@@ -68,7 +77,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                         PasswordHash = PasswordHasher.HashPassword(
                             registrationData.Password),
                         ProfilePicture = null,
-                        Status = "Offline",
+                        Status = PlayerStatus.Offline.ToString(),
                         IsGuest = false,
                         SuspensionUntil = null,
                         IsBanned = false,
@@ -99,18 +108,13 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     };
                 }
             }
-            catch (SqlException)
+            catch (Exception ex) when (ex is SqlException || 
+                                       ex is EntityException || 
+                                       ex is DbUpdateException)
             {
-                return CreateFailureResult(
-                    RegistrationFailureReason.ServiceUnavailable);
-            }
-            catch (EntityException)
-            {
-                return CreateFailureResult(
-                    RegistrationFailureReason.ServiceUnavailable);
-            }
-            catch (DbUpdateException)
-            {
+                _logger.LogError(
+                     ex, 
+                    "An error occurred while registering a new player account.");
                 return CreateFailureResult(
                     RegistrationFailureReason.ServiceUnavailable);
             }
