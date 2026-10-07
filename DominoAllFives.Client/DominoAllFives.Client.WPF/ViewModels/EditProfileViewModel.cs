@@ -186,7 +186,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 MessageKey =
                     "MessageProfile_msgProfileUpdated",
                 OnAccept = () =>
-                    _navigationService.NavigateTo<ProfileViewModel>()
+                    _navigationService.GoBackToRefresh<ProfileViewModel>()
             });
         }
 
