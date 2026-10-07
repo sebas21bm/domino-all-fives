@@ -181,7 +181,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ExecuteLogout()
         {
-            _navigationService.NavigateTo<HomePageViewModel>();
+            _navigationService.NavigateAsRoot<HomePageViewModel>();
         }
     }
 }

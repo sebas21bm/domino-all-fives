@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Controls;
-
-using DominoAllFives.Client.WPF.ViewModels;
+﻿using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Client.WPF.Views;
+using System;
+using System.Collections.Generic;
+using System.Windows.Controls;
+using System.Windows.Navigation;
 
 namespace DominoAllFives.Client.WPF.Services
 {
@@ -40,15 +40,75 @@ namespace DominoAllFives.Client.WPF.Services
 
         public void NavigateTo<TViewModel>(object parameter) where TViewModel : ViewModelBase
         {
-            Type viewModelType = typeof(TViewModel);
+            Page pageInstance = CreatePage<TViewModel>(parameter);
 
-            if (!_viewModelToPageMap.TryGetValue(viewModelType, out Type pageType))
+            _navigationFrame.Navigate(pageInstance);
+        }
+
+        public void GoBackToRefresh<TViewModel>()
+            where TViewModel : ViewModelBase
+        {
+            if (!_navigationFrame.CanGoBack)
             {
-                throw new InvalidOperationException($"No page registered for ViewModel type: " +
-                    $"{viewModelType.FullName}");
+                return;
             }
 
+            Page pageInstance = CreatePage<TViewModel>();
+
+            NavigatedEventHandler navigationHandler = null;
+
+            navigationHandler = (sender, eventArgs) =>
+            {
+                _navigationFrame.Navigated -= navigationHandler;
+
+                _navigationFrame.RemoveBackEntry();
+
+                if (_navigationFrame.CanGoBack)
+                {
+                    _navigationFrame.RemoveBackEntry();
+                }
+            };
+
+            _navigationFrame.Navigated += navigationHandler;
+
+            _navigationFrame.Navigate(pageInstance);
+        }
+
+        public void NavigateAsRoot<TViewModel>()
+            where TViewModel : ViewModelBase
+        {
+            Page pageInstance = CreatePage<TViewModel>();
+
+            NavigatedEventHandler navigationHandler = null;
+
+            navigationHandler = (sender, eventArgs) =>
+            {
+                _navigationFrame.Navigated -= navigationHandler;
+
+                while (_navigationFrame.CanGoBack)
+                {
+                    _navigationFrame.RemoveBackEntry();
+                }
+            };
+
+            _navigationFrame.Navigated += navigationHandler;
+
+            _navigationFrame.Navigate(pageInstance);
+        }
+
+        public void SetViewModelFactory(ViewModelFactory viewModelFactory)
+        {
+            _viewModelFactory = viewModelFactory
+                ?? throw new ArgumentNullException(nameof(viewModelFactory));
+        }
+
+        private TViewModel CreateViewModel<TViewModel>(object parameter = null)
+            where TViewModel : ViewModelBase
+        {
+            Type viewModelType = typeof(TViewModel);
+
             ViewModelBase viewModelInstance;
+
             try
             {
                 if (parameter != null)
@@ -77,16 +137,27 @@ namespace DominoAllFives.Client.WPF.Services
                     ex);
             }
 
+            return (TViewModel)viewModelInstance;
+        }
+
+        private Page CreatePage<TViewModel>(object parameter = null) 
+            where TViewModel : ViewModelBase
+        {
+            Type viewModelType = typeof(TViewModel);
+
+            if (!_viewModelToPageMap.TryGetValue(viewModelType, out Type pageType))
+            {
+                throw new InvalidOperationException(
+                    $"No page registered for ViewModel type: " +
+                    $"{viewModelType.FullName}");
+            }
+
+            TViewModel viewModelInstance = CreateViewModel<TViewModel>(parameter);
+
             Page pageInstance = (Page)Activator.CreateInstance(pageType);
             pageInstance.DataContext = viewModelInstance;
 
-            _navigationFrame.Navigate(pageInstance);
-        }
-
-        public void SetViewModelFactory(ViewModelFactory viewModelFactory)
-        {
-            _viewModelFactory = viewModelFactory
-                ?? throw new ArgumentNullException(nameof(viewModelFactory));
+            return pageInstance;
         }
 
         private void RegisterRoutes()
