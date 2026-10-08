@@ -298,8 +298,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             UpdateProfileDto profileData,
             IPlayerRepository playerRepository)
         {
-            if (!UsernameValidator.IsValid(
-                profileData.Username))
+            if (!AccountValidator.IsUsernameValid(profileData.Username))
             {
                 return UpdateProfileFailureReason
                     .InvalidUsername;
