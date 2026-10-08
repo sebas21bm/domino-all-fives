@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
@@ -62,18 +63,15 @@ namespace DominoAllFives.DataAccess.Repositories
         /// <inheritdoc />
         public bool UpdateUsername(int playerId, string username)
         {
-            bool WasUpdated = true;
+            bool WasUpdated = false;
 
             Player player = _context.Player.FirstOrDefault(
                 currentPlayer => currentPlayer.IdPlayer == playerId);
 
-            if (player == null)
-            {
-                WasUpdated = false;
-            }
-            else
+            if (player != null)
             {
                 player.Username = username;
+                WasUpdated = true;
             }
 
             return WasUpdated;
@@ -82,20 +80,34 @@ namespace DominoAllFives.DataAccess.Repositories
         /// <inheritdoc />
         public bool UpdateProfilePicture(int playerId, string profilePictureFileName)
         {
-            bool wasUpdated = true;
+            bool wasUpdated = false;
             Player player = _context.Player.FirstOrDefault(
                 currentPlayer => currentPlayer.IdPlayer == playerId);
 
-            if (player == null)
-            {
-                wasUpdated = false;
-            }
-            else
+            if (player != null)
             {
                 player.ProfilePicture = profilePictureFileName;
+                wasUpdated = true;
             }
 
             return wasUpdated;
+        }
+
+        public bool SoftDelete(int playerId)
+        {
+            bool wasDeleted = false;
+
+            Player player = _context.Player.FirstOrDefault(
+                currentPlayer => currentPlayer.IdPlayer == playerId);
+
+            if (player != null && !player.IsDeleted)
+            {
+                player.IsDeleted = true;
+                player.DeletedAt = DateTime.UtcNow;
+                wasDeleted = true;
+            }
+
+            return wasDeleted;
         }
     }
 }

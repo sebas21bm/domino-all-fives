@@ -1010,4 +1010,25 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
   <data name="DeleteAccount_msgPasswordRequired" xml:space="preserve">
     <value>Sua senha atual é necessária.</value>
   </data>
+  <data name="MessageAccount_msgWrongCurrentPasswordTitle" xml:space="preserve">
+    <value>Senha incorreta</value>
+  </data>
+  <data name="MessageAccount_msgWrongCurrentPassword" xml:space="preserve">
+    <value>A senha informada está incorreta. Verifique-a e tente novamente</value>
+  </data>
+  <data name="MessageAccount_msgAccountNotFoundTitle" xml:space="preserve">
+    <value>Conta indisponível</value>
+  </data>
+  <data name="MessageAccount_msgAccountNotFound" xml:space="preserve">
+    <value>Não foi possível encontrar uma conta ativa para realizar esta operação.</value>
+  </data>
+  <data name="MessageAccount_msgDeleteConfirm" xml:space="preserve">
+    <value>Tem certeza de que deseja excluir sua conta? Esta ação não pode ser desfeita.</value>
+  </data>
+  <data name="MessageAccount_msgDeleteSuccess" xml:space="preserve">
+    <value>Sua conta foi excluída com sucesso. Lamentamos ver você partir :(</value>
+  </data>
+  <data name="MessageAccount_msgDeleteSuccessTitle" xml:space="preserve">
+    <value>Conta excluída</value>
+  </data>
 </root>

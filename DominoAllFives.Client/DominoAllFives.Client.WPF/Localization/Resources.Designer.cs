@@ -1060,6 +1060,24 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a No fue posible encontrar una cuenta activa para realizar esta operación..
+        /// </summary>
+        public static string MessageAccount_msgAccountNotFound {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgAccountNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Cuenta no disponible.
+        /// </summary>
+        public static string MessageAccount_msgAccountNotFoundTitle {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgAccountNotFoundTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a ¿Estás seguro de que deseas eliminar tu cuenta?.
         /// </summary>
         public static string MessageAccount_msgConfirmElimination {
@@ -1083,6 +1101,33 @@ namespace DominoAllFives.Client.WPF.Localization {
         public static string MessageAccount_msgDeleteAccountTitle {
             get {
                 return ResourceManager.GetString("MessageAccount_msgDeleteAccountTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a ¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer..
+        /// </summary>
+        public static string MessageAccount_msgDeleteConfirm {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgDeleteConfirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Tu cuenta se eliminó correctamente. Lamentamos que te vayas :(.
+        /// </summary>
+        public static string MessageAccount_msgDeleteSuccess {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgDeleteSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Cuenta Eliminada.
+        /// </summary>
+        public static string MessageAccount_msgDeleteSuccessTitle {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgDeleteSuccessTitle", resourceCulture);
             }
         }
         
@@ -1246,6 +1291,24 @@ namespace DominoAllFives.Client.WPF.Localization {
         public static string MessageAccount_msgUsernameUsedTitle {
             get {
                 return ResourceManager.GetString("MessageAccount_msgUsernameUsedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a La contraseña ingresada es incorrecta. Verifícala e intenta nuevamente..
+        /// </summary>
+        public static string MessageAccount_msgWrongCurrentPassword {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgWrongCurrentPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Contraseña incorrecta.
+        /// </summary>
+        public static string MessageAccount_msgWrongCurrentPasswordTitle {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgWrongCurrentPasswordTitle", resourceCulture);
             }
         }
         
