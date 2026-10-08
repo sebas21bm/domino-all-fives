@@ -17,28 +17,30 @@ namespace DominoAllFives.Client.WPF.Services.Local
         private readonly RegistrationController _registrationController;
         private readonly ProfilePictureController _profilePictureController;
         private readonly ProfileController _profileController;
+        private readonly AccountController _accountController;
 
         public LocalAccountService(
             AuthenticationController authenticationController,
             RegistrationController registrationController,
             ProfilePictureController profilePictureController,
-            ProfileController profileController)
+            ProfileController profileController,
+            AccountController accountController)
         {
             _authenticationController = authenticationController
-                ?? throw new ArgumentNullException(
-                    nameof(authenticationController));
+                ?? throw new ArgumentNullException(nameof(authenticationController));
 
             _registrationController = registrationController
-                ?? throw new ArgumentNullException(
-                    nameof(registrationController));
+                ?? throw new ArgumentNullException(nameof(registrationController));
 
             _profilePictureController = profilePictureController
-                ?? throw new ArgumentNullException(
-                    nameof(profilePictureController));
+                ?? throw new ArgumentNullException(nameof(profilePictureController));
 
             _profileController = profileController
-                ?? throw new ArgumentNullException(
-                    nameof(profileController));
+                ?? throw new ArgumentNullException(nameof(profileController));
+
+            _accountController = accountController
+                ?? throw new ArgumentNullException(nameof(accountController));
+
         }
 
         /// <inheritdoc/>
@@ -75,6 +77,12 @@ namespace DominoAllFives.Client.WPF.Services.Local
         public UpdateProfileResultDto UpdateProfile(UpdateProfileDto profileData)
         {
             return _profileController.UpdateProfile(profileData);
+        }
+
+        /// <inheritdoc/>
+        public DeleteAccountResultDto DeleteAccount(DeleteAccountRequestDto request)
+        {
+            return _accountController.DeleteAccount(request);
         }
     }
 }

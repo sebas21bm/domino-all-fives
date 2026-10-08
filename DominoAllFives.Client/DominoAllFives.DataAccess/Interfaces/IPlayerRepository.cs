@@ -88,5 +88,17 @@ namespace DominoAllFives.DataAccess.Interfaces
         /// was updated; otherwise, false.
         /// </returns>
         bool UpdateProfilePicture(int playerId, string profilePictureFileName);
+
+        /// <summary>
+        /// Marks a player account as logically deleted.
+        /// </summary>
+        /// <param name="playerId">
+        /// The identifier of the player account.
+        /// </param>
+        /// <returns>
+        /// True when the account exists and is not already deleted;
+        /// otherwise, false.
+        /// </returns>
+        bool SoftDelete(int playerId);
     }
 }

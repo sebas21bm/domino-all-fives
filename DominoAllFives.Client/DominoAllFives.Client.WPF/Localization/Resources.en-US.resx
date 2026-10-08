@@ -1007,4 +1007,28 @@ Only the following are allowed: .png, .jpg, .jpeg.</value>
   <data name="MessageProfile_msgProfileUpdatedTitle" xml:space="preserve">
     <value>Profile updated</value>
   </data>
+  <data name="DeleteAccount_msgPasswordRequired" xml:space="preserve">
+    <value>Your current password is required.</value>
+  </data>
+  <data name="MessageAccount_msgWrongCurrentPasswordTitle" xml:space="preserve">
+    <value>Incorrect password</value>
+  </data>
+  <data name="MessageAccount_msgWrongCurrentPassword" xml:space="preserve">
+    <value>The password you entered is incorrect. Check it and try again.</value>
+  </data>
+  <data name="MessageAccount_msgAccountNotFoundTitle" xml:space="preserve">
+    <value>Account unavailable</value>
+  </data>
+  <data name="MessageAccount_msgAccountNotFound" xml:space="preserve">
+    <value>An active account could not be found to complete this operation.</value>
+  </data>
+  <data name="MessageAccount_msgDeleteConfirm" xml:space="preserve">
+    <value>Are you sure you want to delete your account? This action cannot be undone.</value>
+  </data>
+  <data name="MessageAccount_msgDeleteSuccess" xml:space="preserve">
+    <value>Your account was successfully deleted. We're sorry to see you go. :(</value>
+  </data>
+  <data name="MessageAccount_msgDeleteSuccessTitle" xml:space="preserve">
+    <value>Account deleted</value>
+  </data>
 </root>

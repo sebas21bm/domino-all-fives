@@ -89,6 +89,9 @@ namespace DominoAllFives.Client.WPF.Services
                 case nameof(GameSettingsViewModel):
                     viewModel = new GameSettingsViewModel(
                         _navigationService,
+                        _dialogService,
+                        _accountService,
+                        _loggerFactory,
                         _playerSession);
                     break;
                 case nameof(ProfileViewModel):

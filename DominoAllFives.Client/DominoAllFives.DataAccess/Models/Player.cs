@@ -35,11 +35,12 @@ namespace DominoAllFives.DataAccess.Models
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public string ProfilePicture { get; set; }
-        public string Status { get; set; }
         public bool IsGuest { get; set; }
         public Nullable<System.DateTime> SuspensionUntil { get; set; }
         public bool IsBanned { get; set; }
         public string PreferredLanguageId { get; set; }
+        public bool IsDeleted { get; set; }
+        public Nullable<System.DateTime> DeletedAt { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<FriendRequest> FriendRequest { get; set; }

@@ -21,7 +21,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand GoToProfileCommand { get; }
         public RelayCommand GoToFriendsCommand { get; }
         public RelayCommand GoToSettingsCommand { get; }
-        public RelayCommand ExitGameCommand { get; }
+        public RelayCommand LogoutCommand { get; }
         public RelayCommand ShowHowToPlayCommand { get; }
         public RelayCommand ShowLeaderboardCommand { get; }
         public RelayCommand GoToCreateGameCommand {  get; }
@@ -51,7 +51,13 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 _ => _navigationService.NavigateTo<CreateGameViewModel>());
             GoToJoinRoomCommand = new RelayCommand(
                 _ => _navigationService.NavigateTo<JoinGameViewModel>());
-            ExitGameCommand = new RelayCommand(_ => Application.Current.Shutdown());
+            LogoutCommand = new RelayCommand(_ => ExecuteLogout());
+        }
+
+        private void ExecuteLogout()
+        {
+            _playerSession.Clear();
+            _navigationService.NavigateAsRoot<HomePageViewModel>();
         }
     }
 }

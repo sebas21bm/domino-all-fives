@@ -77,12 +77,13 @@ namespace DominoAllFives.BusinessLogic.Controllers
                         PasswordHash = PasswordHasher.HashPassword(
                             registrationData.Password),
                         ProfilePicture = null,
-                        Status = PlayerStatus.Offline.ToString(),
                         IsGuest = false,
                         SuspensionUntil = null,
                         IsBanned = false,
                         PreferredLanguageId =
-                            registrationData.PreferredLanguageId
+                            registrationData.PreferredLanguageId,
+                        IsDeleted = false,
+                        DeletedAt = null,
                     };
 
                     PlayerStats playerStats = new PlayerStats

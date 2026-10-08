@@ -53,5 +53,16 @@ namespace DominoAllFives.Contracts.Services
         /// The result of the profile update operation.
         /// </returns>
         UpdateProfileResultDto UpdateProfile(UpdateProfileDto profileData);
+
+        /// <summary>
+        /// Logically deletes a player account after verifying its password.
+        /// </summary>
+        /// <param name="request">
+        /// The account deletion request.
+        /// </param>
+        /// <returns>
+        /// The result of the account deletion operation.
+        /// </returns>
+        DeleteAccountResultDto DeleteAccount(DeleteAccountRequestDto request);
     }
 }

@@ -34,6 +34,12 @@ namespace DominoAllFives.BusinessLogic.Controllers
                         LoginFailureReason.InvalidCredentials);
                 }
 
+                if (player == null || player.IsDeleted)
+                {
+                    return CreateFailureResult(
+                        LoginFailureReason.InvalidCredentials);
+                }
+
                 if (player.IsBanned)
                 {
                     return CreateFailureResult(

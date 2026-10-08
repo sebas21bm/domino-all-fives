@@ -71,12 +71,17 @@ namespace DominoAllFives.Client.WPF
                     profilePictureStorage,
                     loggerFactory.CreateLogger<ProfileController>());
 
+            AccountController accountController =
+                new AccountController(
+                    loggerFactory.CreateLogger<AccountController>());
+
             IAccountService accountService =
                 new LocalAccountService(
                     authenticationController,
                     registrationController,
                     profilePictureController,
-                    profileController);
+                    profileController,
+                    accountController);
 
             IRankingService rankingService =
                 new LocalRankingService(

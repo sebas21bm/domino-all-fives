@@ -1,20 +1,23 @@
 ﻿using System;
 using System.Windows;
-
 using DominoAllFives.Client.WPF.Commands;
+using DominoAllFives.Client.WPF.Controls;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
+using DominoAllFives.Contracts.Services;
+using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class GameSettingsViewModel : ViewModelBase
     {
         private readonly IFrameNavigationService _navigationService;
+        private readonly IDialogService _dialogService;
+        private readonly IAccountService _accountService;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly PlayerSession _playerSession;
-
-
 
         private bool _isAccountSectionVisible;
         private bool _isLanguageSectionVisible;
@@ -79,14 +82,30 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand GoToDeleteAccount { get; }
 
 
-        public GameSettingsViewModel(IFrameNavigationService navigationService, 
+        public GameSettingsViewModel(IFrameNavigationService navigationService,
+            IDialogService dialogService,
+            IAccountService accountService,
+            ILoggerFactory loggerFactory,
             PlayerSession playerSession)
         {
-            _navigationService = navigationService ?? 
-                throw new ArgumentNullException(nameof(navigationService));
-            _playerSession = playerSession;
+            _navigationService = navigationService 
+                ?? throw new ArgumentNullException(nameof(navigationService));
+
+            _dialogService = dialogService
+                ?? throw new ArgumentNullException(nameof(dialogService));
+
+            _accountService = accountService
+                ?? throw new ArgumentNullException(nameof(accountService));
+
+            _loggerFactory = loggerFactory
+                ?? throw new ArgumentNullException(
+                    nameof(loggerFactory));
+
+            _playerSession = playerSession 
+                ?? throw new ArgumentNullException(nameof(playerSession));
 
             _selectedLanguageCode = LanguageManager.Instance.CurrentLanguageCode;
+
             if (string.IsNullOrWhiteSpace(_selectedLanguageCode))
             {
                 _selectedLanguageCode = "es-MX";
@@ -103,15 +122,15 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 _isLanguageSectionVisible = false;
             }
 
-            ShowAccountSectionCommand = new RelayCommand(_ => ExecuteShowAccountSection());
-            ShowLanguageSectionCommand = new RelayCommand(_ => ExecuteShowLanguageSection());
+            ShowAccountSectionCommand = new RelayCommand(ExecuteShowAccountSection);
+            ShowLanguageSectionCommand = new RelayCommand(ExecuteShowLanguageSection);
             SelectLanguageCommand = new RelayCommand(ExecuteSelectLanguage);
-            SaveLanguageCommand = new RelayCommand(_ => ExecuteSaveLanguage());
-            GoToChangePassword = new RelayCommand(_ => OpenChangePasswordModal());
-            GoToDeleteAccount = new RelayCommand(_ => OpenDeleteAccount());
+            SaveLanguageCommand = new RelayCommand(ExecuteSaveLanguage);
+            GoToChangePassword = new RelayCommand(OpenChangePasswordModal);
+            GoToDeleteAccount = new RelayCommand(OpenDeleteAccount);
 
-            GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
-            LogoutCommand = new RelayCommand(_ => ExecuteLogout());
+            GoBackCommand = new RelayCommand(_navigationService.GoBack);
+            LogoutCommand = new RelayCommand(ExecuteLogout);
         }
 
         private void ExecuteShowAccountSection()
@@ -160,17 +179,33 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OpenDeleteAccount()
         {
+            _dialogService.ShowDialog(new DialogRequest
+            {
+                Type = DialogType.Confirmation,
+                TitleKey = "MessageAccount_msgDeleteAccountTitle",
+                MessageKey = "MessageAccount_msgDeleteConfirm",
+                OnAccept = ShowDeleteAccountModal
+            });
+        }
+
+        private void ShowDeleteAccountModal()
+        {
             CurrentModal = new DeleteAccountViewModel(
-                onAccountDeletedSuccess: OnAccountDeletedSuccess,
-                onCancel: CloseModal
-            );
+                _dialogService,
+                _accountService,
+                _loggerFactory.CreateLogger<DeleteAccountViewModel>(),
+                _playerSession,
+                OnAccountDeletedSuccess,
+                CloseModal);
+
             IsModalVisible = true;
         }
 
         private void OnAccountDeletedSuccess()
         {
             CloseModal();
-            _navigationService.NavigateTo<HomePageViewModel>();
+            _playerSession.Clear();
+            _navigationService.NavigateAsRoot<HomePageViewModel>();
         }
 
         private void CloseModal()
@@ -181,6 +216,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ExecuteLogout()
         {
+            _playerSession.Clear();
             _navigationService.NavigateAsRoot<HomePageViewModel>();
         }
     }

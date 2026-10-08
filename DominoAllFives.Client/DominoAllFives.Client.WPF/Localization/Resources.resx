@@ -1006,4 +1006,28 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
   <data name="MessageProfile_msgProfileUpdatedTitle" xml:space="preserve">
     <value>Perfil actualizado</value>
   </data>
+  <data name="DeleteAccount_msgPasswordRequired" xml:space="preserve">
+    <value>Se necesita tu contraseña actual</value>
+  </data>
+  <data name="MessageAccount_msgWrongCurrentPasswordTitle" xml:space="preserve">
+    <value>Contraseña incorrecta</value>
+  </data>
+  <data name="MessageAccount_msgWrongCurrentPassword" xml:space="preserve">
+    <value>La contraseña ingresada es incorrecta. Verifícala e intenta nuevamente.</value>
+  </data>
+  <data name="MessageAccount_msgAccountNotFoundTitle" xml:space="preserve">
+    <value>Cuenta no disponible</value>
+  </data>
+  <data name="MessageAccount_msgAccountNotFound" xml:space="preserve">
+    <value>No fue posible encontrar una cuenta activa para realizar esta operación.</value>
+  </data>
+  <data name="MessageAccount_msgDeleteConfirm" xml:space="preserve">
+    <value>¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.</value>
+  </data>
+  <data name="MessageAccount_msgDeleteSuccess" xml:space="preserve">
+    <value>Tu cuenta se eliminó correctamente. Lamentamos que te vayas :(</value>
+  </data>
+  <data name="MessageAccount_msgDeleteSuccessTitle" xml:space="preserve">
+    <value>Cuenta Eliminada</value>
+  </data>
 </root>
