@@ -92,11 +92,11 @@
                             Command="{Binding GoToSettingsCommand}"
                             Margin="0,0,0,10"/>
 
-                        <Button x:Name="btnExitGame"
+                        <Button x:Name="btnLogout"
                             Style="{StaticResource DarkButton}" 
-                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnExitGame]}" 
+                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Settings_btnLogout]}" 
                             MinHeight="54"
-                            Command="{Binding ExitGameCommand}"/>
+                            Command="{Binding LogoutCommand}"/>
                     </StackPanel>
                 </StackPanel>
 

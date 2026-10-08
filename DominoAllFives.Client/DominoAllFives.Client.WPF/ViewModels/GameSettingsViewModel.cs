@@ -82,11 +82,14 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public GameSettingsViewModel(IFrameNavigationService navigationService, 
             PlayerSession playerSession)
         {
-            _navigationService = navigationService ?? 
-                throw new ArgumentNullException(nameof(navigationService));
-            _playerSession = playerSession;
+            _navigationService = navigationService 
+                ?? throw new ArgumentNullException(nameof(navigationService));
+
+            _playerSession = playerSession 
+                ?? throw new ArgumentNullException(nameof(playerSession));
 
             _selectedLanguageCode = LanguageManager.Instance.CurrentLanguageCode;
+
             if (string.IsNullOrWhiteSpace(_selectedLanguageCode))
             {
                 _selectedLanguageCode = "es-MX";
@@ -181,6 +184,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ExecuteLogout()
         {
+            _playerSession.Clear();
             _navigationService.NavigateAsRoot<HomePageViewModel>();
         }
     }
