@@ -1007,4 +1007,7 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
   <data name="MessageProfile_msgProfileUpdatedTitle" xml:space="preserve">
     <value>Perfil atualizado</value>
   </data>
+  <data name="DeleteAccount_msgPasswordRequired" xml:space="preserve">
+    <value>Sua senha atual é necessária.</value>
+  </data>
 </root>

@@ -20,7 +20,8 @@
                    HorizontalAlignment="Center"
                    Margin="0,0,0,20"/>
 
-            <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[DeleteAccount_lblCurrentPassword]}" 
+            <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, 
+                       Path=[DeleteAccount_lblCurrentPassword]}" 
                        Style="{StaticResource FieldLabelText}" 
                        HorizontalAlignment="Center" 
                        Margin="0,0,0,8"/>
@@ -30,7 +31,18 @@
                          Height="48"
                          Margin="0,0,0,15"/>
 
-            <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[DeleteAccount_lblDeleteAccountWarning]}" 
+            <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, 
+                       Path=[DeleteAccount_msgPasswordRequired]}"
+                       Style="{StaticResource FieldLabelText}"
+                       Foreground="{StaticResource PrimaryRedBrush}"
+                       FontSize="12"
+                       HorizontalAlignment="Left"
+                       Visibility="{Binding IsPasswordRequiredVisible, 
+                       Converter={StaticResource BooleanToVisibilityConverter}}"
+                       Margin="0,0,0,15"/>
+
+            <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, 
+                       Path=[DeleteAccount_lblDeleteAccountWarning]}" 
                        Style="{StaticResource FieldLabelText}" 
                        FontSize="13"
                        Foreground="{StaticResource PrimaryRedBrush}"
@@ -41,14 +53,16 @@
 
             <Button x:Name="btnConfirmDelete"
                     Style="{StaticResource PrimaryButton}"
-                    Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnAccept]}"
+                    Content="{Binding Source={x:Static loc:LanguageManager.Instance},
+                    Path=[Global_btnAccept]}"
                     Height="50"
                     Margin="0,0,0,12"
                     Command="{Binding ConfirmDeleteCommand}"/>
 
             <Button x:Name="btnCancel"
                     Style="{StaticResource OutlineButton}"
-                    Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnCancel]}"
+                    Content="{Binding Source={x:Static loc:LanguageManager.Instance}, 
+                    Path=[Global_btnCancel]}"
                     Height="50"
                     Command="{Binding CancelCommand}"/>
         </StackPanel>

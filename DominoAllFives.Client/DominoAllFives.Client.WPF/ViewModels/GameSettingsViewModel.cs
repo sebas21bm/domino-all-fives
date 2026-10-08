@@ -106,15 +106,15 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 _isLanguageSectionVisible = false;
             }
 
-            ShowAccountSectionCommand = new RelayCommand(_ => ExecuteShowAccountSection());
-            ShowLanguageSectionCommand = new RelayCommand(_ => ExecuteShowLanguageSection());
+            ShowAccountSectionCommand = new RelayCommand(ExecuteShowAccountSection);
+            ShowLanguageSectionCommand = new RelayCommand(ExecuteShowLanguageSection);
             SelectLanguageCommand = new RelayCommand(ExecuteSelectLanguage);
-            SaveLanguageCommand = new RelayCommand(_ => ExecuteSaveLanguage());
-            GoToChangePassword = new RelayCommand(_ => OpenChangePasswordModal());
-            GoToDeleteAccount = new RelayCommand(_ => OpenDeleteAccount());
+            SaveLanguageCommand = new RelayCommand(ExecuteSaveLanguage);
+            GoToChangePassword = new RelayCommand(OpenChangePasswordModal);
+            GoToDeleteAccount = new RelayCommand(OpenDeleteAccount);
 
-            GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
-            LogoutCommand = new RelayCommand(_ => ExecuteLogout());
+            GoBackCommand = new RelayCommand(_navigationService.GoBack);
+            LogoutCommand = new RelayCommand(ExecuteLogout);
         }
 
         private void ExecuteShowAccountSection()
@@ -163,16 +163,19 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OpenDeleteAccount()
         {
-            CurrentModal = new DeleteAccountViewModel(
-                onAccountDeletedSuccess: OnAccountDeletedSuccess,
-                onCancel: CloseModal
-            );
-            IsModalVisible = true;
+            /*
+             *  CurrentModal = new DeleteAccountViewModel(
+             *      onAccountDeletedSuccess: OnAccountDeletedSuccess,
+             *      onCancel: CloseModal
+             *  );
+             *   IsModalVisible = true;
+            */
         }
 
         private void OnAccountDeletedSuccess()
         {
             CloseModal();
+            _playerSession.Clear();
             _navigationService.NavigateTo<HomePageViewModel>();
         }
 

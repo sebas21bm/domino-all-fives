@@ -1006,4 +1006,7 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
   <data name="MessageProfile_msgProfileUpdatedTitle" xml:space="preserve">
     <value>Perfil actualizado</value>
   </data>
+  <data name="DeleteAccount_msgPasswordRequired" xml:space="preserve">
+    <value>Se necesita tu contraseña actual</value>
+  </data>
 </root>

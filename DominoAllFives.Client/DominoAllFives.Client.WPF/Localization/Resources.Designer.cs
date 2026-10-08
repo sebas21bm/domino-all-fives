@@ -133,6 +133,15 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Se necesita tu contraseña actual.
+        /// </summary>
+        public static string DeleteAccount_msgPasswordRequired {
+            get {
+                return ResourceManager.GetString("DeleteAccount_msgPasswordRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Guardar cambios.
         /// </summary>
         public static string EditProfile_btnSaveChanges {
