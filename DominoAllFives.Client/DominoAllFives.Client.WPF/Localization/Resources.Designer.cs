@@ -1259,6 +1259,24 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a La nueva contraseña debe ser diferente de la contraseña actual..
+        /// </summary>
+        public static string MessageAccount_msgSamePassword {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgSamePassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Contraseña no válida.
+        /// </summary>
+        public static string MessageAccount_msgSamePasswordTitle {
+            get {
+                return ResourceManager.GetString("MessageAccount_msgSamePasswordTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a La contraseña debe contener como mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial..
         /// </summary>
         public static string MessageAccount_msgUnsafePassword {

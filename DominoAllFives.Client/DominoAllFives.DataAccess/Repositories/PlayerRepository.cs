@@ -68,7 +68,7 @@ namespace DominoAllFives.DataAccess.Repositories
             Player player = _context.Player.FirstOrDefault(
                 currentPlayer => currentPlayer.IdPlayer == playerId);
 
-            if (player != null)
+            if (player != null && !player.IsDeleted)
             {
                 player.Username = username;
                 WasUpdated = true;
@@ -84,7 +84,7 @@ namespace DominoAllFives.DataAccess.Repositories
             Player player = _context.Player.FirstOrDefault(
                 currentPlayer => currentPlayer.IdPlayer == playerId);
 
-            if (player != null)
+            if (player != null && !player.IsDeleted)
             {
                 player.ProfilePicture = profilePictureFileName;
                 wasUpdated = true;
@@ -93,6 +93,7 @@ namespace DominoAllFives.DataAccess.Repositories
             return wasUpdated;
         }
 
+        /// <inheritdoc />
         public bool SoftDelete(int playerId)
         {
             bool wasDeleted = false;
@@ -108,6 +109,23 @@ namespace DominoAllFives.DataAccess.Repositories
             }
 
             return wasDeleted;
+        }
+
+        /// <inheritdoc />
+        public bool UpdatePassword(int playerId, string passwordHash)
+        {
+            bool wasUpdated = false;
+
+            Player player = _context.Player.FirstOrDefault(
+                currentPlayer => currentPlayer.IdPlayer == playerId);
+
+            if (player != null && !player.IsDeleted)
+            {
+                player.PasswordHash = passwordHash;
+                wasUpdated = true;
+            }
+
+            return wasUpdated;
         }
     }
 }

@@ -84,5 +84,12 @@ namespace DominoAllFives.Client.WPF.Services.Local
         {
             return _accountController.DeleteAccount(request);
         }
+
+        /// <inheritdoc/>
+        public ChangePasswordResultDto ChangePassword(ChangePasswordRequestDto request)
+        {
+            return _accountController.ChangePassword(request);
+        }
+
     }
 }

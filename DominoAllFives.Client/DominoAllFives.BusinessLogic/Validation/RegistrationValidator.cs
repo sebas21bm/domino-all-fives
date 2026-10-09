@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-
+﻿
 using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Enums;
 
@@ -12,24 +9,6 @@ namespace DominoAllFives.BusinessLogic.Validation
     /// </summary>
     public static class RegistrationValidator
     {
-        private const string EmailPattern =
-            @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
-        private const string PasswordPattern =
-            @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$";
-
-        private static readonly TimeSpan regexTimeout =
-            TimeSpan.FromMilliseconds(250);
-
-        private static readonly HashSet<string> validEmailDomains =
-            new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            {
-                "gmail.com",
-                "outlook.com",
-                "hotmail.com",
-                "yahoo.com",
-                "icloud.com"
-            };
-
         /// <summary>
         /// Validates the registration data against the account
         /// registration business rules.
@@ -49,56 +28,22 @@ namespace DominoAllFives.BusinessLogic.Validation
                 return RegistrationFailureReason.InvalidRegistrationData;
             }
 
-            if (!UsernameValidator.IsValid(registrationData.Username))
+            if (!AccountValidator.IsUsernameValid(registrationData.Username))
             {
                 return RegistrationFailureReason.InvalidUsername;
             }
 
-            if (!IsEmailValid(registrationData.Email))
+            if (!AccountValidator.IsEmailValid(registrationData.Email))
             {
                 return RegistrationFailureReason.InvalidEmail;
             }
 
-            if (!IsPasswordValid(registrationData.Password))
+            if (!AccountValidator.IsPasswordValid(registrationData.Password))
             {
                 return RegistrationFailureReason.InvalidPassword;
             }
 
             return RegistrationFailureReason.None;
-        }
-
-        private static bool IsEmailValid(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email) ||
-                !Regex.IsMatch(
-                    email,
-                    EmailPattern,
-                    RegexOptions.None,
-                    regexTimeout))
-            {
-                return false;
-            }
-
-            int atIndex = email.LastIndexOf('@');
-
-            if (atIndex < 0 || atIndex == email.Length - 1)
-            {
-                return false;
-            }
-
-            string domain = email.Substring(atIndex + 1);
-
-            return validEmailDomains.Contains(domain);
-        }
-
-        private static bool IsPasswordValid(string password)
-        {
-            return !string.IsNullOrWhiteSpace(password) &&
-                   Regex.IsMatch(
-                       password,
-                       PasswordPattern,
-                       RegexOptions.None,
-                       regexTimeout);
         }
     }
 }

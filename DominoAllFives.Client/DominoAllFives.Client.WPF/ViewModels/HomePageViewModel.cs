@@ -195,11 +195,16 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void OpenChangePasswordModal()
         {
             CurrentModal = new ChangePasswordViewModel(
+                accountService: _accountService,
+                dialogService: _dialogService,
+                logger: _loggerFactory.CreateLogger<ChangePasswordViewModel>(),
+                playerSession: _playerSession,
                 onPasswordChangedSuccess: OnPasswordRecoverySuccess,
                 onCancel: CloseModal);
 
             IsModalVisible = true;
         }
+
 
         private void OnPasswordRecoverySuccess()
         {

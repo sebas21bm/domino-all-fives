@@ -3,6 +3,7 @@ using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
 using DominoAllFives.BusinessLogic.Security;
+using DominoAllFives.BusinessLogic.Validation;
 using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Interfaces;
@@ -119,5 +120,122 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 FailureReason = reason
             };
         }
+
+
+        /// <summary>
+        /// Changes a player account password after verifying
+        /// the current password and validating the new password.
+        /// </summary>
+        /// <param name="request">
+        /// The password change request.
+        /// </param>
+        /// <returns>
+        /// The result of the password change operation.
+        /// </returns>
+        public ChangePasswordResultDto ChangePassword(
+            ChangePasswordRequestDto request)
+        {
+            if (request == null || request.PlayerId <= 0)
+            {
+                return CreateChangePasswordFailureResult(
+                    ChangePasswordFailureReason.AccountNotFound);
+            }
+
+            if (string.IsNullOrWhiteSpace(request.CurrentPassword))
+            {
+                return CreateChangePasswordFailureResult(
+                    ChangePasswordFailureReason.IncorrectCurrentPassword);
+            }
+
+            if (!AccountValidator.IsPasswordValid(request.NewPassword))
+            {
+                return CreateChangePasswordFailureResult(
+                    ChangePasswordFailureReason.InvalidNewPassword);
+            }
+
+            try
+            {
+                using (DominoAllFivesEntities context =
+                    new DominoAllFivesEntities())
+                {
+                    IPlayerRepository playerRepository =
+                        new PlayerRepository(context);
+
+                    Player player =
+                        playerRepository.GetById(request.PlayerId);
+
+                    if (player == null || player.IsDeleted)
+                    {
+                        return CreateChangePasswordFailureResult(
+                            ChangePasswordFailureReason.AccountNotFound);
+                    }
+
+                    if (!PasswordHasher.VerifyPassword(
+                        request.CurrentPassword,
+                        player.PasswordHash))
+                    {
+                        return CreateChangePasswordFailureResult(
+                            ChangePasswordFailureReason.IncorrectCurrentPassword);
+                    }
+
+                    if (PasswordHasher.VerifyPassword(
+                        request.NewPassword,
+                        player.PasswordHash))
+                    {
+                        return CreateChangePasswordFailureResult(
+                            ChangePasswordFailureReason.SameAsCurrentPassword);
+                    }
+
+                    string newPasswordHash =
+                        PasswordHasher.HashPassword(request.NewPassword);
+
+                    bool wasUpdated = playerRepository.UpdatePassword(
+                        request.PlayerId,
+                        newPasswordHash);
+
+                    if (!wasUpdated)
+                    {
+                        return CreateChangePasswordFailureResult(
+                            ChangePasswordFailureReason.AccountNotFound);
+                    }
+
+                    context.SaveChanges();
+
+                    return CreateChangePasswordSuccessResult();
+                }
+            }
+            catch (Exception ex) when (ex is SqlException
+                                       || ex is EntityException
+                                       || ex is DbUpdateException)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unable to change password for player {PlayerId}.",
+                    request.PlayerId);
+
+                return CreateChangePasswordFailureResult(
+                    ChangePasswordFailureReason.ServiceUnavailable);
+            }
+        }
+
+        private ChangePasswordResultDto CreateChangePasswordSuccessResult()
+        {
+            return new ChangePasswordResultDto
+            {
+                IsSuccessful = true,
+                FailureReason = ChangePasswordFailureReason.None
+            };
+        }
+
+        private ChangePasswordResultDto CreateChangePasswordFailureResult(
+            ChangePasswordFailureReason reason)
+        {
+            return new ChangePasswordResultDto
+            {
+                IsSuccessful = false,
+                FailureReason = reason
+            };
+        }
+
     }
 }

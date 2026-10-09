@@ -85,9 +85,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\PasswordHasher.cs" />
     <Compile Include="Storage\ProfilePictureStorage.cs" />
+    <Compile Include="Validation\AccountValidator.cs" />
     <Compile Include="Validation\ProfilePictureValidator.cs" />
     <Compile Include="Validation\RegistrationValidator.cs" />
-    <Compile Include="Validation\UsernameValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DominoAllFives.Contracts\DominoAllFives.Contracts.csproj">

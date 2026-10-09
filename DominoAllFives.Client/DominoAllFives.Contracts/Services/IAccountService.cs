@@ -64,5 +64,18 @@ namespace DominoAllFives.Contracts.Services
         /// The result of the account deletion operation.
         /// </returns>
         DeleteAccountResultDto DeleteAccount(DeleteAccountRequestDto request);
+
+
+        /// <summary>
+        /// Changes a player account password.
+        /// </summary>
+        /// <param name="request">
+        /// The password change request.
+        /// </param>
+        /// <returns>
+        /// The result of the password change operation.
+        /// </returns>
+        ChangePasswordResultDto ChangePassword(ChangePasswordRequestDto request);
+
     }
 }
