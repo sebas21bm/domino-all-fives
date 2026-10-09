@@ -100,5 +100,22 @@ namespace DominoAllFives.DataAccess.Interfaces
         /// otherwise, false.
         /// </returns>
         bool SoftDelete(int playerId);
+
+
+        /// <summary>
+        /// Updates the password hash assigned to a player.
+        /// </summary>
+        /// <param name="playerId">
+        /// The identifier of the player.
+        /// </param>
+        /// <param name="passwordHash">
+        /// The new hashed password to assign.
+        /// </param>
+        /// <returns>
+        /// True when the player exists and the password hash
+        /// was updated; otherwise, false.
+        /// </returns>
+        bool UpdatePassword(int playerId, string passwordHash);
+
     }
 }

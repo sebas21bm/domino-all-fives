@@ -1031,4 +1031,10 @@ Only the following are allowed: .png, .jpg, .jpeg.</value>
   <data name="MessageAccount_msgDeleteSuccessTitle" xml:space="preserve">
     <value>Account deleted</value>
   </data>
+  <data name="MessageAccount_msgSamePassword" xml:space="preserve">
+    <value>The new password must be different from the current password.</value>
+  </data>
+  <data name="MessageAccount_msgSamePasswordTitle" xml:space="preserve">
+    <value>Invalid password</value>
+  </data>
 </root>

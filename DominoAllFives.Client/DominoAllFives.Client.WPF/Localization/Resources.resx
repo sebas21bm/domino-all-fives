@@ -1030,4 +1030,10 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
   <data name="MessageAccount_msgDeleteSuccessTitle" xml:space="preserve">
     <value>Cuenta Eliminada</value>
   </data>
+  <data name="MessageAccount_msgSamePassword" xml:space="preserve">
+    <value>La nueva contraseña debe ser diferente de la contraseña actual.</value>
+  </data>
+  <data name="MessageAccount_msgSamePasswordTitle" xml:space="preserve">
+    <value>Contraseña no válida</value>
+  </data>
 </root>

@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace DominoAllFives.Client.WPF.Converters
 {
+    /// <summary>
+    /// Converts multiple PasswordBox controls into an array.
+    /// </summary>
     public class PasswordBoxesConverter : IMultiValueConverter
     {
         public object Convert(
@@ -13,11 +17,8 @@ namespace DominoAllFives.Client.WPF.Converters
             object parameter,
             CultureInfo culture)
         {
-            return new[]
-            {
-                values[0] as PasswordBox,
-                values[1] as PasswordBox
-            };
+            return values.Select(
+                value => value as PasswordBox).ToArray();
         }
 
         public object[] ConvertBack(
@@ -30,3 +31,5 @@ namespace DominoAllFives.Client.WPF.Converters
         }
     }
 }
+
+
