@@ -1037,4 +1037,10 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
   <data name="MessageAccount_msgSamePasswordTitle" xml:space="preserve">
     <value>Senha inválida</value>
   </data>
+  <data name="EditProfile_btnChangePicture" xml:space="preserve">
+    <value>Alterar foto de perfil</value>
+  </data>
+  <data name="Global_btnBackToolTip" xml:space="preserve">
+    <value>Voltar</value>
+  </data>
 </root>
