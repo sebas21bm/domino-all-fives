@@ -1,4 +1,5 @@
 ﻿using DominoAllFives.BusinessLogic.Controllers;
+using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Services;
 using System;
@@ -44,9 +45,9 @@ namespace DominoAllFives.Client.WPF.Services.Local
         }
 
         /// <inheritdoc/>
-        public LoginResultDto Login(LoginRequestDto loginRequest)
+        public PlayerAccount Login(PlayerAccount playerAccount)
         {
-            return _authenticationController.Login(loginRequest);
+            return _authenticationController.Login(playerAccount);
         }
 
         /// <inheritdoc/>

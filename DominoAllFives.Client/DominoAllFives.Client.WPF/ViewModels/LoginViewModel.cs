@@ -1,13 +1,14 @@
-﻿using DominoAllFives.Client.WPF.Commands;
+﻿using System;
+using System.Windows.Controls;
+using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
+using DominoAllFives.Contracts.Exceptions;
 using DominoAllFives.Contracts.Services;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Windows.Controls;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -100,8 +101,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
             CancelCommand = new RelayCommand(_onCancel);
             GoToRegisterCommand = new RelayCommand(_onGoToRegister);
             GoToRecoverCommand = new RelayCommand(_onGoToRecover);
-
-            _logger.LogInformation("LoginViewModel initialized successfully.");
         }
 
         private void ExecuteLogin(object parameter)
@@ -113,33 +112,44 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             if (!ValidateInput())
             {
-                _logger.LogWarning("Login attempt aborted due to missing required fields.");
                 return;
             }
 
             _logger.LogInformation("Attempting login for user: {EmailOrUsername}", Email.Trim());
 
-            LoginRequestDto request = new LoginRequestDto
+            try
             {
-                EmailOrUsername = Email.Trim(),
-                Password = Password
-            };
+                PlayerAccount account = PlayerAccount.ForLogin(
+                    Email.Trim(),
+                    Password);
 
-            LoginResultDto result = _accountService.Login(request);
+                PlayerAccount authenticatedAccount = _accountService.Login(account);
 
-            if (!result.IsSuccessful)
+                _playerSession.Start(
+                    authenticatedAccount.PlayerId,
+                    authenticatedAccount.Username);
+
+                _logger.LogInformation("User {EmailOrUsername} logged in successfully with " +
+                    "PlayerId: {PlayerId}", Email.Trim(), authenticatedAccount.PlayerId);
+
+                _onLoginSuccess.Invoke();
+            }
+            catch (AuthenticationException ex)
             {
                 _logger.LogWarning("Login failed for user {EmailOrUsername}. " +
-                    "Reason: {FailureReason}", Email.Trim(), result.FailureReason);
-                ShowLoginFailure(result.FailureReason);
-                return;
+                    "Reason: {FailureReason}", Email.Trim(), ex.Reason);
+
+                ShowLoginFailure(ex.Reason);
             }
+            catch (ServiceUnavailableException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Authentication service unavailable for user {EmailOrUsername}.",
+                    Email.Trim());
 
-            _playerSession.Start(result.PlayerId, result.Username);
-            _logger.LogInformation("User {EmailOrUsername} logged in successfully with " +
-                "PlayerId: {PlayerId}", Email.Trim(), result.PlayerId);
-
-            _onLoginSuccess.Invoke();
+                ShowLoginFailure(LoginFailureReason.ServiceUnavailable);
+            }
         }
 
         private bool ValidateInput()

@@ -1,4 +1,5 @@
-﻿using DominoAllFives.Contracts.DTOs;
+﻿using DominoAllFives.Contracts.Domain;
+using DominoAllFives.Contracts.DTOs;
 
 namespace DominoAllFives.Contracts.Services
 {
@@ -13,7 +14,7 @@ namespace DominoAllFives.Contracts.Services
         /// </summary>
         /// <param name="loginRequest">The login request data.</param>
         /// <returns>The login result.</returns>
-        LoginResultDto Login(LoginRequestDto loginRequest);
+        PlayerAccount Login(PlayerAccount playerAccount);
 
         /// <summary>
         /// Registers a new user account with the provided registration data.
