@@ -2,6 +2,9 @@
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Services;
+using DominoAllFives.Contracts.Enums;
+using DominoAllFives.Contracts.Exceptions;
+using DominoAllFives.Client.WPF.Models;
 using System;
 
 namespace DominoAllFives.Client.WPF.Services.Local
@@ -19,13 +22,17 @@ namespace DominoAllFives.Client.WPF.Services.Local
         private readonly ProfilePictureController _profilePictureController;
         private readonly ProfileController _profileController;
         private readonly AccountController _accountController;
+        private readonly AccountLanguageController _accountLanguageController;
+        private readonly PlayerSession _playerSession;
 
         public LocalAccountService(
             AuthenticationController authenticationController,
             RegistrationController registrationController,
             ProfilePictureController profilePictureController,
             ProfileController profileController,
-            AccountController accountController)
+            AccountController accountController,
+            AccountLanguageController accountLanguageController,
+            PlayerSession playerSession)
         {
             _authenticationController = authenticationController
                 ?? throw new ArgumentNullException(nameof(authenticationController));
@@ -39,9 +46,31 @@ namespace DominoAllFives.Client.WPF.Services.Local
             _profileController = profileController
                 ?? throw new ArgumentNullException(nameof(profileController));
 
+            _accountLanguageController = accountLanguageController
+                ?? throw new ArgumentNullException(nameof(accountLanguageController));
+            _playerSession = playerSession
+                ?? throw new ArgumentNullException(nameof(playerSession));
+
             _accountController = accountController
                 ?? throw new ArgumentNullException(nameof(accountController));
 
+        }
+
+        /// <inheritdoc/>
+        public void ChangePreferredLanguage(string preferredLanguageId)
+        {
+            // Local adapter only; a remote service must resolve its authenticated actor.
+            int? playerId = _playerSession.PlayerId;
+            if (!playerId.HasValue)
+            {
+                throw new LanguagePreferenceException(LanguagePreferenceFailureReason.NotSignedIn);
+            }
+            _accountLanguageController.ChangePreferredLanguage(playerId.Value, preferredLanguageId);
+            if (_playerSession.PlayerId != playerId)
+            {
+                throw new LanguagePreferenceException(LanguagePreferenceFailureReason.NotSignedIn);
+            }
+            _playerSession.UpdatePreferredLanguage(preferredLanguageId);
         }
 
         /// <inheritdoc/>

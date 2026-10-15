@@ -1042,4 +1042,7 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
   <data name="Global_btnBackToolTip" xml:space="preserve">
     <value>Volver</value>
   </data>
+  <data name="MessageLanguage_msgSaveFailed" xml:space="preserve">
+    <value>No se pudo guardar el idioma. Inténtalo de nuevo o selecciona un idioma disponible.</value>
+  </data>
 </root>

@@ -1043,4 +1043,7 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
   <data name="Global_btnBackToolTip" xml:space="preserve">
     <value>Voltar</value>
   </data>
+  <data name="MessageLanguage_msgSaveFailed" xml:space="preserve">
+    <value>Não foi possível salvar o idioma. Tente novamente ou selecione um idioma disponível.</value>
+  </data>
 </root>

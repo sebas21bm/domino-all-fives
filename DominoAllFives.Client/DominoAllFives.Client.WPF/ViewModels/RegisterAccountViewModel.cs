@@ -139,7 +139,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            _playerSession.Start(result.PlayerId, result.Username);
+            _playerSession.Start(
+                result.PlayerId,
+                result.Username,
+                registrationData.PreferredLanguageId);
 
             _dialogService.ShowDialog(new DialogRequest
             {

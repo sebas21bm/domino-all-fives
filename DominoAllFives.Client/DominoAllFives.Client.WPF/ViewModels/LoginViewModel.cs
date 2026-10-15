@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
+using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.Domain;
@@ -18,6 +19,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private readonly IAccountService _accountService;
         private readonly PlayerSession _playerSession;
         private readonly ILogger<LoginViewModel> _logger;
+        private readonly LanguageManager _languageManager;
 
         private readonly Action _onLoginSuccess;
         private readonly Action _onCancel;
@@ -66,7 +68,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             Action onLoginSuccess,
             Action onCancel,
             Action onGoToRegister,
-            Action onGoToRecover)
+            Action onGoToRecover,
+            LanguageManager languageManager = null)
         {
             _dialogService = dialogService
                 ?? throw new ArgumentNullException(nameof(dialogService));
@@ -92,6 +95,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _onGoToRecover = onGoToRecover
                 ?? throw new ArgumentNullException(nameof(onGoToRecover));
 
+            _languageManager = languageManager ?? LanguageManager.Instance;
             _email = string.Empty;
             _password = string.Empty;
             _isEmailRequiredVisible = false;
@@ -125,9 +129,17 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
                 PlayerAccount authenticatedAccount = _accountService.Login(account);
 
+                _languageManager.ApplyAccountLanguage(authenticatedAccount.PreferredLanguageId);
+                if (_languageManager.CurrentLanguageCode != authenticatedAccount.PreferredLanguageId)
+                {
+                    _logger.LogWarning(
+                        "Unsupported stored account language {PreferredLanguageId}; using fallback.",
+                        authenticatedAccount.PreferredLanguageId);
+                }
                 _playerSession.Start(
                     authenticatedAccount.PlayerId,
-                    authenticatedAccount.Username);
+                    authenticatedAccount.Username,
+                    authenticatedAccount.PreferredLanguageId);
 
                 _logger.LogInformation("User {EmailOrUsername} logged in successfully with " +
                     "PlayerId: {PlayerId}", Email.Trim(), authenticatedAccount.PlayerId);

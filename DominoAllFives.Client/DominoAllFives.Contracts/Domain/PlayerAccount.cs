@@ -6,9 +6,13 @@ namespace DominoAllFives.Contracts.Domain
 {
     public class PlayerAccount
     {
+        private const int MaximumLanguageIdLength = 10;
+
         public int PlayerId { get; private set; }
 
         public string Username { get; private set; }
+
+        public string PreferredLanguageId { get; private set; }
 
         public string EmailOrUsername { get; private set; }
 
@@ -24,6 +28,19 @@ namespace DominoAllFives.Contracts.Domain
 
         private PlayerAccount()
         {
+        }
+
+        /// <summary>
+        /// Maps the preferred language stored with the account.
+        /// </summary>
+        public void SetPreferredLanguage(string preferredLanguageId)
+        {
+            if (preferredLanguageId == null || preferredLanguageId.Length > MaximumLanguageIdLength)
+            {
+                throw new ArgumentException("Invalid stored language identifier.",
+                    nameof(preferredLanguageId));
+            }
+            PreferredLanguageId = preferredLanguageId;
         }
 
         public static PlayerAccount ForLogin(

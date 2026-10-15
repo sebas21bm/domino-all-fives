@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Windows;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Controls;
@@ -7,6 +8,7 @@ using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.Services;
+using DominoAllFives.Contracts.Exceptions;
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.ViewModels
@@ -18,6 +20,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private readonly IAccountService _accountService;
         private readonly ILoggerFactory _loggerFactory;
         private readonly PlayerSession _playerSession;
+        private readonly LanguageManager _languageManager;
 
         private bool _isAccountSectionVisible;
         private bool _isLanguageSectionVisible;
@@ -86,7 +89,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             IDialogService dialogService,
             IAccountService accountService,
             ILoggerFactory loggerFactory,
-            PlayerSession playerSession)
+            PlayerSession playerSession,
+            LanguageManager languageManager = null)
         {
             _navigationService = navigationService 
                 ?? throw new ArgumentNullException(nameof(navigationService));
@@ -104,7 +108,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _playerSession = playerSession 
                 ?? throw new ArgumentNullException(nameof(playerSession));
 
-            _selectedLanguageCode = LanguageManager.Instance.CurrentLanguageCode;
+            _languageManager = languageManager ?? LanguageManager.Instance;
+            _selectedLanguageCode = _languageManager.CurrentLanguageCode;
 
             if (string.IsNullOrWhiteSpace(_selectedLanguageCode))
             {
@@ -155,12 +160,48 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ExecuteSaveLanguage()
         {
-            if (!string.IsNullOrWhiteSpace(SelectedLanguageCode))
+            if (string.IsNullOrWhiteSpace(SelectedLanguageCode))
             {
-                LanguageManager.Instance.ChangeLanguage(SelectedLanguageCode);
+                return;
+            }
+            try
+            {
+                if (IsGuest)
+                {
+                    _languageManager.ChangeLanguage(SelectedLanguageCode);
+                }
+                else
+                {
+                    _accountService.ChangePreferredLanguage(SelectedLanguageCode);
+                    _languageManager.ApplyAccountLanguage(SelectedLanguageCode);
+                }
+            }
+            catch (ConfigurationErrorsException)
+            {
+                ShowLanguageFailure("Global_msgDefaultErrorTitle", "MessageLanguage_msgSaveFailed");
+            }
+            catch (LanguagePreferenceException)
+            {
+                ShowLanguageFailure("Global_msgDefaultErrorTitle", "MessageLanguage_msgSaveFailed");
+            }
+            catch (ServiceUnavailableException)
+            {
+                ShowLanguageFailure(
+                    "Global_msgConnectionErrorTitle",
+                    "MessageAuthentication_msgConnectionError");
             }
         }
 
+
+        private void ShowLanguageFailure(string titleKey, string messageKey)
+        {
+            _dialogService.ShowDialog(new DialogRequest
+            {
+                Type = DialogType.Error,
+                TitleKey = titleKey,
+                MessageKey = messageKey
+            });
+        }
 
         private void OpenChangePasswordModal()
         {
@@ -209,6 +250,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             CloseModal();
             _playerSession.Clear();
+            _languageManager.RestoreDeviceLanguage();
             _navigationService.NavigateAsRoot<HomePageViewModel>();
         }
 
@@ -221,6 +263,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void ExecuteLogout()
         {
             _playerSession.Clear();
+            _languageManager.RestoreDeviceLanguage();
             _navigationService.NavigateAsRoot<HomePageViewModel>();
         }
     }

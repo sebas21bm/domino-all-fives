@@ -216,6 +216,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void PlayAsGuest()
         {
             _playerSession.Clear();
+            LanguageManager.Instance.RestoreDeviceLanguage();
 
             _navigationService.NavigateTo<MainMenuViewModel>();
         }

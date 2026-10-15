@@ -1043,4 +1043,7 @@ Only the following are allowed: .png, .jpg, .jpeg.</value>
   <data name="Global_btnBackToolTip" xml:space="preserve">
     <value>Go back</value>
   </data>
+  <data name="MessageLanguage_msgSaveFailed" xml:space="preserve">
+    <value>The language could not be saved. Try again or select an available language.</value>
+  </data>
 </root>

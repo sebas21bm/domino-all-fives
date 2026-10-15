@@ -10,6 +10,11 @@ namespace DominoAllFives.Contracts.Services
     public interface IAccountService
     {
         /// <summary>
+        /// Updates the current local account language.
+        /// </summary>
+        void ChangePreferredLanguage(string preferredLanguageId);
+
+        /// <summary>
         /// Logs in a user with the provided login request data.
         /// </summary>
         /// <param name="loginRequest">The login request data.</param>

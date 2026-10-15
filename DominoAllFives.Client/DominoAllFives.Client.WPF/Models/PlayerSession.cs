@@ -9,6 +9,8 @@
 
         public string Username { get; private set; }
 
+        public string PreferredLanguageId { get; private set; }
+
         public bool IsAuthenticated
         {
             get => PlayerId.HasValue;
@@ -19,8 +21,21 @@
         /// </summary>
         public void Start(int playerId, string username)
         {
+            Start(playerId, username, null);
+        }
+
+        /// <summary>Starts the single local session with the account preference.</summary>
+        public void Start(int playerId, string username, string preferredLanguageId)
+        {
             PlayerId = playerId;
             Username = username;
+            PreferredLanguageId = preferredLanguageId;
+        }
+
+        /// <summary>Updates the session preference after persistence succeeds.</summary>
+        public void UpdatePreferredLanguage(string preferredLanguageId)
+        {
+            PreferredLanguageId = preferredLanguageId;
         }
 
 
@@ -39,6 +54,7 @@
         {
             PlayerId = null;
             Username = null;
+            PreferredLanguageId = null;
         }
     }
 }

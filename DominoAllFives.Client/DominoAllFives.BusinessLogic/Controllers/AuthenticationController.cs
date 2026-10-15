@@ -78,6 +78,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                             player.IsBanned,
                             player.SuspensionUntil);
 
+                    storedAccount.SetPreferredLanguage(player.PreferredLanguageId);
                     storedAccount.MarkAsAuthenticated();
 
                     return storedAccount;
