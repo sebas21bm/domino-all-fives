@@ -53,7 +53,9 @@ namespace DominoAllFives.Client.WPF.Localization
         {
         }
 
-        /// <summary>Creates a manager with a device preference store.</summary>
+        /// <summary>
+        /// Creates a manager with a device preference store.
+        /// </summary>
         public LanguageManager(
             Func<string> readDeviceLanguage,
             Action<string> saveDeviceLanguage)
@@ -101,7 +103,9 @@ namespace DominoAllFives.Client.WPF.Localization
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
         }
 
-        /// <summary>Applies the account culture without overwriting device preferences.</summary>
+        /// <summary>
+        /// Applies the account culture without overwriting device preferences.
+        /// </summary>
         public void ApplyAccountLanguage(string languageCode)
         {
             if (!IsSupportedLanguage(languageCode))
@@ -112,7 +116,9 @@ namespace DominoAllFives.Client.WPF.Localization
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
         }
 
-        /// <summary>Restores the device preference after leaving an account session.</summary>
+        /// <summary>
+        /// Restores the device preference after leaving an account session.
+        /// </summary>
         public void RestoreDeviceLanguage()
         {
             string languageCode = _readDeviceLanguage();

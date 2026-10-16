@@ -6,7 +6,7 @@ using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Contracts.Services;
 
@@ -123,24 +123,30 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            ProfileDto profile = 
-                _accountService.GetProfile(_playerSession.PlayerId.Value);
-
-            if (profile.FailureReason !=
-                RetrieveInformationFailureReason.None)
+            PlayerProfile profile;
+            try
             {
-                ShowRetrieveInformationFailure(
-                    profile.FailureReason);
+                profile = _accountService.GetProfile(_playerSession.PlayerId.Value);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("Profile retrieval failed: {0}", ex);
+                ShowRetrieveInformationFailure(RetrieveInformationFailureReason.ServiceUnavailable);
+                return;
+            }
 
+            if (profile == null)
+            {
+                ShowRetrieveInformationFailure(RetrieveInformationFailureReason.NotFound);
                 return;
             }
 
             Username = profile.Username;
             ProfilePicture =
-                _profilePictureImageService.GetProfilePicture(profile.ProfilePictureData);
-            Wins = profile.Wins;
-            TotalPoints = profile.TotalPoints;
-            GamesPlayed = profile.GamesPlayed;
+                _profilePictureImageService.GetProfilePicture(profile.Picture.ImageData);
+            Wins = profile.Statistics.GamesWon;
+            TotalPoints = profile.Statistics.TotalPointsScored;
+            GamesPlayed = profile.Statistics.GamesPlayed;
         }
 
         private void ShowRetrieveInformationFailure(

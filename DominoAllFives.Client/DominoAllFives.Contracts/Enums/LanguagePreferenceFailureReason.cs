@@ -4,6 +4,7 @@ namespace DominoAllFives.Contracts.Enums
     {
         NotSignedIn,
         InvalidLanguage,
-        AccountNotFound
+        AccountNotFound,
+        None
     }
 }

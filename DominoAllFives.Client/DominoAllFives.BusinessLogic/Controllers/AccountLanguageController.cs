@@ -3,14 +3,15 @@ using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
 using DominoAllFives.Contracts.Enums;
-using DominoAllFives.Contracts.Exceptions;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.BusinessLogic.Controllers
 {
-    /// <summary>Coordinates persistence of the current account language.</summary>
+    /// <summary>
+    /// Coordinates persistence of the current account language.
+    /// </summary>
     public class AccountLanguageController
     {
         private const string SpanishLanguageId = "es-MX";
@@ -32,26 +33,26 @@ namespace DominoAllFives.BusinessLogic.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <summary>Validates the language and commits it before reporting completion.</summary>
-        public void ChangePreferredLanguage(int playerId, string languageId)
+        /// <summary>
+        /// Validates the language and commits it before reporting completion.
+        /// </summary>
+        public LanguagePreferenceFailureReason ChangePreferredLanguage(int playerId, string languageId)
         {
             if (playerId <= 0)
             {
-                throw new LanguagePreferenceException(
-                    LanguagePreferenceFailureReason.NotSignedIn);
+                throw new ArgumentOutOfRangeException(nameof(playerId));
             }
             if (languageId != SpanishLanguageId &&
                 languageId != EnglishLanguageId &&
                 languageId != PortugueseLanguageId)
             {
-                throw new LanguagePreferenceException(
-                    LanguagePreferenceFailureReason.InvalidLanguage);
+                throw new ArgumentException("The language is not supported.", nameof(languageId));
             }
             try
             {
                 using (ILanguagePreferenceStore store = _storeFactory())
                 {
-                    PersistLanguage(store, playerId, languageId);
+                    return PersistLanguage(store, playerId, languageId);
                 }
             }
             catch (Exception ex) when (ex is SqlException ||
@@ -61,24 +62,23 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     ex,
                     "Unable to persist preferred language for player {PlayerId}.",
                     playerId);
-                throw new ServiceUnavailableException();
+                throw;
             }
         }
 
-        private static void PersistLanguage(
+        private static LanguagePreferenceFailureReason PersistLanguage(
             ILanguagePreferenceStore store, int playerId, string languageId)
         {
             if (!store.LanguageExists(languageId))
             {
-                throw new LanguagePreferenceException(
-                    LanguagePreferenceFailureReason.InvalidLanguage);
+                throw new InvalidOperationException("The supported language is absent from the language catalog.");
             }
             if (!store.UpdatePreferredLanguage(playerId, languageId))
             {
-                throw new LanguagePreferenceException(
-                    LanguagePreferenceFailureReason.AccountNotFound);
+                return LanguagePreferenceFailureReason.AccountNotFound;
             }
             store.SaveChanges();
+            return LanguagePreferenceFailureReason.None;
         }
     }
 }

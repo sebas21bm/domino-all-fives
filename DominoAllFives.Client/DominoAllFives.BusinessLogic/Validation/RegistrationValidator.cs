@@ -1,5 +1,5 @@
 ﻿
-using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 
 namespace DominoAllFives.BusinessLogic.Validation
@@ -21,11 +21,11 @@ namespace DominoAllFives.BusinessLogic.Validation
         /// why validation failed.
         /// </returns>
         public static RegistrationFailureReason Validate(
-            RegisterAccountDto registrationData)
+            AccountRegistration registrationData)
         {
             if (registrationData == null)
             {
-                return RegistrationFailureReason.InvalidRegistrationData;
+                throw new System.ArgumentNullException(nameof(registrationData));
             }
 
             if (!AccountValidator.IsUsernameValid(registrationData.Username))

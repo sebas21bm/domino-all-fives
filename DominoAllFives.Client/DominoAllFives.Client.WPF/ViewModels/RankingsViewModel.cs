@@ -7,7 +7,7 @@ using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Services;
 
 namespace DominoAllFives.Client.WPF.ViewModels
@@ -19,6 +19,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
     {
         private readonly IFrameNavigationService _navigationService;
         private readonly IRankingService _rankingService;
+        private readonly IDialogService _dialogService;
         private readonly PlayerSession _playerSession;
         private readonly ProfilePictureImageService _profilePictureImageService;
 
@@ -43,10 +44,14 @@ namespace DominoAllFives.Client.WPF.ViewModels
             IFrameNavigationService navigationService,
             IRankingService rankingService,
             PlayerSession playerSession,
-            ProfilePictureImageService profilePictureImageService)
+            ProfilePictureImageService profilePictureImageService,
+            IDialogService dialogService)
         {
             _navigationService = navigationService
                 ?? throw new ArgumentNullException(nameof(navigationService));
+
+            _dialogService = dialogService
+                ?? throw new ArgumentNullException(nameof(dialogService));
 
             _rankingService = rankingService
                 ?? throw new ArgumentNullException(nameof(rankingService));
@@ -72,8 +77,22 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            RankingResultDto rankingResult =
-                _rankingService.GetTopRanking(_playerSession.PlayerId.Value);
+            Ranking rankingResult;
+            try
+            {
+                rankingResult = _rankingService.GetTopRanking(_playerSession.PlayerId.Value);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("Ranking retrieval failed: {0}", ex);
+                _dialogService.ShowDialog(new DialogRequest
+                {
+                    Type = DialogType.Error,
+                    TitleKey = "Global_msgConnectionErrorTitle",
+                    MessageKey = "Global_msgConnectionError"
+                });
+                return;
+            }
 
             if (rankingResult == null)
             {
@@ -82,7 +101,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             Leaderboard.Clear();
 
-            foreach (RankingEntryDto entry in rankingResult.TopPlayers)
+            foreach (RankingEntry entry in rankingResult.TopPlayers)
             {
                 Leaderboard.Add(
                     new PlayerRankingRecord
@@ -91,7 +110,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                         Username = entry.Username,
                         StatisticValue = entry.GamesWon,
                         Avatar =
-                            _profilePictureImageService.GetProfilePicture(entry.ProfilePictureData)
+                            _profilePictureImageService.GetProfilePicture(entry.Picture.ImageData)
                     });
             }
 

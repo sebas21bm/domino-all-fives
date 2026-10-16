@@ -24,7 +24,9 @@
             Start(playerId, username, null);
         }
 
-        /// <summary>Starts the single local session with the account preference.</summary>
+        /// <summary>
+        /// Starts the single local session with the account preference.
+        /// </summary>
         public void Start(int playerId, string username, string preferredLanguageId)
         {
             PlayerId = playerId;
@@ -32,7 +34,9 @@
             PreferredLanguageId = preferredLanguageId;
         }
 
-        /// <summary>Updates the session preference after persistence succeeds.</summary>
+        /// <summary>
+        /// Updates the session preference after persistence succeeds.
+        /// </summary>
         public void UpdatePreferredLanguage(string preferredLanguageId)
         {
             PreferredLanguageId = preferredLanguageId;

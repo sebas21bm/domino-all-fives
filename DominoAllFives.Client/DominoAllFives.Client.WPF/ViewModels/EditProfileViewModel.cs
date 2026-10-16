@@ -3,7 +3,8 @@ using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Domain;
+using DomainProfilePicture = DominoAllFives.Contracts.Domain.ProfilePicture;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Contracts.Services;
 using System;
@@ -142,34 +143,38 @@ namespace DominoAllFives.Client.WPF.ViewModels
             bool usernameChanged =
                 Username != _originalUsername;
 
-            bool profilePictureChanged =
+            bool hasPictureReplacement =
                 _selectedProfilePictureData != null;
 
             if (!usernameChanged &&
-                !profilePictureChanged)
+                !hasPictureReplacement)
             {
                 return;
             }
 
-            UpdateProfileDto profileData =
-                new UpdateProfileDto
-                {
-                    PlayerId = _playerSession.PlayerId.Value,
-                    Username = Username,
-                    ProfilePictureChanged = profilePictureChanged,
-                    ProfilePictureFileName =
-                        _selectedProfilePictureFileName,
-                    ProfilePictureData =
-                        _selectedProfilePictureData
-                };
-
-            UpdateProfileResultDto result =
-                _accountService.UpdateProfile(profileData);
-
-            if (!result.IsSuccessful)
+            try
             {
-                ShowUpdateProfileFailure(
-                    result.FailureReason);
+                UpdateProfileFailureReason reason;
+                if (hasPictureReplacement)
+                {
+                    DomainProfilePicture picture = DomainProfilePicture.FromSelectedContent(
+                        _selectedProfilePictureFileName, _selectedProfilePictureData);
+                    reason = _accountService.UpdateProfile(_playerSession.PlayerId.Value, Username, picture);
+                }
+                else
+                {
+                    reason = _accountService.UpdateProfile(_playerSession.PlayerId.Value, Username);
+                }
+                if (reason != UpdateProfileFailureReason.None)
+                {
+                    ShowUpdateProfileFailure(reason);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("Profile update failed: {0}", ex);
+                ShowUpdateProfileFailure(UpdateProfileFailureReason.ServiceUnavailable);
                 return;
             }
 
@@ -204,15 +209,21 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            ProfileDto profile =
-                _accountService.GetProfile(
-                    _playerSession.PlayerId.Value);
-
-            if (profile.FailureReason !=
-                RetrieveInformationFailureReason.None)
+            PlayerProfile profile;
+            try
             {
-                ShowRetrieveInformationFailure(
-                    profile.FailureReason);
+                profile = _accountService.GetProfile(_playerSession.PlayerId.Value);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("Profile retrieval failed: {0}", ex);
+                ShowRetrieveInformationFailure(RetrieveInformationFailureReason.ServiceUnavailable);
+                return;
+            }
+
+            if (profile == null)
+            {
+                ShowRetrieveInformationFailure(RetrieveInformationFailureReason.NotFound);
                 return;
             }
 
@@ -221,7 +232,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             ProfilePicture =
                 _profilePictureImageService.GetProfilePicture(
-                    profile.ProfilePictureData);
+                    profile.Picture.ImageData);
         }
 
         private void ShowRetrieveInformationFailure(

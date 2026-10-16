@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data.Entity.Core;
 using System.Globalization;
 using System.Threading;
+using System.Windows.Controls;
 using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Client.WPF.Localization;
@@ -13,9 +14,7 @@ using DominoAllFives.Client.WPF.Services.Local;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.Domain;
-using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Enums;
-using DominoAllFives.Contracts.Exceptions;
 using DominoAllFives.Contracts.Services;
 using DominoAllFives.DataAccess.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -49,6 +48,30 @@ namespace DominoAllFives.Client.Tests
             Thread.CurrentThread.CurrentUICulture = _uiCulture;
             CultureInfo.DefaultThreadCurrentCulture = _defaultCulture;
             CultureInfo.DefaultThreadCurrentUICulture = _defaultUiCulture;
+        }
+
+        [TestCase(LoginFailureReason.InvalidCredentials, "MessageAuthentication_msgInvalidCredentials")]
+        [TestCase(LoginFailureReason.Banned, "MessageAuthentication_msgBannedAccount")]
+        [TestCase(LoginFailureReason.Suspended, "MessageAuthentication_msgSuspendedAccount")]
+        [TestCase(LoginFailureReason.ServiceUnavailable, "MessageAuthentication_msgConnectionError")]
+        public void Login_RejectionOrTechnicalFailure_PreservesLocalizedMessageAndNoSession(
+            LoginFailureReason reason, string expectedMessage)
+        {
+            AccountServiceStub service = new AccountServiceStub { LoginFailure = reason };
+            PlayerSession session = new PlayerSession();
+            DialogRecorder dialogs = new DialogRecorder();
+            bool navigated = false;
+            LoginViewModel model = new LoginViewModel(dialogs, service, session,
+                NullLogger<LoginViewModel>.Instance, () => navigated = true, () => { },
+                () => { }, () => { }, new DevicePreference("es-MX").CreateManager());
+            model.Email = "player";
+            model.Password = "password";
+            model.LoginCommand.Execute(null);
+            Assert.That(session.IsAuthenticated, Is.False);
+            Assert.That(navigated, Is.False);
+            Assert.That(dialogs.Last.MessageKey, Is.EqualTo(expectedMessage));
+            Assert.That(dialogs.Last.TitleKey, Does.Not.Contain("SQL"));
+            Assert.That(dialogs.Last.MessageKey, Does.Not.Contain("private"));
         }
 
         [TestCase("es-MX")]
@@ -215,6 +238,20 @@ namespace DominoAllFives.Client.Tests
         }
 
         [Test]
+        public void ChangeLanguage_TechnicalFailure_PropagatesOriginalExceptionAndStack()
+        {
+            StoreData database = new StoreData();
+            EntityException original = new EntityException("Synthetic persistence failure.");
+            database.SaveFailure = original;
+            EntityException observed = Assert.Throws<EntityException>(
+                () => CreateController(database).ChangePreferredLanguage(11, "en-US"));
+            Assert.That(observed, Is.SameAs(original));
+            Assert.That(observed.StackTrace, Does.Contain("StoreStub.SaveChanges"));
+            Assert.That(database.SaveCount, Is.Zero);
+            Assert.That(database.Languages[11], Is.EqualTo("es-MX"));
+        }
+
+        [Test]
         public void ChangeLanguage_LoggedOut_RejectsBeforeOpeningStore()
         {
             // Arrange.
@@ -225,11 +262,10 @@ namespace DominoAllFives.Client.Tests
             session.Clear();
 
             // Act.
-            LanguagePreferenceException failure = Assert.Throws<LanguagePreferenceException>(
-                () => service.ChangePreferredLanguage("en-US"));
+            LanguagePreferenceFailureReason reason = service.ChangePreferredLanguage("en-US");
 
             // Assert.
-            Assert.That(failure.Reason, Is.EqualTo(LanguagePreferenceFailureReason.NotSignedIn));
+            Assert.That(reason, Is.EqualTo(LanguagePreferenceFailureReason.NotSignedIn));
             Assert.That(database.FactoryCount, Is.Zero);
             Assert.That(database.Languages[11], Is.EqualTo("es-MX"));
         }
@@ -244,11 +280,9 @@ namespace DominoAllFives.Client.Tests
             AccountLanguageController controller = CreateController(database);
 
             // Act.
-            LanguagePreferenceException failure = Assert.Throws<LanguagePreferenceException>(
-                () => controller.ChangePreferredLanguage(11, language));
+            Assert.Throws<ArgumentException>(() => controller.ChangePreferredLanguage(11, language));
 
             // Assert.
-            Assert.That(failure.Reason, Is.EqualTo(LanguagePreferenceFailureReason.InvalidLanguage));
             Assert.That(database.FactoryCount, Is.Zero);
         }
 
@@ -261,11 +295,9 @@ namespace DominoAllFives.Client.Tests
             AccountLanguageController controller = CreateController(database);
 
             // Act.
-            LanguagePreferenceException failure = Assert.Throws<LanguagePreferenceException>(
-                () => controller.ChangePreferredLanguage(11, "en-US"));
+            Assert.Throws<InvalidOperationException>(() => controller.ChangePreferredLanguage(11, "en-US"));
 
             // Assert.
-            Assert.That(failure.Reason, Is.EqualTo(LanguagePreferenceFailureReason.InvalidLanguage));
             Assert.That(database.SaveCount, Is.Zero);
             Assert.That(database.Languages[11], Is.EqualTo("es-MX"));
         }
@@ -278,11 +310,10 @@ namespace DominoAllFives.Client.Tests
             database.Languages.Remove(11);
 
             // Act.
-            LanguagePreferenceException failure = Assert.Throws<LanguagePreferenceException>(
-                () => CreateController(database).ChangePreferredLanguage(11, "en-US"));
+            LanguagePreferenceFailureReason reason = CreateController(database).ChangePreferredLanguage(11, "en-US");
 
             // Assert.
-            Assert.That(failure.Reason, Is.EqualTo(LanguagePreferenceFailureReason.AccountNotFound));
+            Assert.That(reason, Is.EqualTo(LanguagePreferenceFailureReason.AccountNotFound));
             Assert.That(database.SaveCount, Is.Zero);
         }
 
@@ -297,8 +328,7 @@ namespace DominoAllFives.Client.Tests
             LocalAccountService service = CreateLocalService(session, database);
 
             // Act.
-            Assert.Throws<LanguagePreferenceException>(
-                () => service.ChangePreferredLanguage("en-US"));
+            Assert.That(service.ChangePreferredLanguage("en-US"), Is.EqualTo(LanguagePreferenceFailureReason.NotSignedIn));
 
             // Assert.
             Assert.That(session.PlayerId, Is.EqualTo(22));
@@ -347,11 +377,74 @@ namespace DominoAllFives.Client.Tests
             Assert.That(Thread.CurrentThread.CurrentUICulture.Name, Is.EqualTo("es-MX"));
         }
 
+        [Test]
+        public void Register_SuccessResult_StartsLocalSessionWithConfirmedIdentityAndLanguage()
+        {
+            // Arrange.
+            AccountServiceStub service = new AccountServiceStub
+            {
+                Account = CreateAccount(11, "pt-BR")
+            };
+            PlayerSession session = new PlayerSession();
+            DialogRecorder dialogs = new DialogRecorder();
+            bool continued = false;
+            RegisterAccountViewModel model = new RegisterAccountViewModel(
+                dialogs, service, session, () => continued = true, () => { });
+            model.Username = "player";
+            model.Email = "player@gmail.com";
+            PasswordBox[] boxes =
+            {
+                new PasswordBox { Password = "Test-Password1!" },
+                new PasswordBox { Password = "Test-Password1!" }
+            };
+
+            // Act.
+            model.RegisterCommand.Execute(boxes);
+
+            // Assert.
+            Assert.That(session.PlayerId, Is.EqualTo(11));
+            Assert.That(session.PreferredLanguageId, Is.EqualTo("pt-BR"));
+            Assert.That(dialogs.Last.Type, Is.EqualTo(DialogType.Success));
+            Assert.That(continued, Is.False);
+            dialogs.Last.OnAccept();
+            Assert.That(continued, Is.True);
+        }
+
+        [TestCase(RegistrationFailureReason.UsernameAlreadyExists,
+            "MessageAccount_msgUsernameUsed")]
+        [TestCase(RegistrationFailureReason.EmailAlreadyExists, "MessageAccount_msgEmailUsed")]
+        [TestCase(RegistrationFailureReason.ServiceUnavailable, "MessageAccount_msgAccountCreationError")]
+        public void Register_BusinessRejectionOrTechnicalFailure_PreservesDialogAndDoesNotStartSession(
+            RegistrationFailureReason reason, string expectedMessage)
+        {
+            // Arrange.
+            AccountServiceStub service = new AccountServiceStub { RegistrationFailure = reason };
+            PlayerSession session = new PlayerSession();
+            DialogRecorder dialogs = new DialogRecorder();
+            RegisterAccountViewModel model = new RegisterAccountViewModel(
+                dialogs, service, session, () => { }, () => { });
+            model.Username = "player";
+            model.Email = "player@gmail.com";
+            PasswordBox[] boxes =
+            {
+                new PasswordBox { Password = "Test-Password1!" },
+                new PasswordBox { Password = "Test-Password1!" }
+            };
+
+            // Act.
+            model.RegisterCommand.Execute(boxes);
+
+            // Assert.
+            Assert.That(session.IsAuthenticated, Is.False);
+            Assert.That(dialogs.Last.MessageKey, Is.EqualTo(expectedMessage));
+            Assert.That(dialogs.Last.OnAccept, Is.Null);
+        }
+
         private static PlayerAccount CreateAccount(int playerId, string language)
         {
             PlayerAccount account = PlayerAccount.FromStoredAccount(
-                playerId, "player", false, false, null);
-            account.SetPreferredLanguage(language);
+                playerId, "player", language,
+                AccountAccessStatus.FromStoredState(false, false, null));
             return account;
         }
 
@@ -411,6 +504,7 @@ namespace DominoAllFives.Client.Tests
             public HashSet<string> Catalog { get; } =
                 new HashSet<string> { "es-MX", "en-US", "pt-BR" };
             public bool FailSave { get; set; }
+            public EntityException SaveFailure { get; set; }
             public int SaveCount { get; set; }
             public int FactoryCount { get; private set; }
             public Action BeforeSave { get; set; }
@@ -452,6 +546,7 @@ namespace DominoAllFives.Client.Tests
             public void SaveChanges()
             {
                 _database.BeforeSave?.Invoke();
+                if (_database.SaveFailure != null) throw _database.SaveFailure;
                 if (_database.FailSave)
                 {
                     throw new EntityException("Synthetic persistence failure.");
@@ -488,21 +583,42 @@ namespace DominoAllFives.Client.Tests
         private sealed class AccountServiceStub : IAccountService
         {
             public PlayerAccount Account { get; set; }
-            public PlayerAccount Login(PlayerAccount account) => Account;
-            public void ChangePreferredLanguage(string languageId) =>
+            public RegistrationFailureReason? RegistrationFailure { get; set; }
+            public LoginFailureReason? LoginFailure { get; set; }
+            public LoginResult Login(LoginCredentials credentials)
+            {
+                if (LoginFailure == LoginFailureReason.ServiceUnavailable)
+                {
+                    throw new EntityException("SQL Server: private connection and query details.");
+                }
+                return LoginFailure.HasValue ? LoginResult.Rejected(LoginFailure.Value) : LoginResult.Success(Account);
+            }
+            public LanguagePreferenceFailureReason ChangePreferredLanguage(string languageId) =>
                 throw new NotSupportedException();
-            public RegistrationResultDto Register(RegisterAccountDto data) =>
+            public RegistrationResult Register(AccountRegistration data)
+            {
+                if (RegistrationFailure.HasValue)
+                {
+                    if (RegistrationFailure == RegistrationFailureReason.ServiceUnavailable)
+                    {
+                        throw new EntityException("Synthetic persistence failure.");
+                    }
+                    return RegistrationResult.Rejected(RegistrationFailure.Value);
+                }
+                return RegistrationResult.Success(Account);
+            }
+            public ProfilePictureFailureReason SetProfilePicture(int playerId, ProfilePicture picture) =>
                 throw new NotSupportedException();
-            public ProfilePictureResultDto SetProfilePicture(ProfilePictureDto picture) =>
+            public ProfilePictureFailureReason RemoveProfilePicture(int playerId) =>
                 throw new NotSupportedException();
-            public ProfilePictureResultDto RemoveProfilePicture(int playerId) =>
+            public PlayerProfile GetProfile(int playerId) => throw new NotSupportedException();
+            public UpdateProfileFailureReason UpdateProfile(int playerId, string username) =>
                 throw new NotSupportedException();
-            public ProfileDto GetProfile(int playerId) => throw new NotSupportedException();
-            public UpdateProfileResultDto UpdateProfile(UpdateProfileDto data) =>
+            public UpdateProfileFailureReason UpdateProfile(int playerId, string username, ProfilePicture replacementPicture) =>
                 throw new NotSupportedException();
-            public DeleteAccountResultDto DeleteAccount(DeleteAccountRequestDto request) =>
+            public DeleteFailureReason DeleteAccount(int playerId, string password) =>
                 throw new NotSupportedException();
-            public ChangePasswordResultDto ChangePassword(ChangePasswordRequestDto request) =>
+            public ChangePasswordFailureReason ChangePassword(int playerId, string currentPassword, string newPassword) =>
                 throw new NotSupportedException();
         }
     }

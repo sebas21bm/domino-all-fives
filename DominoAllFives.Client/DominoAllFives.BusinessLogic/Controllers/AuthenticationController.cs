@@ -6,7 +6,6 @@ using System.Data.SqlClient;
 using DominoAllFives.BusinessLogic.Security;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
-using DominoAllFives.Contracts.Exceptions;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;
@@ -29,19 +28,25 @@ namespace DominoAllFives.BusinessLogic.Controllers
         }
 
         /// <summary>
-        /// Authenticates a player using the provided account.
+        /// Authenticates a player using the provided credentials.
         /// </summary>
-        /// <param name="account">
+        /// <param name="credentials">
         /// Contains the player's login credentials.
         /// </param>
         /// <returns>
         /// The authenticated player account.
         /// </returns>
-        public PlayerAccount Login(PlayerAccount account)
+        public LoginResult Login(LoginCredentials credentials)
         {
-            if (account == null)
+            if (credentials == null)
             {
-                throw new ArgumentNullException(nameof(account));
+                throw new ArgumentNullException(nameof(credentials));
+            }
+
+            LoginFailureReason validation = credentials.EnsureValid();
+            if (validation != LoginFailureReason.None)
+            {
+                return LoginResult.Rejected(validation);
             }
 
             try
@@ -54,34 +59,43 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
                     Player player =
                         playerRepository.GetByUsernameOrEmail(
-                            account.EmailOrUsername);
+                            credentials.EmailOrUsername);
 
                     if (player == null || player.IsDeleted)
                     {
-                        throw new AuthenticationException(
-                            LoginFailureReason.InvalidCredentials);
+                        return LoginResult.Rejected(LoginFailureReason.InvalidCredentials);
                     }
 
                     if (!PasswordHasher.VerifyPassword(
-                        account.Password,
+                        credentials.Password,
                         player.PasswordHash))
                     {
-                        throw new AuthenticationException(
-                            LoginFailureReason.InvalidCredentials);
+                        return LoginResult.Rejected(LoginFailureReason.InvalidCredentials);
                     }
 
                     PlayerAccount storedAccount =
                         PlayerAccount.FromStoredAccount(
                             player.IdPlayer,
                             player.Username,
-                            player.IsDeleted,
-                            player.IsBanned,
-                            player.SuspensionUntil);
+                            player.PreferredLanguageId,
+                            AccountAccessStatus.FromStoredState(
+                                player.IsDeleted, player.IsBanned, player.SuspensionUntil));
 
-                    storedAccount.SetPreferredLanguage(player.PreferredLanguageId);
-                    storedAccount.MarkAsAuthenticated();
+                    DateTime utcNow = DateTime.UtcNow;
+                    // SQL timestamps with unknown provenance retain their historical wall-clock meaning.
+                    // This server-local comparison preserves prior behavior; it does not identify
+                    // the original time zone or migrate historical values to UTC.
+                    DateTime evaluationTime = player.SuspensionUntil.HasValue &&
+                        player.SuspensionUntil.Value.Kind != DateTimeKind.Utc
+                        ? utcNow.ToLocalTime()
+                        : utcNow;
+                    LoginFailureReason access = storedAccount.EnsureCanLogin(evaluationTime);
+                    if (access != LoginFailureReason.None)
+                    {
+                        return LoginResult.Rejected(access);
+                    }
 
-                    return storedAccount;
+                    return LoginResult.Success(storedAccount);
                 }
             }
             catch (Exception ex) when (
@@ -93,7 +107,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     ex,
                     "Database error while authenticating player.");
 
-                throw new ServiceUnavailableException();
+                throw;
             }
         }
     }

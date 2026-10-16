@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
-using System.IO;
+using System.Data.SqlClient;
 
 using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.BusinessLogic.Validation;
-using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
@@ -37,41 +37,41 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// <summary>
         /// Sets the profile picture of a player.
         /// </summary>
-        /// <param name="profilePicture">
-        /// Contains the player identifier, original file name,
-        /// and image data.
-        /// </param>
-        /// <returns>
-        /// The result of the profile picture operation.
-        /// </returns>
-        public ProfilePictureResultDto SetProfilePicture(
-            ProfilePictureDto profilePicture)
+        /// <param name="playerId">The account identifier.</param>
+        /// <param name="picture">The selected snapshot; null or absent content is invalid.</param>
+        public ProfilePictureFailureReason SetProfilePicture(int playerId, ProfilePicture picture)
         {
-            if (profilePicture == null ||
-                profilePicture.PlayerId <= 0 ||
-                profilePicture.ImageData == null ||
-                profilePicture.ImageData.Length == 0)
+            if (playerId <= 0)
             {
-                return CreateFailureResult(
-                    ProfilePictureFailureReason.InvalidImage);
+                throw new ArgumentOutOfRangeException(nameof(playerId));
+            }
+            if (picture == null)
+            {
+                throw new ArgumentNullException(nameof(picture));
+            }
+            byte[] imageData = picture.ImageData;
+            string fileName = picture?.OriginalFileName;
+            if (imageData == null ||
+                imageData.Length == 0)
+            {
+                return ProfilePictureFailureReason.InvalidImage;
             }
 
             if (!ProfilePictureValidator.HasValidExtension(
-                    profilePicture.FileName))
+                    fileName))
             {
-                return CreateFailureResult(
-                    ProfilePictureFailureReason.InvalidFormat);
+                return ProfilePictureFailureReason.InvalidFormat;
             }
 
             if (!ProfilePictureValidator.HasValidFileSize(
-                    profilePicture.ImageData))
+                    imageData))
             {
-                return CreateFailureResult(
-                    ProfilePictureFailureReason.FileTooLarge);
+                return ProfilePictureFailureReason.FileTooLarge;
             }
 
             string previousProfilePicture = string.Empty;
             string profilePictureFileName = string.Empty;
+            bool changesCommitted = false;
 
             try
             {
@@ -83,29 +83,28 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
                     Player player =
                         playerRepository.GetById(
-                            profilePicture.PlayerId);
+                            playerId);
 
                     if (player == null)
                     {
-                        return CreateFailureResult(
-                            ProfilePictureFailureReason.PlayerNotFound);
+                        return ProfilePictureFailureReason.PlayerNotFound;
                     }
 
                     profilePictureFileName =
                     _profilePictureStorage.GenerateFileName(
-                        profilePicture.PlayerId,
-                        profilePicture.FileName);
+                        playerId,
+                        fileName);
 
                     _profilePictureStorage.SaveProfilePicture(
                         profilePictureFileName,
-                        profilePicture.ImageData);
+                        imageData);
 
                     previousProfilePicture =
                         player.ProfilePicture;
 
                     bool wasUpdated =
                         playerRepository.UpdateProfilePicture(
-                            profilePicture.PlayerId,
+                            playerId,
                             profilePictureFileName);
 
                     if (!wasUpdated)
@@ -113,51 +112,32 @@ namespace DominoAllFives.BusinessLogic.Controllers
                         _profilePictureStorage.TryDeleteProfilePicture(
                             profilePictureFileName);
 
-                        return CreateFailureResult(
-                            ProfilePictureFailureReason.PlayerNotFound);
+                        return ProfilePictureFailureReason.PlayerNotFound;
                     }
 
                     context.SaveChanges();
+                    changesCommitted = true;
                 }
             }
-            catch (Exception ex) when (
-                ex is UnauthorizedAccessException ||
-                ex is PathTooLongException ||
-                ex is DirectoryNotFoundException ||
-                ex is IOException)
+            catch (Exception ex)
             {
+                if (!changesCommitted)
+                {
+                    _profilePictureStorage.TryDeleteProfilePicture(profilePictureFileName);
+                }
+
                 _logger.LogError(
                     ex,
                     "Unable to store profile picture for player {PlayerId}.",
-                    profilePicture.PlayerId);
-
-                _profilePictureStorage.TryDeleteProfilePicture(
-                    profilePictureFileName);
-
-                return CreateFailureResult(
-                    ProfilePictureFailureReason.ServiceUnavailable);
-            }
-            catch (Exception ex) when (
-                ex is EntityException ||
-                ex is DbUpdateException)
-            {
-                _logger.LogError(
-                    ex,
-                    "Unable to update profile picture for player {PlayerId}.",
-                    profilePicture.PlayerId);
-
-                _profilePictureStorage.TryDeleteProfilePicture(
-                    profilePictureFileName);
-
-                return CreateFailureResult(
-                    ProfilePictureFailureReason.ServiceUnavailable);
+                    playerId);
+                throw;
             }
 
             DeletePreviousProfilePicture(
                 previousProfilePicture,
                 profilePictureFileName);
 
-            return CreateSuccessResult();
+            return ProfilePictureFailureReason.None;
         }
 
         /// <summary>
@@ -167,16 +147,12 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// The identifier of the player whose profile picture
         /// will be removed.
         /// </param>
-        /// <returns>
-        /// The result of the profile picture operation.
-        /// </returns>
-        public ProfilePictureResultDto RemoveProfilePicture(
+        public ProfilePictureFailureReason RemoveProfilePicture(
             int playerId)
         {
             if (playerId <= 0)
             {
-                return CreateFailureResult(
-                    ProfilePictureFailureReason.PlayerNotFound);
+                throw new ArgumentOutOfRangeException(nameof(playerId));
             }
 
             string previousProfilePicture = string.Empty;
@@ -194,8 +170,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
                     if (player == null)
                     {
-                        return CreateFailureResult(
-                            ProfilePictureFailureReason.PlayerNotFound);
+                        return ProfilePictureFailureReason.PlayerNotFound;
                     }
 
                     previousProfilePicture =
@@ -204,7 +179,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     if (string.IsNullOrWhiteSpace(
                             previousProfilePicture))
                     {
-                        return CreateSuccessResult();
+                        return ProfilePictureFailureReason.None;
                     }
 
                     bool wasUpdated =
@@ -214,14 +189,14 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
                     if (!wasUpdated)
                     {
-                        return CreateFailureResult(
-                            ProfilePictureFailureReason.PlayerNotFound);
+                        return ProfilePictureFailureReason.PlayerNotFound;
                     }
 
                     context.SaveChanges();
                 }
             }
             catch (Exception ex) when (
+                ex is SqlException ||
                 ex is EntityException ||
                 ex is DbUpdateException)
             {
@@ -230,14 +205,13 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     "Unable to remove profile picture for player {PlayerId}.",
                     playerId);
 
-                return CreateFailureResult(
-                    ProfilePictureFailureReason.ServiceUnavailable);
+                throw;
             }
 
             _profilePictureStorage.TryDeleteProfilePicture(
                 previousProfilePicture);
 
-            return CreateSuccessResult();
+            return ProfilePictureFailureReason.None;
         }
 
         /// <summary>
@@ -261,29 +235,5 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 previousProfilePicture);
         }
 
-        /// <summary>
-        /// Creates a successful profile picture result.
-        /// </summary>
-        private ProfilePictureResultDto CreateSuccessResult()
-        {
-            return new ProfilePictureResultDto
-            {
-                IsSuccessful = true,
-                FailureReason = ProfilePictureFailureReason.None
-            };
-        }
-
-        /// <summary>
-        /// Creates a failed profile picture result.
-        /// </summary>
-        private ProfilePictureResultDto CreateFailureResult(
-            ProfilePictureFailureReason failureReason)
-        {
-            return new ProfilePictureResultDto
-            {
-                IsSuccessful = false,
-                FailureReason = failureReason
-            };
-        }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 using DominoAllFives.BusinessLogic.Storage;
-using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Domain;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;
@@ -36,8 +36,13 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// <returns>
         /// The ranking information.
         /// </returns>
-        public RankingResultDto GetRanking(int playerId)
+        public Ranking GetRanking(int playerId)
         {
+            if (playerId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(playerId));
+            }
+
             using (DominoAllFivesEntities context =
                 new DominoAllFivesEntities())
             {
@@ -48,39 +53,24 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     playerStatsRepository.GetTopByGamesWon(
                         RankingLimit);
 
-                RankingResultDto rankingResult =
-                    new RankingResultDto
-                    {
-                        CurrentPlayerRank =
-                            playerStatsRepository.GetRankByPlayerId(
-                                playerId)
-                    };
+                int currentPlayerRank = playerStatsRepository.GetRankByPlayerId(playerId);
+                List<RankingEntry> entries = new List<RankingEntry>();
 
                 int rank = 1;
 
                 foreach (PlayerStats playerStats in topPlayerStats)
                 {
-                    RankingEntryDto rankingEntry =
-                        new RankingEntryDto
-                        {
-                            Rank = rank,
-                            Username =
-                                playerStats.Player.Username,
-                            GamesWon =
-                                playerStats.GamesWon,
-                            ProfilePictureData =
-                                _profilePictureStorage
-                                    .GetProfilePictureData(
-                                        playerStats.Player.ProfilePicture)
-                        };
-
-                    rankingResult.TopPlayers.Add(
-                        rankingEntry);
+                    RankingEntry rankingEntry = RankingEntry.FromRankedPlayer(
+                        rank, playerStats.Player.Username, playerStats.GamesWon,
+                        ProfilePicture.FromStoredContent(
+                            _profilePictureStorage.GetProfilePictureData(
+                                playerStats.Player.ProfilePicture)));
+                    entries.Add(rankingEntry);
 
                     rank++;
                 }
 
-                return rankingResult;
+                return Ranking.FromOrderedEntries(entries, currentPlayerRank);
             }
         }
     }

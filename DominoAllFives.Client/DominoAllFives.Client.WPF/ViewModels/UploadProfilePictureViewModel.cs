@@ -7,7 +7,7 @@ using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.DTOs;
+using DomainProfilePicture = DominoAllFives.Contracts.Domain.ProfilePicture;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Contracts.Services;
 
@@ -143,19 +143,21 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            ProfilePictureDto profilePicture =
-                new ProfilePictureDto
-                {
-                    PlayerId = _playerSession.PlayerId.Value,
-                    FileName = Path.GetFileName(_selectedFilePath),
-                    ImageData = imageData
-                };
-
-            ProfilePictureResultDto result = _accountService.SetProfilePicture(profilePicture);
-
-            if (!result.IsSuccessful)
+            try
             {
-                ShowProfilePictureFailure(result.FailureReason);
+                DomainProfilePicture picture = DomainProfilePicture.FromSelectedContent(
+                    Path.GetFileName(_selectedFilePath), imageData);
+                ProfilePictureFailureReason reason = _accountService.SetProfilePicture(_playerSession.PlayerId.Value, picture);
+                if (reason != ProfilePictureFailureReason.None)
+                {
+                    ShowProfilePictureFailure(reason);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("Profile picture update failed: {0}", ex);
+                ShowProfilePictureFailure(ProfilePictureFailureReason.ServiceUnavailable);
                 return;
             }
 

@@ -8,7 +8,7 @@ using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.Services;
-using DominoAllFives.Contracts.Exceptions;
+using DominoAllFives.Contracts.Enums;
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.ViewModels
@@ -172,7 +172,12 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 }
                 else
                 {
-                    _accountService.ChangePreferredLanguage(SelectedLanguageCode);
+                    LanguagePreferenceFailureReason reason = _accountService.ChangePreferredLanguage(SelectedLanguageCode);
+                    if (reason != LanguagePreferenceFailureReason.None)
+                    {
+                        ShowLanguageFailure("Global_msgDefaultErrorTitle", "MessageLanguage_msgSaveFailed");
+                        return;
+                    }
                     _languageManager.ApplyAccountLanguage(SelectedLanguageCode);
                 }
             }
@@ -180,12 +185,14 @@ namespace DominoAllFives.Client.WPF.ViewModels
             {
                 ShowLanguageFailure("Global_msgDefaultErrorTitle", "MessageLanguage_msgSaveFailed");
             }
-            catch (LanguagePreferenceException)
+            catch (ArgumentException ex)
             {
+                _loggerFactory.CreateLogger<GameSettingsViewModel>().LogError(ex, "Invalid preferred language.");
                 ShowLanguageFailure("Global_msgDefaultErrorTitle", "MessageLanguage_msgSaveFailed");
             }
-            catch (ServiceUnavailableException)
+            catch (Exception ex)
             {
+                _loggerFactory.CreateLogger<GameSettingsViewModel>().LogError(ex, "Preferred language update failed.");
                 ShowLanguageFailure(
                     "Global_msgConnectionErrorTitle",
                     "MessageAuthentication_msgConnectionError");

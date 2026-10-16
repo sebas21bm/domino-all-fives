@@ -4,7 +4,7 @@ using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
 using DominoAllFives.BusinessLogic.Security;
 using DominoAllFives.BusinessLogic.Validation;
-using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
@@ -22,7 +22,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
         public RegistrationController(ILogger<RegistrationController> logger)
         {
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -34,15 +34,15 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// <returns>
         /// The result of the registration attempt.
         /// </returns>
-        public RegistrationResultDto Register(
-            RegisterAccountDto registrationData)
+        public RegistrationResult Register(
+            AccountRegistration registrationData)
         {
             RegistrationFailureReason validationResult =
                 RegistrationValidator.Validate(registrationData);
 
             if (validationResult != RegistrationFailureReason.None)
             {
-                return CreateFailureResult(validationResult);
+                return RegistrationResult.Rejected(validationResult);
             }
 
             try 
@@ -59,15 +59,13 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     if (playerRepository.UsernameExists(
                         registrationData.Username))
                     {
-                        return CreateFailureResult(
-                            RegistrationFailureReason.UsernameAlreadyExists);
+                        return RegistrationResult.Rejected(RegistrationFailureReason.UsernameAlreadyExists);
                     }
 
                     if (playerRepository.EmailExists(
                         registrationData.Email))
                     {
-                        return CreateFailureResult(
-                            RegistrationFailureReason.EmailAlreadyExists);
+                        return RegistrationResult.Rejected(RegistrationFailureReason.EmailAlreadyExists);
                     }
 
                     Player player = new Player
@@ -100,13 +98,10 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
                     context.SaveChanges();
 
-                    return new RegistrationResultDto
-                    {
-                        IsSuccessful = true,
-                        PlayerId = player.IdPlayer,
-                        Username = player.Username,
-                        FailureReason = RegistrationFailureReason.None
-                    };
+                    return RegistrationResult.Success(PlayerAccount.FromStoredAccount(
+                        player.IdPlayer, player.Username, player.PreferredLanguageId,
+                        AccountAccessStatus.FromStoredState(
+                            player.IsDeleted, player.IsBanned, player.SuspensionUntil)));
                 }
             }
             catch (Exception ex) when (ex is SqlException || 
@@ -116,21 +111,9 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 _logger.LogError(
                      ex, 
                     "An error occurred while registering a new player account.");
-                return CreateFailureResult(
-                    RegistrationFailureReason.ServiceUnavailable);
+                throw;
             }
         }
 
-        private RegistrationResultDto CreateFailureResult(
-            RegistrationFailureReason failureReason)
-        {
-            return new RegistrationResultDto
-            {
-                IsSuccessful = false,
-                PlayerId = 0,
-                Username = null,
-                FailureReason = failureReason
-            };
-        }
     }
 }

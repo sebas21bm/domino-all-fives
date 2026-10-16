@@ -6,7 +6,6 @@ using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Contracts.Services;
 using Microsoft.Extensions.Logging;
@@ -158,25 +157,20 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             int playerId = _playerSession.PlayerId.Value;
 
-            ChangePasswordRequestDto request =
-                new ChangePasswordRequestDto
-                {
-                    PlayerId = playerId,
-                    CurrentPassword = currentPassword,
-                    NewPassword = newPassword
-                };
-
-            ChangePasswordResultDto result =
-                _accountService.ChangePassword(request);
-
-            if (!result.IsSuccessful)
+            try
             {
-                _logger.LogWarning(
-                    "Password change failed for player {PlayerId}. Reason: {FailureReason}.",
-                    playerId,
-                    result.FailureReason);
-
-                ShowChangePasswordFailure(result.FailureReason);
+                ChangePasswordFailureReason reason = _accountService.ChangePassword(playerId, currentPassword, newPassword);
+                if (reason != ChangePasswordFailureReason.None)
+                {
+                    _logger.LogWarning("Operation rejected for player {PlayerId}. Reason: {FailureReason}.", playerId, reason);
+                    ShowChangePasswordFailure(reason);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Account operation failed for player {PlayerId}.", playerId);
+                ShowChangePasswordFailure(ChangePasswordFailureReason.ServiceUnavailable);
                 return;
             }
 

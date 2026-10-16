@@ -1,7 +1,7 @@
 ﻿using System;
 
 using DominoAllFives.BusinessLogic.Controllers;
-using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Services;
 
 namespace DominoAllFives.Client.WPF.Services.Local
@@ -17,7 +17,7 @@ namespace DominoAllFives.Client.WPF.Services.Local
         }
 
         /// <inheritdoc/>
-        public RankingResultDto GetTopRanking(int playerId)
+        public Ranking GetTopRanking(int playerId)
         {
             return _rankingController.GetRanking(playerId);
         }

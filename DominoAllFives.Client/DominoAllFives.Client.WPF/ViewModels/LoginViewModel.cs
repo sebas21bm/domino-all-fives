@@ -7,7 +7,6 @@ using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
-using DominoAllFives.Contracts.Exceptions;
 using DominoAllFives.Contracts.Services;
 using Microsoft.Extensions.Logging;
 
@@ -121,39 +120,16 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             _logger.LogInformation("Attempting login for user: {EmailOrUsername}", Email.Trim());
 
+            LoginResult result;
             try
             {
-                PlayerAccount account = PlayerAccount.ForLogin(
+                LoginCredentials credentials = LoginCredentials.ForLogin(
                     Email.Trim(),
                     Password);
 
-                PlayerAccount authenticatedAccount = _accountService.Login(account);
-
-                _languageManager.ApplyAccountLanguage(authenticatedAccount.PreferredLanguageId);
-                if (_languageManager.CurrentLanguageCode != authenticatedAccount.PreferredLanguageId)
-                {
-                    _logger.LogWarning(
-                        "Unsupported stored account language {PreferredLanguageId}; using fallback.",
-                        authenticatedAccount.PreferredLanguageId);
-                }
-                _playerSession.Start(
-                    authenticatedAccount.PlayerId,
-                    authenticatedAccount.Username,
-                    authenticatedAccount.PreferredLanguageId);
-
-                _logger.LogInformation("User {EmailOrUsername} logged in successfully with " +
-                    "PlayerId: {PlayerId}", Email.Trim(), authenticatedAccount.PlayerId);
-
-                _onLoginSuccess.Invoke();
+                result = _accountService.Login(credentials);
             }
-            catch (AuthenticationException ex)
-            {
-                _logger.LogWarning("Login failed for user {EmailOrUsername}. " +
-                    "Reason: {FailureReason}", Email.Trim(), ex.Reason);
-
-                ShowLoginFailure(ex.Reason);
-            }
-            catch (ServiceUnavailableException ex)
+            catch (Exception ex)
             {
                 _logger.LogError(
                     ex,
@@ -161,7 +137,32 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     Email.Trim());
 
                 ShowLoginFailure(LoginFailureReason.ServiceUnavailable);
+                return;
             }
+            if (result.Reason != LoginFailureReason.None)
+            {
+                _logger.LogWarning("Login rejected. Reason: {FailureReason}.", result.Reason);
+                ShowLoginFailure(result.Reason);
+                return;
+            }
+
+            PlayerAccount authenticatedAccount = result.Account;
+            _languageManager.ApplyAccountLanguage(authenticatedAccount.PreferredLanguageId);
+            if (_languageManager.CurrentLanguageCode != authenticatedAccount.PreferredLanguageId)
+            {
+                _logger.LogWarning(
+                    "Unsupported stored account language {PreferredLanguageId}; using fallback.",
+                    authenticatedAccount.PreferredLanguageId);
+            }
+            _playerSession.Start(
+                authenticatedAccount.PlayerId,
+                authenticatedAccount.Username,
+                authenticatedAccount.PreferredLanguageId);
+
+            _logger.LogInformation("User {EmailOrUsername} logged in successfully with " +
+                "PlayerId: {PlayerId}", Email.Trim(), authenticatedAccount.PlayerId);
+
+            _onLoginSuccess.Invoke();
         }
 
         private bool ValidateInput()
