@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
@@ -11,7 +11,7 @@ using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;
 using Microsoft.Extensions.Logging;
 
-namespace DominoAllFives.BusinessLogic.Controllers
+namespace DominoAllFives.Server.Controllers
 {
     /// <summary>
     /// Handles player authentication operations.
@@ -82,13 +82,13 @@ namespace DominoAllFives.BusinessLogic.Controllers
                                 player.IsDeleted, player.IsBanned, player.SuspensionUntil));
 
                     DateTime utcNow = DateTime.UtcNow;
-                    // SQL timestamps with unknown provenance retain their historical wall-clock meaning.
-                    // This server-local comparison preserves prior behavior; it does not identify
-                    // the original time zone or migrate historical values to UTC.
+
+
                     DateTime evaluationTime = player.SuspensionUntil.HasValue &&
                         player.SuspensionUntil.Value.Kind != DateTimeKind.Utc
                         ? utcNow.ToLocalTime()
                         : utcNow;
+
                     LoginFailureReason access = storedAccount.EnsureCanLogin(evaluationTime);
                     if (access != LoginFailureReason.None)
                     {

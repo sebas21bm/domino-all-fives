@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
@@ -17,6 +17,7 @@ namespace DominoAllFives.Client.WPF.Services
         private readonly IFrameNavigationService _navigationService;
         private readonly IDialogService _dialogService;
         private readonly IAccountService _accountService;
+        private readonly ILoginClient _loginClient;
         private readonly IRankingService _rankingService;
         private readonly PlayerSession _playerSession;
         private readonly ILoggerFactory _loggerFactory;
@@ -26,6 +27,7 @@ namespace DominoAllFives.Client.WPF.Services
             IFrameNavigationService navigationService,
             IDialogService dialogService,
             IAccountService accountService,
+            ILoginClient loginClient,
             IRankingService rankingService,
             PlayerSession playerSession,
             ILoggerFactory loggerFactory,
@@ -43,6 +45,9 @@ namespace DominoAllFives.Client.WPF.Services
             _accountService = accountService
                 ?? throw new ArgumentNullException(
                     nameof(accountService));
+
+            _loginClient = loginClient
+                ?? throw new ArgumentNullException(nameof(loginClient));
 
             _rankingService = rankingService
                 ?? throw new ArgumentNullException(
@@ -78,6 +83,7 @@ namespace DominoAllFives.Client.WPF.Services
                         _dialogService,
                         _playerSession,
                         _accountService,
+                        _loginClient,
                         _loggerFactory);
                     break;
                 case nameof(MainMenuViewModel):

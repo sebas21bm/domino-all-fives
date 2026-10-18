@@ -1,10 +1,11 @@
-﻿using System.Windows;
+using System.Windows;
 
 using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Local;
+using DominoAllFives.Client.WPF.Services.Wcf;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Contracts.Services;
@@ -50,9 +51,6 @@ namespace DominoAllFives.Client.WPF
                 new ProfilePictureStorage(
                     loggerFactory.CreateLogger<ProfilePictureStorage>());
 
-            AuthenticationController authenticationController =
-                new AuthenticationController(
-                    loggerFactory.CreateLogger<AuthenticationController>());
 
             RegistrationController registrationController =
                 new RegistrationController(
@@ -76,16 +74,15 @@ namespace DominoAllFives.Client.WPF
                 new AccountController(
                     loggerFactory.CreateLogger<AccountController>());
 
-            IAccountService accountService =
+            IAccountService accountService = new LegacyAccountServiceAdapter(() =>
                 new LocalAccountService(
-                    authenticationController,
                     registrationController,
                     profilePictureController,
                     profileController,
                     accountController,
                     new AccountLanguageController(
                         loggerFactory.CreateLogger<AccountLanguageController>()),
-                    playerSession);
+                    playerSession));
 
             IRankingService rankingService =
                 new LocalRankingService(
@@ -96,6 +93,7 @@ namespace DominoAllFives.Client.WPF
                     navigationService,
                     mainWindowViewModel.DialogService,
                     accountService,
+                    new WcfLoginService(),
                     rankingService,
                     playerSession,
                     loggerFactory,
