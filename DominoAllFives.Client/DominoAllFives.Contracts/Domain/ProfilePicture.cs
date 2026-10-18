@@ -1,11 +1,15 @@
-﻿namespace DominoAllFives.Contracts.Domain
+using System.Runtime.Serialization;
+namespace DominoAllFives.Contracts.Domain
 {
     /// <summary>
     /// Represents optional image content independently of its storage path.
     /// </summary>
+    [DataContract]
     public sealed class ProfilePicture
     {
+        [DataMember(Name = "ImageData", Order = 2, IsRequired = true)]
         private readonly byte[] _imageData;
+        [DataMember(Order = 1, IsRequired = true)]
         public string OriginalFileName { get; private set; }
         public byte[] ImageData => _imageData == null ? null : (byte[])_imageData.Clone();
 

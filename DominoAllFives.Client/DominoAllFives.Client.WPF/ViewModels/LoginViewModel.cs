@@ -1,21 +1,21 @@
-﻿using System;
+using System;
+using System.ServiceModel;
 using System.Windows.Controls;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.Domain;
-using DominoAllFives.Contracts.Enums;
-using DominoAllFives.Contracts.Services;
+using DominoAllFivesService;
 using Microsoft.Extensions.Logging;
+
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class LoginViewModel : ViewModelBase
     {
         private readonly IDialogService _dialogService;
-        private readonly IAccountService _accountService;
+        private readonly ILoginClient _loginClient;
         private readonly PlayerSession _playerSession;
         private readonly ILogger<LoginViewModel> _logger;
         private readonly LanguageManager _languageManager;
@@ -61,7 +61,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public LoginViewModel(
             IDialogService dialogService,
-            IAccountService accountService,
+            ILoginClient loginClient,
             PlayerSession playerSession,
             ILogger<LoginViewModel> logger,
             Action onLoginSuccess,
@@ -73,8 +73,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _dialogService = dialogService
                 ?? throw new ArgumentNullException(nameof(dialogService));
 
-            _accountService = accountService
-                ?? throw new ArgumentNullException(nameof(accountService));
+            _loginClient = loginClient
+                ?? throw new ArgumentNullException(nameof(loginClient));
 
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(nameof(playerSession));
@@ -121,15 +121,18 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _logger.LogInformation("Attempting login for user: {EmailOrUsername}", Email.Trim());
 
             LoginResult result;
+
             try
             {
-                LoginCredentials credentials = LoginCredentials.ForLogin(
-                    Email.Trim(),
-                    Password);
+                LoginCredentials credentials = new LoginCredentials
+                {
+                    EmailOrUsername = Email.Trim(),
+                    Password = Password
+                };
 
-                result = _accountService.Login(credentials);
+                result = _loginClient.Login(credentials);
             }
-            catch (Exception ex)
+            catch (CommunicationException ex)
             {
                 _logger.LogError(
                     ex,
@@ -139,6 +142,18 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 ShowLoginFailure(LoginFailureReason.ServiceUnavailable);
                 return;
             }
+            catch (TimeoutException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Authentication service timed out for user {EmailOrUsername}.",
+                    Email.Trim());
+
+                ShowLoginFailure(LoginFailureReason.ServiceUnavailable);
+                return;
+            }
+
+
             if (result.Reason != LoginFailureReason.None)
             {
                 _logger.LogWarning("Login rejected. Reason: {FailureReason}.", result.Reason);

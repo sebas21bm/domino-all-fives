@@ -1,10 +1,11 @@
-﻿using System.Windows;
+using System.Windows;
 
 using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Local;
+using DominoAllFives.Client.WPF.Services.Wcf;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Contracts.Services;
@@ -41,61 +42,33 @@ namespace DominoAllFives.Client.WPF
                 new ProfilePictureFileService(
                     loggerFactory.CreateLogger<ProfilePictureFileService>());
 
-            /*
-             * Initialize controllers and services temporarily for local testing,
-             * these will be replaced with remote implementations later.
-             */
-
-            ProfilePictureStorage profilePictureStorage =
-                new ProfilePictureStorage(
+            // Login and ranking use WCF. Other account operations remain local until migrated.
+            // Lazy construction keeps persistence controllers out of both remote call paths.
+            IAccountService accountService = new LegacyAccountServiceAdapter(() =>
+            {
+                ProfilePictureStorage storage = new ProfilePictureStorage(
                     loggerFactory.CreateLogger<ProfilePictureStorage>());
-
-            AuthenticationController authenticationController =
-                new AuthenticationController(
-                    loggerFactory.CreateLogger<AuthenticationController>());
-
-            RegistrationController registrationController =
-                new RegistrationController(
-                    loggerFactory.CreateLogger<RegistrationController>());
-
-            ProfilePictureController profilePictureController =
-                new ProfilePictureController(
-                    profilePictureStorage,
-                    loggerFactory.CreateLogger<ProfilePictureController>());
-
-            RankingController rankingController =
-                new RankingController(
-                    profilePictureStorage);
-
-            ProfileController profileController =
-                new ProfileController(
-                    profilePictureStorage,
-                    loggerFactory.CreateLogger<ProfileController>());
-
-            AccountController accountController =
-                new AccountController(
-                    loggerFactory.CreateLogger<AccountController>());
-
-            IAccountService accountService =
-                new LocalAccountService(
-                    authenticationController,
-                    registrationController,
-                    profilePictureController,
-                    profileController,
-                    accountController,
+                return new LocalAccountService(
+                    new RegistrationController(
+                        loggerFactory.CreateLogger<RegistrationController>()),
+                    new ProfilePictureController(storage,
+                        loggerFactory.CreateLogger<ProfilePictureController>()),
+                    new ProfileController(storage,
+                        loggerFactory.CreateLogger<ProfileController>()),
+                    new AccountController(
+                        loggerFactory.CreateLogger<AccountController>()),
                     new AccountLanguageController(
                         loggerFactory.CreateLogger<AccountLanguageController>()),
                     playerSession);
+            });
 
-            IRankingService rankingService =
-                new LocalRankingService(
-                    rankingController);
-
+            IRankingClient rankingService = new WcfRankingService();
             ViewModelFactory viewModelFactory =
                 new ViewModelFactory(
                     navigationService,
                     mainWindowViewModel.DialogService,
                     accountService,
+                    new WcfLoginService(),
                     rankingService,
                     playerSession,
                     loggerFactory,

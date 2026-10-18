@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3D5037B2-404C-4821-8EE9-D66DF252B097}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>DominoAllFives.Server</RootNamespace>
+    <AssemblyName>DominoAllFives.Server</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols><DebugType>full</DebugType><Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath><DefineConstants>DEBUG;TRACE</DefineConstants><WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType><Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath><DefineConstants>TRACE</DefineConstants><WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" /><Reference Include="System.Core" /><Reference Include="System.Data" /><Reference Include="System.ServiceModel" />
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.8.0.1\lib\net462\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework"><HintPath>..\packages\EntityFramework.6.5.2\lib\net45\EntityFramework.dll</HintPath></Reference>
+    <Reference Include="EntityFramework.SqlServer"><HintPath>..\packages\EntityFramework.6.5.2\lib\net45\EntityFramework.SqlServer.dll</HintPath></Reference>
+  </ItemGroup>
+  <ItemGroup><Compile Include="Program.cs" /><Compile Include="DominoService.cs" /><Compile Include="Controllers\AuthenticationController.cs" /><Compile Include="Controllers\RankingController.cs" /></ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DominoAllFives.Contracts\DominoAllFives.Contracts.csproj"><Project>{9e01a5c7-aeb0-4480-870e-429a5791399c}</Project><Name>DominoAllFives.Contracts</Name></ProjectReference>
+    <ProjectReference Include="..\DominoAllFives.BusinessLogic\DominoAllFives.BusinessLogic.csproj"><Project>{34f7b0ce-2282-4e94-bb0d-bc5d971d6ee1}</Project><Name>DominoAllFives.BusinessLogic</Name></ProjectReference>
+    <ProjectReference Include="..\DominoAllFives.DataAccess\DominoAllFives.DataAccess.csproj"><Project>{7ec41d39-8132-4c47-a69f-64450a4347da}</Project><Name>DominoAllFives.DataAccess</Name></ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="Configuration\DatabaseConnection.example.config" />
+    <None Include="Configuration\DatabaseConnection.config" Condition="Exists('Configuration\DatabaseConnection.config')"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

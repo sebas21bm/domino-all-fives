@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -17,6 +17,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private readonly IFrameNavigationService _navigationService;
         private readonly IDialogService _dialogService;
         private readonly IAccountService _accountService;
+        private readonly ILoginClient _loginClient;
         private readonly PlayerSession _playerSession;
         private readonly ILoggerFactory _loggerFactory;
 
@@ -60,6 +61,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             IDialogService dialogService,
             PlayerSession playerSession,
             IAccountService accountService,
+            ILoginClient loginClient,
             ILoggerFactory loggerFactory)
         {
             _navigationService = navigationService
@@ -77,6 +79,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _accountService = accountService
                 ?? throw new ArgumentNullException(
                     nameof(accountService));
+
+            _loginClient = loginClient ?? throw new ArgumentNullException(nameof(loginClient));
 
             _loggerFactory = loggerFactory
                 ?? throw new ArgumentNullException(
@@ -118,7 +122,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             CurrentModal = new LoginViewModel(
                 _dialogService,
-                _accountService,
+                _loginClient,
                 _playerSession,
                 _loggerFactory.CreateLogger<LoginViewModel>(),
                 OnLoginSuccess,

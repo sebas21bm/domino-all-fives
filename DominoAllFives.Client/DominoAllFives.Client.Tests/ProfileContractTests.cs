@@ -225,12 +225,16 @@ namespace DominoAllFives.Client.Tests
         public void Rankings_SnapshotMapping_PreservesOrdinalAndDistinctOwnRank()
         {
             // Arrange.
-            ProfilePicture picture = ProfilePicture.FromStoredContent(CreatePng());
-            Ranking snapshot = Ranking.FromOrderedEntries(new[]
+            var picture = new DominoAllFivesService.ProfilePicture { ImageData = CreatePng() };
+            var snapshot = new DominoAllFivesService.Ranking
             {
-                RankingEntry.FromRankedPlayer(1, "first", 5, picture),
-                RankingEntry.FromRankedPlayer(2, "player", 5, picture)
-            }, 1);
+                TopPlayers = new[]
+                {
+                    new DominoAllFivesService.RankingEntry { Rank = 1, Username = "first", GamesWon = 5, Picture = picture },
+                    new DominoAllFivesService.RankingEntry { Rank = 2, Username = "player", GamesWon = 5, Picture = picture }
+                },
+                CurrentPlayerRank = 1
+            };
 
             // Act.
             RankingsViewModel model = new RankingsViewModel(
@@ -429,17 +433,17 @@ namespace DominoAllFives.Client.Tests
             public void GoBack() { }
         }
 
-        private sealed class RankingService : IRankingService
+        private sealed class RankingService : IRankingClient
         {
-            private readonly Ranking _ranking;
+            private readonly DominoAllFivesService.Ranking _ranking;
             public Exception Failure { get; set; }
 
-            public RankingService(Ranking ranking)
+            public RankingService(DominoAllFivesService.Ranking ranking)
             {
                 _ranking = ranking;
             }
 
-            public Ranking GetTopRanking(int playerId)
+            public DominoAllFivesService.Ranking GetTopRanking(int playerId)
             {
                 if (Failure != null) throw Failure;
                 return _ranking;

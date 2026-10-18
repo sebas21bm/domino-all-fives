@@ -5,7 +5,7 @@ namespace DominoAllFives.Contracts.Services
 {
     /// <summary>
     /// Represents the service responsible for handling account-related operations,
-    /// such as login, registration, and profile picture management.
+    /// such as registration and profile picture management pending migration.
     /// </summary>
     public interface IAccountService
     {
@@ -13,13 +13,6 @@ namespace DominoAllFives.Contracts.Services
         /// Updates the current local account language.
         /// </summary>
         LanguagePreferenceFailureReason ChangePreferredLanguage(string preferredLanguageId);
-
-        /// <summary>
-        /// Logs in a user with the provided login request data.
-        /// </summary>
-        /// <param name="credentials">The login request data.</param>
-        /// <returns>The login result.</returns>
-        LoginResult Login(LoginCredentials credentials);
 
         /// <summary>
         /// Registers a new user account with the provided registration data.

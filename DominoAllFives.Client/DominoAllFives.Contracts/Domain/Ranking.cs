@@ -1,4 +1,5 @@
-﻿using System;
+using System.Runtime.Serialization;
+using System;
 using System.Collections.Generic;
 
 namespace DominoAllFives.Contracts.Domain
@@ -6,9 +7,13 @@ namespace DominoAllFives.Contracts.Domain
     /// <summary>
     /// Preserves an ordered ranking snapshot and the independently calculated player position.
     /// </summary>
+    [DataContract]
     public sealed class Ranking
     {
-        public IReadOnlyList<RankingEntry> TopPlayers { get; private set; }
+        [DataMember(Name = "TopPlayers", Order = 1, IsRequired = true)]
+        private List<RankingEntry> _topPlayers;
+        public IReadOnlyList<RankingEntry> TopPlayers => _topPlayers.AsReadOnly();
+        [DataMember(Order = 2, IsRequired = true)]
         public int CurrentPlayerRank { get; private set; }
 
         private Ranking()
@@ -30,7 +35,7 @@ namespace DominoAllFives.Contracts.Domain
             }
             return new Ranking
             {
-                TopPlayers = new List<RankingEntry>(topPlayers).AsReadOnly(),
+                _topPlayers = new List<RankingEntry>(topPlayers),
                 CurrentPlayerRank = currentPlayerRank
             };
         }

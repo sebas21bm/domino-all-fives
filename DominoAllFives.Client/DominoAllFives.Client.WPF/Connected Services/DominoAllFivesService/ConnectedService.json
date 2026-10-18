@@ -1,0 +1,17 @@
+{
+  "ExtendedData": {
+    "inputs": [
+      "http://localhost:8734/Domino/"
+    ],
+    "collectionTypes": [
+      "System.Array",
+      "System.Collections.Generic.Dictionary`2"
+    ],
+    "namespaceMappings": [
+      "*, DominoAllFivesService"
+    ],
+    "sync": true,
+    "targetFramework": "net48",
+    "typeReuseMode": "None"
+  }
+}

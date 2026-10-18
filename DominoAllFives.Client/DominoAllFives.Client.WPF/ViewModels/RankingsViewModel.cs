@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows.Media.Imaging;
@@ -7,8 +7,8 @@ using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.Domain;
-using DominoAllFives.Contracts.Services;
+using DominoAllFivesService;
+
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
@@ -18,7 +18,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
     public class RankingsViewModel : ViewModelBase
     {
         private readonly IFrameNavigationService _navigationService;
-        private readonly IRankingService _rankingService;
+        private readonly IRankingClient _rankingService;
         private readonly IDialogService _dialogService;
         private readonly PlayerSession _playerSession;
         private readonly ProfilePictureImageService _profilePictureImageService;
@@ -42,7 +42,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public RankingsViewModel(
             IFrameNavigationService navigationService,
-            IRankingService rankingService,
+            IRankingClient rankingService,
             PlayerSession playerSession,
             ProfilePictureImageService profilePictureImageService,
             IDialogService dialogService)

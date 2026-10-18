@@ -1,7 +1,6 @@
-﻿using DominoAllFives.BusinessLogic.Controllers;
+using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.Contracts.Domain;
 using DomainProfilePicture = DominoAllFives.Contracts.Domain.ProfilePicture;
-using DominoAllFives.Contracts.Services;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Client.WPF.Models;
 using System;
@@ -9,14 +8,11 @@ using System;
 namespace DominoAllFives.Client.WPF.Services.Local
 {
     /// <summary>
-    /// Represents a local implementation
-    /// providing account-related operations,
-    /// it'll be later replaced with a remote implementation
-    /// that communicates with the server.
+    /// Provides only account operations that have not been migrated to WCF.
+    /// Login is implemented exclusively by the server.
     /// </summary>
-    public class LocalAccountService : IAccountService
+    public class LocalAccountService
     {
-        private readonly AuthenticationController _authenticationController;
         private readonly RegistrationController _registrationController;
         private readonly ProfilePictureController _profilePictureController;
         private readonly ProfileController _profileController;
@@ -25,7 +21,6 @@ namespace DominoAllFives.Client.WPF.Services.Local
         private readonly PlayerSession _playerSession;
 
         public LocalAccountService(
-            AuthenticationController authenticationController,
             RegistrationController registrationController,
             ProfilePictureController profilePictureController,
             ProfileController profileController,
@@ -33,9 +28,6 @@ namespace DominoAllFives.Client.WPF.Services.Local
             AccountLanguageController accountLanguageController,
             PlayerSession playerSession)
         {
-            _authenticationController = authenticationController
-                ?? throw new ArgumentNullException(nameof(authenticationController));
-
             _registrationController = registrationController
                 ?? throw new ArgumentNullException(nameof(registrationController));
 
@@ -79,13 +71,7 @@ namespace DominoAllFives.Client.WPF.Services.Local
             return LanguagePreferenceFailureReason.None;
         }
 
-        /// <inheritdoc/>
-        public LoginResult Login(LoginCredentials credentials)
-        {
-            return _authenticationController.Login(credentials);
-        }
-
-        /// <inheritdoc/>
+/// <inheritdoc/>
         public RegistrationResult Register(AccountRegistration registrationData)
         {
             return _registrationController.Register(registrationData);

@@ -1,3 +1,4 @@
+using System.Runtime.Serialization;
 using DominoAllFives.Contracts.Enums;
 
 namespace DominoAllFives.Contracts.Domain
@@ -5,9 +6,12 @@ namespace DominoAllFives.Contracts.Domain
     /// <summary>
     /// Represents the credentials required to authenticate an account.
     /// </summary>
+    [DataContract]
     public sealed class LoginCredentials
     {
+        [DataMember(Order = 1, IsRequired = true)]
         public string EmailOrUsername { get; private set; }
+        [DataMember(Order = 2, IsRequired = true)]
         public string Password { get; private set; }
 
         private LoginCredentials()
