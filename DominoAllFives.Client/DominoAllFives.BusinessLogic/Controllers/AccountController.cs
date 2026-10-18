@@ -4,7 +4,6 @@ using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
 using DominoAllFives.BusinessLogic.Security;
 using DominoAllFives.BusinessLogic.Validation;
-using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
@@ -29,25 +28,18 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// <summary>
         /// Logically deletes a player account after verifying its password.
         /// </summary>
-        /// <param name="request">
-        /// The account deletion request.
-        /// </param>
-        /// <returns>
-        /// The result of the account deletion operation.
-        /// </returns>
-        public DeleteAccountResultDto DeleteAccount(
-            DeleteAccountRequestDto request)
+        /// <param name="playerId">The account identifier.</param>
+        /// <param name="password">The current password to verify.</param>
+        public DeleteFailureReason DeleteAccount(int playerId, string password)
         {
-            if (request == null || request.PlayerId <= 0)
+            if (playerId <= 0)
             {
-                return CreateDeleteFailureResult(
-                    DeleteFailureReason.AccountNotFound);
+                throw new ArgumentOutOfRangeException(nameof(playerId));
             }
 
-            if (string.IsNullOrWhiteSpace(request.Password))
+            if (string.IsNullOrWhiteSpace(password))
             {
-                return CreateDeleteFailureResult(
-                    DeleteFailureReason.PasswordNotMatch);
+                return DeleteFailureReason.PasswordNotMatch;
             }
 
             try
@@ -59,33 +51,30 @@ namespace DominoAllFives.BusinessLogic.Controllers
                         new PlayerRepository(context);
 
                     Player player =
-                        playerRepository.GetById(request.PlayerId);
+                        playerRepository.GetById(playerId);
 
                     if (player == null || player.IsDeleted)
                     {
-                        return CreateDeleteFailureResult(
-                            DeleteFailureReason.AccountNotFound);
+                        return DeleteFailureReason.AccountNotFound;
                     }
 
                     if (!PasswordHasher.VerifyPassword(
-                        request.Password, player.PasswordHash))
+                        password, player.PasswordHash))
                     {
-                        return CreateDeleteFailureResult(
-                            DeleteFailureReason.PasswordNotMatch);
+                        return DeleteFailureReason.PasswordNotMatch;
                     }
 
                     bool wasDeleted =
-                        playerRepository.SoftDelete(request.PlayerId);
+                        playerRepository.SoftDelete(playerId);
 
                     if (!wasDeleted)
                     {
-                        return CreateDeleteFailureResult(
-                            DeleteFailureReason.AccountNotFound);
+                        return DeleteFailureReason.AccountNotFound;
                     }
 
                     context.SaveChanges();
 
-                    return CreateDeleteSuccessResult();
+                    return DeleteFailureReason.None;
                 }
             }
             catch (Exception ex) when (ex is SqlException 
@@ -95,62 +84,34 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 _logger.LogError(
                     ex,
                     "Unable to delete account for player {PlayerId}.",
-                    request.PlayerId);
+                    playerId);
 
-                return CreateDeleteFailureResult(
-                    DeleteFailureReason.ServiceUnavailable);
+                throw;
             }
         }
-
-        private DeleteAccountResultDto CreateDeleteSuccessResult()
-        {
-            return new DeleteAccountResultDto
-            {
-                IsSuccessful = true,
-                FailureReason = DeleteFailureReason.None
-            };
-        }
-
-        private DeleteAccountResultDto CreateDeleteFailureResult(
-            DeleteFailureReason reason)
-        {
-            return new DeleteAccountResultDto
-            {
-                IsSuccessful = false,
-                FailureReason = reason
-            };
-        }
-
 
         /// <summary>
         /// Changes a player account password after verifying
         /// the current password and validating the new password.
         /// </summary>
-        /// <param name="request">
-        /// The password change request.
-        /// </param>
-        /// <returns>
-        /// The result of the password change operation.
-        /// </returns>
-        public ChangePasswordResultDto ChangePassword(
-            ChangePasswordRequestDto request)
+        /// <param name="playerId">The account identifier.</param>
+        /// <param name="currentPassword">The current password to verify.</param>
+        /// <param name="newPassword">The new password subject to the creation policy.</param>
+        public ChangePasswordFailureReason ChangePassword(int playerId, string currentPassword, string newPassword)
         {
-            if (request == null || request.PlayerId <= 0)
+            if (playerId <= 0)
             {
-                return CreateChangePasswordFailureResult(
-                    ChangePasswordFailureReason.AccountNotFound);
+                throw new ArgumentOutOfRangeException(nameof(playerId));
             }
 
-            if (string.IsNullOrWhiteSpace(request.CurrentPassword))
+            if (string.IsNullOrWhiteSpace(currentPassword))
             {
-                return CreateChangePasswordFailureResult(
-                    ChangePasswordFailureReason.IncorrectCurrentPassword);
+                return ChangePasswordFailureReason.IncorrectCurrentPassword;
             }
 
-            if (!AccountValidator.IsPasswordValid(request.NewPassword))
+            if (!AccountValidator.IsPasswordValid(newPassword))
             {
-                return CreateChangePasswordFailureResult(
-                    ChangePasswordFailureReason.InvalidNewPassword);
+                return ChangePasswordFailureReason.InvalidNewPassword;
             }
 
             try
@@ -162,46 +123,42 @@ namespace DominoAllFives.BusinessLogic.Controllers
                         new PlayerRepository(context);
 
                     Player player =
-                        playerRepository.GetById(request.PlayerId);
+                        playerRepository.GetById(playerId);
 
                     if (player == null || player.IsDeleted)
                     {
-                        return CreateChangePasswordFailureResult(
-                            ChangePasswordFailureReason.AccountNotFound);
+                        return ChangePasswordFailureReason.AccountNotFound;
                     }
 
                     if (!PasswordHasher.VerifyPassword(
-                        request.CurrentPassword,
+                        currentPassword,
                         player.PasswordHash))
                     {
-                        return CreateChangePasswordFailureResult(
-                            ChangePasswordFailureReason.IncorrectCurrentPassword);
+                        return ChangePasswordFailureReason.IncorrectCurrentPassword;
                     }
 
                     if (PasswordHasher.VerifyPassword(
-                        request.NewPassword,
+                        newPassword,
                         player.PasswordHash))
                     {
-                        return CreateChangePasswordFailureResult(
-                            ChangePasswordFailureReason.SameAsCurrentPassword);
+                        return ChangePasswordFailureReason.SameAsCurrentPassword;
                     }
 
                     string newPasswordHash =
-                        PasswordHasher.HashPassword(request.NewPassword);
+                        PasswordHasher.HashPassword(newPassword);
 
                     bool wasUpdated = playerRepository.UpdatePassword(
-                        request.PlayerId,
+                        playerId,
                         newPasswordHash);
 
                     if (!wasUpdated)
                     {
-                        return CreateChangePasswordFailureResult(
-                            ChangePasswordFailureReason.AccountNotFound);
+                        return ChangePasswordFailureReason.AccountNotFound;
                     }
 
                     context.SaveChanges();
 
-                    return CreateChangePasswordSuccessResult();
+                    return ChangePasswordFailureReason.None;
                 }
             }
             catch (Exception ex) when (ex is SqlException
@@ -211,30 +168,10 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 _logger.LogError(
                     ex,
                     "Unable to change password for player {PlayerId}.",
-                    request.PlayerId);
+                    playerId);
 
-                return CreateChangePasswordFailureResult(
-                    ChangePasswordFailureReason.ServiceUnavailable);
+                throw;
             }
-        }
-
-        private ChangePasswordResultDto CreateChangePasswordSuccessResult()
-        {
-            return new ChangePasswordResultDto
-            {
-                IsSuccessful = true,
-                FailureReason = ChangePasswordFailureReason.None
-            };
-        }
-
-        private ChangePasswordResultDto CreateChangePasswordFailureResult(
-            ChangePasswordFailureReason reason)
-        {
-            return new ChangePasswordResultDto
-            {
-                IsSuccessful = false,
-                FailureReason = reason
-            };
         }
 
     }

@@ -4,7 +4,6 @@ using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.DTOs;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Contracts.Services;
 using Microsoft.Extensions.Logging;
@@ -108,24 +107,20 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 "Account deletion requested for player {PlayerId}.",
                 playerId);
 
-            DeleteAccountRequestDto request =
-                new DeleteAccountRequestDto
-                {
-                    PlayerId = playerId,
-                    Password = password
-                };
-
-            DeleteAccountResultDto result =
-                _accountService.DeleteAccount(request);
-
-            if (!result.IsSuccessful)
+            try
             {
-                _logger.LogWarning(
-                    "Account deletion failed for player {PlayerId}. Reason: {FailureReason}.",
-                    playerId,
-                    result.FailureReason);
-
-                ShowDeleteFailure(result.FailureReason);
+                DeleteFailureReason reason = _accountService.DeleteAccount(playerId, password);
+                if (reason != DeleteFailureReason.None)
+                {
+                    _logger.LogWarning("Operation rejected for player {PlayerId}. Reason: {FailureReason}.", playerId, reason);
+                    ShowDeleteFailure(reason);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Account operation failed for player {PlayerId}.", playerId);
+                ShowDeleteFailure(DeleteFailureReason.ServiceUnavailable);
                 return;
             }
 

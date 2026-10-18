@@ -82,7 +82,10 @@ namespace DominoAllFives.Client.WPF
                     registrationController,
                     profilePictureController,
                     profileController,
-                    accountController);
+                    accountController,
+                    new AccountLanguageController(
+                        loggerFactory.CreateLogger<AccountLanguageController>()),
+                    playerSession);
 
             IRankingService rankingService =
                 new LocalRankingService(

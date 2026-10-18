@@ -1,92 +1,91 @@
-﻿using DominoAllFives.Contracts.Enums;
-using DominoAllFives.Contracts.Exceptions;
 using System;
+using System.Runtime.Serialization;
+using DominoAllFives.Contracts.Enums;
 
 namespace DominoAllFives.Contracts.Domain
 {
-    public class PlayerAccount
+    /// <summary>
+    /// Represents account identity, preference and server-reconstructed access restrictions.
+    /// </summary>
+    [DataContract]
+    public sealed class PlayerAccount
     {
+        private const int MaximumLanguageIdLength = 10;
+
+        [DataMember(Order = 1, IsRequired = true)]
         public int PlayerId { get; private set; }
-
+        [DataMember(Order = 2, IsRequired = true)]
         public string Username { get; private set; }
-
-        public string EmailOrUsername { get; private set; }
-
-        public string Password { get; private set; }
-
-        public bool IsAuthenticated { get; private set; }
-
-        public bool IsDeleted { get; private set; }
-
-        public bool IsBanned { get; private set; }
-
-        public DateTime? SuspensionUntil { get; private set; }
+        [DataMember(Order = 3, IsRequired = true)]
+        public string PreferredLanguageId { get; private set; }
+        [DataMember(Order = 4, IsRequired = true)]
+        public AccountAccessStatus AccessStatus { get; private set; }
 
         private PlayerAccount()
         {
         }
 
-        public static PlayerAccount ForLogin(
-            string emailOrUsername,
-            string password)
+        /// <summary>
+        /// Reconstructs an account without including credentials or persistence entities.
+        /// </summary>
+        /// <param name="playerId">The account identifier.</param>
+        /// <param name="username">The stored or requested username.</param>
+        /// <param name="preferredLanguageId">The preferred language identifier associated with the account.</param>
+        /// <param name="accessStatus">The restrictions reconstructed by the server.</param>
+        /// <returns>The domain value produced by the operation.</returns>
+        public static PlayerAccount FromStoredAccount(int playerId, string username,
+            string preferredLanguageId, AccountAccessStatus accessStatus)
         {
-            if (string.IsNullOrWhiteSpace(emailOrUsername) ||
-                string.IsNullOrWhiteSpace(password))
-            {
-                throw new AuthenticationException(
-                    LoginFailureReason.InvalidCredentials);
-            }
-
-            return new PlayerAccount
-            {
-                EmailOrUsername = emailOrUsername.Trim(),
-                Password = password
-            };
-        }
-
-        public static PlayerAccount FromStoredAccount(
-            int playerId,
-            string username,
-            bool isDeleted,
-            bool isBanned,
-            DateTime? suspensionUntil)
-        {
-            return new PlayerAccount
+            PlayerAccount account = new PlayerAccount
             {
                 PlayerId = playerId,
                 Username = username,
-                IsDeleted = isDeleted,
-                IsBanned = isBanned,
-                SuspensionUntil = suspensionUntil
+                AccessStatus = accessStatus ?? throw new ArgumentNullException(nameof(accessStatus))
             };
+            account.SetPreferredLanguage(preferredLanguageId);
+            return account;
         }
 
-        public void EnsureCanLogin(DateTime currentTime)
+        /// <summary>
+        /// Maps the preferred language stored with the account.
+        /// </summary>
+        /// <param name="preferredLanguageId">The preferred language identifier associated with the account.</param>
+        public void SetPreferredLanguage(string preferredLanguageId)
         {
-            if (IsDeleted)
+            if (!IsPreferredLanguageValid(preferredLanguageId))
             {
-                throw new AuthenticationException(
-                    LoginFailureReason.InvalidCredentials);
+                throw new ArgumentException("Invalid stored language identifier.",
+                    nameof(preferredLanguageId));
             }
+            PreferredLanguageId = preferredLanguageId;
+        }
 
-            if (IsBanned)
-            {
-                throw new AuthenticationException(
-                    LoginFailureReason.Banned);
-            }
+        private static bool IsPreferredLanguageValid(string preferredLanguageId)
+        {
+            return preferredLanguageId != null &&
+                preferredLanguageId.Length <= MaximumLanguageIdLength;
+        }
 
-            if (SuspensionUntil.HasValue &&
-                SuspensionUntil.Value > currentTime)
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            if (AccessStatus == null || !IsPreferredLanguageValid(PreferredLanguageId))
             {
-                throw new AuthenticationException(
-                    LoginFailureReason.Suspended);
+                throw new SerializationException("Invalid stored account state.");
             }
         }
 
-        public void MarkAsAuthenticated()
+        /// <summary>
+        /// Checks server-reconstructed restrictions without authenticating a client session.
+        /// </summary>
+        /// <param name="currentTime">The comparison time in the timestamp convention of the stored restrictions.</param>
+        public LoginFailureReason EnsureCanLogin(DateTime currentTime)
         {
-            EnsureCanLogin(DateTime.Now);
-            IsAuthenticated = true;
+            if (AccessStatus == null)
+            {
+                throw new InvalidOperationException("Account access restrictions are unavailable.");
+            }
+            return AccessStatus.EnsureCanLogin(currentTime);
         }
     }
 }

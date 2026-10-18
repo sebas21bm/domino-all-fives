@@ -1,7 +1,9 @@
 ﻿using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.Contracts.Domain;
-using DominoAllFives.Contracts.DTOs;
+using DomainProfilePicture = DominoAllFives.Contracts.Domain.ProfilePicture;
 using DominoAllFives.Contracts.Services;
+using DominoAllFives.Contracts.Enums;
+using DominoAllFives.Client.WPF.Models;
 using System;
 
 namespace DominoAllFives.Client.WPF.Services.Local
@@ -19,13 +21,17 @@ namespace DominoAllFives.Client.WPF.Services.Local
         private readonly ProfilePictureController _profilePictureController;
         private readonly ProfileController _profileController;
         private readonly AccountController _accountController;
+        private readonly AccountLanguageController _accountLanguageController;
+        private readonly PlayerSession _playerSession;
 
         public LocalAccountService(
             AuthenticationController authenticationController,
             RegistrationController registrationController,
             ProfilePictureController profilePictureController,
             ProfileController profileController,
-            AccountController accountController)
+            AccountController accountController,
+            AccountLanguageController accountLanguageController,
+            PlayerSession playerSession)
         {
             _authenticationController = authenticationController
                 ?? throw new ArgumentNullException(nameof(authenticationController));
@@ -39,57 +45,93 @@ namespace DominoAllFives.Client.WPF.Services.Local
             _profileController = profileController
                 ?? throw new ArgumentNullException(nameof(profileController));
 
+            _accountLanguageController = accountLanguageController
+                ?? throw new ArgumentNullException(nameof(accountLanguageController));
+            _playerSession = playerSession
+                ?? throw new ArgumentNullException(nameof(playerSession));
+
             _accountController = accountController
                 ?? throw new ArgumentNullException(nameof(accountController));
 
         }
 
         /// <inheritdoc/>
-        public PlayerAccount Login(PlayerAccount playerAccount)
+        public LanguagePreferenceFailureReason ChangePreferredLanguage(string preferredLanguageId)
         {
-            return _authenticationController.Login(playerAccount);
+            // Local adapter only; a remote service must resolve its authenticated actor.
+            int? playerId = _playerSession.PlayerId;
+            if (!playerId.HasValue)
+            {
+                return LanguagePreferenceFailureReason.NotSignedIn;
+            }
+            LanguagePreferenceFailureReason reason =
+                _accountLanguageController.ChangePreferredLanguage(
+                    playerId.Value, preferredLanguageId);
+            if (reason != LanguagePreferenceFailureReason.None)
+            {
+                return reason;
+            }
+            if (_playerSession.PlayerId != playerId)
+            {
+                return LanguagePreferenceFailureReason.NotSignedIn;
+            }
+            _playerSession.UpdatePreferredLanguage(preferredLanguageId);
+            return LanguagePreferenceFailureReason.None;
         }
 
         /// <inheritdoc/>
-        public RegistrationResultDto Register(RegisterAccountDto registrationData)
+        public LoginResult Login(LoginCredentials credentials)
+        {
+            return _authenticationController.Login(credentials);
+        }
+
+        /// <inheritdoc/>
+        public RegistrationResult Register(AccountRegistration registrationData)
         {
             return _registrationController.Register(registrationData);
         }
 
         /// <inheritdoc/>
-        public ProfilePictureResultDto SetProfilePicture(ProfilePictureDto profilePicture)
+        public ProfilePictureFailureReason SetProfilePicture(int playerId, DomainProfilePicture picture)
         {
-            return _profilePictureController.SetProfilePicture(profilePicture);
+            return _profilePictureController.SetProfilePicture(playerId, picture);
         }
 
         /// <inheritdoc/>
-        public ProfilePictureResultDto RemoveProfilePicture(int playerId)
+        public ProfilePictureFailureReason RemoveProfilePicture(int playerId)
         {
             return _profilePictureController.RemoveProfilePicture(playerId);
         }
 
         /// <inheritdoc/>
-        public ProfileDto GetProfile(int playerId)
+        public PlayerProfile GetProfile(int playerId)
         {
             return _profileController.GetProfile(playerId);
         }
 
         /// <inheritdoc/>
-        public UpdateProfileResultDto UpdateProfile(UpdateProfileDto profileData)
+        public UpdateProfileFailureReason UpdateProfile(int playerId, string username)
         {
-            return _profileController.UpdateProfile(profileData);
+            return _profileController.UpdateProfile(playerId, username);
         }
 
         /// <inheritdoc/>
-        public DeleteAccountResultDto DeleteAccount(DeleteAccountRequestDto request)
+        public UpdateProfileFailureReason UpdateProfile(int playerId, string username,
+            DomainProfilePicture replacementPicture)
         {
-            return _accountController.DeleteAccount(request);
+            return _profileController.UpdateProfile(playerId, username, replacementPicture);
         }
 
         /// <inheritdoc/>
-        public ChangePasswordResultDto ChangePassword(ChangePasswordRequestDto request)
+        public DeleteFailureReason DeleteAccount(int playerId, string password)
         {
-            return _accountController.ChangePassword(request);
+            return _accountController.DeleteAccount(playerId, password);
+        }
+
+        /// <inheritdoc/>
+        public ChangePasswordFailureReason ChangePassword(int playerId, string currentPassword, string newPassword)
+        {
+            return _accountController.ChangePassword(playerId, currentPassword, newPassword);
         }
 
     }

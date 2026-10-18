@@ -116,7 +116,8 @@ namespace DominoAllFives.Client.WPF.Services
                         _navigationService,
                         _rankingService,
                         _playerSession,
-                        _profilePictureImageService);
+                        _profilePictureImageService,
+                        _dialogService);
                     break;
                 default:
                     viewModel = (TViewModel)Activator.CreateInstance(

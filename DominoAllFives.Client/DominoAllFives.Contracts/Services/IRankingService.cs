@@ -1,4 +1,4 @@
-﻿using DominoAllFives.Contracts.DTOs;
+﻿using DominoAllFives.Contracts.Domain;
 
 namespace DominoAllFives.Contracts.Services
 {
@@ -13,6 +13,6 @@ namespace DominoAllFives.Contracts.Services
         /// <param name="playerId">The ID of the player for whom 
         /// to retrieve ranking information.</param>
         /// <returns>The ranking result.</returns>
-        RankingResultDto GetTopRanking(int playerId);
+        Ranking GetTopRanking(int playerId);
     }
 }

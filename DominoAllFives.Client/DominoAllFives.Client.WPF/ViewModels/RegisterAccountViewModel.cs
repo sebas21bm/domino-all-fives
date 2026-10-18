@@ -5,7 +5,7 @@ using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.DTOs;
+using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Contracts.Services;
 
@@ -121,26 +121,28 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            RegisterAccountDto registrationData =
-                new RegisterAccountDto
-                {
-                    Username = Username.Trim(),
-                    Email = Email.Trim(),
-                    Password = password,
-                    PreferredLanguageId =
-                        LanguageManager.Instance.CurrentLanguageCode
-                };
-
-            RegistrationResultDto result =_accountService.Register(registrationData);
-
-            if (!result.IsSuccessful)
+            RegistrationResult result;
+            try
             {
-                ShowRegistrationFailure(result.FailureReason);
+                AccountRegistration registrationData = AccountRegistration.Create(
+                    Username.Trim(), Email.Trim(), password,
+                    LanguageManager.Instance.CurrentLanguageCode);
+                result = _accountService.Register(registrationData);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.TraceError("Registration failed: {0}", ex);
+                ShowRegistrationFailure(RegistrationFailureReason.ServiceUnavailable);
+                return;
+            }
+            if (result.Reason != RegistrationFailureReason.None)
+            {
+                ShowRegistrationFailure(result.Reason);
                 return;
             }
 
-            _playerSession.Start(result.PlayerId, result.Username);
-
+            PlayerAccount account = result.Account;
+            _playerSession.Start(account.PlayerId, account.Username, account.PreferredLanguageId);
             _dialogService.ShowDialog(new DialogRequest
             {
                 Type = DialogType.Success,
