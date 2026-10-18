@@ -51,7 +51,8 @@ namespace DominoAllFives.Client.WPF
                     loggerFactory.CreateLogger<ProfilePictureStorage>());
 
             AuthenticationController authenticationController =
-                new AuthenticationController();
+                new AuthenticationController(
+                    loggerFactory.CreateLogger<AuthenticationController>());
 
             RegistrationController registrationController =
                 new RegistrationController(
