@@ -18,7 +18,7 @@ namespace DominoAllFives.Client.WPF.Services
         private readonly IDialogService _dialogService;
         private readonly IAccountService _accountService;
         private readonly ILoginClient _loginClient;
-        private readonly IRankingService _rankingService;
+        private readonly IRankingClient _rankingService;
         private readonly PlayerSession _playerSession;
         private readonly ILoggerFactory _loggerFactory;
         private readonly ProfilePictureImageService _profilePictureImageService;
@@ -28,7 +28,7 @@ namespace DominoAllFives.Client.WPF.Services
             IDialogService dialogService,
             IAccountService accountService,
             ILoginClient loginClient,
-            IRankingService rankingService,
+            IRankingClient rankingService,
             PlayerSession playerSession,
             ILoggerFactory loggerFactory,
             ProfilePictureImageService profilePictureImageService,
@@ -47,7 +47,8 @@ namespace DominoAllFives.Client.WPF.Services
                     nameof(accountService));
 
             _loginClient = loginClient
-                ?? throw new ArgumentNullException(nameof(loginClient));
+                ?? throw new ArgumentNullException(
+                    nameof(loginClient));
 
             _rankingService = rankingService
                 ?? throw new ArgumentNullException(

@@ -28,8 +28,7 @@
     <Reference Include="EntityFramework"><HintPath>..\packages\EntityFramework.6.5.2\lib\net45\EntityFramework.dll</HintPath></Reference>
     <Reference Include="EntityFramework.SqlServer"><HintPath>..\packages\EntityFramework.6.5.2\lib\net45\EntityFramework.SqlServer.dll</HintPath></Reference>
   </ItemGroup>
-  <ItemGroup><Compile Include="Program.cs" /><Compile Include="DominoService.cs" />
-    <Compile Include="Controllers\AuthenticationController.cs" /></ItemGroup>
+  <ItemGroup><Compile Include="Program.cs" /><Compile Include="DominoService.cs" /><Compile Include="Controllers\AuthenticationController.cs" /><Compile Include="Controllers\RankingController.cs" /></ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DominoAllFives.Contracts\DominoAllFives.Contracts.csproj"><Project>{9e01a5c7-aeb0-4480-870e-429a5791399c}</Project><Name>DominoAllFives.Contracts</Name></ProjectReference>
     <ProjectReference Include="..\DominoAllFives.BusinessLogic\DominoAllFives.BusinessLogic.csproj"><Project>{34f7b0ce-2282-4e94-bb0d-bc5d971d6ee1}</Project><Name>DominoAllFives.BusinessLogic</Name></ProjectReference>

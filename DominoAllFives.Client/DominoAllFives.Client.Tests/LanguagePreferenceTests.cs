@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity.Core;
 using System.Globalization;
+using System.ServiceModel;
 using System.Threading;
 using System.Windows.Controls;
 using DominoAllFives.BusinessLogic.Controllers;
@@ -19,6 +20,7 @@ using DominoAllFives.Contracts.Services;
 using DominoAllFives.DataAccess.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
+using Proxy = DominoAllFivesService;
 
 namespace DominoAllFives.Client.Tests
 {
@@ -145,7 +147,7 @@ namespace DominoAllFives.Client.Tests
                 Assert.That(session.PreferredLanguageId, Is.EqualTo("es-MX"));
             };
             GameSettingsViewModel model = CreateSettings(
-                session, CreateLocalService(session, database), manager, new DialogRecorder());
+                session, new LegacyAccountServiceAdapter(() => CreateLocalService(session, database)), manager, new DialogRecorder());
             model.SelectedLanguageCode = "en-US";
 
             // Act.
@@ -195,7 +197,7 @@ namespace DominoAllFives.Client.Tests
             DevicePreference device = new DevicePreference("es-MX");
             LanguageManager manager = device.CreateManager();
             GameSettingsViewModel model = CreateSettings(
-                session, CreateLocalService(session, database), manager, new DialogRecorder());
+                session, new LegacyAccountServiceAdapter(() => CreateLocalService(session, database)), manager, new DialogRecorder());
             model.SelectedLanguageCode = "pt-BR";
 
             // Act.
@@ -222,7 +224,7 @@ namespace DominoAllFives.Client.Tests
             manager.ApplyAccountLanguage("es-MX");
             DialogRecorder dialogs = new DialogRecorder();
             GameSettingsViewModel model = CreateSettings(
-                session, CreateLocalService(session, database), manager, dialogs);
+                session, new LegacyAccountServiceAdapter(() => CreateLocalService(session, database)), manager, dialogs);
             model.SelectedLanguageCode = "en-US";
 
             // Act.
@@ -460,7 +462,6 @@ namespace DominoAllFives.Client.Tests
             ProfilePictureStorage storage = new ProfilePictureStorage(
                 NullLogger<ProfilePictureStorage>.Instance);
             return new LocalAccountService(
-                new AuthenticationController(NullLogger<AuthenticationController>.Instance),
                 new RegistrationController(NullLogger<RegistrationController>.Instance),
                 new ProfilePictureController(storage, NullLogger<ProfilePictureController>.Instance),
                 new ProfileController(storage, NullLogger<ProfileController>.Instance),
@@ -580,18 +581,28 @@ namespace DominoAllFives.Client.Tests
             public void GoBack() { }
         }
 
-        private sealed class AccountServiceStub : IAccountService
+        private sealed class AccountServiceStub : IAccountService, ILoginClient
         {
             public PlayerAccount Account { get; set; }
             public RegistrationFailureReason? RegistrationFailure { get; set; }
             public LoginFailureReason? LoginFailure { get; set; }
-            public LoginResult Login(LoginCredentials credentials)
+            public Proxy.LoginResult Login(Proxy.LoginCredentials credentials)
             {
                 if (LoginFailure == LoginFailureReason.ServiceUnavailable)
                 {
-                    throw new EntityException("SQL Server: private connection and query details.");
+                    throw new CommunicationException("Synthetic transport failure.");
                 }
-                return LoginFailure.HasValue ? LoginResult.Rejected(LoginFailure.Value) : LoginResult.Success(Account);
+                return new Proxy.LoginResult
+                {
+                    Reason = LoginFailure.HasValue
+                        ? (Proxy.LoginFailureReason)LoginFailure.Value : Proxy.LoginFailureReason.None,
+                    Account = LoginFailure.HasValue ? null : new Proxy.PlayerAccount
+                    {
+                        PlayerId = Account.PlayerId,
+                        Username = Account.Username,
+                        PreferredLanguageId = Account.PreferredLanguageId
+                    }
+                };
             }
             public LanguagePreferenceFailureReason ChangePreferredLanguage(string languageId) =>
                 throw new NotSupportedException();

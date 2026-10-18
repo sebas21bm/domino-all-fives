@@ -132,11 +132,21 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
                 result = _loginClient.Login(credentials);
             }
-            catch (FaultException ex)
+            catch (CommunicationException ex)
             {
                 _logger.LogError(
                     ex,
                     "Authentication service unavailable for user {EmailOrUsername}.",
+                    Email.Trim());
+
+                ShowLoginFailure(LoginFailureReason.ServiceUnavailable);
+                return;
+            }
+            catch (TimeoutException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Authentication service timed out for user {EmailOrUsername}.",
                     Email.Trim());
 
                 ShowLoginFailure(LoginFailureReason.ServiceUnavailable);

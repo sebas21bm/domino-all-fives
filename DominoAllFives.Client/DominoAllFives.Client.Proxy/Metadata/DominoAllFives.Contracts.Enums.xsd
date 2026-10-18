@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="LoginFailureReason">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None" />
+      <xs:enumeration value="InvalidCredentials" />
+      <xs:enumeration value="Banned" />
+      <xs:enumeration value="Suspended" />
+      <xs:enumeration value="ServiceUnavailable" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="LoginFailureReason" nillable="true" type="tns:LoginFailureReason" />
+</xs:schema>

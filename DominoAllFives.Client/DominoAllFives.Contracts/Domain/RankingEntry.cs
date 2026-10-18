@@ -1,15 +1,21 @@
-﻿using System;
+using System.Runtime.Serialization;
+using System;
 
 namespace DominoAllFives.Contracts.Domain
 {
     /// <summary>
     /// Represents a server-assigned ordinal position and the corresponding public player data.
     /// </summary>
+    [DataContract]
     public sealed class RankingEntry
     {
+        [DataMember(Order = 1, IsRequired = true)]
         public int Rank { get; private set; }
+        [DataMember(Order = 2, IsRequired = true)]
         public string Username { get; private set; }
+        [DataMember(Order = 3, IsRequired = true)]
         public int GamesWon { get; private set; }
+        [DataMember(Order = 4, IsRequired = true)]
         public ProfilePicture Picture { get; private set; }
 
         private RankingEntry()

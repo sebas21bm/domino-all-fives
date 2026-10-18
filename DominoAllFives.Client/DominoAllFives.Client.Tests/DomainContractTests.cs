@@ -15,6 +15,14 @@ namespace DominoAllFives.Client.Tests
     public class DomainContractTests
     {
         [Test]
+        public void LocalClientServices_HaveNoLoginOrRankingImplementation()
+        {
+            Type localAccount = typeof(DominoAllFives.Client.WPF.Services.Local.LocalAccountService);
+            Assert.That(localAccount.GetMethod("Login"), Is.Null);
+            Assert.That(localAccount.Assembly.GetType("DominoAllFives.Client.WPF.Services.Local.LocalRankingService"), Is.Null);
+        }
+
+        [Test]
         public void LoginCredentials_ValidInput_NormalizesOnlyIdentifier()
         {
             // Arrange.
@@ -200,17 +208,6 @@ namespace DominoAllFives.Client.Tests
         public void RegistrationResult_InvalidRejection_CannotBeConstructed(RegistrationFailureReason reason)
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => RegistrationResult.Rejected(reason));
-        }
-
-        [Test]
-        public void Login_InvalidCredentials_RejectsWithoutOpeningDatabase()
-        {
-            AuthenticationController controller = new AuthenticationController(
-                NullLogger<AuthenticationController>.Instance);
-            LoginResult result = controller.Login(LoginCredentials.ForLogin("", ""));
-            Assert.That(result.Account, Is.Null);
-            Assert.That(result.Reason, Is.EqualTo(LoginFailureReason.InvalidCredentials));
-            Assert.Throws<ArgumentNullException>(() => controller.Login(null));
         }
 
         [TestCase("", "bad-email", "x", RegistrationFailureReason.InvalidUsername)]

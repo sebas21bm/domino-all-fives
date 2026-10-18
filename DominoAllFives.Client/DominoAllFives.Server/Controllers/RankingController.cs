@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using DominoAllFives.BusinessLogic.Storage;
@@ -7,7 +7,7 @@ using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;
 
-namespace DominoAllFives.BusinessLogic.Controllers
+namespace DominoAllFives.Server.Controllers
 {
     /// <summary>
     /// Coordinates operations related to player rankings.

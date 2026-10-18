@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:tns="urn:domino-all-fives:services" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" targetNamespace="urn:domino-all-fives:services" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="urn:domino-all-fives:services/Imports">
+      <xsd:import namespace="urn:domino-all-fives:services" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IAuthenticationService_Login_InputMessage">
+    <wsdl:part name="parameters" element="tns:Login" />
+  </wsdl:message>
+  <wsdl:message name="IAuthenticationService_Login_OutputMessage">
+    <wsdl:part name="parameters" element="tns:LoginResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRankingRemoteService_GetTopRanking_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetTopRanking" />
+  </wsdl:message>
+  <wsdl:message name="IRankingRemoteService_GetTopRanking_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetTopRankingResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IAuthenticationService">
+    <wsdl:operation name="Login">
+      <wsdl:input wsaw:Action="urn:domino-all-fives:services/IAuthenticationService/Login" message="tns:IAuthenticationService_Login_InputMessage" />
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IAuthenticationService/LoginResponse" message="tns:IAuthenticationService_Login_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="IRankingRemoteService">
+    <wsdl:operation name="GetTopRanking">
+      <wsdl:input wsaw:Action="urn:domino-all-fives:services/IRankingRemoteService/GetTopRanking" message="tns:IRankingRemoteService_GetTopRanking_InputMessage" />
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IRankingRemoteService/GetTopRankingResponse" message="tns:IRankingRemoteService_GetTopRanking_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="DefaultBinding_IAuthenticationService" type="tns:IAuthenticationService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Login">
+      <soap:operation soapAction="urn:domino-all-fives:services/IAuthenticationService/Login" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="DefaultBinding_IRankingRemoteService" type="tns:IRankingRemoteService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetTopRanking">
+      <soap:operation soapAction="urn:domino-all-fives:services/IRankingRemoteService/GetTopRanking" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+</wsdl:definitions>

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="urn:domino-all-fives:services" elementFormDefault="qualified" targetNamespace="urn:domino-all-fives:services" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" />
+  <xs:element name="Login">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="credentials" nillable="true" xmlns:q1="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q1:LoginCredentials" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LoginResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="LoginResult" nillable="true" xmlns:q2="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q2:LoginResult" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetTopRanking">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="playerId" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetTopRankingResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetTopRankingResult" nillable="true" xmlns:q3="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q3:Ranking" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

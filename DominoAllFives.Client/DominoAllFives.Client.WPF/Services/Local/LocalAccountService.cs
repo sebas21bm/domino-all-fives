@@ -71,7 +71,7 @@ namespace DominoAllFives.Client.WPF.Services.Local
             return LanguagePreferenceFailureReason.None;
         }
 
-        /// <inheritdoc/>
+/// <inheritdoc/>
         public RegistrationResult Register(AccountRegistration registrationData)
         {
             return _registrationController.Register(registrationData);
