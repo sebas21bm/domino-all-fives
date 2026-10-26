@@ -1,9 +1,9 @@
-﻿namespace DominoAllFives.Contracts.Enums
+namespace DominoAllFives.Contracts.Enums
 {
     /// <summary>
     /// Defines the possible reasons for a failed account deletion attempt.
     /// </summary>
-    public enum DeleteFailureReason
+    public enum DeleteStatus
     {
         None,
         PasswordNotMatch,

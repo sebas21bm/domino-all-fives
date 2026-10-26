@@ -34,7 +34,7 @@ namespace DominoAllFives.Client.Tests
             // Assert.
             Assert.That(credentials.EmailOrUsername, Is.EqualTo("player"));
             Assert.That(credentials.Password, Is.EqualTo(password));
-            Assert.That(credentials.EnsureValid(), Is.EqualTo(LoginFailureReason.None));
+            Assert.That(credentials.EnsureValid(), Is.EqualTo(LoginStatus.None));
         }
 
         [TestCase(null, "password")]
@@ -45,10 +45,10 @@ namespace DominoAllFives.Client.Tests
             string identifier, string password)
         {
             // Arrange and act.
-            LoginFailureReason reason = LoginCredentials.ForLogin(identifier, password).EnsureValid();
+            LoginStatus reason = LoginCredentials.ForLogin(identifier, password).EnsureValid();
 
             // Assert.
-            Assert.That(reason, Is.EqualTo(LoginFailureReason.InvalidCredentials));
+            Assert.That(reason, Is.EqualTo(LoginStatus.InvalidCredentials));
         }
 
         [TestCase("x")]
@@ -85,10 +85,10 @@ namespace DominoAllFives.Client.Tests
                 .Any(property => property.GetSetMethod() != null), Is.False);
         }
 
-        [TestCase(true, true, LoginFailureReason.InvalidCredentials)]
-        [TestCase(false, true, LoginFailureReason.Banned)]
+        [TestCase(true, true, LoginStatus.InvalidCredentials)]
+        [TestCase(false, true, LoginStatus.Banned)]
         public void AccountAccessStatus_Restrictions_PreserveFailurePrecedence(
-            bool deleted, bool banned, LoginFailureReason expected)
+            bool deleted, bool banned, LoginStatus expected)
         {
             // Arrange.
             DateTime utcNow = new DateTime(2026, 10, 15, 12, 0, 0, DateTimeKind.Utc);
@@ -96,7 +96,7 @@ namespace DominoAllFives.Client.Tests
                 deleted, banned, utcNow.AddHours(1));
 
             // Act.
-            LoginFailureReason reason = status.EnsureCanLogin(utcNow);
+            LoginStatus reason = status.EnsureCanLogin(utcNow);
 
             // Assert.
             Assert.That(reason, Is.EqualTo(expected));
@@ -116,22 +116,22 @@ namespace DominoAllFives.Client.Tests
             // Act and assert.
             if (allowed)
             {
-                Assert.That(status.EnsureCanLogin(evaluationTime), Is.EqualTo(LoginFailureReason.None));
+                Assert.That(status.EnsureCanLogin(evaluationTime), Is.EqualTo(LoginStatus.None));
             }
             else
             {
-                Assert.That(status.EnsureCanLogin(evaluationTime), Is.EqualTo(LoginFailureReason.Suspended));
+                Assert.That(status.EnsureCanLogin(evaluationTime), Is.EqualTo(LoginStatus.Suspended));
             }
         }
 
-        [TestCase("", "bad-email", "x", RegistrationFailureReason.InvalidUsername)]
-        [TestCase("player", "bad-email", "x", RegistrationFailureReason.InvalidEmail)]
-        [TestCase("player", "player@gmail.com", "x", RegistrationFailureReason.InvalidPassword)]
+        [TestCase("", "bad-email", "x", RegistrationStatus.InvalidUsername)]
+        [TestCase("player", "bad-email", "x", RegistrationStatus.InvalidEmail)]
+        [TestCase("player", "player@gmail.com", "x", RegistrationStatus.InvalidPassword)]
         public void AccountRegistration_MultipleInvalidFields_PreservesValidationOrder(
-            string username, string email, string password, RegistrationFailureReason expected)
+            string username, string email, string password, RegistrationStatus expected)
         {
             // Arrange and act.
-            RegistrationFailureReason reason = AccountRegistration.Create(username, email, password, "es-MX").EnsureValid();
+            RegistrationStatus reason = AccountRegistration.Create(username, email, password, "es-MX").EnsureValid();
 
             // Assert.
             Assert.That(reason, Is.EqualTo(expected));
@@ -164,64 +164,64 @@ namespace DominoAllFives.Client.Tests
             LoginResult login = LoginResult.Success(account);
             RegistrationResult registration = RegistrationResult.Success(account);
             Assert.That(login.Account, Is.SameAs(account));
-            Assert.That(login.Reason, Is.EqualTo(LoginFailureReason.None));
+            Assert.That(login.Status, Is.EqualTo(LoginStatus.None));
             Assert.That(registration.Account, Is.SameAs(account));
-            Assert.That(registration.Reason, Is.EqualTo(RegistrationFailureReason.None));
+            Assert.That(registration.Status, Is.EqualTo(RegistrationStatus.None));
             Assert.Throws<ArgumentNullException>(() => LoginResult.Success(null));
             Assert.Throws<ArgumentNullException>(() => RegistrationResult.Success(null));
         }
 
-        [TestCase(LoginFailureReason.InvalidCredentials)]
-        [TestCase(LoginFailureReason.Banned)]
-        [TestCase(LoginFailureReason.Suspended)]
-        public void LoginResult_Rejection_PreservesReasonWithoutAccount(LoginFailureReason reason)
+        [TestCase(LoginStatus.InvalidCredentials)]
+        [TestCase(LoginStatus.Banned)]
+        [TestCase(LoginStatus.Suspended)]
+        public void LoginResult_Rejection_PreservesReasonWithoutAccount(LoginStatus reason)
         {
             LoginResult result = LoginResult.Rejected(reason);
             Assert.That(result.Account, Is.Null);
-            Assert.That(result.Reason, Is.EqualTo(reason));
+            Assert.That(result.Status, Is.EqualTo(reason));
         }
 
-        [TestCase(LoginFailureReason.ServiceUnavailable)]
-        [TestCase(LoginFailureReason.None)]
-        [TestCase((LoginFailureReason)999)]
-        public void LoginResult_InvalidRejection_CannotBeConstructed(LoginFailureReason reason)
+        [TestCase(LoginStatus.ServiceUnavailable)]
+        [TestCase(LoginStatus.None)]
+        [TestCase((LoginStatus)999)]
+        public void LoginResult_InvalidRejection_CannotBeConstructed(LoginStatus reason)
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => LoginResult.Rejected(reason));
         }
 
-        [TestCase(RegistrationFailureReason.InvalidUsername)]
-        [TestCase(RegistrationFailureReason.InvalidEmail)]
-        [TestCase(RegistrationFailureReason.InvalidPassword)]
-        [TestCase(RegistrationFailureReason.UsernameAlreadyExists)]
-        [TestCase(RegistrationFailureReason.EmailAlreadyExists)]
-        public void RegistrationResult_Rejection_PreservesReasonWithoutAccount(RegistrationFailureReason reason)
+        [TestCase(RegistrationStatus.InvalidUsername)]
+        [TestCase(RegistrationStatus.InvalidEmail)]
+        [TestCase(RegistrationStatus.InvalidPassword)]
+        [TestCase(RegistrationStatus.UsernameAlreadyExists)]
+        [TestCase(RegistrationStatus.EmailAlreadyExists)]
+        public void RegistrationResult_Rejection_PreservesReasonWithoutAccount(RegistrationStatus reason)
         {
             RegistrationResult result = RegistrationResult.Rejected(reason);
             Assert.That(result.Account, Is.Null);
-            Assert.That(result.Reason, Is.EqualTo(reason));
+            Assert.That(result.Status, Is.EqualTo(reason));
         }
 
-        [TestCase(RegistrationFailureReason.InvalidRegistrationData)]
-        [TestCase(RegistrationFailureReason.None)]
-        [TestCase(RegistrationFailureReason.ServiceUnavailable)]
-        [TestCase((RegistrationFailureReason)999)]
-        public void RegistrationResult_InvalidRejection_CannotBeConstructed(RegistrationFailureReason reason)
+        [TestCase(RegistrationStatus.InvalidRegistrationData)]
+        [TestCase(RegistrationStatus.None)]
+        [TestCase(RegistrationStatus.ServiceUnavailable)]
+        [TestCase((RegistrationStatus)999)]
+        public void RegistrationResult_InvalidRejection_CannotBeConstructed(RegistrationStatus reason)
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => RegistrationResult.Rejected(reason));
         }
 
-        [TestCase("", "bad-email", "x", RegistrationFailureReason.InvalidUsername)]
-        [TestCase("player", "bad-email", "x", RegistrationFailureReason.InvalidEmail)]
-        [TestCase("player", "player@gmail.com", "x", RegistrationFailureReason.InvalidPassword)]
+        [TestCase("", "bad-email", "x", RegistrationStatus.InvalidUsername)]
+        [TestCase("player", "bad-email", "x", RegistrationStatus.InvalidEmail)]
+        [TestCase("player", "player@gmail.com", "x", RegistrationStatus.InvalidPassword)]
         public void Register_InvalidInput_RejectsBeforeOpeningDatabase(
-            string username, string email, string password, RegistrationFailureReason expected)
+            string username, string email, string password, RegistrationStatus expected)
         {
             RegistrationController controller = new RegistrationController(
                 NullLogger<RegistrationController>.Instance);
             RegistrationResult result = controller.Register(
                 AccountRegistration.Create(username, email, password, "es-MX"));
             Assert.That(result.Account, Is.Null);
-            Assert.That(result.Reason, Is.EqualTo(expected));
+            Assert.That(result.Status, Is.EqualTo(expected));
         }
 
         [TestCase(false)]
@@ -230,14 +230,14 @@ namespace DominoAllFives.Client.Tests
         {
             PlayerAccount account = PlayerAccount.FromStoredAccount(7, "player", "pt-BR",
                 AccountAccessStatus.FromStoredState(false, false, null));
-            LoginResult login = RoundTrip(rejected ? LoginResult.Rejected(LoginFailureReason.Banned)
+            LoginResult login = RoundTrip(rejected ? LoginResult.Rejected(LoginStatus.Banned)
                 : LoginResult.Success(account));
             RegistrationResult registration = RoundTrip(rejected
-                ? RegistrationResult.Rejected(RegistrationFailureReason.UsernameAlreadyExists)
+                ? RegistrationResult.Rejected(RegistrationStatus.UsernameAlreadyExists)
                 : RegistrationResult.Success(account));
-            Assert.That(login.Reason, Is.EqualTo(rejected ? LoginFailureReason.Banned : LoginFailureReason.None));
-            Assert.That(registration.Reason, Is.EqualTo(rejected
-                ? RegistrationFailureReason.UsernameAlreadyExists : RegistrationFailureReason.None));
+            Assert.That(login.Status, Is.EqualTo(rejected ? LoginStatus.Banned : LoginStatus.None));
+            Assert.That(registration.Status, Is.EqualTo(rejected
+                ? RegistrationStatus.UsernameAlreadyExists : RegistrationStatus.None));
             if (rejected)
             {
                 Assert.That(login.Account, Is.Null);
@@ -248,7 +248,7 @@ namespace DominoAllFives.Client.Tests
                 Assert.That(login.Account.PlayerId, Is.EqualTo(7));
                 Assert.That(registration.Account.Username, Is.EqualTo("player"));
                 Assert.That(login.Account.PreferredLanguageId, Is.EqualTo("pt-BR"));
-                Assert.That(login.Account.EnsureCanLogin(DateTime.UtcNow), Is.EqualTo(LoginFailureReason.None));
+                Assert.That(login.Account.EnsureCanLogin(DateTime.UtcNow), Is.EqualTo(LoginStatus.None));
             }
         }
 
@@ -274,7 +274,7 @@ namespace DominoAllFives.Client.Tests
                 document = XDocument.Load(stream);
             }
             XElement accountElement = document.Root.Elements().Single(element => element.Name.LocalName == "Account");
-            XElement reasonElement = document.Root.Elements().Single(element => element.Name.LocalName == "Reason");
+            XElement reasonElement = document.Root.Elements().Single(element => element.Name.LocalName == "Status");
             if (corruption == "missing") reasonElement.Remove();
             else if (corruption == "successWithoutAccount")
             {

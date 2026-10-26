@@ -22,9 +22,9 @@ namespace DominoAllFives.Client.Tests
                 Is.EqualTo(typeof(Proxy.LoginCredentials)));
             Assert.That(typeof(Proxy.IRankingRemoteService).GetMethod("GetTopRanking").ReturnType,
                 Is.EqualTo(typeof(Proxy.Ranking)));
-            Assert.That(typeof(Proxy.LoginResult).GetProperty("Reason").PropertyType,
-                Is.EqualTo(typeof(Proxy.LoginFailureReason)));
-            Assert.That(typeof(Proxy.LoginFailureReason).IsEnum, Is.True);
+            Assert.That(typeof(Proxy.LoginResult).GetProperty("Status").PropertyType,
+                Is.EqualTo(typeof(Proxy.LoginStatus)));
+            Assert.That(typeof(Proxy.LoginStatus).IsEnum, Is.True);
             Assert.That(typeof(Proxy.LoginResult).Assembly, Is.Not.EqualTo(typeof(LoginResult).Assembly));
         }
 
@@ -35,7 +35,7 @@ namespace DominoAllFives.Client.Tests
                 new Proxy.LoginCredentials { EmailOrUsername = "demo", Password = "  secret  " });
             Assert.That(received.EmailOrUsername, Is.EqualTo("demo"));
             Assert.That(received.Password, Is.EqualTo("  secret  "));
-            Assert.That(received.EnsureValid(), Is.EqualTo(LoginFailureReason.None));
+            Assert.That(received.EnsureValid(), Is.EqualTo(LoginStatus.None));
         }
 
         [Test]
@@ -48,19 +48,19 @@ namespace DominoAllFives.Client.Tests
             Assert.That(ranking.ReturnType, Is.EqualTo(typeof(Proxy.Ranking)));
         }
 
-        [TestCase(LoginFailureReason.None)]
-        [TestCase(LoginFailureReason.InvalidCredentials)]
-        [TestCase(LoginFailureReason.Banned)]
-        [TestCase(LoginFailureReason.Suspended)]
-        public void ServerLoginResult_ProxyReadsTypedReasonAndAccount(LoginFailureReason reason)
+        [TestCase(LoginStatus.None)]
+        [TestCase(LoginStatus.InvalidCredentials)]
+        [TestCase(LoginStatus.Banned)]
+        [TestCase(LoginStatus.Suspended)]
+        public void ServerLoginResult_ProxyReadsTypedReasonAndAccount(LoginStatus reason)
         {
-            LoginResult source = reason == LoginFailureReason.None
+            LoginResult source = reason == LoginStatus.None
                 ? LoginResult.Success(PlayerAccount.FromStoredAccount(17, "demo", "pt-BR",
                     AccountAccessStatus.FromStoredState(false, false, null)))
                 : LoginResult.Rejected(reason);
             Proxy.LoginResult received = Transfer<LoginResult, Proxy.LoginResult>(source);
-            Assert.That(received.Reason.ToString(), Is.EqualTo(reason.ToString()));
-            if (reason == LoginFailureReason.None)
+            Assert.That(received.Status.ToString(), Is.EqualTo(reason.ToString()));
+            if (reason == LoginStatus.None)
             {
                 Assert.That(received.Account.PlayerId, Is.EqualTo(17));
                 Assert.That(received.Account.Username, Is.EqualTo("demo"));
@@ -76,9 +76,9 @@ namespace DominoAllFives.Client.Tests
         [Test]
         public void ServerEnum_AllDeclaredMembers_AreTypedAndReadableByProxy()
         {
-            foreach (LoginFailureReason reason in Enum.GetValues(typeof(LoginFailureReason)))
+            foreach (LoginStatus reason in Enum.GetValues(typeof(LoginStatus)))
             {
-                Proxy.LoginFailureReason received = Transfer<LoginFailureReason, Proxy.LoginFailureReason>(reason);
+                Proxy.LoginStatus received = Transfer<LoginStatus, Proxy.LoginStatus>(reason);
                 Assert.That(received.ToString(), Is.EqualTo(reason.ToString()));
                 Assert.That((int)received, Is.EqualTo((int)reason));
             }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
@@ -37,10 +37,10 @@ namespace DominoAllFives.BusinessLogic.Controllers
         public RegistrationResult Register(
             AccountRegistration registrationData)
         {
-            RegistrationFailureReason validationResult =
+            RegistrationStatus validationResult =
                 RegistrationValidator.Validate(registrationData);
 
-            if (validationResult != RegistrationFailureReason.None)
+            if (validationResult != RegistrationStatus.None)
             {
                 return RegistrationResult.Rejected(validationResult);
             }
@@ -59,13 +59,13 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     if (playerRepository.UsernameExists(
                         registrationData.Username))
                     {
-                        return RegistrationResult.Rejected(RegistrationFailureReason.UsernameAlreadyExists);
+                        return RegistrationResult.Rejected(RegistrationStatus.UsernameAlreadyExists);
                     }
 
                     if (playerRepository.EmailExists(
                         registrationData.Email))
                     {
-                        return RegistrationResult.Rejected(RegistrationFailureReason.EmailAlreadyExists);
+                        return RegistrationResult.Rejected(RegistrationStatus.EmailAlreadyExists);
                     }
 
                     Player player = new Player

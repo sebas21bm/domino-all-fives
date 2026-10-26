@@ -52,12 +52,12 @@ namespace DominoAllFives.Client.Tests
             CultureInfo.DefaultThreadCurrentUICulture = _defaultUiCulture;
         }
 
-        [TestCase(LoginFailureReason.InvalidCredentials, "MessageAuthentication_msgInvalidCredentials")]
-        [TestCase(LoginFailureReason.Banned, "MessageAuthentication_msgBannedAccount")]
-        [TestCase(LoginFailureReason.Suspended, "MessageAuthentication_msgSuspendedAccount")]
-        [TestCase(LoginFailureReason.ServiceUnavailable, "MessageAuthentication_msgConnectionError")]
+        [TestCase(LoginStatus.InvalidCredentials, "MessageAuthentication_msgInvalidCredentials")]
+        [TestCase(LoginStatus.Banned, "MessageAuthentication_msgBannedAccount")]
+        [TestCase(LoginStatus.Suspended, "MessageAuthentication_msgSuspendedAccount")]
+        [TestCase(LoginStatus.ServiceUnavailable, "MessageAuthentication_msgConnectionError")]
         public void Login_RejectionOrTechnicalFailure_PreservesLocalizedMessageAndNoSession(
-            LoginFailureReason reason, string expectedMessage)
+            LoginStatus reason, string expectedMessage)
         {
             AccountServiceStub service = new AccountServiceStub { LoginFailure = reason };
             PlayerSession session = new PlayerSession();
@@ -264,10 +264,10 @@ namespace DominoAllFives.Client.Tests
             session.Clear();
 
             // Act.
-            LanguagePreferenceFailureReason reason = service.ChangePreferredLanguage("en-US");
+            LanguagePreferenceStatus reason = service.ChangePreferredLanguage("en-US");
 
             // Assert.
-            Assert.That(reason, Is.EqualTo(LanguagePreferenceFailureReason.NotSignedIn));
+            Assert.That(reason, Is.EqualTo(LanguagePreferenceStatus.NotSignedIn));
             Assert.That(database.FactoryCount, Is.Zero);
             Assert.That(database.Languages[11], Is.EqualTo("es-MX"));
         }
@@ -312,10 +312,10 @@ namespace DominoAllFives.Client.Tests
             database.Languages.Remove(11);
 
             // Act.
-            LanguagePreferenceFailureReason reason = CreateController(database).ChangePreferredLanguage(11, "en-US");
+            LanguagePreferenceStatus reason = CreateController(database).ChangePreferredLanguage(11, "en-US");
 
             // Assert.
-            Assert.That(reason, Is.EqualTo(LanguagePreferenceFailureReason.AccountNotFound));
+            Assert.That(reason, Is.EqualTo(LanguagePreferenceStatus.AccountNotFound));
             Assert.That(database.SaveCount, Is.Zero);
         }
 
@@ -330,7 +330,7 @@ namespace DominoAllFives.Client.Tests
             LocalAccountService service = CreateLocalService(session, database);
 
             // Act.
-            Assert.That(service.ChangePreferredLanguage("en-US"), Is.EqualTo(LanguagePreferenceFailureReason.NotSignedIn));
+            Assert.That(service.ChangePreferredLanguage("en-US"), Is.EqualTo(LanguagePreferenceStatus.NotSignedIn));
 
             // Assert.
             Assert.That(session.PlayerId, Is.EqualTo(22));
@@ -412,12 +412,12 @@ namespace DominoAllFives.Client.Tests
             Assert.That(continued, Is.True);
         }
 
-        [TestCase(RegistrationFailureReason.UsernameAlreadyExists,
+        [TestCase(RegistrationStatus.UsernameAlreadyExists,
             "MessageAccount_msgUsernameUsed")]
-        [TestCase(RegistrationFailureReason.EmailAlreadyExists, "MessageAccount_msgEmailUsed")]
-        [TestCase(RegistrationFailureReason.ServiceUnavailable, "MessageAccount_msgAccountCreationError")]
+        [TestCase(RegistrationStatus.EmailAlreadyExists, "MessageAccount_msgEmailUsed")]
+        [TestCase(RegistrationStatus.ServiceUnavailable, "MessageAccount_msgAccountCreationError")]
         public void Register_BusinessRejectionOrTechnicalFailure_PreservesDialogAndDoesNotStartSession(
-            RegistrationFailureReason reason, string expectedMessage)
+            RegistrationStatus reason, string expectedMessage)
         {
             // Arrange.
             AccountServiceStub service = new AccountServiceStub { RegistrationFailure = reason };
@@ -584,18 +584,18 @@ namespace DominoAllFives.Client.Tests
         private sealed class AccountServiceStub : IAccountService, ILoginClient
         {
             public PlayerAccount Account { get; set; }
-            public RegistrationFailureReason? RegistrationFailure { get; set; }
-            public LoginFailureReason? LoginFailure { get; set; }
+            public RegistrationStatus? RegistrationFailure { get; set; }
+            public LoginStatus? LoginFailure { get; set; }
             public Proxy.LoginResult Login(Proxy.LoginCredentials credentials)
             {
-                if (LoginFailure == LoginFailureReason.ServiceUnavailable)
+                if (LoginFailure == LoginStatus.ServiceUnavailable)
                 {
                     throw new CommunicationException("Synthetic transport failure.");
                 }
                 return new Proxy.LoginResult
                 {
-                    Reason = LoginFailure.HasValue
-                        ? (Proxy.LoginFailureReason)LoginFailure.Value : Proxy.LoginFailureReason.None,
+                    Status = LoginFailure.HasValue
+                        ? (Proxy.LoginStatus)LoginFailure.Value : Proxy.LoginStatus.None,
                     Account = LoginFailure.HasValue ? null : new Proxy.PlayerAccount
                     {
                         PlayerId = Account.PlayerId,
@@ -604,13 +604,13 @@ namespace DominoAllFives.Client.Tests
                     }
                 };
             }
-            public LanguagePreferenceFailureReason ChangePreferredLanguage(string languageId) =>
+            public LanguagePreferenceStatus ChangePreferredLanguage(string languageId) =>
                 throw new NotSupportedException();
             public RegistrationResult Register(AccountRegistration data)
             {
                 if (RegistrationFailure.HasValue)
                 {
-                    if (RegistrationFailure == RegistrationFailureReason.ServiceUnavailable)
+                    if (RegistrationFailure == RegistrationStatus.ServiceUnavailable)
                     {
                         throw new EntityException("Synthetic persistence failure.");
                     }
@@ -618,18 +618,18 @@ namespace DominoAllFives.Client.Tests
                 }
                 return RegistrationResult.Success(Account);
             }
-            public ProfilePictureFailureReason SetProfilePicture(int playerId, ProfilePicture picture) =>
+            public ProfilePictureStatus SetProfilePicture(int playerId, ProfilePicture picture) =>
                 throw new NotSupportedException();
-            public ProfilePictureFailureReason RemoveProfilePicture(int playerId) =>
+            public ProfilePictureStatus RemoveProfilePicture(int playerId) =>
                 throw new NotSupportedException();
             public PlayerProfile GetProfile(int playerId) => throw new NotSupportedException();
-            public UpdateProfileFailureReason UpdateProfile(int playerId, string username) =>
+            public UpdateProfileStatus UpdateProfile(int playerId, string username) =>
                 throw new NotSupportedException();
-            public UpdateProfileFailureReason UpdateProfile(int playerId, string username, ProfilePicture replacementPicture) =>
+            public UpdateProfileStatus UpdateProfile(int playerId, string username, ProfilePicture replacementPicture) =>
                 throw new NotSupportedException();
-            public DeleteFailureReason DeleteAccount(int playerId, string password) =>
+            public DeleteStatus DeleteAccount(int playerId, string password) =>
                 throw new NotSupportedException();
-            public ChangePasswordFailureReason ChangePassword(int playerId, string currentPassword, string newPassword) =>
+            public ChangePasswordStatus ChangePassword(int playerId, string currentPassword, string newPassword) =>
                 throw new NotSupportedException();
         }
     }

@@ -1,4 +1,5 @@
-﻿using DominoAllFives.Contracts.Domain;
+using System.Collections.Generic;
+using DominoAllFives.Contracts.Domain;
 
 namespace DominoAllFives.Contracts.Services
 {
@@ -8,11 +9,14 @@ namespace DominoAllFives.Contracts.Services
     public interface IRankingService
     {
         /// <summary>
-        /// Retrieves the ranking information for the top players and the current player's rank.
+        /// Retrieves the ranking information for the top players by games won.
         /// </summary>
-        /// <param name="playerId">The ID of the player for whom 
-        /// to retrieve ranking information.</param>
         /// <returns>The ranking result.</returns>
-        Ranking GetTopRanking(int playerId);
+        List<RankingEntry> GetTopWinsRanking();
+
+        /// <summary>
+        /// Retrieves the player's position by games won, or zero when absent.
+        /// </summary>
+        int GetWinsRankingPositionById(int playerId);
     }
 }

@@ -15,12 +15,12 @@ namespace DominoAllFives.Contracts.Domain
         public PlayerAccount Account { get; private set; }
 
         [DataMember(Order = 2, IsRequired = true)]
-        public RegistrationFailureReason Reason { get; private set; }
+        public RegistrationStatus Status { get; private set; }
 
-        private RegistrationResult(PlayerAccount account, RegistrationFailureReason reason)
+        private RegistrationResult(PlayerAccount account, RegistrationStatus reason)
         {
             Account = account;
-            Reason = reason;
+            Status = reason;
         }
 
         public static RegistrationResult Success(PlayerAccount account)
@@ -29,10 +29,10 @@ namespace DominoAllFives.Contracts.Domain
             {
                 throw new ArgumentNullException(nameof(account));
             }
-            return new RegistrationResult(account, RegistrationFailureReason.None);
+            return new RegistrationResult(account, RegistrationStatus.None);
         }
 
-        public static RegistrationResult Rejected(RegistrationFailureReason reason)
+        public static RegistrationResult Rejected(RegistrationStatus reason)
         {
             if (!IsRejection(reason))
             {
@@ -42,20 +42,20 @@ namespace DominoAllFives.Contracts.Domain
             return new RegistrationResult(null, reason);
         }
 
-        private static bool IsRejection(RegistrationFailureReason reason)
+        private static bool IsRejection(RegistrationStatus reason)
         {
-            return reason == RegistrationFailureReason.InvalidUsername ||
-                reason == RegistrationFailureReason.InvalidEmail ||
-                reason == RegistrationFailureReason.InvalidPassword ||
-                reason == RegistrationFailureReason.UsernameAlreadyExists ||
-                reason == RegistrationFailureReason.EmailAlreadyExists;
+            return reason == RegistrationStatus.InvalidUsername ||
+                reason == RegistrationStatus.InvalidEmail ||
+                reason == RegistrationStatus.InvalidPassword ||
+                reason == RegistrationStatus.UsernameAlreadyExists ||
+                reason == RegistrationStatus.EmailAlreadyExists;
         }
 
         [OnDeserialized]
         private void OnDeserialized(StreamingContext context)
         {
-            bool isSuccess = Reason == RegistrationFailureReason.None && Account != null;
-            bool isRejection = Account == null && IsRejection(Reason);
+            bool isSuccess = Status == RegistrationStatus.None && Account != null;
+            bool isRejection = Account == null && IsRejection(Status);
             if (!isSuccess && !isRejection)
             {
                 throw new SerializationException("Contradictory operation result.");

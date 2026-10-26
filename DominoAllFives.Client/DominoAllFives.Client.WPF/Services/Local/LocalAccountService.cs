@@ -48,27 +48,27 @@ namespace DominoAllFives.Client.WPF.Services.Local
         }
 
         /// <inheritdoc/>
-        public LanguagePreferenceFailureReason ChangePreferredLanguage(string preferredLanguageId)
+        public LanguagePreferenceStatus ChangePreferredLanguage(string preferredLanguageId)
         {
             // Local adapter only; a remote service must resolve its authenticated actor.
             int? playerId = _playerSession.PlayerId;
             if (!playerId.HasValue)
             {
-                return LanguagePreferenceFailureReason.NotSignedIn;
+                return LanguagePreferenceStatus.NotSignedIn;
             }
-            LanguagePreferenceFailureReason reason =
+            LanguagePreferenceStatus reason =
                 _accountLanguageController.ChangePreferredLanguage(
                     playerId.Value, preferredLanguageId);
-            if (reason != LanguagePreferenceFailureReason.None)
+            if (reason != LanguagePreferenceStatus.None)
             {
                 return reason;
             }
             if (_playerSession.PlayerId != playerId)
             {
-                return LanguagePreferenceFailureReason.NotSignedIn;
+                return LanguagePreferenceStatus.NotSignedIn;
             }
             _playerSession.UpdatePreferredLanguage(preferredLanguageId);
-            return LanguagePreferenceFailureReason.None;
+            return LanguagePreferenceStatus.None;
         }
 
 /// <inheritdoc/>
@@ -78,13 +78,13 @@ namespace DominoAllFives.Client.WPF.Services.Local
         }
 
         /// <inheritdoc/>
-        public ProfilePictureFailureReason SetProfilePicture(int playerId, DomainProfilePicture picture)
+        public ProfilePictureStatus SetProfilePicture(int playerId, DomainProfilePicture picture)
         {
             return _profilePictureController.SetProfilePicture(playerId, picture);
         }
 
         /// <inheritdoc/>
-        public ProfilePictureFailureReason RemoveProfilePicture(int playerId)
+        public ProfilePictureStatus RemoveProfilePicture(int playerId)
         {
             return _profilePictureController.RemoveProfilePicture(playerId);
         }
@@ -96,26 +96,26 @@ namespace DominoAllFives.Client.WPF.Services.Local
         }
 
         /// <inheritdoc/>
-        public UpdateProfileFailureReason UpdateProfile(int playerId, string username)
+        public UpdateProfileStatus UpdateProfile(int playerId, string username)
         {
             return _profileController.UpdateProfile(playerId, username);
         }
 
         /// <inheritdoc/>
-        public UpdateProfileFailureReason UpdateProfile(int playerId, string username,
+        public UpdateProfileStatus UpdateProfile(int playerId, string username,
             DomainProfilePicture replacementPicture)
         {
             return _profileController.UpdateProfile(playerId, username, replacementPicture);
         }
 
         /// <inheritdoc/>
-        public DeleteFailureReason DeleteAccount(int playerId, string password)
+        public DeleteStatus DeleteAccount(int playerId, string password)
         {
             return _accountController.DeleteAccount(playerId, password);
         }
 
         /// <inheritdoc/>
-        public ChangePasswordFailureReason ChangePassword(int playerId, string currentPassword, string newPassword)
+        public ChangePasswordStatus ChangePassword(int playerId, string currentPassword, string newPassword)
         {
             return _accountController.ChangePassword(playerId, currentPassword, newPassword);
         }

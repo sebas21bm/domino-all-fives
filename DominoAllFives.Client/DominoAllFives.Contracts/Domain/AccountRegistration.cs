@@ -35,21 +35,21 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Preserves the registration failure precedence without querying persistence.
         /// </summary>
-        public RegistrationFailureReason EnsureValid()
+        public RegistrationStatus EnsureValid()
         {
             if (!AccountRules.IsUsernameValid(Username))
             {
-                return RegistrationFailureReason.InvalidUsername;
+                return RegistrationStatus.InvalidUsername;
             }
             if (!AccountRules.IsEmailValid(Email))
             {
-                return RegistrationFailureReason.InvalidEmail;
+                return RegistrationStatus.InvalidEmail;
             }
             if (!AccountRules.IsPasswordValid(Password))
             {
-                return RegistrationFailureReason.InvalidPassword;
+                return RegistrationStatus.InvalidPassword;
             }
-            return RegistrationFailureReason.None;
+            return RegistrationStatus.None;
         }
     }
 }

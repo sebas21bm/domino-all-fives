@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
@@ -109,7 +109,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             if (!LoadPreview(selectedFilePath))
             {
-                ShowProfilePictureFailure(ProfilePictureFailureReason.InvalidImage);
+                ShowProfilePictureFailure(ProfilePictureStatus.InvalidImage);
                 return;
             }
 
@@ -120,13 +120,13 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             if (string.IsNullOrWhiteSpace(_selectedFilePath))
             {
-                ShowProfilePictureFailure(ProfilePictureFailureReason.InvalidImage);
+                ShowProfilePictureFailure(ProfilePictureStatus.InvalidImage);
                 return;
             }
 
             if (!_playerSession.PlayerId.HasValue)
             {
-                ShowProfilePictureFailure(ProfilePictureFailureReason.ServiceUnavailable);
+                ShowProfilePictureFailure(ProfilePictureStatus.ServiceUnavailable);
                 return;
             }
 
@@ -139,7 +139,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             catch (Exception ex) when (ex is IOException ||
                                        ex is UnauthorizedAccessException)
             {
-                ShowProfilePictureFailure(ProfilePictureFailureReason.ServiceUnavailable);
+                ShowProfilePictureFailure(ProfilePictureStatus.ServiceUnavailable);
                 return;
             }
 
@@ -147,8 +147,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             {
                 DomainProfilePicture picture = DomainProfilePicture.FromSelectedContent(
                     Path.GetFileName(_selectedFilePath), imageData);
-                ProfilePictureFailureReason reason = _accountService.SetProfilePicture(_playerSession.PlayerId.Value, picture);
-                if (reason != ProfilePictureFailureReason.None)
+                ProfilePictureStatus reason = _accountService.SetProfilePicture(_playerSession.PlayerId.Value, picture);
+                if (reason != ProfilePictureStatus.None)
                 {
                     ShowProfilePictureFailure(reason);
                     return;
@@ -157,7 +157,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             catch (Exception ex)
             {
                 System.Diagnostics.Trace.TraceError("Profile picture update failed: {0}", ex);
-                ShowProfilePictureFailure(ProfilePictureFailureReason.ServiceUnavailable);
+                ShowProfilePictureFailure(ProfilePictureStatus.ServiceUnavailable);
                 return;
             }
 
@@ -203,11 +203,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
         }
 
         private void ShowProfilePictureFailure(
-            ProfilePictureFailureReason failureReason)
+            ProfilePictureStatus status)
         {
-            switch (failureReason)
+            switch (status)
             {
-                case ProfilePictureFailureReason.InvalidFormat:
+                case ProfilePictureStatus.InvalidFormat:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -216,7 +216,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case ProfilePictureFailureReason.InvalidImage:
+                case ProfilePictureStatus.InvalidImage:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -225,7 +225,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case ProfilePictureFailureReason.FileTooLarge:
+                case ProfilePictureStatus.FileTooLarge:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -234,8 +234,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case ProfilePictureFailureReason.PlayerNotFound:
-                case ProfilePictureFailureReason.ServiceUnavailable:
+                case ProfilePictureStatus.PlayerNotFound:
+                case ProfilePictureStatus.ServiceUnavailable:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Error,

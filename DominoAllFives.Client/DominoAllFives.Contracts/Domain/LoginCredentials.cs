@@ -38,13 +38,13 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Returns the rejection reason for missing credentials before accessing persistence.
         /// </summary>
-        public LoginFailureReason EnsureValid()
+        public LoginStatus EnsureValid()
         {
             if (string.IsNullOrWhiteSpace(EmailOrUsername) || string.IsNullOrWhiteSpace(Password))
             {
-                return LoginFailureReason.InvalidCredentials;
+                return LoginStatus.InvalidCredentials;
             }
-            return LoginFailureReason.None;
+            return LoginStatus.None;
         }
     }
 }

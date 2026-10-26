@@ -11,7 +11,7 @@
   <xs:complexType name="LoginResult">
     <xs:sequence>
       <xs:element name="Account" nillable="true" type="tns:PlayerAccount" />
-      <xs:element name="Reason" xmlns:q1="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" type="q1:LoginFailureReason" />
+      <xs:element name="Status" xmlns:q1="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" type="q1:LoginStatus" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="LoginResult" nillable="true" type="tns:LoginResult" />

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Controls;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
@@ -96,7 +96,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     "Account deletion attempted without an authenticated session.");
 
                 ShowDeleteFailure(
-                    DeleteFailureReason.ServiceUnavailable);
+                    DeleteStatus.ServiceUnavailable);
 
                 return;
             }
@@ -109,10 +109,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             try
             {
-                DeleteFailureReason reason = _accountService.DeleteAccount(playerId, password);
-                if (reason != DeleteFailureReason.None)
+                DeleteStatus reason = _accountService.DeleteAccount(playerId, password);
+                if (reason != DeleteStatus.None)
                 {
-                    _logger.LogWarning("Operation rejected for player {PlayerId}. Reason: {FailureReason}.", playerId, reason);
+                    _logger.LogWarning("Operation rejected for player {PlayerId}. Status: {Status}.", playerId, reason);
                     ShowDeleteFailure(reason);
                     return;
                 }
@@ -120,7 +120,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Account operation failed for player {PlayerId}.", playerId);
-                ShowDeleteFailure(DeleteFailureReason.ServiceUnavailable);
+                ShowDeleteFailure(DeleteStatus.ServiceUnavailable);
                 return;
             }
 
@@ -140,11 +140,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
         }
 
         private void ShowDeleteFailure(
-            DeleteFailureReason failureReason)
+            DeleteStatus status)
         {
-            switch (failureReason)
+            switch (status)
             {
-                case DeleteFailureReason.PasswordNotMatch:
+                case DeleteStatus.PasswordNotMatch:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -155,7 +155,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case DeleteFailureReason.AccountNotFound:
+                case DeleteStatus.AccountNotFound:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -166,7 +166,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case DeleteFailureReason.ServiceUnavailable:
+                case DeleteStatus.ServiceUnavailable:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Error,

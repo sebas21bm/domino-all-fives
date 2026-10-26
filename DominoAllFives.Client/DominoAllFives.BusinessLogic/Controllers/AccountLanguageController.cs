@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
@@ -36,7 +36,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// <summary>
         /// Validates the language and commits it before reporting completion.
         /// </summary>
-        public LanguagePreferenceFailureReason ChangePreferredLanguage(int playerId, string languageId)
+        public LanguagePreferenceStatus ChangePreferredLanguage(int playerId, string languageId)
         {
             if (playerId <= 0)
             {
@@ -66,7 +66,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             }
         }
 
-        private static LanguagePreferenceFailureReason PersistLanguage(
+        private static LanguagePreferenceStatus PersistLanguage(
             ILanguagePreferenceStore store, int playerId, string languageId)
         {
             if (!store.LanguageExists(languageId))
@@ -75,10 +75,10 @@ namespace DominoAllFives.BusinessLogic.Controllers
             }
             if (!store.UpdatePreferredLanguage(playerId, languageId))
             {
-                return LanguagePreferenceFailureReason.AccountNotFound;
+                return LanguagePreferenceStatus.AccountNotFound;
             }
             store.SaveChanges();
-            return LanguagePreferenceFailureReason.None;
+            return LanguagePreferenceStatus.None;
         }
     }
 }

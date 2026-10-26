@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -159,10 +159,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             try
             {
-                ChangePasswordFailureReason reason = _accountService.ChangePassword(playerId, currentPassword, newPassword);
-                if (reason != ChangePasswordFailureReason.None)
+                ChangePasswordStatus reason = _accountService.ChangePassword(playerId, currentPassword, newPassword);
+                if (reason != ChangePasswordStatus.None)
                 {
-                    _logger.LogWarning("Operation rejected for player {PlayerId}. Reason: {FailureReason}.", playerId, reason);
+                    _logger.LogWarning("Operation rejected for player {PlayerId}. Status: {Status}.", playerId, reason);
                     ShowChangePasswordFailure(reason);
                     return;
                 }
@@ -170,7 +170,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Account operation failed for player {PlayerId}.", playerId);
-                ShowChangePasswordFailure(ChangePasswordFailureReason.ServiceUnavailable);
+                ShowChangePasswordFailure(ChangePasswordStatus.ServiceUnavailable);
                 return;
             }
 
@@ -192,39 +192,39 @@ namespace DominoAllFives.Client.WPF.ViewModels
         }
 
         private void ShowChangePasswordFailure(
-            ChangePasswordFailureReason failureReason)
+            ChangePasswordStatus status)
         {
-            switch (failureReason)
+            switch (status)
             {
-                case ChangePasswordFailureReason.IncorrectCurrentPassword:
+                case ChangePasswordStatus.IncorrectCurrentPassword:
                     ShowDialog(
                         DialogType.Warning,
                         "MessageAccount_msgWrongCurrentPasswordTitle",
                         "MessageAccount_msgWrongCurrentPassword");
                     break;
 
-                case ChangePasswordFailureReason.InvalidNewPassword:
+                case ChangePasswordStatus.InvalidNewPassword:
                     ShowDialog(
                         DialogType.Warning,
                         "MessageAccount_msgUnsafePasswordTitle",
                         "MessageAccount_msgUnsafePassword");
                     break;
 
-                case ChangePasswordFailureReason.AccountNotFound:
+                case ChangePasswordStatus.AccountNotFound:
                     ShowDialog(
                         DialogType.Warning,
                         "MessageAccount_msgAccountNotFoundTitle",
                         "MessageAccount_msgAccountNotFound");
                     break;
 
-                case ChangePasswordFailureReason.SameAsCurrentPassword:
+                case ChangePasswordStatus.SameAsCurrentPassword:
                     ShowDialog(
                         DialogType.Warning,
                         "MessageAccount_msgSamePasswordTitle",
                         "MessageAccount_msgSamePassword");
                     break;
 
-                case ChangePasswordFailureReason.ServiceUnavailable:
+                case ChangePasswordStatus.ServiceUnavailable:
                     ShowDialog(
                         DialogType.Error,
                         "Global_msgConnectionErrorTitle",

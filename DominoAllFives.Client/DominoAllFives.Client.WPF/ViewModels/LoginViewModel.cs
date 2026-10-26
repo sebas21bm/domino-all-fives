@@ -139,7 +139,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     "Authentication service unavailable for user {EmailOrUsername}.",
                     Email.Trim());
 
-                ShowLoginFailure(LoginFailureReason.ServiceUnavailable);
+                ShowLoginFailure(LoginStatus.ServiceUnavailable);
                 return;
             }
             catch (TimeoutException ex)
@@ -149,15 +149,15 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     "Authentication service timed out for user {EmailOrUsername}.",
                     Email.Trim());
 
-                ShowLoginFailure(LoginFailureReason.ServiceUnavailable);
+                ShowLoginFailure(LoginStatus.ServiceUnavailable);
                 return;
             }
 
 
-            if (result.Reason != LoginFailureReason.None)
+            if (result.Status != LoginStatus.None)
             {
-                _logger.LogWarning("Login rejected. Reason: {FailureReason}.", result.Reason);
-                ShowLoginFailure(result.Reason);
+                _logger.LogWarning("Login rejected. Status: {Status}.", result.Status);
+                ShowLoginFailure(result.Status);
                 return;
             }
 
@@ -193,11 +193,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
         }
 
         private void ShowLoginFailure(
-            LoginFailureReason failureReason)
+            LoginStatus status)
         {
-            switch (failureReason)
+            switch (status)
             {
-                case LoginFailureReason.Banned:
+                case LoginStatus.Banned:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -206,7 +206,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case LoginFailureReason.Suspended:
+                case LoginStatus.Suspended:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -215,7 +215,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case LoginFailureReason.ServiceUnavailable:
+                case LoginStatus.ServiceUnavailable:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Error,
@@ -224,7 +224,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case LoginFailureReason.InvalidCredentials:
+                case LoginStatus.InvalidCredentials:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,

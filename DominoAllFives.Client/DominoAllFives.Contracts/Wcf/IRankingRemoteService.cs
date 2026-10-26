@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ServiceModel;
 using DominoAllFives.Contracts.Domain;
 
@@ -7,6 +8,9 @@ namespace DominoAllFives.Contracts.Wcf
     public interface IRankingRemoteService
     {
         [OperationContract]
-        Ranking GetTopRanking(int playerId);
+        List<RankingEntry> GetTopWinsRanking();
+
+        [OperationContract]
+        int GetWinsRankingPositionById(int playerId);
     }
 }

@@ -1,4 +1,4 @@
-﻿using DominoAllFives.BusinessLogic.Storage;
+using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.BusinessLogic.Validation;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
@@ -103,7 +103,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// </summary>
         /// <param name="playerId">The account identifier.</param>
         /// <param name="username">The requested username.</param>
-        public UpdateProfileFailureReason UpdateProfile(int playerId, string username)
+        public UpdateProfileStatus UpdateProfile(int playerId, string username)
         {
             return UpdateProfileCore(playerId, username, false, null);
         }
@@ -114,7 +114,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// <param name="playerId">The account identifier.</param>
         /// <param name="username">The requested username.</param>
         /// <param name="replacementPicture">The replacement snapshot; null is invalid.</param>
-        public UpdateProfileFailureReason UpdateProfile(int playerId, string username, ProfilePicture replacementPicture)
+        public UpdateProfileStatus UpdateProfile(int playerId, string username, ProfilePicture replacementPicture)
         {
             if (replacementPicture == null)
             {
@@ -123,7 +123,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             return UpdateProfileCore(playerId, username, true, replacementPicture);
         }
 
-        private UpdateProfileFailureReason UpdateProfileCore(int playerId, string username,
+        private UpdateProfileStatus UpdateProfileCore(int playerId, string username,
             bool replacePicture, ProfilePicture picture)
         {
             if (playerId <= 0)
@@ -148,7 +148,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
                     if (player == null)
                     {
-                        return UpdateProfileFailureReason.PlayerNotFound;
+                        return UpdateProfileStatus.PlayerNotFound;
                     }
 
                     bool usernameChanged =
@@ -157,19 +157,19 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     if (!usernameChanged &&
                         !replacePicture)
                     {
-                        return UpdateProfileFailureReason.SameUsername;
+                        return UpdateProfileStatus.SameUsername;
                     }
 
                     if (usernameChanged)
                     {
-                        UpdateProfileFailureReason
+                        UpdateProfileStatus
                             usernameValidationFailure =
                                 ValidateUsername(
                                     username,
                                     playerRepository);
 
                         if (usernameValidationFailure !=
-                            UpdateProfileFailureReason.None)
+                            UpdateProfileStatus.None)
                         {
                             return usernameValidationFailure;
                         }
@@ -177,13 +177,13 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
                     if (replacePicture)
                     {
-                        UpdateProfileFailureReason
+                        UpdateProfileStatus
                             profilePictureValidationFailure =
                                 ValidateProfilePicture(
                                     picture);
 
                         if (profilePictureValidationFailure !=
-                            UpdateProfileFailureReason.None)
+                            UpdateProfileStatus.None)
                         {
                             return profilePictureValidationFailure;
                         }
@@ -217,7 +217,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                             DeleteNewProfilePictureIfNecessary(
                                 newProfilePictureFileName);
 
-                            return UpdateProfileFailureReason.PlayerNotFound;
+                            return UpdateProfileStatus.PlayerNotFound;
                         }
                     }
 
@@ -233,7 +233,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                             DeleteNewProfilePictureIfNecessary(
                                 newProfilePictureFileName);
 
-                            return UpdateProfileFailureReason.PlayerNotFound;
+                            return UpdateProfileStatus.PlayerNotFound;
                         }
                     }
 
@@ -246,7 +246,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                             previousProfilePictureFileName);
                     }
 
-                    return UpdateProfileFailureReason.None;
+                    return UpdateProfileStatus.None;
                 }
             }
             catch (Exception ex)
@@ -264,52 +264,52 @@ namespace DominoAllFives.BusinessLogic.Controllers
             }
         }
 
-        private UpdateProfileFailureReason ValidateUsername(
+        private UpdateProfileStatus ValidateUsername(
             string username,
             IPlayerRepository playerRepository)
         {
             if (!AccountValidator.IsUsernameValid(username))
             {
-                return UpdateProfileFailureReason
+                return UpdateProfileStatus
                     .InvalidUsername;
             }
 
             if (playerRepository.UsernameExists(
                 username))
             {
-                return UpdateProfileFailureReason
+                return UpdateProfileStatus
                     .UsernameAlreadyExists;
             }
 
-            return UpdateProfileFailureReason.None;
+            return UpdateProfileStatus.None;
         }
 
-        private UpdateProfileFailureReason
+        private UpdateProfileStatus
             ValidateProfilePicture(
                 ProfilePicture picture)
         {
             if (picture == null || picture.ImageData == null ||
                 picture.ImageData.Length == 0)
             {
-                return UpdateProfileFailureReason
+                return UpdateProfileStatus
                     .InvalidProfilePicture;
             }
 
             if (!ProfilePictureValidator.HasValidExtension(
                 picture.OriginalFileName))
             {
-                return UpdateProfileFailureReason
+                return UpdateProfileStatus
                     .InvalidProfilePictureFormat;
             }
 
             if (!ProfilePictureValidator.HasValidFileSize(
                 picture.ImageData))
             {
-                return UpdateProfileFailureReason
+                return UpdateProfileStatus
                     .ProfilePictureTooLarge;
             }
 
-            return UpdateProfileFailureReason.None;
+            return UpdateProfileStatus.None;
         }
 
         private void DeleteNewProfilePictureIfNecessary(

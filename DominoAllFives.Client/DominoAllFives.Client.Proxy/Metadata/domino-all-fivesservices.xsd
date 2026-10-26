@@ -15,17 +15,29 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="GetTopRanking">
+  <xs:element name="GetTopWinsRanking">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetTopWinsRankingResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetTopWinsRankingResult" nillable="true" xmlns:q3="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q3:Ranking" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetWinsRankingPositionById">
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="playerId" type="xs:int" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="GetTopRankingResponse">
+  <xs:element name="GetWinsRankingPositionByIdResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="GetTopRankingResult" nillable="true" xmlns:q3="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q3:Ranking" />
+        <xs:element minOccurs="0" name="GetWinsRankingPositionByIdResult" type="xs:int" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

@@ -1,10 +1,10 @@
-﻿
+
 namespace DominoAllFives.Contracts.Enums
 {
     /// <summary>
     /// Defines the possible reasons for a failed password change attempt.
     /// </summary>
-    public enum ChangePasswordFailureReason
+    public enum ChangePasswordStatus
     {
         None,
         AccountNotFound,

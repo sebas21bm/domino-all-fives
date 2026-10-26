@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Windows;
 using DominoAllFives.Client.WPF.Commands;
@@ -172,8 +172,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 }
                 else
                 {
-                    LanguagePreferenceFailureReason reason = _accountService.ChangePreferredLanguage(SelectedLanguageCode);
-                    if (reason != LanguagePreferenceFailureReason.None)
+                    LanguagePreferenceStatus reason = _accountService.ChangePreferredLanguage(SelectedLanguageCode);
+                    if (reason != LanguagePreferenceStatus.None)
                     {
                         ShowLanguageFailure("Global_msgDefaultErrorTitle", "MessageLanguage_msgSaveFailed");
                         return;

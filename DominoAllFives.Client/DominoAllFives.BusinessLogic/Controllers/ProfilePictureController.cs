@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
@@ -39,7 +39,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// </summary>
         /// <param name="playerId">The account identifier.</param>
         /// <param name="picture">The selected snapshot; null or absent content is invalid.</param>
-        public ProfilePictureFailureReason SetProfilePicture(int playerId, ProfilePicture picture)
+        public ProfilePictureStatus SetProfilePicture(int playerId, ProfilePicture picture)
         {
             if (playerId <= 0)
             {
@@ -54,19 +54,19 @@ namespace DominoAllFives.BusinessLogic.Controllers
             if (imageData == null ||
                 imageData.Length == 0)
             {
-                return ProfilePictureFailureReason.InvalidImage;
+                return ProfilePictureStatus.InvalidImage;
             }
 
             if (!ProfilePictureValidator.HasValidExtension(
                     fileName))
             {
-                return ProfilePictureFailureReason.InvalidFormat;
+                return ProfilePictureStatus.InvalidFormat;
             }
 
             if (!ProfilePictureValidator.HasValidFileSize(
                     imageData))
             {
-                return ProfilePictureFailureReason.FileTooLarge;
+                return ProfilePictureStatus.FileTooLarge;
             }
 
             string previousProfilePicture = string.Empty;
@@ -87,7 +87,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
                     if (player == null)
                     {
-                        return ProfilePictureFailureReason.PlayerNotFound;
+                        return ProfilePictureStatus.PlayerNotFound;
                     }
 
                     profilePictureFileName =
@@ -112,7 +112,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                         _profilePictureStorage.TryDeleteProfilePicture(
                             profilePictureFileName);
 
-                        return ProfilePictureFailureReason.PlayerNotFound;
+                        return ProfilePictureStatus.PlayerNotFound;
                     }
 
                     context.SaveChanges();
@@ -137,7 +137,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 previousProfilePicture,
                 profilePictureFileName);
 
-            return ProfilePictureFailureReason.None;
+            return ProfilePictureStatus.None;
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// The identifier of the player whose profile picture
         /// will be removed.
         /// </param>
-        public ProfilePictureFailureReason RemoveProfilePicture(
+        public ProfilePictureStatus RemoveProfilePicture(
             int playerId)
         {
             if (playerId <= 0)
@@ -170,7 +170,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
                     if (player == null)
                     {
-                        return ProfilePictureFailureReason.PlayerNotFound;
+                        return ProfilePictureStatus.PlayerNotFound;
                     }
 
                     previousProfilePicture =
@@ -179,7 +179,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     if (string.IsNullOrWhiteSpace(
                             previousProfilePicture))
                     {
-                        return ProfilePictureFailureReason.None;
+                        return ProfilePictureStatus.None;
                     }
 
                     bool wasUpdated =
@@ -189,7 +189,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
                     if (!wasUpdated)
                     {
-                        return ProfilePictureFailureReason.PlayerNotFound;
+                        return ProfilePictureStatus.PlayerNotFound;
                     }
 
                     context.SaveChanges();
@@ -211,7 +211,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             _profilePictureStorage.TryDeleteProfilePicture(
                 previousProfilePicture);
 
-            return ProfilePictureFailureReason.None;
+            return ProfilePictureStatus.None;
         }
 
         /// <summary>

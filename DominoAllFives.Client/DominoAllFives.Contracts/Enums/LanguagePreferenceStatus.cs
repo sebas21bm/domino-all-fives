@@ -1,6 +1,6 @@
 namespace DominoAllFives.Contracts.Enums
 {
-    public enum LanguagePreferenceFailureReason
+    public enum LanguagePreferenceStatus
     {
         NotSignedIn,
         InvalidLanguage,

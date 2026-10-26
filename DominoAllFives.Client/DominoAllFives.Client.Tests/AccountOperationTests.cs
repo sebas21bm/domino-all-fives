@@ -26,49 +26,49 @@ namespace DominoAllFives.Client.Tests
             Assert.Throws<ArgumentOutOfRangeException>(() => controller.ChangePassword(playerId, "", ""));
         }
 
-        [TestCase(1, "", DeleteFailureReason.PasswordNotMatch)]
-        [TestCase(1, null, DeleteFailureReason.PasswordNotMatch)]
+        [TestCase(1, "", DeleteStatus.PasswordNotMatch)]
+        [TestCase(1, null, DeleteStatus.PasswordNotMatch)]
         public void DeleteAccount_InvalidParameters_PreservesReasonBeforeDatabase(
-            int playerId, string password, DeleteFailureReason expected)
+            int playerId, string password, DeleteStatus expected)
         {
             // Arrange.
             AccountController controller = new AccountController(
                 NullLogger<AccountController>.Instance);
 
             // Act.
-            DeleteFailureReason reason = controller.DeleteAccount(playerId, password);
+            DeleteStatus reason = controller.DeleteAccount(playerId, password);
 
             // Assert.
             Assert.That(reason, Is.EqualTo(expected));
         }
 
-        [TestCase(1, "", "", ChangePasswordFailureReason.IncorrectCurrentPassword)]
-        [TestCase(1, "old-password", "x", ChangePasswordFailureReason.InvalidNewPassword)]
+        [TestCase(1, "", "", ChangePasswordStatus.IncorrectCurrentPassword)]
+        [TestCase(1, "old-password", "x", ChangePasswordStatus.InvalidNewPassword)]
         public void ChangePassword_MultipleInvalidFields_PreservesReasonBeforeDatabase(
-            int playerId, string current, string replacement, ChangePasswordFailureReason expected)
+            int playerId, string current, string replacement, ChangePasswordStatus expected)
         {
             // Arrange.
             AccountController controller = new AccountController(
                 NullLogger<AccountController>.Instance);
 
             // Act.
-            ChangePasswordFailureReason reason = controller.ChangePassword(playerId, current, replacement);
+            ChangePasswordStatus reason = controller.ChangePassword(playerId, current, replacement);
 
             // Assert.
             Assert.That(reason, Is.EqualTo(expected));
         }
 
-        [TestCase(ChangePasswordFailureReason.IncorrectCurrentPassword,
+        [TestCase(ChangePasswordStatus.IncorrectCurrentPassword,
             "MessageAccount_msgWrongCurrentPassword")]
-        [TestCase(ChangePasswordFailureReason.InvalidNewPassword,
+        [TestCase(ChangePasswordStatus.InvalidNewPassword,
             "MessageAccount_msgUnsafePassword")]
-        [TestCase(ChangePasswordFailureReason.AccountNotFound,
+        [TestCase(ChangePasswordStatus.AccountNotFound,
             "MessageAccount_msgAccountNotFound")]
-        [TestCase(ChangePasswordFailureReason.SameAsCurrentPassword,
+        [TestCase(ChangePasswordStatus.SameAsCurrentPassword,
             "MessageAccount_msgSamePassword")]
-        [TestCase(ChangePasswordFailureReason.ServiceUnavailable, "Global_msgConnectionError")]
+        [TestCase(ChangePasswordStatus.ServiceUnavailable, "Global_msgConnectionError")]
         public void ChangePassword_BusinessRejectionOrTechnicalFailure_PreservesDialogAndInput(
-            ChangePasswordFailureReason reason, string expectedMessage)
+            ChangePasswordStatus reason, string expectedMessage)
         {
             // Arrange.
             OperationService service = new OperationService { PasswordFailure = reason };
@@ -118,11 +118,11 @@ namespace DominoAllFives.Client.Tests
             Assert.That(callbackInvoked, Is.True);
         }
 
-        [TestCase(DeleteFailureReason.PasswordNotMatch, "MessageAccount_msgWrongCurrentPassword")]
-        [TestCase(DeleteFailureReason.AccountNotFound, "MessageAccount_msgAccountNotFound")]
-        [TestCase(DeleteFailureReason.ServiceUnavailable, "Global_msgConnectionError")]
+        [TestCase(DeleteStatus.PasswordNotMatch, "MessageAccount_msgWrongCurrentPassword")]
+        [TestCase(DeleteStatus.AccountNotFound, "MessageAccount_msgAccountNotFound")]
+        [TestCase(DeleteStatus.ServiceUnavailable, "Global_msgConnectionError")]
         public void DeleteAccount_BusinessRejectionOrTechnicalFailure_PreservesDialogInputAndSession(
-            DeleteFailureReason reason, string expectedMessage)
+            DeleteStatus reason, string expectedMessage)
         {
             // Arrange.
             OperationService service = new OperationService { DeleteFailure = reason };
@@ -197,44 +197,44 @@ namespace DominoAllFives.Client.Tests
 
         private sealed class OperationService : IAccountService
         {
-            public ChangePasswordFailureReason? PasswordFailure { get; set; }
-            public DeleteFailureReason? DeleteFailure { get; set; }
+            public ChangePasswordStatus? PasswordFailure { get; set; }
+            public DeleteStatus? DeleteFailure { get; set; }
             public int LastPlayerId { get; private set; }
 
-            public ChangePasswordFailureReason ChangePassword(int playerId, string currentPassword, string newPassword)
+            public ChangePasswordStatus ChangePassword(int playerId, string currentPassword, string newPassword)
             {
                 LastPlayerId = playerId;
-                if (PasswordFailure == ChangePasswordFailureReason.ServiceUnavailable)
+                if (PasswordFailure == ChangePasswordStatus.ServiceUnavailable)
                 {
                     throw new System.Data.Entity.Core.EntityException("Synthetic technical failure.");
                 }
-                return PasswordFailure ?? ChangePasswordFailureReason.None;
+                return PasswordFailure ?? ChangePasswordStatus.None;
             }
 
-            public DeleteFailureReason DeleteAccount(int playerId, string password)
+            public DeleteStatus DeleteAccount(int playerId, string password)
             {
                 LastPlayerId = playerId;
-                if (DeleteFailure == DeleteFailureReason.ServiceUnavailable)
+                if (DeleteFailure == DeleteStatus.ServiceUnavailable)
                 {
                     throw new System.Data.Entity.Core.EntityException("Synthetic technical failure.");
                 }
-                return DeleteFailure ?? DeleteFailureReason.None;
+                return DeleteFailure ?? DeleteStatus.None;
             }
 
             public LoginResult Login(LoginCredentials credentials) =>
                 throw new NotSupportedException();
             public RegistrationResult Register(AccountRegistration registration) =>
                 throw new NotSupportedException();
-            public LanguagePreferenceFailureReason ChangePreferredLanguage(string languageId) =>
+            public LanguagePreferenceStatus ChangePreferredLanguage(string languageId) =>
                 throw new NotSupportedException();
-            public ProfilePictureFailureReason SetProfilePicture(int playerId, ProfilePicture picture) =>
+            public ProfilePictureStatus SetProfilePicture(int playerId, ProfilePicture picture) =>
                 throw new NotSupportedException();
-            public ProfilePictureFailureReason RemoveProfilePicture(int playerId) =>
+            public ProfilePictureStatus RemoveProfilePicture(int playerId) =>
                 throw new NotSupportedException();
             public PlayerProfile GetProfile(int playerId) => throw new NotSupportedException();
-            public UpdateProfileFailureReason UpdateProfile(int playerId, string username) =>
+            public UpdateProfileStatus UpdateProfile(int playerId, string username) =>
                 throw new NotSupportedException();
-            public UpdateProfileFailureReason UpdateProfile(int playerId, string username, ProfilePicture replacementPicture) =>
+            public UpdateProfileStatus UpdateProfile(int playerId, string username, ProfilePicture replacementPicture) =>
                 throw new NotSupportedException();
         }
     }

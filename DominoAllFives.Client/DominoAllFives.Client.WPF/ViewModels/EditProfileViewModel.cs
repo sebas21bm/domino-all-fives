@@ -1,4 +1,4 @@
-﻿using DominoAllFives.Client.WPF.Commands;
+using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
@@ -136,7 +136,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             if (!_playerSession.PlayerId.HasValue)
             {
                 ShowRetrieveInformationFailure(
-                    RetrieveInformationFailureReason.NotFound);
+                    RetrieveInformationStatus.NotFound);
                 return;
             }
 
@@ -154,7 +154,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             try
             {
-                UpdateProfileFailureReason reason;
+                UpdateProfileStatus reason;
                 if (hasPictureReplacement)
                 {
                     DomainProfilePicture picture = DomainProfilePicture.FromSelectedContent(
@@ -165,7 +165,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 {
                     reason = _accountService.UpdateProfile(_playerSession.PlayerId.Value, Username);
                 }
-                if (reason != UpdateProfileFailureReason.None)
+                if (reason != UpdateProfileStatus.None)
                 {
                     ShowUpdateProfileFailure(reason);
                     return;
@@ -174,7 +174,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             catch (Exception ex)
             {
                 System.Diagnostics.Trace.TraceError("Profile update failed: {0}", ex);
-                ShowUpdateProfileFailure(UpdateProfileFailureReason.ServiceUnavailable);
+                ShowUpdateProfileFailure(UpdateProfileStatus.ServiceUnavailable);
                 return;
             }
 
@@ -205,7 +205,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             if (!_playerSession.PlayerId.HasValue)
             {
                 ShowRetrieveInformationFailure(
-                    RetrieveInformationFailureReason.NotFound);
+                    RetrieveInformationStatus.NotFound);
                 return;
             }
 
@@ -217,13 +217,13 @@ namespace DominoAllFives.Client.WPF.ViewModels
             catch (Exception ex)
             {
                 System.Diagnostics.Trace.TraceError("Profile retrieval failed: {0}", ex);
-                ShowRetrieveInformationFailure(RetrieveInformationFailureReason.ServiceUnavailable);
+                ShowRetrieveInformationFailure(RetrieveInformationStatus.ServiceUnavailable);
                 return;
             }
 
             if (profile == null)
             {
-                ShowRetrieveInformationFailure(RetrieveInformationFailureReason.NotFound);
+                ShowRetrieveInformationFailure(RetrieveInformationStatus.NotFound);
                 return;
             }
 
@@ -236,11 +236,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
         }
 
         private void ShowRetrieveInformationFailure(
-            RetrieveInformationFailureReason reason)
+            RetrieveInformationStatus reason)
         {
             switch (reason)
             {
-                case RetrieveInformationFailureReason.NotFound:
+                case RetrieveInformationStatus.NotFound:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Error,
@@ -249,7 +249,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case RetrieveInformationFailureReason.ServiceUnavailable:
+                case RetrieveInformationStatus.ServiceUnavailable:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Error,
@@ -280,11 +280,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
         }
 
         private void ShowUpdateProfileFailure(
-            UpdateProfileFailureReason reason)
+            UpdateProfileStatus reason)
         {
             switch (reason)
             {
-                case UpdateProfileFailureReason.InvalidUsername:
+                case UpdateProfileStatus.InvalidUsername:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -295,7 +295,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case UpdateProfileFailureReason.UsernameAlreadyExists:
+                case UpdateProfileStatus.UsernameAlreadyExists:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -306,7 +306,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case UpdateProfileFailureReason.InvalidProfilePictureFormat:
+                case UpdateProfileStatus.InvalidProfilePictureFormat:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -317,7 +317,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case UpdateProfileFailureReason.InvalidProfilePicture:
+                case UpdateProfileStatus.InvalidProfilePicture:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -328,7 +328,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case UpdateProfileFailureReason.ProfilePictureTooLarge:
+                case UpdateProfileStatus.ProfilePictureTooLarge:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -339,8 +339,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case UpdateProfileFailureReason.PlayerNotFound:
-                case UpdateProfileFailureReason.ServiceUnavailable:
+                case UpdateProfileStatus.PlayerNotFound:
+                case UpdateProfileStatus.ServiceUnavailable:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Error,
@@ -351,7 +351,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case UpdateProfileFailureReason.SameUsername:
+                case UpdateProfileStatus.SameUsername:
                     break;
 
                 default:

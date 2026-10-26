@@ -43,21 +43,21 @@ namespace DominoAllFives.Contracts.Domain
         /// Enforces restrictions using a time in the stored timestamp convention.
         /// </summary>
         /// <param name="currentTime">The comparison time in the timestamp convention of the stored restrictions.</param>
-        public LoginFailureReason EnsureCanLogin(DateTime currentTime)
+        public LoginStatus EnsureCanLogin(DateTime currentTime)
         {
             if (IsDeleted)
             {
-                return LoginFailureReason.InvalidCredentials;
+                return LoginStatus.InvalidCredentials;
             }
             if (IsBanned)
             {
-                return LoginFailureReason.Banned;
+                return LoginStatus.Banned;
             }
             if (SuspensionUntil.HasValue && SuspensionUntil.Value > currentTime)
             {
-                return LoginFailureReason.Suspended;
+                return LoginStatus.Suspended;
             }
-            return LoginFailureReason.None;
+            return LoginStatus.None;
         }
     }
 }

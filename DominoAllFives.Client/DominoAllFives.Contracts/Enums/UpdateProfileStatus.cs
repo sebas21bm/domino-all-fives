@@ -1,10 +1,10 @@
-﻿namespace DominoAllFives.Contracts.Enums
+namespace DominoAllFives.Contracts.Enums
 {
     /// <summary>
     /// Represents the possible failure reasons when updating
     /// player profile information.
     /// </summary>
-    public enum UpdateProfileFailureReason
+    public enum UpdateProfileStatus
     {
         None,
         InvalidUsername,

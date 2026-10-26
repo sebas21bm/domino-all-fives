@@ -15,12 +15,12 @@ namespace DominoAllFives.Contracts.Domain
         public PlayerAccount Account { get; private set; }
 
         [DataMember(Order = 2, IsRequired = true)]
-        public LoginFailureReason Reason { get; private set; }
+        public LoginStatus Status { get; private set; }
 
-        private LoginResult(PlayerAccount account, LoginFailureReason reason)
+        private LoginResult(PlayerAccount account, LoginStatus reason)
         {
             Account = account;
-            Reason = reason;
+            Status = reason;
         }
 
         public static LoginResult Success(PlayerAccount account)
@@ -29,10 +29,10 @@ namespace DominoAllFives.Contracts.Domain
             {
                 throw new ArgumentNullException(nameof(account));
             }
-            return new LoginResult(account, LoginFailureReason.None);
+            return new LoginResult(account, LoginStatus.None);
         }
 
-        public static LoginResult Rejected(LoginFailureReason reason)
+        public static LoginResult Rejected(LoginStatus reason)
         {
             if (!IsRejection(reason))
             {
@@ -42,18 +42,18 @@ namespace DominoAllFives.Contracts.Domain
             return new LoginResult(null, reason);
         }
 
-        private static bool IsRejection(LoginFailureReason reason)
+        private static bool IsRejection(LoginStatus reason)
         {
-            return reason == LoginFailureReason.InvalidCredentials ||
-                reason == LoginFailureReason.Banned ||
-                reason == LoginFailureReason.Suspended;
+            return reason == LoginStatus.InvalidCredentials ||
+                reason == LoginStatus.Banned ||
+                reason == LoginStatus.Suspended;
         }
 
         [OnDeserialized]
         private void OnDeserialized(StreamingContext context)
         {
-            bool isSuccess = Reason == LoginFailureReason.None && Account != null;
-            bool isRejection = Account == null && IsRejection(Reason);
+            bool isSuccess = Status == LoginStatus.None && Account != null;
+            bool isRejection = Account == null && IsRejection(Status);
             if (!isSuccess && !isRejection)
             {
                 throw new SerializationException("Contradictory operation result.");

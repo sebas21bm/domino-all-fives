@@ -43,7 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Wcf\IAuthenticationService.cs" />
+    <Compile Include="Wcf\ISessionAccount.cs" />
     <Compile Include="Wcf\IRankingRemoteService.cs" />
     <Compile Include="Domain\LoginResult.cs" />
     <Compile Include="Domain\RegistrationResult.cs" />
@@ -56,15 +56,15 @@
     <Compile Include="Domain\AccountAccessStatus.cs" />
     <Compile Include="Domain\AccountRegistration.cs" />
     <Compile Include="Domain\AccountRules.cs" />
-    <Compile Include="Enums\LanguagePreferenceFailureReason.cs" />
+    <Compile Include="Enums\LanguagePreferenceStatus.cs" />
     <Compile Include="Domain\PlayerAccount.cs" />
-    <Compile Include="Enums\ChangePasswordFailureReason.cs" />
-    <Compile Include="Enums\DeleteFailureReason.cs" />
-    <Compile Include="Enums\LoginFailureReason.cs" />
-    <Compile Include="Enums\ProfilePictureFailureReason.cs" />
-    <Compile Include="Enums\RetrieveInformationFailureReason.cs" />
-    <Compile Include="Enums\RegistrationFailureReason.cs" />
-    <Compile Include="Enums\UpdateProfileFailureReason.cs" />
+    <Compile Include="Enums\ChangePasswordStatus.cs" />
+    <Compile Include="Enums\DeleteStatus.cs" />
+    <Compile Include="Enums\LoginStatus.cs" /><Compile Include="Enums\AccountIssue.cs" />
+    <Compile Include="Enums\ProfilePictureStatus.cs" />
+    <Compile Include="Enums\RetrieveInformationStatus.cs" />
+    <Compile Include="Enums\RegistrationStatus.cs" />
+    <Compile Include="Enums\UpdateProfileStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\IAccountService.cs" />
     <Compile Include="Services\IRankingService.cs" />

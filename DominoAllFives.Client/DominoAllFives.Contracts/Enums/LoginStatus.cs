@@ -6,7 +6,7 @@ namespace DominoAllFives.Contracts.Enums
     /// Defines the possible reasons for a failed login attempt.
     /// </summary>
     [DataContract]
-    public enum LoginFailureReason
+    public enum LoginStatus
     {
         [EnumMember]
         None = 0,

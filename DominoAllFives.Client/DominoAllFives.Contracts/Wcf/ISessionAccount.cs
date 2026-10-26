@@ -1,12 +1,14 @@
 using System.ServiceModel;
 using DominoAllFives.Contracts.Domain;
+using DominoAllFives.Contracts.Enums;
 
 namespace DominoAllFives.Contracts.Wcf
 {
     [ServiceContract(Namespace = "urn:domino-all-fives:services")]
-    public interface IAuthenticationService
+    public interface ISessionAccount
     {
         [OperationContract]
-        LoginResult Login(LoginCredentials credentials);
+        [FaultContract(typeof(AccountIssue))]
+        PlayerAccount LoginWithAccount(LoginCredentials credentials);
     }
 }

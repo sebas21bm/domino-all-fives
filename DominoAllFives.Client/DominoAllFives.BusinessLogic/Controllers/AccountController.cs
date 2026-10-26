@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
@@ -30,7 +30,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// </summary>
         /// <param name="playerId">The account identifier.</param>
         /// <param name="password">The current password to verify.</param>
-        public DeleteFailureReason DeleteAccount(int playerId, string password)
+        public DeleteStatus DeleteAccount(int playerId, string password)
         {
             if (playerId <= 0)
             {
@@ -39,7 +39,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
             if (string.IsNullOrWhiteSpace(password))
             {
-                return DeleteFailureReason.PasswordNotMatch;
+                return DeleteStatus.PasswordNotMatch;
             }
 
             try
@@ -55,13 +55,13 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
                     if (player == null || player.IsDeleted)
                     {
-                        return DeleteFailureReason.AccountNotFound;
+                        return DeleteStatus.AccountNotFound;
                     }
 
                     if (!PasswordHasher.VerifyPassword(
                         password, player.PasswordHash))
                     {
-                        return DeleteFailureReason.PasswordNotMatch;
+                        return DeleteStatus.PasswordNotMatch;
                     }
 
                     bool wasDeleted =
@@ -69,12 +69,12 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
                     if (!wasDeleted)
                     {
-                        return DeleteFailureReason.AccountNotFound;
+                        return DeleteStatus.AccountNotFound;
                     }
 
                     context.SaveChanges();
 
-                    return DeleteFailureReason.None;
+                    return DeleteStatus.None;
                 }
             }
             catch (Exception ex) when (ex is SqlException 
@@ -97,7 +97,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// <param name="playerId">The account identifier.</param>
         /// <param name="currentPassword">The current password to verify.</param>
         /// <param name="newPassword">The new password subject to the creation policy.</param>
-        public ChangePasswordFailureReason ChangePassword(int playerId, string currentPassword, string newPassword)
+        public ChangePasswordStatus ChangePassword(int playerId, string currentPassword, string newPassword)
         {
             if (playerId <= 0)
             {
@@ -106,12 +106,12 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
             if (string.IsNullOrWhiteSpace(currentPassword))
             {
-                return ChangePasswordFailureReason.IncorrectCurrentPassword;
+                return ChangePasswordStatus.IncorrectCurrentPassword;
             }
 
             if (!AccountValidator.IsPasswordValid(newPassword))
             {
-                return ChangePasswordFailureReason.InvalidNewPassword;
+                return ChangePasswordStatus.InvalidNewPassword;
             }
 
             try
@@ -127,21 +127,21 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
                     if (player == null || player.IsDeleted)
                     {
-                        return ChangePasswordFailureReason.AccountNotFound;
+                        return ChangePasswordStatus.AccountNotFound;
                     }
 
                     if (!PasswordHasher.VerifyPassword(
                         currentPassword,
                         player.PasswordHash))
                     {
-                        return ChangePasswordFailureReason.IncorrectCurrentPassword;
+                        return ChangePasswordStatus.IncorrectCurrentPassword;
                     }
 
                     if (PasswordHasher.VerifyPassword(
                         newPassword,
                         player.PasswordHash))
                     {
-                        return ChangePasswordFailureReason.SameAsCurrentPassword;
+                        return ChangePasswordStatus.SameAsCurrentPassword;
                     }
 
                     string newPasswordHash =
@@ -153,12 +153,12 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
                     if (!wasUpdated)
                     {
-                        return ChangePasswordFailureReason.AccountNotFound;
+                        return ChangePasswordStatus.AccountNotFound;
                     }
 
                     context.SaveChanges();
 
-                    return ChangePasswordFailureReason.None;
+                    return ChangePasswordStatus.None;
                 }
             }
             catch (Exception ex) when (ex is SqlException

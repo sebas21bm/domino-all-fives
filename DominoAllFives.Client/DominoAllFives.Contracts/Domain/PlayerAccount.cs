@@ -79,7 +79,7 @@ namespace DominoAllFives.Contracts.Domain
         /// Checks server-reconstructed restrictions without authenticating a client session.
         /// </summary>
         /// <param name="currentTime">The comparison time in the timestamp convention of the stored restrictions.</param>
-        public LoginFailureReason EnsureCanLogin(DateTime currentTime)
+        public LoginStatus EnsureCanLogin(DateTime currentTime)
         {
             if (AccessStatus == null)
             {

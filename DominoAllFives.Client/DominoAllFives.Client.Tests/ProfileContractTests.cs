@@ -117,36 +117,36 @@ namespace DominoAllFives.Client.Tests
             // Assert.
         }
 
-        [TestCase(1, "bad.ext", 0, ProfilePictureFailureReason.InvalidImage)]
-        [TestCase(1, "bad.ext", 1048577, ProfilePictureFailureReason.InvalidFormat)]
-        [TestCase(1, "avatar.PNG", 1048577, ProfilePictureFailureReason.FileTooLarge)]
+        [TestCase(1, "bad.ext", 0, ProfilePictureStatus.InvalidImage)]
+        [TestCase(1, "bad.ext", 1048577, ProfilePictureStatus.InvalidFormat)]
+        [TestCase(1, "avatar.PNG", 1048577, ProfilePictureStatus.FileTooLarge)]
         public void SetProfilePicture_InvalidData_PreservesErrorOrderBeforeDatabase(
-            int playerId, string name, int byteCount, ProfilePictureFailureReason expected)
+            int playerId, string name, int byteCount, ProfilePictureStatus expected)
         {
             // Arrange.
             ProfilePictureController controller = new ProfilePictureController(
                 CreateStorage(), NullLogger<ProfilePictureController>.Instance);
 
             // Act.
-            ProfilePictureFailureReason reason = controller.SetProfilePicture(playerId,
+            ProfilePictureStatus reason = controller.SetProfilePicture(playerId,
                 ProfilePicture.FromSelectedContent(name, new byte[byteCount]));
 
             // Assert.
             Assert.That(reason, Is.EqualTo(expected));
         }
 
-        [TestCase(UpdateProfileFailureReason.InvalidUsername, "MessageAccount_msgInvalidUsername")]
-        [TestCase(UpdateProfileFailureReason.UsernameAlreadyExists, "MessageAccount_msgUsernameUsed")]
-        [TestCase(UpdateProfileFailureReason.InvalidProfilePicture,
+        [TestCase(UpdateProfileStatus.InvalidUsername, "MessageAccount_msgInvalidUsername")]
+        [TestCase(UpdateProfileStatus.UsernameAlreadyExists, "MessageAccount_msgUsernameUsed")]
+        [TestCase(UpdateProfileStatus.InvalidProfilePicture,
             "MessageProfile_msgPhotoInvalid")]
-        [TestCase(UpdateProfileFailureReason.InvalidProfilePictureFormat,
+        [TestCase(UpdateProfileStatus.InvalidProfilePictureFormat,
             "MessageProfile_msgPhotoInvalidFormat")]
-        [TestCase(UpdateProfileFailureReason.ProfilePictureTooLarge,
+        [TestCase(UpdateProfileStatus.ProfilePictureTooLarge,
             "MessageProfile_msgPhotoTooLarge")]
-        [TestCase(UpdateProfileFailureReason.PlayerNotFound, "MessageProfile_msgUpdateProfileError")]
-        [TestCase(UpdateProfileFailureReason.ServiceUnavailable, "MessageProfile_msgUpdateProfileError")]
+        [TestCase(UpdateProfileStatus.PlayerNotFound, "MessageProfile_msgUpdateProfileError")]
+        [TestCase(UpdateProfileStatus.ServiceUnavailable, "MessageProfile_msgUpdateProfileError")]
         public void EditProfile_BusinessRejectionOrTechnicalFailure_PreservesDialogAndSession(
-            UpdateProfileFailureReason reason, string expectedMessage)
+            UpdateProfileStatus reason, string expectedMessage)
         {
             // Arrange.
             ProfileService service = new ProfileService { UpdateFailure = reason };
@@ -203,10 +203,10 @@ namespace DominoAllFives.Client.Tests
             Assert.That(dialogs.Last.OnAccept, Is.Not.Null);
         }
 
-        [TestCase(RetrieveInformationFailureReason.NotFound, "Global_msgNotFound")]
-        [TestCase(RetrieveInformationFailureReason.ServiceUnavailable, "Global_msgConnectionError")]
+        [TestCase(RetrieveInformationStatus.NotFound, "Global_msgNotFound")]
+        [TestCase(RetrieveInformationStatus.ServiceUnavailable, "Global_msgConnectionError")]
         public void GetProfile_BusinessRejectionOrTechnicalFailure_PreservesUiMessage(
-            RetrieveInformationFailureReason reason, string expectedMessage)
+            RetrieveInformationStatus reason, string expectedMessage)
         {
             // Arrange.
             ProfileService service = new ProfileService { RetrievalFailure = reason };
@@ -268,7 +268,7 @@ namespace DominoAllFives.Client.Tests
             ProfileService service = new ProfileService();
             if (failSave)
             {
-                service.UpdateFailure = UpdateProfileFailureReason.ServiceUnavailable;
+                service.UpdateFailure = UpdateProfileStatus.ServiceUnavailable;
             }
             PlayerProfile original = service.CurrentProfile;
             DialogRecorder dialogs = new DialogRecorder();
@@ -349,12 +349,12 @@ namespace DominoAllFives.Client.Tests
                 .Any(property => property.GetSetMethod() != null), Is.False);
         }
 
-        [TestCase(true, "avatar.png", 0, UpdateProfileFailureReason.InvalidProfilePicture)]
-        [TestCase(false, "avatar.png", 0, UpdateProfileFailureReason.InvalidProfilePicture)]
-        [TestCase(false, "bad.ext", 1048577, UpdateProfileFailureReason.InvalidProfilePictureFormat)]
-        [TestCase(false, "avatar.png", 1048577, UpdateProfileFailureReason.ProfilePictureTooLarge)]
+        [TestCase(true, "avatar.png", 0, UpdateProfileStatus.InvalidProfilePicture)]
+        [TestCase(false, "avatar.png", 0, UpdateProfileStatus.InvalidProfilePicture)]
+        [TestCase(false, "bad.ext", 1048577, UpdateProfileStatus.InvalidProfilePictureFormat)]
+        [TestCase(false, "avatar.png", 1048577, UpdateProfileStatus.ProfilePictureTooLarge)]
         public void ReplacementValidation_RejectsMissingEmptyOrInvalidPicture(
-            bool nullPicture, string name, int byteCount, UpdateProfileFailureReason expected)
+            bool nullPicture, string name, int byteCount, UpdateProfileStatus expected)
         {
             // Arrange. Isolate validation because account lookup requires SQL Server.
             ProfilePicture picture = nullPicture ? null
@@ -462,8 +462,8 @@ namespace DominoAllFives.Client.Tests
                     ProfilePicture.FromStoredContent(OriginalImage));
             }
 
-            public UpdateProfileFailureReason? UpdateFailure { get; set; }
-            public RetrieveInformationFailureReason? RetrievalFailure { get; set; }
+            public UpdateProfileStatus? UpdateFailure { get; set; }
+            public RetrieveInformationStatus? RetrievalFailure { get; set; }
             public int UpdateCount { get; private set; }
             public bool PictureChanged { get; private set; }
 
@@ -471,30 +471,30 @@ namespace DominoAllFives.Client.Tests
             {
                 if (RetrievalFailure.HasValue)
                 {
-                    if (RetrievalFailure == RetrieveInformationFailureReason.NotFound) return null;
+                    if (RetrievalFailure == RetrieveInformationStatus.NotFound) return null;
                     throw new System.Data.Entity.Core.EntityException("Synthetic retrieval failure.");
                 }
                 return CurrentProfile;
             }
 
-            public UpdateProfileFailureReason UpdateProfile(int playerId, string username)
+            public UpdateProfileStatus UpdateProfile(int playerId, string username)
             {
                 return SaveProfile(username, false, null);
             }
 
-            public UpdateProfileFailureReason UpdateProfile(int playerId, string username,
+            public UpdateProfileStatus UpdateProfile(int playerId, string username,
                 ProfilePicture replacementPicture)
             {
                 return SaveProfile(username, true, replacementPicture);
             }
 
-            private UpdateProfileFailureReason SaveProfile(string username, bool replacePicture, ProfilePicture picture)
+            private UpdateProfileStatus SaveProfile(string username, bool replacePicture, ProfilePicture picture)
             {
                 UpdateCount++;
                 PictureChanged = replacePicture;
                 if (UpdateFailure.HasValue)
                 {
-                    if (UpdateFailure == UpdateProfileFailureReason.ServiceUnavailable)
+                    if (UpdateFailure == UpdateProfileStatus.ServiceUnavailable)
                     {
                         throw new System.Data.Entity.Core.EntityException("Synthetic save failure.");
                     }
@@ -502,21 +502,21 @@ namespace DominoAllFives.Client.Tests
                 }
                 CurrentProfile = PlayerProfile.FromStoredProfile(username,
                     CurrentProfile.Statistics, replacePicture ? picture : CurrentProfile.Picture);
-                return UpdateProfileFailureReason.None;
+                return UpdateProfileStatus.None;
             }
 
             public LoginResult Login(LoginCredentials credentials) =>
                 throw new NotSupportedException();
             public RegistrationResult Register(AccountRegistration registration) =>
                 throw new NotSupportedException();
-            public LanguagePreferenceFailureReason ChangePreferredLanguage(string languageId) =>
+            public LanguagePreferenceStatus ChangePreferredLanguage(string languageId) =>
                 throw new NotSupportedException();
-            public ProfilePictureFailureReason SetProfilePicture(int playerId, ProfilePicture picture) =>
+            public ProfilePictureStatus SetProfilePicture(int playerId, ProfilePicture picture) =>
                 throw new NotSupportedException();
-            public ProfilePictureFailureReason RemoveProfilePicture(int playerId) => throw new NotSupportedException();
-            public DeleteFailureReason DeleteAccount(int playerId, string password) =>
+            public ProfilePictureStatus RemoveProfilePicture(int playerId) => throw new NotSupportedException();
+            public DeleteStatus DeleteAccount(int playerId, string password) =>
                 throw new NotSupportedException();
-            public ChangePasswordFailureReason ChangePassword(int playerId, string currentPassword, string newPassword) =>
+            public ChangePasswordStatus ChangePassword(int playerId, string currentPassword, string newPassword) =>
                 throw new NotSupportedException();
         }
     }

@@ -27,22 +27,13 @@ namespace DominoAllFives.Server.Controllers
         }
 
         /// <summary>
-        /// Gets the top players and the ranking position
-        /// of the current player.
+        /// Gets the top players ordered by games won.
         /// </summary>
-        /// <param name="playerId">
-        /// The identifier of the current player.
-        /// </param>
         /// <returns>
         /// The ranking information.
         /// </returns>
-        public Ranking GetRanking(int playerId)
+        public List<RankingEntry> GetTopWinsRanking()
         {
-            if (playerId <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(playerId));
-            }
-
             using (DominoAllFivesEntities context =
                 new DominoAllFivesEntities())
             {
@@ -53,7 +44,6 @@ namespace DominoAllFives.Server.Controllers
                     playerStatsRepository.GetTopByGamesWon(
                         RankingLimit);
 
-                int currentPlayerRank = playerStatsRepository.GetRankByPlayerId(playerId);
                 List<RankingEntry> entries = new List<RankingEntry>();
 
                 int rank = 1;
@@ -70,7 +60,26 @@ namespace DominoAllFives.Server.Controllers
                     rank++;
                 }
 
-                return Ranking.FromOrderedEntries(entries, currentPlayerRank);
+                return entries;
+            }
+        }
+
+        /// <summary>
+        /// Gets the player's position by games won, or zero when absent.
+        /// </summary>
+        public int GetWinsRankingPositionById(int playerId)
+        {
+            if (playerId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(playerId));
+            }
+
+            
+            using (DominoAllFivesEntities context = new DominoAllFivesEntities())
+            {
+                IPlayerStatsRepository playerStatsRepository =
+                    new PlayerStatsRepository(context);
+                return playerStatsRepository.GetRankByPlayerId(playerId);
             }
         }
     }

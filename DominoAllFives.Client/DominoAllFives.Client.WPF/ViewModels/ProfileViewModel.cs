@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Media.Imaging;
 
 using DominoAllFives.Client.WPF.Commands;
@@ -118,7 +118,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             if (!_playerSession.PlayerId.HasValue)
             {
                 ShowRetrieveInformationFailure(
-                    RetrieveInformationFailureReason.NotFound);
+                    RetrieveInformationStatus.NotFound);
 
                 return;
             }
@@ -131,13 +131,13 @@ namespace DominoAllFives.Client.WPF.ViewModels
             catch (Exception ex)
             {
                 System.Diagnostics.Trace.TraceError("Profile retrieval failed: {0}", ex);
-                ShowRetrieveInformationFailure(RetrieveInformationFailureReason.ServiceUnavailable);
+                ShowRetrieveInformationFailure(RetrieveInformationStatus.ServiceUnavailable);
                 return;
             }
 
             if (profile == null)
             {
-                ShowRetrieveInformationFailure(RetrieveInformationFailureReason.NotFound);
+                ShowRetrieveInformationFailure(RetrieveInformationStatus.NotFound);
                 return;
             }
 
@@ -150,11 +150,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
         }
 
         private void ShowRetrieveInformationFailure(
-            RetrieveInformationFailureReason reason)
+            RetrieveInformationStatus reason)
         {
             switch (reason)
             {
-                case RetrieveInformationFailureReason.NotFound:
+                case RetrieveInformationStatus.NotFound:
                     _dialogService.ShowDialog(
                         new DialogRequest
                         {
@@ -164,7 +164,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                         });
                     break;
 
-                case RetrieveInformationFailureReason.ServiceUnavailable:
+                case RetrieveInformationStatus.ServiceUnavailable:
                     _dialogService.ShowDialog(
                         new DialogRequest
                         {

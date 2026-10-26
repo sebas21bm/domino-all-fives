@@ -1,9 +1,9 @@
-﻿namespace DominoAllFives.Contracts.Enums
+namespace DominoAllFives.Contracts.Enums
 {
     /// <summary>
     /// Defines the possible reasons for a failed registration attempt.
     /// </summary>
-    public enum RegistrationFailureReason
+    public enum RegistrationStatus
     {
         None,
         InvalidRegistrationData,

@@ -12,7 +12,7 @@ namespace DominoAllFives.Contracts.Services
         /// <summary>
         /// Updates the current local account language.
         /// </summary>
-        LanguagePreferenceFailureReason ChangePreferredLanguage(string preferredLanguageId);
+        LanguagePreferenceStatus ChangePreferredLanguage(string preferredLanguageId);
 
         /// <summary>
         /// Registers a new user account with the provided registration data.
@@ -26,13 +26,13 @@ namespace DominoAllFives.Contracts.Services
         /// </summary>
         /// <param name="playerId">The player whose picture is updated.</param>
         /// <param name="picture">The selected image snapshot validated by the operation.</param>
-        ProfilePictureFailureReason SetProfilePicture(int playerId, ProfilePicture picture);
+        ProfilePictureStatus SetProfilePicture(int playerId, ProfilePicture picture);
 
         /// <summary>
         /// Removes the profile picture for the specified player.
         /// </summary>
         /// <param name="playerId">The ID of the player.</param>
-        ProfilePictureFailureReason RemoveProfilePicture(int playerId);
+        ProfilePictureStatus RemoveProfilePicture(int playerId);
 
         /// <summary>
         /// Retrieves the profile information for the specified player.
@@ -46,7 +46,7 @@ namespace DominoAllFives.Contracts.Services
         /// </summary>
         /// <param name="playerId">The account identifier.</param>
         /// <param name="username">The requested username.</param>
-        UpdateProfileFailureReason UpdateProfile(int playerId, string username);
+        UpdateProfileStatus UpdateProfile(int playerId, string username);
 
         /// <summary>
         /// Updates the username and replaces the profile picture.
@@ -54,14 +54,14 @@ namespace DominoAllFives.Contracts.Services
         /// <param name="playerId">The account identifier.</param>
         /// <param name="username">The requested username.</param>
         /// <param name="replacementPicture">The replacement snapshot; null is invalid.</param>
-        UpdateProfileFailureReason UpdateProfile(int playerId, string username, ProfilePicture replacementPicture);
+        UpdateProfileStatus UpdateProfile(int playerId, string username, ProfilePicture replacementPicture);
 
         /// <summary>
         /// Logically deletes a player account after verifying its password.
         /// </summary>
         /// <param name="playerId">The account identifier.</param>
         /// <param name="password">The current password to verify.</param>
-        DeleteFailureReason DeleteAccount(int playerId, string password);
+        DeleteStatus DeleteAccount(int playerId, string password);
 
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace DominoAllFives.Contracts.Services
         /// <param name="playerId">The account identifier.</param>
         /// <param name="currentPassword">The current password to verify.</param>
         /// <param name="newPassword">The new password.</param>
-        ChangePasswordFailureReason ChangePassword(int playerId, string currentPassword, string newPassword);
+        ChangePasswordStatus ChangePassword(int playerId, string currentPassword, string newPassword);
 
     }
 }

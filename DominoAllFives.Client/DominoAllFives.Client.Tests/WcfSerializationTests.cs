@@ -22,20 +22,20 @@ namespace DominoAllFives.Client.Tests
         {
             LoginResult copy = RoundTrip(LoginResult.Success(PlayerAccount.FromStoredAccount(
                 7, "demo", "pt-BR", AccountAccessStatus.FromStoredState(false, false, null))));
-            Assert.That(copy.Reason, Is.EqualTo(LoginFailureReason.None));
+            Assert.That(copy.Status, Is.EqualTo(LoginStatus.None));
             Assert.That(copy.Account.PlayerId, Is.EqualTo(7));
             Assert.That(copy.Account.Username, Is.EqualTo("demo"));
             Assert.That(copy.Account.PreferredLanguageId, Is.EqualTo("pt-BR"));
             Assert.That(copy.Account.AccessStatus, Is.Not.Null);
         }
 
-        [TestCase(LoginFailureReason.InvalidCredentials)]
-        [TestCase(LoginFailureReason.Banned)]
-        [TestCase(LoginFailureReason.Suspended)]
-        public void LoginResult_Rejection_RoundTrip_PreservesBusinessReason(LoginFailureReason reason)
+        [TestCase(LoginStatus.InvalidCredentials)]
+        [TestCase(LoginStatus.Banned)]
+        [TestCase(LoginStatus.Suspended)]
+        public void LoginResult_Rejection_RoundTrip_PreservesBusinessReason(LoginStatus reason)
         {
             LoginResult copy = RoundTrip(LoginResult.Rejected(reason));
-            Assert.That(copy.Reason, Is.EqualTo(reason));
+            Assert.That(copy.Status, Is.EqualTo(reason));
             Assert.That(copy.Account, Is.Null);
         }
 

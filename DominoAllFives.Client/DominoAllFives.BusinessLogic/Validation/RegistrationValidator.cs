@@ -1,4 +1,4 @@
-﻿
+
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 
@@ -20,7 +20,7 @@ namespace DominoAllFives.BusinessLogic.Validation
         /// None when the data is valid; otherwise, the reason
         /// why validation failed.
         /// </returns>
-        public static RegistrationFailureReason Validate(
+        public static RegistrationStatus Validate(
             AccountRegistration registrationData)
         {
             if (registrationData == null)
@@ -30,20 +30,20 @@ namespace DominoAllFives.BusinessLogic.Validation
 
             if (!AccountValidator.IsUsernameValid(registrationData.Username))
             {
-                return RegistrationFailureReason.InvalidUsername;
+                return RegistrationStatus.InvalidUsername;
             }
 
             if (!AccountValidator.IsEmailValid(registrationData.Email))
             {
-                return RegistrationFailureReason.InvalidEmail;
+                return RegistrationStatus.InvalidEmail;
             }
 
             if (!AccountValidator.IsPasswordValid(registrationData.Password))
             {
-                return RegistrationFailureReason.InvalidPassword;
+                return RegistrationStatus.InvalidPassword;
             }
 
-            return RegistrationFailureReason.None;
+            return RegistrationStatus.None;
         }
     }
 }

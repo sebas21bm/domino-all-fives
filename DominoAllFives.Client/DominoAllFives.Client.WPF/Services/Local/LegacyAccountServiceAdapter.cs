@@ -21,31 +21,31 @@ namespace DominoAllFives.Client.WPF.Services.Local
             _localService = new Lazy<LocalAccountService>(localServiceFactory);
         }
 
-        public LanguagePreferenceFailureReason ChangePreferredLanguage(string languageId) =>
+        public LanguagePreferenceStatus ChangePreferredLanguage(string languageId) =>
             _localService.Value.ChangePreferredLanguage(languageId);
 
         public RegistrationResult Register(AccountRegistration registrationData) =>
             _localService.Value.Register(registrationData);
 
-        public ProfilePictureFailureReason SetProfilePicture(int playerId, DomainProfilePicture picture) =>
+        public ProfilePictureStatus SetProfilePicture(int playerId, DomainProfilePicture picture) =>
             _localService.Value.SetProfilePicture(playerId, picture);
 
-        public ProfilePictureFailureReason RemoveProfilePicture(int playerId) =>
+        public ProfilePictureStatus RemoveProfilePicture(int playerId) =>
             _localService.Value.RemoveProfilePicture(playerId);
 
         public PlayerProfile GetProfile(int playerId) => _localService.Value.GetProfile(playerId);
 
-        public UpdateProfileFailureReason UpdateProfile(int playerId, string username) =>
+        public UpdateProfileStatus UpdateProfile(int playerId, string username) =>
             _localService.Value.UpdateProfile(playerId, username);
 
-        public UpdateProfileFailureReason UpdateProfile(int playerId, string username,
+        public UpdateProfileStatus UpdateProfile(int playerId, string username,
             DomainProfilePicture replacementPicture) =>
             _localService.Value.UpdateProfile(playerId, username, replacementPicture);
 
-        public DeleteFailureReason DeleteAccount(int playerId, string password) =>
+        public DeleteStatus DeleteAccount(int playerId, string password) =>
             _localService.Value.DeleteAccount(playerId, password);
 
-        public ChangePasswordFailureReason ChangePassword(int playerId, string currentPassword,
+        public ChangePasswordStatus ChangePassword(int playerId, string currentPassword,
             string newPassword) =>
             _localService.Value.ChangePassword(playerId, currentPassword, newPassword);
     }

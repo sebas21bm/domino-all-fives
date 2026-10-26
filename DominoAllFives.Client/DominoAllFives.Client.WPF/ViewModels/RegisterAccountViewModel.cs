@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Controls;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
@@ -132,12 +132,12 @@ namespace DominoAllFives.Client.WPF.ViewModels
             catch (Exception ex)
             {
                 System.Diagnostics.Trace.TraceError("Registration failed: {0}", ex);
-                ShowRegistrationFailure(RegistrationFailureReason.ServiceUnavailable);
+                ShowRegistrationFailure(RegistrationStatus.ServiceUnavailable);
                 return;
             }
-            if (result.Reason != RegistrationFailureReason.None)
+            if (result.Status != RegistrationStatus.None)
             {
-                ShowRegistrationFailure(result.Reason);
+                ShowRegistrationFailure(result.Status);
                 return;
             }
 
@@ -185,11 +185,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
         }
 
         private void ShowRegistrationFailure(
-            RegistrationFailureReason failureReason)
+            RegistrationStatus status)
         {
-            switch (failureReason)
+            switch (status)
             {
-                case RegistrationFailureReason.InvalidPassword:
+                case RegistrationStatus.InvalidPassword:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -198,7 +198,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case RegistrationFailureReason.UsernameAlreadyExists:
+                case RegistrationStatus.UsernameAlreadyExists:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -207,7 +207,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case RegistrationFailureReason.EmailAlreadyExists:
+                case RegistrationStatus.EmailAlreadyExists:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -216,7 +216,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case RegistrationFailureReason.InvalidUsername:
+                case RegistrationStatus.InvalidUsername:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -225,7 +225,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case RegistrationFailureReason.InvalidEmail:
+                case RegistrationStatus.InvalidEmail:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -234,7 +234,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case RegistrationFailureReason.InvalidRegistrationData:
+                case RegistrationStatus.InvalidRegistrationData:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -243,7 +243,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case RegistrationFailureReason.ServiceUnavailable:
+                case RegistrationStatus.ServiceUnavailable:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Error,
