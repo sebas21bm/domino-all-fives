@@ -9,6 +9,6 @@ namespace DominoAllFives.Contracts.Wcf
     {
         [OperationContract]
         [FaultContract(typeof(AccountIssue))]
-        PlayerAccount LoginWithAccount(LoginCredentials credentials);
+        PlayerAccount LoginWithAccount(Credentials credentials);
     }
 }

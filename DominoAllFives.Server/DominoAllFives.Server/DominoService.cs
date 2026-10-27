@@ -10,7 +10,9 @@ using DominoAllFives.Contracts.Enums;
 using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Wcf;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using DominoAllFives.Server.Logging;
 
 namespace DominoAllFives.Server
 {
@@ -21,29 +23,45 @@ namespace DominoAllFives.Server
         IncludeExceptionDetailInFaults = false)]
     public partial class DominoService : ISessionAccount
     {
+        private readonly Func<Credentials, PlayerAccount> _authenticate;
+        private readonly ILogger<DominoService> _logger;
+
+        public DominoService()
+            : this(new AuthenticationController().LoginWithAccount, new ConsoleLogger<DominoService>())
+        {
+        }
+
+        internal DominoService(Func<Credentials, PlayerAccount> authenticate, ILogger<DominoService> logger)
+        {
+            _authenticate = authenticate ?? throw new ArgumentNullException(nameof(authenticate));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <summary>Authenticates an account using its identifier and password.</summary>
+        /// <param name="credentials">Credentials supplied by the player.</param>
+        /// <returns>The authenticated account.</returns>
+        /// <exception cref="FaultException{AccountIssue}">The account cannot sign in.</exception>
+        /// <exception cref="FaultException">Persistence failed.</exception>
         public PlayerAccount LoginWithAccount(
             Credentials credentials)
         {
             try
             {
-                AuthenticationController controller =
-                    new AuthenticationController();
-
-                return controller.LoginWithAccount(credentials);
+                return _authenticate(credentials);
             }
-            catch (AccountRuleException exception)
+            catch (AccountRuleException ex)
             {
+                _logger.LogWarning(ex, "Login rejected. Account issue: {AccountIssue}.", ex.Issue);
                 throw new FaultException<AccountIssue>(
-                    exception.Issue,
+                    ex.Issue,
                     new FaultReason("The account cannot sign in."));
             }
-            catch (Exception exception) when (
-                exception is SqlException ||
-                exception is EntityException ||
-                exception is DbUpdateException)
+            catch (Exception ex) when (
+                ex is SqlException ||
+                ex is EntityException ||
+                ex is DbUpdateException)
             {
-                Console.Error.WriteLine(
-                    "Login failed on server: {0}", exception);
+                _logger.LogError(ex, "Login failed on server.");
 
                 throw new FaultException(
                     "The service could not complete the operation.");
@@ -53,6 +71,9 @@ namespace DominoAllFives.Server
 
     public partial class DominoService :  IRankingRemoteService
     {
+        /// <summary>Gets the accounts with the most wins.</summary>
+        /// <returns>The ranking entries.</returns>
+        /// <exception cref="FaultException">Persistence failed.</exception>
         public List<RankingEntry> GetTopWinsRanking()
         {
             try
@@ -66,16 +87,22 @@ namespace DominoAllFives.Server
                             ex is EntityException ||
                             ex is DbUpdateException)
             {
-                Console.Error.WriteLine("Ranking failed on server ({0}).", ex.GetType().Name);
+                _logger.LogError(ex, "Ranking failed on server.");
                 throw new FaultException("The service could not complete the operation.");
             }
         }
 
+        /// <summary>Gets the wins ranking position for a player.</summary>
+        /// <param name="playerId">The target player identifier.</param>
+        /// <returns>The player ranking position.</returns>
+        /// <exception cref="FaultException">The request is invalid or persistence failed.</exception>
         public int GetWinsRankingPositionById(int playerId)
         {
             if (playerId <= 0)
             {
-                throw new FaultException("Invalid request.");
+                FaultException fault = new FaultException("Invalid request.");
+                _logger.LogWarning(fault, "Ranking rejected an invalid player identifier.");
+                throw fault;
             }
 
             try
@@ -89,7 +116,7 @@ namespace DominoAllFives.Server
                             ex is EntityException ||
                             ex is DbUpdateException)
             {
-                Console.Error.WriteLine("Ranking failed on server ({0}).", ex.GetType().Name);
+                _logger.LogError(ex, "Ranking failed on server.");
                 throw new FaultException("The service could not complete the operation.");
             }
         }

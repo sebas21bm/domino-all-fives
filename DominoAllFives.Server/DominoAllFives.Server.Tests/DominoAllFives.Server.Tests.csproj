@@ -92,6 +92,8 @@
     <ProjectReference Include="..\DominoAllFives.BusinessLogic\DominoAllFives.BusinessLogic.csproj" />
     <ProjectReference Include="..\DominoAllFives.Contracts\DominoAllFives.Contracts.csproj" /><ProjectReference Include="..\DominoAllFives.DataAccess\DominoAllFives.DataAccess.csproj" />
     <Compile Include="AuthenticationControllerTests.cs" />
+    <Compile Include="TestLogger.cs" />
+    <Compile Include="CredentialsTests.cs" />
     <Compile Include="RankingControllerTests.cs" />
   </ItemGroup>
   <ItemGroup>

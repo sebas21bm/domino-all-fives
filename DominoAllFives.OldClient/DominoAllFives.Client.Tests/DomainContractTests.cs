@@ -23,13 +23,13 @@ namespace DominoAllFives.Client.Tests
         }
 
         [Test]
-        public void LoginCredentials_ValidInput_NormalizesOnlyIdentifier()
+        public void Credentials_ValidInput_NormalizesOnlyIdentifier()
         {
             // Arrange.
             const string password = "  existing-password  ";
 
             // Act.
-            LoginCredentials credentials = LoginCredentials.ForLogin("  player  ", password);
+            Credentials credentials = Credentials.ForLogin("  player  ", password);
 
             // Assert.
             Assert.That(credentials.EmailOrUsername, Is.EqualTo("player"));
@@ -41,11 +41,11 @@ namespace DominoAllFives.Client.Tests
         [TestCase(" ", "password")]
         [TestCase("player", null)]
         [TestCase("player", " ")]
-        public void LoginCredentials_BlankInput_PreservesInvalidCredentialsReason(
+        public void Credentials_BlankInput_PreservesInvalidCredentialsReason(
             string identifier, string password)
         {
             // Arrange and act.
-            LoginStatus reason = LoginCredentials.ForLogin(identifier, password).EnsureValid();
+            LoginStatus reason = Credentials.ForLogin(identifier, password).EnsureValid();
 
             // Assert.
             Assert.That(reason, Is.EqualTo(LoginStatus.InvalidCredentials));
@@ -53,10 +53,10 @@ namespace DominoAllFives.Client.Tests
 
         [TestCase("x")]
         [TestCase("old-password")]
-        public void LoginCredentials_ExistingPassword_DoesNotApplyRegistrationPolicy(string password)
+        public void Credentials_ExistingPassword_DoesNotApplyRegistrationPolicy(string password)
         {
             // Arrange and act.
-            LoginCredentials credentials = LoginCredentials.ForLogin("player", password);
+            Credentials credentials = Credentials.ForLogin("player", password);
 
             // Assert.
             Assert.That(credentials.Password, Is.EqualTo(password));

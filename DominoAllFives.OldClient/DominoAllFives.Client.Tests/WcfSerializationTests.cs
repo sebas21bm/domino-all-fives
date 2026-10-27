@@ -12,7 +12,7 @@ namespace DominoAllFives.Client.Tests
         [Test]
         public void Credentials_RoundTrip_PreservesIdentifierAndPasswordExactly()
         {
-            LoginCredentials copy = RoundTrip(LoginCredentials.ForLogin("  demo  ", "  old-password  "));
+            Credentials copy = RoundTrip(Credentials.ForLogin("  demo  ", "  old-password  "));
             Assert.That(copy.EmailOrUsername, Is.EqualTo("demo"));
             Assert.That(copy.Password, Is.EqualTo("  old-password  "));
         }

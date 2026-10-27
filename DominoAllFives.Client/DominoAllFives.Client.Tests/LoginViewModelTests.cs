@@ -9,7 +9,7 @@ using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFivesService;
-using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 
 namespace DominoAllFives.Client.Tests
@@ -26,6 +26,7 @@ namespace DominoAllFives.Client.Tests
         private DialogService _dialogs;
         private PlayerSession _session;
         private LanguageManager _languages;
+        private TestLogger<LoginViewModel> _logger;
         private int _navigations;
         private int _savedPreferences;
 
@@ -36,6 +37,7 @@ namespace DominoAllFives.Client.Tests
             _uiCulture = Thread.CurrentThread.CurrentUICulture;
             _defaultCulture = CultureInfo.DefaultThreadCurrentCulture;
             _defaultUiCulture = CultureInfo.DefaultThreadCurrentUICulture;
+            _logger = new TestLogger<LoginViewModel>();
             _client = new LoginClient();
             _dialogs = new DialogService();
             _session = new PlayerSession();
@@ -58,9 +60,14 @@ namespace DominoAllFives.Client.Tests
         [TestCase(AccountIssue.Suspended, "MessageAuthentication_msgSuspendedAccount")]
         public void Login_BusinessFault_ShowsLocalizedWarning(AccountIssue issue, string messageKey)
         {
+            // Arrange
             _client.Error = new FaultException<AccountIssue>(issue);
+            // Act
             CreateViewModel().LoginCommand.Execute(null);
+            // Assert
             AssertFailure(messageKey, DialogType.Warning);
+            AssertLog(LogLevel.Warning);
+            Assert.That(_logger.Messages[0], Does.Contain(issue.ToString()));
         }
 
         [Test]
@@ -82,25 +89,37 @@ namespace DominoAllFives.Client.Tests
         [Test]
         public void Login_TechnicalFault_ShowsTechnicalMessage()
         {
+            // Arrange
             _client.Error = new FaultException("Internal details must not be displayed");
+            // Act
             CreateViewModel().LoginCommand.Execute(null);
+            // Assert
             AssertFailure("Global_msgDefaultError", DialogType.Error);
+            AssertLog(LogLevel.Error);
         }
 
         [Test]
         public void Login_Timeout_ShowsConnectionMessage()
         {
+            // Arrange
             _client.Error = new TimeoutException();
+            // Act
             CreateViewModel().LoginCommand.Execute(null);
+            // Assert
             AssertFailure("MessageAuthentication_msgConnectionError", DialogType.Error);
+            AssertLog(LogLevel.Error);
         }
 
         [Test]
         public void Login_EndpointUnavailable_ShowsConnectionMessage()
         {
+            // Arrange
             _client.Error = new EndpointNotFoundException();
+            // Act
             CreateViewModel().LoginCommand.Execute(null);
+            // Assert
             AssertFailure("MessageAuthentication_msgConnectionError", DialogType.Error);
+            AssertLog(LogLevel.Error);
         }
 
         [Test]
@@ -145,9 +164,16 @@ namespace DominoAllFives.Client.Tests
             AssertFailure("Global_msgDefaultError", DialogType.Error);
         }
 
+        private void AssertLog(LogLevel level)
+        {
+            Assert.That(_logger.Levels, Is.EqualTo(new[] { level }));
+            Assert.That(_logger.Exceptions[0], Is.SameAs(_client.Error));
+            Assert.That(_logger.Messages[0], Does.Not.Contain("password"));
+        }
+
         private LoginViewModel CreateViewModel()
         {
-            return new LoginViewModel(_dialogs, _client, _session, NullLogger<LoginViewModel>.Instance,
+            return new LoginViewModel(_dialogs, _client, _session, _logger,
                 () => _navigations++, () => { }, () => { }, () => { }, _languages)
             { Email = " player ", Password = "password" };
         }
@@ -168,9 +194,9 @@ namespace DominoAllFives.Client.Tests
         {
             public Exception Error { get; set; }
             public PlayerAccount Account { get; set; }
-            public LoginCredentials Credentials { get; private set; }
+            public Credentials Credentials { get; private set; }
             public int CallCount { get; private set; }
-            public PlayerAccount LoginWithAccount(LoginCredentials credentials)
+            public PlayerAccount LoginWithAccount(Credentials credentials)
             {
                 CallCount++;
                 Credentials = credentials;

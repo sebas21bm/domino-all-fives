@@ -125,7 +125,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             try
             {
-                LoginCredentials credentials = new LoginCredentials
+                Credentials credentials = new Credentials
                 {
                     EmailOrUsername = Email.Trim(),
                     Password = Password
@@ -135,7 +135,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
             catch (FaultException<AccountIssue> ex)
             {
-                _logger.LogWarning("Login rejected. Account issue: {AccountIssue}.", ex);
+                _logger.LogWarning(ex, "Login rejected. Account issue: {AccountIssue}.", ex.Detail);
                 ShowMessageFailure(ex.Detail);
                 return;
             }
@@ -148,13 +148,13 @@ namespace DominoAllFives.Client.WPF.ViewModels
             catch (TimeoutException ex)
             {
                 _logger.LogError(ex, "Authentication service timed out.");
-                ShowConnectionFailure();
+                ShowMessageFailure(connectionFailure: true);
                 return;
             }
             catch (CommunicationException ex)
             {
                 _logger.LogError(ex, "Authentication service unavailable.");
-                ShowConnectionFailure();
+                ShowMessageFailure(connectionFailure: true);
                 return;
             }
 
@@ -197,7 +197,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         }
 
         private void ShowMessageFailure(
-            AccountIssue issue)
+            AccountIssue? issue = null, bool connectionFailure = false)
         {
             switch (issue)
             {
@@ -228,6 +228,15 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
+                case null when connectionFailure:
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Error,
+                        TitleKey = "Global_msgConnectionErrorTitle",
+                        MessageKey = "MessageAuthentication_msgConnectionError"
+                    });
+                    break;
+
                 default:
                     _dialogService.ShowDialog(new DialogRequest
                     {
@@ -239,14 +248,5 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
         }
 
-        private void ShowConnectionFailure()
-        {
-            _dialogService.ShowDialog(new DialogRequest
-            {
-                Type = DialogType.Error,
-                TitleKey = "Global_msgConnectionErrorTitle",
-                MessageKey = "MessageAuthentication_msgConnectionError"
-            });
-        }
     }
 }

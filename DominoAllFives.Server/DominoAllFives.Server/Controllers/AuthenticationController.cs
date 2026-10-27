@@ -24,7 +24,7 @@ namespace DominoAllFives.Server.Controllers
             _utcNow = utcNow ?? throw new ArgumentNullException(nameof(utcNow));
         }
 
-        public PlayerAccount LoginWithAccount(LoginCredentials credentials)
+        public PlayerAccount LoginWithAccount(Credentials credentials)
         {
             if (credentials == null || string.IsNullOrWhiteSpace(credentials.EmailOrUsername) ||
                 string.IsNullOrWhiteSpace(credentials.Password))

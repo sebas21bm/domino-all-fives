@@ -52,7 +52,7 @@
     <Compile Include="Domain\PlayerProfile.cs" />
     <Compile Include="Domain\RankingEntry.cs" />
     <Compile Include="Domain\Ranking.cs" />
-    <Compile Include="Domain\LoginCredentials.cs" />
+    <Compile Include="Domain\Credentials.cs" />
     <Compile Include="Domain\AccountAccessStatus.cs" />
     <Compile Include="Domain\AccountRegistration.cs" />
     <Compile Include="Domain\AccountRules.cs" />

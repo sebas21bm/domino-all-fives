@@ -31,7 +31,7 @@ namespace DominoAllFives.Client.Tests
         [Test]
         public void ProxyCredentials_ServerReadsIdentifierAndUnmodifiedPassword()
         {
-            LoginCredentials received = Transfer<Proxy.LoginCredentials, LoginCredentials>(
+            Credentials received = Transfer<Proxy.LoginCredentials, Credentials>(
                 new Proxy.LoginCredentials { EmailOrUsername = "demo", Password = "  secret  " });
             Assert.That(received.EmailOrUsername, Is.EqualTo("demo"));
             Assert.That(received.Password, Is.EqualTo("  secret  "));

@@ -14,8 +14,8 @@ namespace DominoAllFivesService
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="LoginCredentials", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
-    public partial class LoginCredentials : object
+    [System.Runtime.Serialization.DataContractAttribute(Name="Credentials", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
+    public partial class Credentials : object
     {
         
         private string EmailOrUsernameField;
@@ -174,13 +174,13 @@ namespace DominoAllFivesService
     {
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        InvalidCredentials = 1,
+        InvalidCredentials = 0,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Banned = 2,
+        Banned = 1,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Suspended = 3,
+        Suspended = 2,
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -294,10 +294,10 @@ namespace DominoAllFivesService
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/ISessionAccount/LoginWithAccount", ReplyAction="urn:domino-all-fives:services/ISessionAccount/LoginWithAccountResponse")]
         [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccountIssue), Action="urn:domino-all-fives:services/ISessionAccount/LoginWithAccountAccountIssueFault", Name="AccountIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
-        DominoAllFivesService.PlayerAccount LoginWithAccount(DominoAllFivesService.LoginCredentials credentials);
+        DominoAllFivesService.PlayerAccount LoginWithAccount(DominoAllFivesService.Credentials credentials);
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/ISessionAccount/LoginWithAccount", ReplyAction="urn:domino-all-fives:services/ISessionAccount/LoginWithAccountResponse")]
-        System.Threading.Tasks.Task<DominoAllFivesService.PlayerAccount> LoginWithAccountAsync(DominoAllFivesService.LoginCredentials credentials);
+        System.Threading.Tasks.Task<DominoAllFivesService.PlayerAccount> LoginWithAccountAsync(DominoAllFivesService.Credentials credentials);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
@@ -350,12 +350,12 @@ namespace DominoAllFivesService
         {
         }
         
-        public DominoAllFivesService.PlayerAccount LoginWithAccount(DominoAllFivesService.LoginCredentials credentials)
+        public DominoAllFivesService.PlayerAccount LoginWithAccount(DominoAllFivesService.Credentials credentials)
         {
             return base.Channel.LoginWithAccount(credentials);
         }
         
-        public System.Threading.Tasks.Task<DominoAllFivesService.PlayerAccount> LoginWithAccountAsync(DominoAllFivesService.LoginCredentials credentials)
+        public System.Threading.Tasks.Task<DominoAllFivesService.PlayerAccount> LoginWithAccountAsync(DominoAllFivesService.Credentials credentials)
         {
             return base.Channel.LoginWithAccountAsync(credentials);
         }

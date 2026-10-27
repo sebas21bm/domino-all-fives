@@ -221,7 +221,7 @@ namespace DominoAllFives.Client.Tests
                 return DeleteFailure ?? DeleteStatus.None;
             }
 
-            public LoginResult Login(LoginCredentials credentials) =>
+            public LoginResult Login(Credentials credentials) =>
                 throw new NotSupportedException();
             public RegistrationResult Register(AccountRegistration registration) =>
                 throw new NotSupportedException();
