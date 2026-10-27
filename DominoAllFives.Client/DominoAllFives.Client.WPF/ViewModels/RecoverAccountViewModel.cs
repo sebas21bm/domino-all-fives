@@ -1,41 +1,20 @@
 ﻿using System;
-
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
+    /// <summary>Presentation retained for a future remote use case implementation.</summary>
     public class RecoverAccountViewModel : ViewModelBase
     {
-        private readonly Action<string> _onGoToVerifyEmail;
-        private readonly Action _onCancel;
-
-        private string _email;
-
-        public string Email
-        {
-            get => _email;
-            set => SetProperty(ref _email, value);
-        }
-
+        public string Email { get; set; } = string.Empty;
         public RelayCommand SendCodeCommand { get; }
         public RelayCommand CancelCommand { get; }
 
-        public RecoverAccountViewModel(
-            Action<string> onGoToVerifyEmail,
-            Action onCancel)
+        public RecoverAccountViewModel(Action onCancel = null)
         {
-            _onGoToVerifyEmail = onGoToVerifyEmail ?? 
-                throw new ArgumentNullException(nameof(onGoToVerifyEmail));
-            _onCancel = onCancel ?? throw new ArgumentNullException(nameof(onCancel));
-
-            SendCodeCommand = new RelayCommand(ExecuteSendCode);
-            CancelCommand = new RelayCommand(_onCancel);
-        }
-
-        private void ExecuteSendCode()
-        {
-            _onGoToVerifyEmail?.Invoke(Email);
+            SendCodeCommand = new RelayCommand(() => { }, () => false);
+            CancelCommand = new RelayCommand(() => onCancel?.Invoke());
         }
     }
 }

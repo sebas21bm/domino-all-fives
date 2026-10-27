@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows.Media.Imaging;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
+using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFivesService;
@@ -80,7 +82,16 @@ namespace DominoAllFives.Client.WPF.ViewModels
             Ranking rankingResult;
             try
             {
-                rankingResult = _rankingService.GetTopRanking(_playerSession.PlayerId.Value);
+                List<RankingEntry> topPlayers = _rankingService.GetTopWinsRanking();
+
+                if (topPlayers == null)
+                {
+                    return;
+                }
+
+                int currentPlayerRank =
+                    _rankingService.GetWinsRankingPositionById(_playerSession.PlayerId.Value);
+                rankingResult = new Ranking(topPlayers, currentPlayerRank);
             }
             catch (Exception ex)
             {
@@ -91,11 +102,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     TitleKey = "Global_msgConnectionErrorTitle",
                     MessageKey = "Global_msgConnectionError"
                 });
-                return;
-            }
-
-            if (rankingResult == null)
-            {
                 return;
             }
 
@@ -120,3 +126,4 @@ namespace DominoAllFives.Client.WPF.ViewModels
         }
     }
 }
+

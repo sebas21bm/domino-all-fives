@@ -1,11 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-	  <TargetFramework>net48</TargetFramework>
-	  <UseWPF>true</UseWPF>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Assets\Fonts\PressStart.ttf" />
     <None Remove="Assets\Icons\iconEdit.png" />
@@ -21,34 +19,17 @@
     <None Remove="Assets\Images\gameBoardBackground.png" />
     <None Remove="Assets\Images\logoFull.png" />
     <None Remove="Assets\Images\ProfilePictures\defaultProfilePic.png" />
-    <None Remove="Configuration\DatabaseConnection.config" />
   </ItemGroup>
-
   <ItemGroup>
-    <Content Include="Configuration\DatabaseConnection.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="EntityFramework" Version="6.5.2" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\DominoAllFives.BusinessLogic\DominoAllFives.BusinessLogic.csproj" />
-    <ProjectReference Include="..\DominoAllFives.Contracts\DominoAllFives.Contracts.csproj" />
-    <ProjectReference Include="..\DominoAllFives.DataAccess\DominoAllFives.DataAccess.csproj" />
-  </ItemGroup>
-
   <ItemGroup>
     <Reference Include="System.Configuration" />
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
-
   <ItemGroup>
     <Resource Include="Assets\Fonts\PressStart.ttf" />
     <Resource Include="Assets\Icons\iconEdit.png">
@@ -87,7 +68,6 @@
     </Resource>
     <Resource Include="Assets\Images\ProfilePictures\defaultProfilePic.png" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Localization\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -100,20 +80,17 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Update="Localization\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-		<CustomToolNamespace>DominoAllFives.Client.WPF.Localization</CustomToolNamespace>
+      <CustomToolNamespace>DominoAllFives.Client.WPF.Localization</CustomToolNamespace>
     </EmbeddedResource>
   </ItemGroup>
-
   <ItemGroup>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-
 </Project>
