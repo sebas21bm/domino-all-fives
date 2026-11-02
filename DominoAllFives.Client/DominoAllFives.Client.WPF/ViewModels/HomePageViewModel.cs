@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -7,7 +7,7 @@ using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.Services;
+using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.ViewModels
@@ -16,7 +16,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
     {
         private readonly IFrameNavigationService _navigationService;
         private readonly IDialogService _dialogService;
-        private readonly IAccountService _accountService;
         private readonly ILoginClient _loginClient;
         private readonly PlayerSession _playerSession;
         private readonly ILoggerFactory _loggerFactory;
@@ -60,7 +59,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
             IFrameNavigationService navigationService,
             IDialogService dialogService,
             PlayerSession playerSession,
-            IAccountService accountService,
             ILoginClient loginClient,
             ILoggerFactory loggerFactory)
         {
@@ -76,9 +74,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 ?? throw new ArgumentNullException(
                     nameof(playerSession));
 
-            _accountService = accountService
-                ?? throw new ArgumentNullException(
-                    nameof(accountService));
 
             _loginClient = loginClient ?? throw new ArgumentNullException(nameof(loginClient));
 
@@ -109,7 +104,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 LanguageManager.Instance.CurrentLanguageCode;
 
             ShowLoginCommand = new RelayCommand(OpenLoginModal);
-            PlayAsGuestCommand = new RelayCommand(PlayAsGuest);
+            PlayAsGuestCommand = new RelayCommand(() => { }, () => false);
             ExitGameCommand = new RelayCommand(ExitGame);
         }
 
@@ -148,81 +143,14 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OpenRegisterModal()
         {
-            CurrentModal = new RegisterAccountViewModel(
-                _dialogService,
-                _accountService,
-                _playerSession,
-                OpenUploadProfilePictureModal,
-                CloseModal);
-
+            CurrentModal = new RegisterAccountViewModel(CloseModal);
             IsModalVisible = true;
-        }
-
-        private void OpenUploadProfilePictureModal()
-        {
-            CurrentModal = new UploadProfilePictureViewModel(
-                _dialogService,
-                _accountService,
-                _playerSession,
-                OnRegistrationSuccess,
-                CloseModal);
-
-            IsModalVisible = true;
-        }
-
-        private void OnRegistrationSuccess()
-        {
-            CloseModal();
-
-            _navigationService.NavigateTo<MainMenuViewModel>();
         }
 
         private void OpenRecoverModal()
         {
-            CurrentModal = new RecoverAccountViewModel(
-                onGoToVerifyEmail: OpenVerifyEmailForRecoveryModal,
-                onCancel: CloseModal);
-
+            CurrentModal = new RecoverAccountViewModel(CloseModal);
             IsModalVisible = true;
-        }
-
-        private void OpenVerifyEmailForRecoveryModal(string email)
-        {
-            CurrentModal = new VerifyEmailViewModel(
-                targetEmail: email,
-                onVerificationSuccess: OpenChangePasswordModal,
-                onCancel: CloseModal);
-
-            IsModalVisible = true;
-        }
-
-        private void OpenChangePasswordModal()
-        {
-            CurrentModal = new ChangePasswordViewModel(
-                accountService: _accountService,
-                dialogService: _dialogService,
-                logger: _loggerFactory.CreateLogger<ChangePasswordViewModel>(),
-                playerSession: _playerSession,
-                onPasswordChangedSuccess: OnPasswordRecoverySuccess,
-                onCancel: CloseModal);
-
-            IsModalVisible = true;
-        }
-
-
-        private void OnPasswordRecoverySuccess()
-        {
-            CloseModal();
-
-            _navigationService.NavigateTo<MainMenuViewModel>();
-        }
-
-        private void PlayAsGuest()
-        {
-            _playerSession.Clear();
-            LanguageManager.Instance.RestoreDeviceLanguage();
-
-            _navigationService.NavigateTo<MainMenuViewModel>();
         }
 
         private void ExitGame()

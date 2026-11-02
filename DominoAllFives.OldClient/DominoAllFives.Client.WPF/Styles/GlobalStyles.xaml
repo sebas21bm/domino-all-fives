@@ -1,0 +1,664 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Tipografía -->
+    <FontFamily x:Key="PressStartFont">./../Assets/Fonts/#Press Start 2P</FontFamily>
+
+    <!-- Colores -->
+    <SolidColorBrush x:Key="PrimaryRedBrush" Color="#CC2222"/>
+    <SolidColorBrush x:Key="DarkRedBrush" Color="#8A1212"/>
+    <SolidColorBrush x:Key="CreamLightBrush" Color="#F0EAD8"/>
+    <SolidColorBrush x:Key="DarkBgBrush" Color="#171717"/>
+    <SolidColorBrush x:Key="GrayPanelBrush" Color="#3A3A3A"/>
+    <SolidColorBrush x:Key="DisabledGrayBrush" Color="#666666"/>
+    <SolidColorBrush x:Key="MutedTextBrush" Color="#888070"/>
+    <SolidColorBrush x:Key="MutedLineBrush" Color="#888070"/>
+    <SolidColorBrush x:Key="HeaderLineBrush" Color="#444444"/>
+    <SolidColorBrush x:Key="PureBlackBrush" Color="#000000"/>
+    <SolidColorBrush x:Key="PureWhiteBrush" Color="#FFFFFF"/>
+
+    <!-- Plantilla base de botones -->
+    <ControlTemplate x:Key="StandardButtonTemplate" TargetType="{x:Type Button}">
+        <Border x:Name="borButton"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="0"
+                SnapsToDevicePixels="True">
+
+            <ContentPresenter Margin="{TemplateBinding Padding}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                              RecognizesAccessKey="True"/>
+        </Border>
+
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="borButton" Property="Opacity" Value="0.85"/>
+            </Trigger>
+
+            <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="borButton" Property="Opacity" Value="0.68"/>
+            </Trigger>
+
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="borButton" Property="Opacity" Value="0.45"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <!-- Botón base -->
+    <Style x:Key="BaseButton" TargetType="Button">
+        <Setter Property="FontFamily" Value="{StaticResource PressStartFont}"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="Padding" Value="14,9"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+        <Setter Property="Template" Value="{StaticResource StandardButtonTemplate}"/>
+    </Style>
+
+    <!-- Botón primario -->
+    <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource BaseButton}">
+        <Setter Property="Background" Value="{StaticResource PrimaryRedBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource DarkRedBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+
+    <!-- Botón oscuro -->
+    <Style x:Key="DarkButton" TargetType="Button" BasedOn="{StaticResource BaseButton}">
+        <Setter Property="Background" Value="{StaticResource DarkBgBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource GrayPanelBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+
+    <!-- Botón con contorno -->
+    <Style x:Key="OutlineButton" TargetType="Button" BasedOn="{StaticResource BaseButton}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource PrimaryRedBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryRedBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+
+    <!-- Botón deshabilitado -->
+    <Style x:Key="DisabledButton" TargetType="Button" BasedOn="{StaticResource DarkButton}">
+        <Setter Property="Foreground" Value="{StaticResource DisabledGrayBrush}"/>
+        <Setter Property="Cursor" Value="Arrow"/>
+        <Setter Property="IsEnabled" Value="False"/>
+    </Style>
+
+    <!-- Botón de icono -->
+    <Style x:Key="IconButton" TargetType="Button" BasedOn="{StaticResource BaseButton}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+
+    <!-- Botón de regreso -->
+    <Style x:Key="BackButton" TargetType="Button">
+        <Setter Property="Width" Value="64"/>
+        <Setter Property="Height" Value="62"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource PrimaryRedBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryRedBrush}"/>
+        <Setter Property="BorderThickness" Value="3"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="borBackButton"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="0"
+                            SnapsToDevicePixels="True">
+
+                        <Viewbox Width="18"
+                                 Height="26"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center">
+
+                            <Path Data="M 18,0 L 3,13 L 18,26"
+                                  Stroke="{TemplateBinding Foreground}"
+                                  StrokeThickness="4"
+                                  StrokeStartLineCap="Square"
+                                  StrokeEndLineCap="Square"
+                                  StrokeLineJoin="Miter"/>
+                        </Viewbox>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="borBackButton" Property="Opacity" Value="0.85"/>
+                        </Trigger>
+
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="borBackButton" Property="Opacity" Value="0.65"/>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="borBackButton" Property="Opacity" Value="0.40"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Botón de navegación -->
+    <Style x:Key="NavigationTabButton" TargetType="Button" BasedOn="{StaticResource DarkButton}">
+        <Setter Property="MinWidth" Value="220"/>
+        <Setter Property="MinHeight" Value="52"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="Padding" Value="14,8"/>
+    </Style>
+
+    <!-- Botón de navegación seleccionado -->
+    <Style x:Key="SelectedNavigationTabButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+        <Setter Property="MinWidth" Value="220"/>
+        <Setter Property="MinHeight" Value="52"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="Padding" Value="14,8"/>
+    </Style>
+
+    <!-- Campo de texto -->
+    <Style x:Key="CreamTextBox" TargetType="TextBox">
+        <Setter Property="FontFamily" Value="{StaticResource PressStartFont}"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="Background" Value="{StaticResource GrayPanelBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="CaretBrush" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="borTextBox"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="0"
+                            SnapsToDevicePixels="True">
+
+                        <ScrollViewer x:Name="PART_ContentHost"
+                                      Margin="{TemplateBinding Padding}"/>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="borTextBox" Property="BorderBrush" Value="{StaticResource PrimaryRedBrush}"/>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource DisabledGrayBrush}"/>
+                            <Setter TargetName="borTextBox" Property="Opacity" Value="0.60"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Campo de contraseña -->
+    <Style x:Key="CreamPasswordBox" TargetType="PasswordBox">
+        <Setter Property="FontFamily" Value="{StaticResource PressStartFont}"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="Background" Value="{StaticResource GrayPanelBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="CaretBrush" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="PasswordBox">
+                    <Border x:Name="borPasswordBox"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="0"
+                            SnapsToDevicePixels="True">
+
+                        <ScrollViewer x:Name="PART_ContentHost"
+                                      Margin="{TemplateBinding Padding}"/>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="borPasswordBox" Property="BorderBrush" Value="{StaticResource PrimaryRedBrush}"/>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource DisabledGrayBrush}"/>
+                            <Setter TargetName="borPasswordBox" Property="Opacity" Value="0.60"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Texto base -->
+    <Style TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource PressStartFont}"/>
+    </Style>
+
+    <!-- Texto crema -->
+    <Style x:Key="TextCream" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+        <Setter Property="Foreground" Value="{StaticResource CreamLightBrush}"/>
+    </Style>
+
+    <!-- Texto rojo -->
+    <Style x:Key="TextRed" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+        <Setter Property="Foreground" Value="{StaticResource PrimaryRedBrush}"/>
+    </Style>
+
+    <!-- Texto blanco -->
+    <Style x:Key="TextWhite" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+        <Setter Property="Foreground" Value="{StaticResource PureWhiteBrush}"/>
+    </Style>
+
+    <!-- Texto gris -->
+    <Style x:Key="TextGray" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}"/>
+    </Style>
+
+    <!-- Título de pantalla -->
+    <Style x:Key="PageTitleText" TargetType="TextBlock" BasedOn="{StaticResource TextCream}">
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+    </Style>
+
+    <!-- Título de sección -->
+    <Style x:Key="SectionTitleText" TargetType="TextBlock" BasedOn="{StaticResource TextCream}">
+        <Setter Property="FontSize" Value="17"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+    </Style>
+
+    <!-- Etiqueta de campo -->
+    <Style x:Key="FieldLabelText" TargetType="TextBlock" BasedOn="{StaticResource TextCream}">
+        <Setter Property="FontSize" Value="13"/>
+    </Style>
+
+    <!-- Texto general -->
+    <Style x:Key="BodyText" TargetType="TextBlock" BasedOn="{StaticResource TextCream}">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+
+    <!-- Texto de validación -->
+    <Style x:Key="ValidationText" TargetType="TextBlock" BasedOn="{StaticResource TextRed}">
+        <Setter Property="FontSize" Value="9"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+
+    <!-- Valor de datos -->
+    <Style x:Key="DataValueText" TargetType="TextBlock" BasedOn="{StaticResource TextCream}">
+        <Setter Property="FontSize" Value="18"/>
+    </Style>
+
+    <!-- Logo corto -->
+    <Style x:Key="ShortLogoStyle" TargetType="Image">
+        <Setter Property="Width" Value="290"/>
+        <Setter Property="Height" Value="78"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+    </Style>
+
+    <!-- Logo completo -->
+    <Style x:Key="FullLogoStyle" TargetType="Image">
+        <Setter Property="Width" Value="640"/>
+        <Setter Property="Height" Value="203"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+    </Style>
+
+    <!-- Icono de edición -->
+    <Style x:Key="EditIconStyle" TargetType="Image">
+        <Setter Property="Width" Value="35"/>
+        <Setter Property="Height" Value="35"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
+
+    <!-- Icono de advertencia -->
+    <Style x:Key="WarningIconStyle" TargetType="Image">
+        <Setter Property="Width" Value="64"/>
+        <Setter Property="Height" Value="64"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+    </Style>
+
+    <!-- Icono de información -->
+    <Style x:Key="InformationIconStyle" TargetType="Image">
+        <Setter Property="Width" Value="64"/>
+        <Setter Property="Height" Value="64"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+    </Style>
+
+    <!-- Icono de error -->
+    <Style x:Key="ErrorIconStyle" TargetType="Image">
+        <Setter Property="Width" Value="64"/>
+        <Setter Property="Height" Value="64"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+    </Style>
+
+    <!-- Icono de pregunta -->
+    <Style x:Key="QuestionIconStyle" TargetType="Image">
+        <Setter Property="Width" Value="64"/>
+        <Setter Property="Height" Value="64"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+    </Style>
+
+    <!-- Icono de éxito -->
+    <Style x:Key="SuccessIconStyle" TargetType="Image">
+        <Setter Property="Width" Value="64"/>
+        <Setter Property="Height" Value="64"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+    </Style>
+
+    <!-- Patrón de fondo -->
+    <Style x:Key="BackgroundDominoPatternStyle" TargetType="Image">
+        <Setter Property="Stretch" Value="UniformToFill"/>
+        <Setter Property="Opacity" Value="0.25"/>
+        <Setter Property="IsHitTestVisible" Value="False"/>
+    </Style>
+
+    <!-- Ficha decorativa grande -->
+    <Style x:Key="DecorativeDominoLargeStyle" TargetType="Image">
+        <Setter Property="Stretch" Value="Uniform"/>
+        <Setter Property="IsHitTestVisible" Value="False"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
+
+    <!-- Barra superior -->
+    <Style x:Key="HeaderBarStyle" TargetType="Border">
+        <Setter Property="Height" Value="78"/>
+        <Setter Property="Background" Value="{StaticResource DarkBgBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource HeaderLineBrush}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,3"/>
+    </Style>
+
+    <!-- Panel redondeado -->
+    <Style x:Key="RoundedPanelStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource GrayPanelBrush}"/>
+        <Setter Property="CornerRadius" Value="28"/>
+        <Setter Property="Padding" Value="30"/>
+    </Style>
+
+    <!-- Elemento de lista -->
+    <Style x:Key="OutlinedListItemStyle" TargetType="Border">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="MinHeight" Value="54"/>
+        <Setter Property="Padding" Value="12,8"/>
+    </Style>
+
+    <!-- Separador horizontal -->
+    <Style x:Key="HorizontalDividerStyle" TargetType="Border">
+        <Setter Property="Height" Value="2"/>
+        <Setter Property="Background" Value="{StaticResource MutedLineBrush}"/>
+    </Style>
+
+    <!-- Separador vertical -->
+    <Style x:Key="VerticalDividerStyle" TargetType="Border">
+        <Setter Property="Width" Value="2"/>
+        <Setter Property="Background" Value="{StaticResource HeaderLineBrush}"/>
+    </Style>
+
+    <!-- Avatar pequeño -->
+    <Style x:Key="SmallAvatarImageStyle" TargetType="Image">
+        <Setter Property="Width" Value="54"/>
+        <Setter Property="Height" Value="54"/>
+        <Setter Property="Stretch" Value="UniformToFill"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
+
+    <!-- Borde de avatar pequeño -->
+    <Style x:Key="SmallAvatarBorderStyle" TargetType="Ellipse">
+        <Setter Property="Width" Value="58"/>
+        <Setter Property="Height" Value="58"/>
+        <Setter Property="Fill" Value="{StaticResource DarkBgBrush}"/>
+        <Setter Property="Stroke" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="StrokeThickness" Value="2"/>
+    </Style>
+
+    <!-- ComboBoxItem Style -->
+    <Style TargetType="ComboBoxItem">
+        <Setter Property="FontFamily" Value="{StaticResource PressStartFont}"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="Foreground" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="10,12"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <Border x:Name="borItem"
+                        Background="{TemplateBinding Background}"
+                        Padding="{TemplateBinding Padding}"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!-- Selected Item -->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="borItem" Property="Background" Value="{StaticResource GrayPanelBrush}"/>
+                        </Trigger>
+                        <!-- Hovered Item -->
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="borItem" Property="Background" Value="{StaticResource HeaderLineBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ComboBox Style -->
+    <Style x:Key="DarkComboBox" TargetType="ComboBox">
+        <Setter Property="FontFamily" Value="{StaticResource PressStartFont}"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="Background" Value="{StaticResource DarkBgBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource GrayPanelBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="Padding" Value="14,0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <ToggleButton x:Name="togButton"
+                                  BorderBrush="{TemplateBinding BorderBrush}"
+                                  Background="{TemplateBinding Background}"
+                                  BorderThickness="{TemplateBinding BorderThickness}"
+                                  IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                  ClickMode="Press">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                        <Path Fill="{StaticResource CreamLightBrush}"
+                                          HorizontalAlignment="Right"
+                                          VerticalAlignment="Center"
+                                          Margin="0,0,15,0"
+                                          Data="M 0 0 L 4 4 L 8 0 Z"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+
+                        <ContentPresenter x:Name="conSite"
+                                      IsHitTestVisible="False"
+                                      Content="{TemplateBinding SelectionBoxItem}"
+                                      Margin="{TemplateBinding Padding}"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        <Popup x:Name="dlgPopup"
+                           Placement="Bottom"
+                           IsOpen="{TemplateBinding IsDropDownOpen}"
+                           AllowsTransparency="True"
+                           Focusable="False">
+                            <Border x:Name="borDropDown"
+                                Background="{StaticResource DarkBgBrush}"
+                                BorderBrush="{StaticResource GrayPanelBrush}"
+                                BorderThickness="2,0,2,2"
+                                MinWidth="{Binding ActualWidth, ElementName=ToggleButton}">
+                                <ScrollViewer Margin="0,4,0,4" SnapsToDevicePixels="True">
+                                    <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="togButton" Property="Opacity" Value="0.85"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <SolidColorBrush x:Key="BlockPurpleBrush" Color="#9747FF"/>
+
+    <Style x:Key="SelectableButtonStyle" TargetType="RadioButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource GrayPanelBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontFamily" Value="{StaticResource PressStartFont}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="borBackground"
+                        Background="{TemplateBinding Background}" 
+                        BorderBrush="{TemplateBinding BorderBrush}" 
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="borBackground" Property="Background" Value="{StaticResource PrimaryRedBrush}"/>
+                            <Setter TargetName="borBackground" Property="BorderThickness" Value="2"/>
+                            <Setter TargetName="borBackground" Property="BorderBrush" Value="{StaticResource DarkRedBrush}"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                                <Condition Property="IsChecked" Value="False"/>
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="borBackground" Property="Background" Value="{StaticResource GrayPanelBrush}"/>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="Separator">
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Background" Value="#555555"/>
+        <Setter Property="Margin" Value="4,2"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Separator">
+                    <Border Background="{TemplateBinding Background}" Height="1"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="MenuItem">
+        <Setter Property="FontFamily" Value="{StaticResource PressStartFont}"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="Foreground" Value="{StaticResource CreamLightBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="14,10"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <Border x:Name="borMenuItem" 
+                            Background="{TemplateBinding Background}" 
+                            CornerRadius="6"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter ContentSource="Header" 
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="borMenuItem" Property="Background" Value="#4A4A4A"/>
+                            <Setter Property="Foreground" Value="{StaticResource PureWhiteBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource DisabledGrayBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="ContextMenu">
+        <Setter Property="Background" Value="{StaticResource GrayPanelBrush}"/>
+        <Setter Property="BorderBrush" Value="#555555"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="HasDropShadow" Value="True"/>
+        <Setter Property="Padding" Value="6"/>
+        <Setter Property="MinWidth" Value="180"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="12"
+                            SnapsToDevicePixels="True"
+                            Padding="{TemplateBinding Padding}">
+                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <ImageBrush x:Key="GameBoardBackgroundBrush" 
+                ImageSource="/Assets/Images/gameBoardBackground.png" 
+                Stretch="Fill"
+                Opacity="0.7"/>
+
+</ResourceDictionary>

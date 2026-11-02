@@ -1,189 +1,27 @@
-﻿using System;
-using System.Windows.Media.Imaging;
-
+﻿using System.Windows.Media.Imaging;
 using DominoAllFives.Client.WPF.Commands;
-using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
-using DominoAllFives.Client.WPF.Services.ProfilePicture;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.Domain;
-using DominoAllFives.Contracts.Enums;
-using DominoAllFives.Contracts.Services;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
-    /// <summary>
-    /// Represents the view model for the profile view,
-    /// used for displaying and navigating through the user's profile information.
-    /// </summary>
+    /// <summary>Presentation retained for a future remote use case implementation.</summary>
     public class ProfileViewModel : ViewModelBase
     {
-        private readonly IFrameNavigationService _navigationService;
-        private readonly IAccountService _accountService;
-        private readonly IDialogService _dialogService;
-        private readonly ProfilePictureImageService _profilePictureImageService;
-        private readonly PlayerSession _playerSession;
-
-        private string _username;
-        private BitmapImage _profilePicture;
-        private int _wins;
-        private int _totalPoints;
-        private int _gamesPlayed;
-
-        public string Username
-        {
-            get => _username;
-            private set => SetProperty(ref _username, value);
-        }
-
-        public BitmapImage ProfilePicture
-        {
-            get => _profilePicture;
-            private set => SetProperty(ref _profilePicture, value);
-        }
-
-        public int Wins
-        {
-            get => _wins;
-            private set => SetProperty(ref _wins, value);
-        }
-
-        public int TotalPoints
-        {
-            get => _totalPoints;
-            private set => SetProperty(ref _totalPoints, value);
-        }
-
-        public int GamesPlayed
-        {
-            get => _gamesPlayed;
-            private set => SetProperty(ref _gamesPlayed, value);
-        }
-
+        public string Username { get; set; } = string.Empty;
+        public BitmapImage ProfilePicture { get; set; }
+        public int Wins { get; set; }
+        public int TotalPoints { get; set; }
+        public int GamesPlayed { get; set; }
         public RelayCommand GoBackCommand { get; }
-
         public RelayCommand GoToEditProfileCommand { get; }
-
         public RelayCommand GoToMatchHistoryCommand { get; }
 
-        public ProfileViewModel(
-            IFrameNavigationService navigationService,
-            IAccountService accountService,
-            IDialogService dialogService,
-            PlayerSession playerSession,
-            ProfilePictureImageService profilePictureImageService)
+        public ProfileViewModel(IFrameNavigationService navigationService)
         {
-            _navigationService = navigationService
-                ?? throw new ArgumentNullException(nameof(navigationService));
-
-            _accountService = accountService
-                ?? throw new ArgumentNullException(nameof(accountService));
-
-            _dialogService = dialogService
-                ?? throw new ArgumentNullException(nameof(dialogService));
-
-            _playerSession = playerSession
-                ?? throw new ArgumentNullException(nameof(playerSession));
-
-            _profilePictureImageService = profilePictureImageService
-                ?? throw new ArgumentNullException(nameof(profilePictureImageService));
-
-            GoBackCommand =
-                new RelayCommand(
-                    _ => _navigationService.GoBack());
-
-            GoToEditProfileCommand =
-                new RelayCommand(
-                    _ => ExecuteGoToEditProfile());
-
-            GoToMatchHistoryCommand =
-                new RelayCommand(
-                    _ => ExecuteGoToMatchHistory());
-
-            ShowProfileInformation();
-        }
-
-        private void ExecuteGoToEditProfile()
-        {
-            _navigationService.NavigateTo<EditProfileViewModel>();
-        }
-
-        private void ExecuteGoToMatchHistory()
-        {
-            _navigationService.NavigateTo<MatchHistoryViewModel>();
-        }
-
-        private void ShowProfileInformation()
-        {
-            if (!_playerSession.PlayerId.HasValue)
-            {
-                ShowRetrieveInformationFailure(
-                    RetrieveInformationFailureReason.NotFound);
-
-                return;
-            }
-
-            PlayerProfile profile;
-            try
-            {
-                profile = _accountService.GetProfile(_playerSession.PlayerId.Value);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Trace.TraceError("Profile retrieval failed: {0}", ex);
-                ShowRetrieveInformationFailure(RetrieveInformationFailureReason.ServiceUnavailable);
-                return;
-            }
-
-            if (profile == null)
-            {
-                ShowRetrieveInformationFailure(RetrieveInformationFailureReason.NotFound);
-                return;
-            }
-
-            Username = profile.Username;
-            ProfilePicture =
-                _profilePictureImageService.GetProfilePicture(profile.Picture.ImageData);
-            Wins = profile.Statistics.GamesWon;
-            TotalPoints = profile.Statistics.TotalPointsScored;
-            GamesPlayed = profile.Statistics.GamesPlayed;
-        }
-
-        private void ShowRetrieveInformationFailure(
-            RetrieveInformationFailureReason reason)
-        {
-            switch (reason)
-            {
-                case RetrieveInformationFailureReason.NotFound:
-                    _dialogService.ShowDialog(
-                        new DialogRequest
-                        {
-                            Type = DialogType.Error,
-                            TitleKey = "Global_msgNotFoundTitle",
-                            MessageKey = "Global_msgNotFound"
-                        });
-                    break;
-
-                case RetrieveInformationFailureReason.ServiceUnavailable:
-                    _dialogService.ShowDialog(
-                        new DialogRequest
-                        {
-                            Type = DialogType.Error,
-                            TitleKey = "Global_msgConnectionErrorTitle",
-                            MessageKey = "Global_msgConnectionError"
-                        });
-                    break;
-
-                default:
-                    _dialogService.ShowDialog(
-                        new DialogRequest
-                        {
-                            Type = DialogType.Error,
-                            TitleKey = "Global_msgDefaultErrorTitle",
-                            MessageKey = "Global_msgDefaultError"
-                        });
-                    break;
-            }
+            GoBackCommand = new RelayCommand(() => navigationService.GoBack());
+            GoToEditProfileCommand = new RelayCommand(() => { }, () => false);
+            GoToMatchHistoryCommand = new RelayCommand(() => { }, () => false);
         }
     }
 }

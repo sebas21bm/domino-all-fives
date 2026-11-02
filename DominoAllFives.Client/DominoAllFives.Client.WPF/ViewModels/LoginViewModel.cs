@@ -5,6 +5,7 @@ using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Services;
+using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFivesService;
 using Microsoft.Extensions.Logging;
@@ -102,8 +103,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             LoginCommand = new RelayCommand(ExecuteLogin);
             CancelCommand = new RelayCommand(_onCancel);
-            GoToRegisterCommand = new RelayCommand(_onGoToRegister);
-            GoToRecoverCommand = new RelayCommand(_onGoToRecover);
+            GoToRegisterCommand = new RelayCommand(_onGoToRegister, () => false);
+            GoToRecoverCommand = new RelayCommand(_onGoToRecover, () => false);
         }
 
         private void ExecuteLogin(object parameter)
@@ -120,48 +121,51 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             _logger.LogInformation("Attempting login for user: {EmailOrUsername}", Email.Trim());
 
-            LoginResult result;
+            PlayerAccount authenticatedAccount;
 
             try
             {
-                LoginCredentials credentials = new LoginCredentials
+                Credentials credentials = new Credentials
                 {
                     EmailOrUsername = Email.Trim(),
                     Password = Password
                 };
 
-                result = _loginClient.Login(credentials);
+                authenticatedAccount = _loginClient.LoginWithAccount(credentials);
             }
-            catch (CommunicationException ex)
+            catch (FaultException<AccountIssue> ex)
             {
-                _logger.LogError(
-                    ex,
-                    "Authentication service unavailable for user {EmailOrUsername}.",
-                    Email.Trim());
-
-                ShowLoginFailure(LoginFailureReason.ServiceUnavailable);
+                _logger.LogWarning(ex, "Login rejected. Account issue: {AccountIssue}.", ex.Detail);
+                ShowMessageFailure(ex.Detail);
+                return;
+            }
+            catch (FaultException ex)
+            {
+                _logger.LogError(ex, "Authentication service could not complete login.");
+                ShowMessageFailure();
                 return;
             }
             catch (TimeoutException ex)
             {
-                _logger.LogError(
-                    ex,
-                    "Authentication service timed out for user {EmailOrUsername}.",
-                    Email.Trim());
-
-                ShowLoginFailure(LoginFailureReason.ServiceUnavailable);
+                _logger.LogError(ex, "Authentication service timed out.");
+                ShowMessageFailure(connectionFailure: true);
                 return;
             }
-
-
-            if (result.Reason != LoginFailureReason.None)
+            catch (CommunicationException ex)
             {
-                _logger.LogWarning("Login rejected. Reason: {FailureReason}.", result.Reason);
-                ShowLoginFailure(result.Reason);
+                _logger.LogError(ex, "Authentication service unavailable.");
+                ShowMessageFailure(connectionFailure: true);
                 return;
             }
 
-            PlayerAccount authenticatedAccount = result.Account;
+            if (authenticatedAccount == null || authenticatedAccount.PlayerId <= 0 ||
+                string.IsNullOrWhiteSpace(authenticatedAccount.Username))
+            {
+                _logger.LogError("Authentication service returned an invalid account.");
+                ShowMessageFailure();
+                return;
+            }
+
             _languageManager.ApplyAccountLanguage(authenticatedAccount.PreferredLanguageId);
             if (_languageManager.CurrentLanguageCode != authenticatedAccount.PreferredLanguageId)
             {
@@ -192,12 +196,12 @@ namespace DominoAllFives.Client.WPF.ViewModels
                    !IsPasswordRequiredVisible;
         }
 
-        private void ShowLoginFailure(
-            LoginFailureReason failureReason)
+        private void ShowMessageFailure(
+            AccountIssue? issue = null, bool connectionFailure = false)
         {
-            switch (failureReason)
+            switch (issue)
             {
-                case LoginFailureReason.Banned:
+                case AccountIssue.Banned:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -206,7 +210,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case LoginFailureReason.Suspended:
+                case AccountIssue.Suspended:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
@@ -215,21 +219,21 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     });
                     break;
 
-                case LoginFailureReason.ServiceUnavailable:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Error,
-                        TitleKey = "Global_msgConnectionErrorTitle",
-                        MessageKey = "MessageAuthentication_msgConnectionError"
-                    });
-                    break;
-
-                case LoginFailureReason.InvalidCredentials:
+                case AccountIssue.InvalidCredentials:
                     _dialogService.ShowDialog(new DialogRequest
                     {
                         Type = DialogType.Warning,
                         TitleKey = "MessageAuthentication_msgInvalidCredentialsTitle",
                         MessageKey = "MessageAuthentication_msgInvalidCredentials"
+                    });
+                    break;
+
+                case null when connectionFailure:
+                    _dialogService.ShowDialog(new DialogRequest
+                    {
+                        Type = DialogType.Error,
+                        TitleKey = "Global_msgConnectionErrorTitle",
+                        MessageKey = "MessageAuthentication_msgConnectionError"
                     });
                     break;
 
@@ -243,5 +247,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     break;
             }
         }
+
     }
 }

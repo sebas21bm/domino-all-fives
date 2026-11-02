@@ -1,37 +1,21 @@
-﻿using System;
-
+﻿using System.Collections.ObjectModel;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
+    /// <summary>Presentation retained for a future remote use case implementation.</summary>
     public class FriendsViewModel : ViewModelBase
     {
-        private readonly IFrameNavigationService _navigationService;
-
-        private bool _isFriendsListVisible;
-        private bool _isAddFriendsVisible;
-        private bool _isFriendRequestsVisible;
-
-        public bool IsFriendsListVisible
-        {
-            get => _isFriendsListVisible;
-            set => SetProperty(ref _isFriendsListVisible, value);
-        }
-
-        public bool IsAddFriendsVisible
-        {
-            get => _isAddFriendsVisible;
-            set => SetProperty(ref _isAddFriendsVisible, value);
-        }
-
-        public bool IsFriendRequestsVisible
-        {
-            get => _isFriendRequestsVisible;
-            set => SetProperty(ref _isFriendRequestsVisible, value);
-        }
-
+        public ObservableCollection<string> OnlineFriends { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> OfflineFriends { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> SearchResults { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> SentRequests { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> ReceivedRequests { get; } = new ObservableCollection<string>();
+        public bool IsFriendsListVisible { get; set; }
+        public bool IsAddFriendsVisible { get; set; }
+        public bool IsFriendRequestsVisible { get; set; }
         public RelayCommand ShowFriendsListCommand { get; }
         public RelayCommand ShowAddFriendsCommand { get; }
         public RelayCommand ShowFriendRequestsCommand { get; }
@@ -39,38 +23,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public FriendsViewModel(IFrameNavigationService navigationService)
         {
-            _navigationService = navigationService ?? 
-                throw new ArgumentNullException(nameof(navigationService));
-
-            _isFriendsListVisible = true;
-            _isAddFriendsVisible = false;
-            _isFriendRequestsVisible = false;
-
-            ShowFriendsListCommand = new RelayCommand(_ => ExecuteShowFriendsList());
-            ShowAddFriendsCommand = new RelayCommand(_ => ExecuteShowAddFriends());
-            ShowFriendRequestsCommand = new RelayCommand(_ => ExecuteShowFriendRequests());
-            GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
-        }
-
-        private void ExecuteShowFriendsList()
-        {
-            IsFriendsListVisible = true;
-            IsAddFriendsVisible = false;
-            IsFriendRequestsVisible = false;
-        }
-
-        private void ExecuteShowAddFriends()
-        {
-            IsFriendsListVisible = false;
-            IsAddFriendsVisible = true;
-            IsFriendRequestsVisible = false;
-        }
-
-        private void ExecuteShowFriendRequests()
-        {
-            IsFriendsListVisible = false;
-            IsAddFriendsVisible = false;
-            IsFriendRequestsVisible = true;
+            ShowFriendsListCommand = new RelayCommand(() => { }, () => false);
+            ShowAddFriendsCommand = new RelayCommand(() => { }, () => false);
+            ShowFriendRequestsCommand = new RelayCommand(() => { }, () => false);
+            GoBackCommand = new RelayCommand(() => navigationService.GoBack());
         }
     }
 }

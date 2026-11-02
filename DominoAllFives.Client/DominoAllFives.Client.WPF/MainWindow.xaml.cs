@@ -1,14 +1,11 @@
-using System.Windows;
+﻿using System.Windows;
 
-using DominoAllFives.BusinessLogic.Controllers;
-using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
-using DominoAllFives.Client.WPF.Services.Local;
-using DominoAllFives.Client.WPF.Services.Wcf;
+using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
+using DominoAllFives.Client.WPF.Services.Wcf.Services;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
 using DominoAllFives.Client.WPF.ViewModels;
-using DominoAllFives.Contracts.Services;
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF
@@ -38,42 +35,16 @@ namespace DominoAllFives.Client.WPF
                 new ProfilePictureImageService(
                     loggerFactory.CreateLogger<ProfilePictureImageService>());
 
-            ProfilePictureFileService profilePictureFileService =
-                new ProfilePictureFileService(
-                    loggerFactory.CreateLogger<ProfilePictureFileService>());
-
-            // Login and ranking use WCF. Other account operations remain local until migrated.
-            // Lazy construction keeps persistence controllers out of both remote call paths.
-            IAccountService accountService = new LegacyAccountServiceAdapter(() =>
-            {
-                ProfilePictureStorage storage = new ProfilePictureStorage(
-                    loggerFactory.CreateLogger<ProfilePictureStorage>());
-                return new LocalAccountService(
-                    new RegistrationController(
-                        loggerFactory.CreateLogger<RegistrationController>()),
-                    new ProfilePictureController(storage,
-                        loggerFactory.CreateLogger<ProfilePictureController>()),
-                    new ProfileController(storage,
-                        loggerFactory.CreateLogger<ProfileController>()),
-                    new AccountController(
-                        loggerFactory.CreateLogger<AccountController>()),
-                    new AccountLanguageController(
-                        loggerFactory.CreateLogger<AccountLanguageController>()),
-                    playerSession);
-            });
-
             IRankingClient rankingService = new WcfRankingService();
             ViewModelFactory viewModelFactory =
                 new ViewModelFactory(
                     navigationService,
                     mainWindowViewModel.DialogService,
-                    accountService,
                     new WcfLoginService(),
                     rankingService,
                     playerSession,
                     loggerFactory,
-                    profilePictureImageService,
-                    profilePictureFileService);
+                    profilePictureImageService);
 
             navigationService.SetViewModelFactory(viewModelFactory);
 

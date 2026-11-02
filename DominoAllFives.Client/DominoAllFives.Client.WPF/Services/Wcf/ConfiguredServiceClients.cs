@@ -1,8 +1,8 @@
 namespace DominoAllFivesService
 {
-    public partial class AuthenticationServiceClient
+    public partial class SessionAccountClient
     {
-        public AuthenticationServiceClient(string endpointConfigurationName)
+        public SessionAccountClient(string endpointConfigurationName)
             : base(endpointConfigurationName) { }
     }
 

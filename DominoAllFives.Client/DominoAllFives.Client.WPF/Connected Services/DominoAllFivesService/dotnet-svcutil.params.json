@@ -1,0 +1,19 @@
+{
+  "providerId": "Microsoft.Tools.ServiceModel.Svcutil",
+  "version": "8.0.0",
+  "options": {
+    "inputs": [
+      "http://localhost:8734/Domino/"
+    ],
+    "collectionTypes": [
+      "System.Collections.Generic.List`1"
+    ],
+    "namespaceMappings": [
+      "*, DominoAllFivesService"
+    ],
+    "outputFile": "Reference.cs",
+    "sync": true,
+    "targetFramework": "net48",
+    "typeReuseMode": "None"
+  }
+}

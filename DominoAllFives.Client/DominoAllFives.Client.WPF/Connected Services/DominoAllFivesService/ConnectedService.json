@@ -4,7 +4,7 @@
       "http://localhost:8734/Domino/"
     ],
     "collectionTypes": [
-      "System.Array",
+      "System.Collections.Generic.List`1",
       "System.Collections.Generic.Dictionary`2"
     ],
     "namespaceMappings": [

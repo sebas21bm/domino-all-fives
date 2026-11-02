@@ -10,18 +10,18 @@
 namespace DominoAllFivesService
 {
     using System.Runtime.Serialization;
-
-
+    
+    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="LoginCredentials", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
-    public partial class LoginCredentials : object
+    [System.Runtime.Serialization.DataContractAttribute(Name="Credentials", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
+    public partial class Credentials : object
     {
-
+        
         private string EmailOrUsernameField;
-
+        
         private string PasswordField;
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public string EmailOrUsername
         {
@@ -34,7 +34,7 @@ namespace DominoAllFivesService
                 this.EmailOrUsernameField = value;
             }
         }
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public string Password
         {
@@ -48,58 +48,21 @@ namespace DominoAllFivesService
             }
         }
     }
-
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="LoginResult", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
-    public partial class LoginResult : object
-    {
-
-        private DominoAllFivesService.PlayerAccount AccountField;
-
-        private DominoAllFivesService.LoginFailureReason ReasonField;
-
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public DominoAllFivesService.PlayerAccount Account
-        {
-            get
-            {
-                return this.AccountField;
-            }
-            set
-            {
-                this.AccountField = value;
-            }
-        }
-
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public DominoAllFivesService.LoginFailureReason Reason
-        {
-            get
-            {
-                return this.ReasonField;
-            }
-            set
-            {
-                this.ReasonField = value;
-            }
-        }
-    }
-
+    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="PlayerAccount", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
     public partial class PlayerAccount : object
     {
-
+        
         private int PlayerIdField;
-
+        
         private string UsernameField;
-
+        
         private string PreferredLanguageIdField;
-
+        
         private DominoAllFivesService.AccountAccessStatus AccessStatusField;
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public int PlayerId
         {
@@ -112,7 +75,7 @@ namespace DominoAllFivesService
                 this.PlayerIdField = value;
             }
         }
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public string Username
         {
@@ -125,7 +88,7 @@ namespace DominoAllFivesService
                 this.UsernameField = value;
             }
         }
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
         public string PreferredLanguageId
         {
@@ -138,7 +101,7 @@ namespace DominoAllFivesService
                 this.PreferredLanguageIdField = value;
             }
         }
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=3)]
         public DominoAllFivesService.AccountAccessStatus AccessStatus
         {
@@ -152,40 +115,19 @@ namespace DominoAllFivesService
             }
         }
     }
-
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="LoginFailureReason", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
-    public enum LoginFailureReason : int
-    {
-
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        None = 0,
-
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        InvalidCredentials = 1,
-
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Banned = 2,
-
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Suspended = 3,
-
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        ServiceUnavailable = 4,
-    }
-
+    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="AccountAccessStatus", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
     public partial class AccountAccessStatus : object
     {
-
+        
         private bool IsDeletedField;
-
+        
         private bool IsBannedField;
-
+        
         private System.Nullable<System.DateTime> SuspensionUntilField;
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public bool IsDeleted
         {
@@ -198,7 +140,7 @@ namespace DominoAllFivesService
                 this.IsDeletedField = value;
             }
         }
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
         public bool IsBanned
         {
@@ -211,7 +153,7 @@ namespace DominoAllFivesService
                 this.IsBannedField = value;
             }
         }
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
         public System.Nullable<System.DateTime> SuspensionUntil
         {
@@ -225,58 +167,36 @@ namespace DominoAllFivesService
             }
         }
     }
-
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Ranking", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
-    public partial class Ranking : object
+    [System.Runtime.Serialization.DataContractAttribute(Name="AccountIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+    public enum AccountIssue : int
     {
-
-        private DominoAllFivesService.RankingEntry[] TopPlayersField;
-
-        private int CurrentPlayerRankField;
-
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public DominoAllFivesService.RankingEntry[] TopPlayers
-        {
-            get
-            {
-                return this.TopPlayersField;
-            }
-            set
-            {
-                this.TopPlayersField = value;
-            }
-        }
-
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
-        public int CurrentPlayerRank
-        {
-            get
-            {
-                return this.CurrentPlayerRankField;
-            }
-            set
-            {
-                this.CurrentPlayerRankField = value;
-            }
-        }
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        InvalidCredentials = 0,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Banned = 1,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Suspended = 2,
     }
-
+    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="RankingEntry", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
     public partial class RankingEntry : object
     {
-
+        
         private int RankField;
-
+        
         private string UsernameField;
-
+        
         private int GamesWonField;
-
+        
         private DominoAllFivesService.ProfilePicture PictureField;
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public int Rank
         {
@@ -289,7 +209,7 @@ namespace DominoAllFivesService
                 this.RankField = value;
             }
         }
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public string Username
         {
@@ -302,7 +222,7 @@ namespace DominoAllFivesService
                 this.UsernameField = value;
             }
         }
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
         public int GamesWon
         {
@@ -315,7 +235,7 @@ namespace DominoAllFivesService
                 this.GamesWonField = value;
             }
         }
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=3)]
         public DominoAllFivesService.ProfilePicture Picture
         {
@@ -329,17 +249,17 @@ namespace DominoAllFivesService
             }
         }
     }
-
+    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="ProfilePicture", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
     public partial class ProfilePicture : object
     {
-
+        
         private string OriginalFileNameField;
-
+        
         private byte[] ImageDataField;
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public string OriginalFileName
         {
@@ -352,7 +272,7 @@ namespace DominoAllFivesService
                 this.OriginalFileNameField = value;
             }
         }
-
+        
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
         public byte[] ImageData
         {
@@ -366,94 +286,95 @@ namespace DominoAllFivesService
             }
         }
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:domino-all-fives:services", ConfigurationName="DominoAllFivesService.IAuthenticationService")]
-    public interface IAuthenticationService
+    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:domino-all-fives:services", ConfigurationName="DominoAllFivesService.ISessionAccount")]
+    public interface ISessionAccount
     {
-
-        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IAuthenticationService/Login", ReplyAction="urn:domino-all-fives:services/IAuthenticationService/LoginResponse")]
-        DominoAllFivesService.LoginResult Login(DominoAllFivesService.LoginCredentials credentials);
-
-        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IAuthenticationService/Login", ReplyAction="urn:domino-all-fives:services/IAuthenticationService/LoginResponse")]
-        System.Threading.Tasks.Task<DominoAllFivesService.LoginResult> LoginAsync(DominoAllFivesService.LoginCredentials credentials);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/ISessionAccount/LoginWithAccount", ReplyAction="urn:domino-all-fives:services/ISessionAccount/LoginWithAccountResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccountIssue), Action="urn:domino-all-fives:services/ISessionAccount/LoginWithAccountAccountIssueFault", Name="AccountIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        DominoAllFivesService.PlayerAccount LoginWithAccount(DominoAllFivesService.Credentials credentials);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/ISessionAccount/LoginWithAccount", ReplyAction="urn:domino-all-fives:services/ISessionAccount/LoginWithAccountResponse")]
+        System.Threading.Tasks.Task<DominoAllFivesService.PlayerAccount> LoginWithAccountAsync(DominoAllFivesService.Credentials credentials);
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    public interface IAuthenticationServiceChannel : DominoAllFivesService.IAuthenticationService, System.ServiceModel.IClientChannel
+    public interface ISessionAccountChannel : DominoAllFivesService.ISessionAccount, System.ServiceModel.IClientChannel
     {
     }
-
+    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    public partial class AuthenticationServiceClient : System.ServiceModel.ClientBase<DominoAllFivesService.IAuthenticationService>, DominoAllFivesService.IAuthenticationService
+    public partial class SessionAccountClient : System.ServiceModel.ClientBase<DominoAllFivesService.ISessionAccount>, DominoAllFivesService.ISessionAccount
     {
-
+        
         /// <summary>
         /// Implemente este método parcial para configurar el punto de conexión de servicio.
         /// </summary>
         /// <param name="serviceEndpoint">El punto de conexión para configurar</param>
         /// <param name="clientCredentials">Credenciales de cliente</param>
         static partial void ConfigureEndpoint(System.ServiceModel.Description.ServiceEndpoint serviceEndpoint, System.ServiceModel.Description.ClientCredentials clientCredentials);
-
-        public AuthenticationServiceClient() :
-                base(AuthenticationServiceClient.GetDefaultBinding(), AuthenticationServiceClient.GetDefaultEndpointAddress())
+        
+        public SessionAccountClient() : 
+                base(SessionAccountClient.GetDefaultBinding(), SessionAccountClient.GetDefaultEndpointAddress())
         {
-            this.Endpoint.Name = EndpointConfiguration.NetTcpBinding_IAuthenticationService.ToString();
+            this.Endpoint.Name = EndpointConfiguration.NetTcpBinding_ISessionAccount.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-
-        public AuthenticationServiceClient(EndpointConfiguration endpointConfiguration) :
-                base(AuthenticationServiceClient.GetBindingForEndpoint(endpointConfiguration), AuthenticationServiceClient.GetEndpointAddress(endpointConfiguration))
-        {
-            this.Endpoint.Name = endpointConfiguration.ToString();
-            ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
-        }
-
-        public AuthenticationServiceClient(EndpointConfiguration endpointConfiguration, string remoteAddress) :
-                base(AuthenticationServiceClient.GetBindingForEndpoint(endpointConfiguration), new System.ServiceModel.EndpointAddress(remoteAddress))
+        
+        public SessionAccountClient(EndpointConfiguration endpointConfiguration) : 
+                base(SessionAccountClient.GetBindingForEndpoint(endpointConfiguration), SessionAccountClient.GetEndpointAddress(endpointConfiguration))
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-
-        public AuthenticationServiceClient(EndpointConfiguration endpointConfiguration, System.ServiceModel.EndpointAddress remoteAddress) :
-                base(AuthenticationServiceClient.GetBindingForEndpoint(endpointConfiguration), remoteAddress)
+        
+        public SessionAccountClient(EndpointConfiguration endpointConfiguration, string remoteAddress) : 
+                base(SessionAccountClient.GetBindingForEndpoint(endpointConfiguration), new System.ServiceModel.EndpointAddress(remoteAddress))
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-
-        public AuthenticationServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
+        
+        public SessionAccountClient(EndpointConfiguration endpointConfiguration, System.ServiceModel.EndpointAddress remoteAddress) : 
+                base(SessionAccountClient.GetBindingForEndpoint(endpointConfiguration), remoteAddress)
+        {
+            this.Endpoint.Name = endpointConfiguration.ToString();
+            ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
+        }
+        
+        public SessionAccountClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress)
         {
         }
-
-        public DominoAllFivesService.LoginResult Login(DominoAllFivesService.LoginCredentials credentials)
+        
+        public DominoAllFivesService.PlayerAccount LoginWithAccount(DominoAllFivesService.Credentials credentials)
         {
-            return base.Channel.Login(credentials);
+            return base.Channel.LoginWithAccount(credentials);
         }
-
-        public System.Threading.Tasks.Task<DominoAllFivesService.LoginResult> LoginAsync(DominoAllFivesService.LoginCredentials credentials)
+        
+        public System.Threading.Tasks.Task<DominoAllFivesService.PlayerAccount> LoginWithAccountAsync(DominoAllFivesService.Credentials credentials)
         {
-            return base.Channel.LoginAsync(credentials);
+            return base.Channel.LoginWithAccountAsync(credentials);
         }
-
+        
         public virtual System.Threading.Tasks.Task OpenAsync()
         {
             return System.Threading.Tasks.Task.Factory.FromAsync(((System.ServiceModel.ICommunicationObject)(this)).BeginOpen(null, null), new System.Action<System.IAsyncResult>(((System.ServiceModel.ICommunicationObject)(this)).EndOpen));
         }
-
+        
         #if !NET6_0_OR_GREATER
         public virtual System.Threading.Tasks.Task CloseAsync()
         {
             return System.Threading.Tasks.Task.Factory.FromAsync(((System.ServiceModel.ICommunicationObject)(this)).BeginClose(null, null), new System.Action<System.IAsyncResult>(((System.ServiceModel.ICommunicationObject)(this)).EndClose));
         }
         #endif
-
+        
         private static System.ServiceModel.Channels.Binding GetBindingForEndpoint(EndpointConfiguration endpointConfiguration)
         {
-            if ((endpointConfiguration == EndpointConfiguration.NetTcpBinding_IAuthenticationService))
+            if ((endpointConfiguration == EndpointConfiguration.NetTcpBinding_ISessionAccount))
             {
                 System.ServiceModel.NetTcpBinding result = new System.ServiceModel.NetTcpBinding();
                 result.MaxBufferSize = int.MaxValue;
@@ -463,117 +384,135 @@ namespace DominoAllFivesService
             }
             throw new System.InvalidOperationException(string.Format("No se pudo encontrar un punto de conexión con el nombre \"{0}\".", endpointConfiguration));
         }
-
+        
         private static System.ServiceModel.EndpointAddress GetEndpointAddress(EndpointConfiguration endpointConfiguration)
         {
-            if ((endpointConfiguration == EndpointConfiguration.NetTcpBinding_IAuthenticationService))
+            if ((endpointConfiguration == EndpointConfiguration.NetTcpBinding_ISessionAccount))
             {
                 return new System.ServiceModel.EndpointAddress("net.tcp://localhost:8733/Domino/account");
             }
             throw new System.InvalidOperationException(string.Format("No se pudo encontrar un punto de conexión con el nombre \"{0}\".", endpointConfiguration));
         }
-
+        
         private static System.ServiceModel.Channels.Binding GetDefaultBinding()
         {
-            return AuthenticationServiceClient.GetBindingForEndpoint(EndpointConfiguration.NetTcpBinding_IAuthenticationService);
+            return SessionAccountClient.GetBindingForEndpoint(EndpointConfiguration.NetTcpBinding_ISessionAccount);
         }
-
+        
         private static System.ServiceModel.EndpointAddress GetDefaultEndpointAddress()
         {
-            return AuthenticationServiceClient.GetEndpointAddress(EndpointConfiguration.NetTcpBinding_IAuthenticationService);
+            return SessionAccountClient.GetEndpointAddress(EndpointConfiguration.NetTcpBinding_ISessionAccount);
         }
-
+        
         public enum EndpointConfiguration
         {
-
-            NetTcpBinding_IAuthenticationService,
+            
+            NetTcpBinding_ISessionAccount,
         }
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ServiceModel.ServiceContractAttribute(Namespace="urn:domino-all-fives:services", ConfigurationName="DominoAllFivesService.IRankingRemoteService")]
     public interface IRankingRemoteService
     {
-
-        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IRankingRemoteService/GetTopRanking", ReplyAction="urn:domino-all-fives:services/IRankingRemoteService/GetTopRankingResponse")]
-        DominoAllFivesService.Ranking GetTopRanking(int playerId);
-
-        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IRankingRemoteService/GetTopRanking", ReplyAction="urn:domino-all-fives:services/IRankingRemoteService/GetTopRankingResponse")]
-        System.Threading.Tasks.Task<DominoAllFivesService.Ranking> GetTopRankingAsync(int playerId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IRankingRemoteService/GetTopWinsRanking", ReplyAction="urn:domino-all-fives:services/IRankingRemoteService/GetTopWinsRankingResponse")]
+        System.Collections.Generic.List<DominoAllFivesService.RankingEntry> GetTopWinsRanking();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IRankingRemoteService/GetTopWinsRanking", ReplyAction="urn:domino-all-fives:services/IRankingRemoteService/GetTopWinsRankingResponse")]
+        System.Threading.Tasks.Task<System.Collections.Generic.List<DominoAllFivesService.RankingEntry>> GetTopWinsRankingAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IRankingRemoteService/GetWinsRankingPositionById", ReplyAction="urn:domino-all-fives:services/IRankingRemoteService/GetWinsRankingPositionByIdRes" +
+            "ponse")]
+        int GetWinsRankingPositionById(int playerId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IRankingRemoteService/GetWinsRankingPositionById", ReplyAction="urn:domino-all-fives:services/IRankingRemoteService/GetWinsRankingPositionByIdRes" +
+            "ponse")]
+        System.Threading.Tasks.Task<int> GetWinsRankingPositionByIdAsync(int playerId);
     }
-
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     public interface IRankingRemoteServiceChannel : DominoAllFivesService.IRankingRemoteService, System.ServiceModel.IClientChannel
     {
     }
-
+    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     public partial class RankingRemoteServiceClient : System.ServiceModel.ClientBase<DominoAllFivesService.IRankingRemoteService>, DominoAllFivesService.IRankingRemoteService
     {
-
+        
         /// <summary>
         /// Implemente este método parcial para configurar el punto de conexión de servicio.
         /// </summary>
         /// <param name="serviceEndpoint">El punto de conexión para configurar</param>
         /// <param name="clientCredentials">Credenciales de cliente</param>
         static partial void ConfigureEndpoint(System.ServiceModel.Description.ServiceEndpoint serviceEndpoint, System.ServiceModel.Description.ClientCredentials clientCredentials);
-
-        public RankingRemoteServiceClient() :
+        
+        public RankingRemoteServiceClient() : 
                 base(RankingRemoteServiceClient.GetDefaultBinding(), RankingRemoteServiceClient.GetDefaultEndpointAddress())
         {
             this.Endpoint.Name = EndpointConfiguration.NetTcpBinding_IRankingRemoteService.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-
-        public RankingRemoteServiceClient(EndpointConfiguration endpointConfiguration) :
+        
+        public RankingRemoteServiceClient(EndpointConfiguration endpointConfiguration) : 
                 base(RankingRemoteServiceClient.GetBindingForEndpoint(endpointConfiguration), RankingRemoteServiceClient.GetEndpointAddress(endpointConfiguration))
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-
-        public RankingRemoteServiceClient(EndpointConfiguration endpointConfiguration, string remoteAddress) :
+        
+        public RankingRemoteServiceClient(EndpointConfiguration endpointConfiguration, string remoteAddress) : 
                 base(RankingRemoteServiceClient.GetBindingForEndpoint(endpointConfiguration), new System.ServiceModel.EndpointAddress(remoteAddress))
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-
-        public RankingRemoteServiceClient(EndpointConfiguration endpointConfiguration, System.ServiceModel.EndpointAddress remoteAddress) :
+        
+        public RankingRemoteServiceClient(EndpointConfiguration endpointConfiguration, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(RankingRemoteServiceClient.GetBindingForEndpoint(endpointConfiguration), remoteAddress)
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-
-        public RankingRemoteServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
+        
+        public RankingRemoteServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress)
         {
         }
-
-        public DominoAllFivesService.Ranking GetTopRanking(int playerId)
+        
+        public System.Collections.Generic.List<DominoAllFivesService.RankingEntry> GetTopWinsRanking()
         {
-            return base.Channel.GetTopRanking(playerId);
+            return base.Channel.GetTopWinsRanking();
         }
-
-        public System.Threading.Tasks.Task<DominoAllFivesService.Ranking> GetTopRankingAsync(int playerId)
+        
+        public System.Threading.Tasks.Task<System.Collections.Generic.List<DominoAllFivesService.RankingEntry>> GetTopWinsRankingAsync()
         {
-            return base.Channel.GetTopRankingAsync(playerId);
+            return base.Channel.GetTopWinsRankingAsync();
         }
-
+        
+        public int GetWinsRankingPositionById(int playerId)
+        {
+            return base.Channel.GetWinsRankingPositionById(playerId);
+        }
+        
+        public System.Threading.Tasks.Task<int> GetWinsRankingPositionByIdAsync(int playerId)
+        {
+            return base.Channel.GetWinsRankingPositionByIdAsync(playerId);
+        }
+        
         public virtual System.Threading.Tasks.Task OpenAsync()
         {
             return System.Threading.Tasks.Task.Factory.FromAsync(((System.ServiceModel.ICommunicationObject)(this)).BeginOpen(null, null), new System.Action<System.IAsyncResult>(((System.ServiceModel.ICommunicationObject)(this)).EndOpen));
         }
-
+        
         #if !NET6_0_OR_GREATER
         public virtual System.Threading.Tasks.Task CloseAsync()
         {
             return System.Threading.Tasks.Task.Factory.FromAsync(((System.ServiceModel.ICommunicationObject)(this)).BeginClose(null, null), new System.Action<System.IAsyncResult>(((System.ServiceModel.ICommunicationObject)(this)).EndClose));
         }
         #endif
-
+        
         private static System.ServiceModel.Channels.Binding GetBindingForEndpoint(EndpointConfiguration endpointConfiguration)
         {
             if ((endpointConfiguration == EndpointConfiguration.NetTcpBinding_IRankingRemoteService))
@@ -586,7 +525,7 @@ namespace DominoAllFivesService
             }
             throw new System.InvalidOperationException(string.Format("No se pudo encontrar un punto de conexión con el nombre \"{0}\".", endpointConfiguration));
         }
-
+        
         private static System.ServiceModel.EndpointAddress GetEndpointAddress(EndpointConfiguration endpointConfiguration)
         {
             if ((endpointConfiguration == EndpointConfiguration.NetTcpBinding_IRankingRemoteService))
@@ -595,20 +534,20 @@ namespace DominoAllFivesService
             }
             throw new System.InvalidOperationException(string.Format("No se pudo encontrar un punto de conexión con el nombre \"{0}\".", endpointConfiguration));
         }
-
+        
         private static System.ServiceModel.Channels.Binding GetDefaultBinding()
         {
             return RankingRemoteServiceClient.GetBindingForEndpoint(EndpointConfiguration.NetTcpBinding_IRankingRemoteService);
         }
-
+        
         private static System.ServiceModel.EndpointAddress GetDefaultEndpointAddress()
         {
             return RankingRemoteServiceClient.GetEndpointAddress(EndpointConfiguration.NetTcpBinding_IRankingRemoteService);
         }
-
+        
         public enum EndpointConfiguration
         {
-
+            
             NetTcpBinding_IRankingRemoteService,
         }
     }
