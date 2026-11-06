@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
+using DominoAllFives.Client.WPF.Services.Wcf;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
@@ -8,8 +9,8 @@ using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.Services
 {
-    /// <summary>Creates presentation models and injects the implemented remote clients.</summary>
-    public class ViewModelFactory
+    /// <summary>Creates presentation models and injects implemented remote clients.</summary>
+    public class ViewModelFactory : IDisposable
     {
         private readonly IFrameNavigationService _navigationService;
         private readonly IDialogService _dialogService;
@@ -18,6 +19,7 @@ namespace DominoAllFives.Client.WPF.Services
         private readonly PlayerSession _playerSession;
         private readonly ILoggerFactory _loggerFactory;
         private readonly ProfilePictureImageService _profilePictureImageService;
+        private readonly LobbySession _lobbySession;
 
         public ViewModelFactory(
             IFrameNavigationService navigationService,
@@ -35,7 +37,10 @@ namespace DominoAllFives.Client.WPF.Services
             _playerSession = playerSession ?? throw new ArgumentNullException(nameof(playerSession));
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _profilePictureImageService = profilePictureImageService ?? throw new ArgumentNullException(nameof(profilePictureImageService));
+            _lobbySession = new LobbySession();
         }
+
+        public void Dispose() => _lobbySession.Dispose();
 
         public TViewModel Create<TViewModel>() where TViewModel : ViewModelBase
         {
@@ -52,6 +57,15 @@ namespace DominoAllFives.Client.WPF.Services
                 case nameof(RankingsViewModel):
                     viewModel = new RankingsViewModel(_navigationService, _rankingClient,
                         _playerSession, _profilePictureImageService, _dialogService);
+                    break;
+                case nameof(CreateGameViewModel):
+                    viewModel = new CreateGameViewModel(_navigationService, _lobbySession, _playerSession);
+                    break;
+                case nameof(JoinGameViewModel):
+                    viewModel = new JoinGameViewModel(_navigationService, _lobbySession);
+                    break;
+                case nameof(LobbyViewModel):
+                    viewModel = new LobbyViewModel(_navigationService, _lobbySession);
                     break;
                 default:
                     viewModel = (TViewModel)Activator.CreateInstance(typeof(TViewModel), _navigationService);

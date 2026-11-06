@@ -1,30 +1,79 @@
-﻿using System.Collections.ObjectModel;
+using System;
+using System.Collections.ObjectModel;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
+using DominoAllFives.Client.WPF.Services.Wcf;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
-    /// <summary>Presentation retained for a future remote use case implementation.</summary>
     public class JoinGameViewModel : ViewModelBase
     {
-        public bool IsJoinByCodeMode { get; set; }
-        public string RoomCode { get; set; } = string.Empty;
-        public string ErrorMessage { get; set; } = string.Empty;
-        public bool HasError { get; set; }
-        public ObservableCollection<GameInvitationRecord> Invitations { get; } = new ObservableCollection<GameInvitationRecord>();
+        private readonly IFrameNavigationService _navigation;
+        private readonly LobbySession _lobbySession;
+        private bool _isBusy;
+        private string _roomCode = string.Empty;
+        private bool _isJoinByCodeMode = true;
+        private string _errorMessage = string.Empty;
+
+        public bool IsJoinByCodeMode
+        {
+            get => _isJoinByCodeMode;
+            set => SetProperty(ref _isJoinByCodeMode, value);
+        }
+        public string RoomCode
+        {
+            get => _roomCode;
+            set { if (SetProperty(ref _roomCode, value)) JoinRoomCommand?.RaiseCanExecuteChanged(); }
+        }
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            private set
+            {
+                if (SetProperty(ref _errorMessage, value))
+                    OnPropertyChanged(nameof(HasError));
+            }
+        }
+        public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
+        public ObservableCollection<GameInvitationRecord> Invitations { get; }
+            = new ObservableCollection<GameInvitationRecord>();
         public RelayCommand GoBackCommand { get; }
         public RelayCommand SwitchModeCommand { get; }
         public RelayCommand JoinRoomCommand { get; }
         public RelayCommand AcceptInvitationCommand { get; }
 
-        public JoinGameViewModel(IFrameNavigationService navigationService)
+        public JoinGameViewModel(IFrameNavigationService navigation, LobbySession lobbySession)
         {
-            GoBackCommand = new RelayCommand(() => navigationService.GoBack());
-            SwitchModeCommand = new RelayCommand(() => { }, () => false);
-            JoinRoomCommand = new RelayCommand(() => { }, () => false);
+            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
+            _lobbySession = lobbySession ?? throw new ArgumentNullException(nameof(lobbySession));
+            GoBackCommand = new RelayCommand(() => _navigation.GoBack(), () => !_isBusy);
+            SwitchModeCommand = new RelayCommand(() => IsJoinByCodeMode = !IsJoinByCodeMode, () => !_isBusy);
+            JoinRoomCommand = new RelayCommand(JoinRoom, () => !_isBusy && !string.IsNullOrWhiteSpace(RoomCode));
             AcceptInvitationCommand = new RelayCommand(() => { }, () => false);
+        }
+
+        private void JoinRoom()
+        {
+            if (_isBusy || string.IsNullOrWhiteSpace(RoomCode)) return;
+            string code = RoomCode.Trim();
+            ErrorMessage = string.Empty;
+            _isBusy = true;
+            JoinRoomCommand.RaiseCanExecuteChanged();
+            UiOperationRunner.Run(
+                () => _lobbySession.Join(code),
+                lobby =>
+                {
+                    _isBusy = false;
+                    _navigation.NavigateTo<LobbyViewModel>();
+                },
+                error =>
+                {
+                    _isBusy = false;
+                    ErrorMessage = UiOperationRunner.ErrorMessage(error);
+                    JoinRoomCommand.RaiseCanExecuteChanged();
+                });
         }
     }
 }

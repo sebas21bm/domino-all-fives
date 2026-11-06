@@ -1,18 +1,19 @@
-using System.Collections.Generic;
-using System;
-using System.Data.SqlClient;
-using System.Data.Entity.Core;
-using System.Data.Entity.Infrastructure;
-using System.ServiceModel;
-using DominoAllFives.Server.Controllers;
-using DominoAllFives.Server.Exceptions;
-using DominoAllFives.Contracts.Enums;
 using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Contracts.Domain;
+using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Contracts.Services;
+using DominoAllFives.Server.Controllers;
+using DominoAllFives.Server.Exceptions;
+using DominoAllFives.Server.Infrastructure;
+using DominoAllFives.Server.Logging;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using DominoAllFives.Server.Logging;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity.Core;
+using System.Data.Entity.Infrastructure;
+using System.Data.SqlClient;
+using System.ServiceModel;
 
 namespace DominoAllFives.Server
 {
@@ -20,6 +21,7 @@ namespace DominoAllFives.Server
     /// Server boundary for the remote use cases.
     /// </summary>
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall,
+        ConcurrencyMode = ConcurrencyMode.Reentrant,
         IncludeExceptionDetailInFaults = false)]
     public partial class DominoService : ISessionAccount
     {
@@ -120,4 +122,119 @@ namespace DominoAllFives.Server
             }
         }
     }
+
+    public partial class DominoService : ILobbyService
+    {
+        private static readonly LobbyController LobbyController = new LobbyController();
+        private static readonly CallbackRegistry<ILobbyCallback> LobbyCallbacks =
+            new CallbackRegistry<ILobbyCallback>();
+        private static readonly PresenceManager Presence = new PresenceManager();
+        private static readonly GameEventPublisher Publisher =
+            new GameEventPublisher(LobbyCallbacks);
+
+        public Lobby CreateLobby(LobbySettings settings)
+        {
+            string id = CurrentConnectionId();
+            LobbyController.Change change = RunLobbyOperation(
+                () => LobbyController.Create(id, settings));
+            RegisterCallbackOrRollback(id);
+            Publisher.LobbyChanged(change.Recipients, change.Lobby);
+            return change.Lobby;
+        }
+
+        public Lobby JoinLobby(string lobbyCode)
+        {
+            string id = CurrentConnectionId();
+            LobbyController.Change change = RunLobbyOperation(
+                () => LobbyController.Join(id, lobbyCode));
+            RegisterCallbackOrRollback(id);
+            Publisher.LobbyChanged(change.Recipients, change.Lobby);
+            return change.Lobby;
+        }
+
+        public Lobby GetLobby(string lobbyCode)
+        {
+            return RunLobbyOperation(() => LobbyController.Get(lobbyCode));
+        }
+
+        public void LeaveLobby()
+        {
+            string id = CurrentConnectionId();
+            LobbyController.Change change = LobbyController.Leave(id);
+            LobbyCallbacks.Unregister(id);
+            Presence.Remove(id);
+            PublishChange(change);
+        }
+
+        public void CloseLobby()
+        {
+            string id = CurrentConnectionId();
+            LobbyController.Change change = RunLobbyOperation(
+                () => LobbyController.Close(id));
+            LobbyCallbacks.Unregister(id);
+            Presence.Remove(id);
+            PublishChange(change);
+        }
+
+        public void StartMatch()
+        {
+            string id = CurrentConnectionId();
+            LobbyController.Change change = RunLobbyOperation(
+                () => LobbyController.Start(id));
+            Publisher.LobbyChanged(change.Recipients, change.Lobby);
+            Publisher.MatchStarted(change.Recipients, change.MatchId);
+            // A real Match has NOT been created. Do not navigate using this ID.
+        }
+
+        private static void PublishChange(LobbyController.Change change)
+        {
+            if (change == null) return;
+            if (change.Closed) Publisher.LobbyClosed(change.Recipients);
+            else Publisher.LobbyChanged(change.Recipients, change.Lobby);
+        }
+
+        private static void RegisterCallbackOrRollback(string connectionId)
+        {
+            try
+            {
+                RegisterCurrentCallback(connectionId);
+                Presence.Set(connectionId, ConnectionPresence.InLobby);
+            }
+            catch
+            {
+                LobbyCallbacks.Unregister(connectionId);
+                Presence.Remove(connectionId);
+                PublishChange(LobbyController.Leave(connectionId));
+                throw;
+            }
+        }
+
+        private static void RegisterCurrentCallback(string connectionId)
+        {
+            ILobbyCallback callback = OperationContext.Current
+                .GetCallbackChannel<ILobbyCallback>();
+            ICommunicationObject channel =
+                (ICommunicationObject)OperationContext.Current.Channel;
+            LobbyCallbacks.Register(connectionId, callback, channel);
+        }
+
+        private static string CurrentConnectionId()
+        {
+            OperationContext context = OperationContext.Current;
+            string id = context == null ? null : context.SessionId;
+            if (string.IsNullOrWhiteSpace(id))
+                throw new FaultException("A WCF duplex session is required.");
+            return id;
+        }
+
+        private static TResult RunLobbyOperation<TResult>(Func<TResult> operation)
+        {
+            try { return operation(); }
+            catch (InvalidOperationException ex)
+            {
+                throw new FaultException(ex.Message);
+            }
+        }
+    }
+
 }

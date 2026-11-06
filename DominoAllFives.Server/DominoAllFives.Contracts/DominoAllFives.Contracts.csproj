@@ -70,4 +70,11 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="Domain\LobbySettings.cs" />
+    <Compile Include="Domain\LobbyParticipant.cs" />
+    <Compile Include="Domain\Lobby.cs" />
+    <Compile Include="Services\ILobbyCallback.cs" />
+    <Compile Include="Services\ILobbyService.cs" />
+  </ItemGroup>
 </Project>

@@ -1046,4 +1046,14 @@ Only the following are allowed: .png, .jpg, .jpeg.</value>
   <data name="MessageLanguage_msgSaveFailed" xml:space="preserve">
     <value>The language could not be saved. Try again or select an available language.</value>
   </data>
+  <data name="Lobby_msgAlreadyJoined" xml:space="preserve"><value>You are already in a lobby.</value></data>
+  <data name="Lobby_msgCannotStart" xml:space="preserve"><value>At least two participants and a lobby that has not started are required.</value></data>
+  <data name="Lobby_msgClosed" xml:space="preserve"><value>The host closed the lobby.</value></data>
+  <data name="Lobby_msgHostOnly" xml:space="preserve"><value>Only the host can perform this operation.</value></data>
+  <data name="Lobby_msgInvalidSettings" xml:space="preserve"><value>Invalid lobby settings.</value></data>
+  <data name="Lobby_msgNotFound" xml:space="preserve"><value>Lobby not found.</value></data>
+  <data name="Lobby_msgOperationFailed" xml:space="preserve"><value>The operation could not be completed. Check your connection and rejoin the lobby.</value></data>
+  <data name="Lobby_msgStarted" xml:space="preserve"><value>Start notification received. The match is not available yet.</value></data>
+  <data name="Lobby_msgStartRequested" xml:space="preserve"><value>Start requested.</value></data>
+  <data name="Lobby_msgUnavailable" xml:space="preserve"><value>The lobby is full or has already started.</value></data>
 </root>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1045,4 +1045,14 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
   <data name="MessageLanguage_msgSaveFailed" xml:space="preserve">
     <value>No se pudo guardar el idioma. Inténtalo de nuevo o selecciona un idioma disponible.</value>
   </data>
+  <data name="Lobby_msgAlreadyJoined" xml:space="preserve"><value>Ya perteneces a una sala.</value></data>
+  <data name="Lobby_msgCannotStart" xml:space="preserve"><value>Se necesitan al menos dos participantes y una sala que no haya iniciado.</value></data>
+  <data name="Lobby_msgClosed" xml:space="preserve"><value>El anfitrión cerró la sala.</value></data>
+  <data name="Lobby_msgHostOnly" xml:space="preserve"><value>Solo el anfitrión puede realizar esta operación.</value></data>
+  <data name="Lobby_msgInvalidSettings" xml:space="preserve"><value>La configuración de la sala no es válida.</value></data>
+  <data name="Lobby_msgNotFound" xml:space="preserve"><value>No se encontró la sala.</value></data>
+  <data name="Lobby_msgOperationFailed" xml:space="preserve"><value>No se pudo completar la operación. Comprueba la conexión y vuelve a entrar a la sala.</value></data>
+  <data name="Lobby_msgStarted" xml:space="preserve"><value>Se recibió la señal de inicio. La partida aún no está disponible.</value></data>
+  <data name="Lobby_msgStartRequested" xml:space="preserve"><value>Se solicitó el inicio.</value></data>
+  <data name="Lobby_msgUnavailable" xml:space="preserve"><value>La sala está llena o ya inició.</value></data>
 </root>
