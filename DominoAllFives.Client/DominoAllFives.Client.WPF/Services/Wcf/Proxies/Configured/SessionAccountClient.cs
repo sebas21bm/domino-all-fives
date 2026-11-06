@@ -5,10 +5,4 @@ namespace DominoAllFivesService
         public SessionAccountClient(string endpointConfigurationName)
             : base(endpointConfigurationName) { }
     }
-
-    public partial class RankingRemoteServiceClient
-    {
-        public RankingRemoteServiceClient(string endpointConfigurationName)
-            : base(endpointConfigurationName) { }
-    }
 }

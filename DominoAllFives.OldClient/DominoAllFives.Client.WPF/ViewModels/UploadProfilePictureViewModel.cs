@@ -9,7 +9,7 @@ using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DomainProfilePicture = DominoAllFives.Contracts.Domain.ProfilePicture;
 using DominoAllFives.Contracts.Enums;
-using DominoAllFives.Contracts.Services;
+using DominoAllFives.Contracts.OldServices;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {

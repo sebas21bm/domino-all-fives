@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
@@ -45,6 +45,20 @@ namespace DominoAllFives.Client.WPF
                     playerSession,
                     loggerFactory,
                     profilePictureImageService);
+
+            bool closingStarted = false;
+            bool closingCompleted = false;
+            Closing += (sender, args) =>
+            {
+                if (closingCompleted) return;
+                args.Cancel = true;
+                if (closingStarted) return;
+                closingStarted = true;
+                UiOperationRunner.Run(
+                    () => { viewModelFactory.Dispose(); return true; },
+                    result => { closingCompleted = true; Close(); },
+                    error => { closingCompleted = true; Close(); });
+            };
 
             navigationService.SetViewModelFactory(viewModelFactory);
 

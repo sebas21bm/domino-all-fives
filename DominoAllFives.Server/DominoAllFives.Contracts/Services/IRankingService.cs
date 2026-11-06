@@ -1,22 +1,16 @@
 using System.Collections.Generic;
+using System.ServiceModel;
 using DominoAllFives.Contracts.Domain;
 
 namespace DominoAllFives.Contracts.Services
 {
-    /// <summary>
-    /// Represents the service responsible for handling ranking-related operations.
-    /// </summary>
+    [ServiceContract(Name = "IRankingRemoteService", Namespace = "urn:domino-all-fives:services")]
     public interface IRankingService
     {
-        /// <summary>
-        /// Retrieves the ranking information for the top players by games won.
-        /// </summary>
-        /// <returns>The ranking result.</returns>
+        [OperationContract]
         List<RankingEntry> GetTopWinsRanking();
 
-        /// <summary>
-        /// Retrieves the player's position by games won, or zero when absent.
-        /// </summary>
+        [OperationContract]
         int GetWinsRankingPositionById(int playerId);
     }
 }
