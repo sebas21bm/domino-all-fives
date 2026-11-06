@@ -15,7 +15,7 @@ using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
-using DominoAllFives.Contracts.Services;
+using DominoAllFives.Contracts.OldServices;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 

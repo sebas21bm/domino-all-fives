@@ -1,7 +1,7 @@
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 
-namespace DominoAllFives.Contracts.Services
+namespace DominoAllFives.Contracts.OldServices
 {
     /// <summary>
     /// Represents the service responsible for handling account-related operations,

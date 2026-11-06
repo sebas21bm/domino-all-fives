@@ -16,7 +16,7 @@ La referencia `Connected Services/DominoAllFivesService` se generó desde el ser
 
 Para actualizarla, iniciar el servidor y actualizar la referencia de servicio en Visual Studio desde esa dirección, conservando el namespace `DominoAllFivesService`, métodos sincrónicos y reutilización de tipos deshabilitada. `ConnectedService.json` conserva esas opciones. `Reference.cs` es generado; no editarlo manualmente.
 
-`Services/Wcf/ConfiguredServiceClients.cs` conserva los constructores que toman los endpoints de `App.config`; `WcfInvoker.cs` conserva el cierre/aborto de cada canal. Las implementaciones están en `Services/Wcf/Services` y las interfaces en `Services/Wcf/Interfaces`.
+`Services/Wcf/Proxies/SessionAccountClient.cs` y `Services/Wcf/Proxies/RankingRemoteServiceClient.cs` conservan los constructores que toman los endpoints de `App.config`; `WcfInvoker.cs` conserva el cierre/aborto de cada canal. Las implementaciones están en `Services/Wcf/Services` y las interfaces en `Services/Wcf/Interfaces`.
 
 Ranking expone dos operaciones desde el controller hasta el cliente:
 

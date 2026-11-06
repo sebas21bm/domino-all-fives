@@ -9,7 +9,7 @@ using DominoAllFives.Server.Exceptions;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Contracts.Domain;
-using DominoAllFives.Contracts.Wcf;
+using DominoAllFives.Contracts.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using DominoAllFives.Server.Logging;
@@ -42,8 +42,7 @@ namespace DominoAllFives.Server
         /// <returns>The authenticated account.</returns>
         /// <exception cref="FaultException{AccountIssue}">The account cannot sign in.</exception>
         /// <exception cref="FaultException">Persistence failed.</exception>
-        public PlayerAccount LoginWithAccount(
-            Credentials credentials)
+        public PlayerAccount LoginWithAccount(Credentials credentials)
         {
             try
             {
@@ -69,7 +68,7 @@ namespace DominoAllFives.Server
         }
     }
 
-    public partial class DominoService :  IRankingRemoteService
+    public partial class DominoService :  IRankingService
     {
         /// <summary>Gets the accounts with the most wins.</summary>
         /// <returns>The ranking entries.</returns>

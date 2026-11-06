@@ -3,7 +3,7 @@ using DominoAllFives.Client.WPF.Services.Local;
 using DominoAllFives.Contracts.Domain;
 using DomainProfilePicture = DominoAllFives.Contracts.Domain.ProfilePicture;
 using DominoAllFives.Contracts.Enums;
-using DominoAllFives.Contracts.Services;
+using DominoAllFives.Contracts.OldServices;
 
 namespace DominoAllFives.Client.WPF.Services.Local
 {

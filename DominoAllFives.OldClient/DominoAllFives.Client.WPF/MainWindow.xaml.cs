@@ -8,7 +8,7 @@ using DominoAllFives.Client.WPF.Services.Local;
 using DominoAllFives.Client.WPF.Services.Wcf;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
 using DominoAllFives.Client.WPF.ViewModels;
-using DominoAllFives.Contracts.Services;
+using DominoAllFives.Contracts.OldServices;
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF

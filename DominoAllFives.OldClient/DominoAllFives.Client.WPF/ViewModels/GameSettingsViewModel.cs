@@ -7,7 +7,7 @@ using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.Services;
+using DominoAllFives.Contracts.OldServices;
 using DominoAllFives.Contracts.Enums;
 using Microsoft.Extensions.Logging;
 
