@@ -10,16 +10,15 @@ using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFivesService;
 using Microsoft.Extensions.Logging;
 
-
 namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class LoginViewModel : ViewModelBase
     {
-        private readonly IDialogService _dialogService;
-        private readonly ILoginClient _loginClient;
+        private IDialogService _dialogService;
+        private ILoginClient _loginClient;
         private readonly PlayerSession _playerSession;
-        private readonly ILogger<LoginViewModel> _logger;
-        private readonly LanguageManager _languageManager;
+        private ILogger<LoginViewModel> _logger;
+        private LanguageManager _languageManager;
 
         private readonly Action _onLoginSuccess;
         private readonly Action _onCancel;
@@ -61,27 +60,14 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand GoToRecoverCommand { get; }
 
         public LoginViewModel(
-            IDialogService dialogService,
-            ILoginClient loginClient,
             PlayerSession playerSession,
-            ILogger<LoginViewModel> logger,
             Action onLoginSuccess,
             Action onCancel,
             Action onGoToRegister,
-            Action onGoToRecover,
-            LanguageManager languageManager = null)
+            Action onGoToRecover)
         {
-            _dialogService = dialogService
-                ?? throw new ArgumentNullException(nameof(dialogService));
-
-            _loginClient = loginClient
-                ?? throw new ArgumentNullException(nameof(loginClient));
-
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(nameof(playerSession));
-
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
 
             _onLoginSuccess = onLoginSuccess
                 ?? throw new ArgumentNullException(nameof(onLoginSuccess));
@@ -95,7 +81,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _onGoToRecover = onGoToRecover
                 ?? throw new ArgumentNullException(nameof(onGoToRecover));
 
-            _languageManager = languageManager ?? LanguageManager.Instance;
             _email = string.Empty;
             _password = string.Empty;
             _isEmailRequiredVisible = false;
@@ -103,12 +88,41 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             LoginCommand = new RelayCommand(ExecuteLogin);
             CancelCommand = new RelayCommand(_onCancel);
-            GoToRegisterCommand = new RelayCommand(_onGoToRegister, () => false);
-            GoToRecoverCommand = new RelayCommand(_onGoToRecover, () => false);
+            GoToRegisterCommand = new RelayCommand(
+                _onGoToRegister, () => false);
+            GoToRecoverCommand = new RelayCommand(
+                _onGoToRecover, () => false);
+        }
+
+        public void Initialize(
+            IDialogService dialogService,
+            ILoginClient loginClient,
+            ILogger<LoginViewModel> logger,
+            LanguageManager languageManager = null)
+        {
+            if (_loginClient != null)
+            {
+                throw new InvalidOperationException(
+                    "LoginViewModel has already been initialized.");
+            }
+            _dialogService = dialogService
+                ?? throw new ArgumentNullException(nameof(dialogService));
+            _logger = logger
+                ?? throw new ArgumentNullException(nameof(logger));
+            _languageManager = languageManager 
+                ?? LanguageManager.Instance;
+            _loginClient = loginClient
+                ?? throw new ArgumentNullException(nameof(loginClient));
         }
 
         private void ExecuteLogin(object parameter)
         {
+            if (_loginClient == null)
+            {
+                throw new InvalidOperationException(
+                    "LoginViewModel must be initialized before login.");
+            }
+
             if (parameter is PasswordBox passwordBox)
             {
                 Password = passwordBox.Password;
@@ -119,7 +133,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            _logger.LogInformation("Attempting login for user: {EmailOrUsername}", Email.Trim());
+            _logger.LogInformation(
+                "Attempting login for user: {EmailOrUsername}",
+                Email.Trim());
 
             PlayerAccount authenticatedAccount;
 
@@ -131,55 +147,80 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     Password = Password
                 };
 
-                authenticatedAccount = _loginClient.LoginWithAccount(credentials);
+                authenticatedAccount =
+                    _loginClient.LoginWithAccount(credentials);
             }
             catch (FaultException<AccountIssue> ex)
             {
-                _logger.LogWarning(ex, "Login rejected. Account issue: {AccountIssue}.", ex.Detail);
+                _logger.LogWarning(
+                    ex,
+                    "Login rejected. Account issue: {AccountIssue}.",
+                    ex.Detail);
+
                 ShowMessageFailure(ex.Detail);
                 return;
             }
             catch (FaultException ex)
             {
-                _logger.LogError(ex, "Authentication service could not complete login.");
+                _logger.LogError(
+                    ex,
+                    "Authentication service could not complete login.");
+
                 ShowMessageFailure();
                 return;
             }
             catch (TimeoutException ex)
             {
-                _logger.LogError(ex, "Authentication service timed out.");
+                _logger.LogError(
+                    ex,
+                    "Authentication service timed out.");
+
                 ShowMessageFailure(connectionFailure: true);
                 return;
             }
             catch (CommunicationException ex)
             {
-                _logger.LogError(ex, "Authentication service unavailable.");
+                _logger.LogError(
+                    ex,
+                    "Authentication service unavailable.");
+
                 ShowMessageFailure(connectionFailure: true);
                 return;
             }
 
-            if (authenticatedAccount == null || authenticatedAccount.PlayerId <= 0 ||
+            if (authenticatedAccount == null ||
+                authenticatedAccount.PlayerId <= 0 ||
                 string.IsNullOrWhiteSpace(authenticatedAccount.Username))
             {
-                _logger.LogError("Authentication service returned an invalid account.");
+                _logger.LogError(
+                    "Authentication service returned an invalid account.");
+
                 ShowMessageFailure();
                 return;
             }
 
-            _languageManager.ApplyAccountLanguage(authenticatedAccount.PreferredLanguageId);
-            if (_languageManager.CurrentLanguageCode != authenticatedAccount.PreferredLanguageId)
+            _languageManager.ApplyAccountLanguage(
+                authenticatedAccount.PreferredLanguageId);
+
+            if (_languageManager.CurrentLanguageCode !=
+                authenticatedAccount.PreferredLanguageId)
             {
                 _logger.LogWarning(
-                    "Unsupported stored account language {PreferredLanguageId}; using fallback.",
+                    "Unsupported stored account language " +
+                    "{PreferredLanguageId}; using fallback.",
                     authenticatedAccount.PreferredLanguageId);
             }
+
             _playerSession.Start(
                 authenticatedAccount.PlayerId,
                 authenticatedAccount.Username,
                 authenticatedAccount.PreferredLanguageId);
 
-            _logger.LogInformation("User {EmailOrUsername} logged in successfully with " +
-                "PlayerId: {PlayerId}", Email.Trim(), authenticatedAccount.PlayerId);
+            _logger.LogInformation(
+                "User {EmailOrUsername} logged in successfully with " +
+                "PlayerId: {PlayerId}",
+                Email.Trim(),
+                authenticatedAccount.PlayerId);
 
             _onLoginSuccess.Invoke();
         }
@@ -197,7 +238,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
         }
 
         private void ShowMessageFailure(
-            AccountIssue? issue = null, bool connectionFailure = false)
+            AccountIssue? issue = null,
+            bool connectionFailure = false)
         {
             switch (issue)
             {
@@ -247,6 +289,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     break;
             }
         }
-
     }
 }
+

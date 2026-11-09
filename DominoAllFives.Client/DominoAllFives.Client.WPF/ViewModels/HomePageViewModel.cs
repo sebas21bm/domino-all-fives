@@ -1,24 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
-using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class HomePageViewModel : ViewModelBase
     {
         private readonly IFrameNavigationService _navigationService;
-        private readonly IDialogService _dialogService;
-        private readonly ILoginClient _loginClient;
         private readonly PlayerSession _playerSession;
-        private readonly ILoggerFactory _loggerFactory;
+        private readonly ViewModelFactory _viewModelFactory;
 
         private ViewModelBase _currentModal;
         private bool _isModalVisible;
@@ -57,29 +52,17 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public HomePageViewModel(
             IFrameNavigationService navigationService,
-            IDialogService dialogService,
             PlayerSession playerSession,
-            ILoginClient loginClient,
-            ILoggerFactory loggerFactory)
+            ViewModelFactory viewModelFactory)
         {
             _navigationService = navigationService
-                ?? throw new ArgumentNullException(
-                    nameof(navigationService));
-
-            _dialogService = dialogService
-                ?? throw new ArgumentNullException(
-                    nameof(dialogService));
+                ?? throw new ArgumentNullException(nameof(navigationService));
 
             _playerSession = playerSession
-                ?? throw new ArgumentNullException(
-                    nameof(playerSession));
+                ?? throw new ArgumentNullException(nameof(playerSession));
 
-
-            _loginClient = loginClient ?? throw new ArgumentNullException(nameof(loginClient));
-
-            _loggerFactory = loggerFactory
-                ?? throw new ArgumentNullException(
-                    nameof(loggerFactory));
+            _viewModelFactory = viewModelFactory
+                ?? throw new ArgumentNullException(nameof(viewModelFactory));
 
             AvailableLanguages = new List<LanguageOption>
             {
@@ -115,11 +98,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OpenLoginModal()
         {
-            CurrentModal = new LoginViewModel(
-                _dialogService,
-                _loginClient,
-                _playerSession,
-                _loggerFactory.CreateLogger<LoginViewModel>(),
+            CurrentModal = _viewModelFactory.CreateLogin(
                 OnLoginSuccess,
                 CloseModal,
                 OpenRegisterModal,
@@ -137,19 +116,22 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void OnLoginSuccess()
         {
             CloseModal();
-
             _navigationService.NavigateTo<MainMenuViewModel>();
         }
 
         private void OpenRegisterModal()
         {
-            CurrentModal = new RegisterAccountViewModel(CloseModal);
+            CurrentModal = _viewModelFactory.CreateRegisterAccount(
+                CloseModal);
+
             IsModalVisible = true;
         }
 
         private void OpenRecoverModal()
         {
-            CurrentModal = new RecoverAccountViewModel(CloseModal);
+            CurrentModal = _viewModelFactory.CreateRecoverAccount(
+                CloseModal);
+
             IsModalVisible = true;
         }
 
