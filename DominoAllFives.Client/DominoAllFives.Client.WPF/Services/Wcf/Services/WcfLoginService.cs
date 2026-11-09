@@ -11,14 +11,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
         public PlayerAccount LoginWithAccount(Credentials credentials)
         {
             return WcfInvoker.Invoke<SessionAccountClient, PlayerAccount>(
-                () =>
-                {
-                    var proxy = new SessionAccountClient("AuthenticationEndpoint");
-
-                    string actualAddress = proxy.Endpoint.Address.Uri.ToString();
-
-                    return proxy;
-                },
+                () => new SessionAccountClient("AuthenticationEndpoint"),
                 proxy => proxy.LoginWithAccount(credentials));
         }
     }

@@ -12,7 +12,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
     public class HomePageViewModel : ViewModelBase
     {
         private IFrameNavigationService _navigationService;
-        private readonly PlayerSession _playerSession;
+
         private ViewModelFactory _viewModelFactory;
 
         private ViewModelBase _currentModal;
@@ -52,8 +52,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public HomePageViewModel(PlayerSession playerSession)
         {
-            _playerSession = playerSession
-                ?? throw new ArgumentNullException(nameof(playerSession));
 
             AvailableLanguages = new List<LanguageOption>
             {

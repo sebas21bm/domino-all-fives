@@ -12,7 +12,8 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
         public List<RankingEntry> GetTopWinsRanking()
         {
             return WcfInvoker.Invoke<RankingRemoteServiceClient, List<RankingEntry>>(
-                () => new RankingRemoteServiceClient("RankingEndpoint"), proxy => proxy.GetTopWinsRanking());
+                () => new RankingRemoteServiceClient("RankingEndpoint"), 
+                proxy => proxy.GetTopWinsRanking());
         }
 
         public int GetWinsRankingPositionById(int playerId)
