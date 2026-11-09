@@ -42,8 +42,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             if (_isBusy) return;
             int maxPlayers = Is4PlayersSelected ? 4 : Is3PlayersSelected ? 3 : 2;
-            // Current provisional server contract only supports HostDisplayName and MaximumPlayers.
-            // Do not send score as an invented property; preserve UI selection for future match contract.
+
             LobbySettings settings = new LobbySettings
             {
                 HostDisplayName = _playerSession != null && _playerSession.IsAuthenticated ? _playerSession.Username : "Host", // Provisional: replace with verified session display name if available.

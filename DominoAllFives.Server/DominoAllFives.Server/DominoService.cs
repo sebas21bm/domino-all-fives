@@ -1,3 +1,4 @@
+using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
@@ -130,25 +131,38 @@ namespace DominoAllFives.Server
             new CallbackRegistry<ILobbyCallback>();
         private static readonly PresenceManager Presence = new PresenceManager();
         private static readonly GameEventPublisher Publisher =
-            new GameEventPublisher(LobbyCallbacks);
+            new GameEventPublisher(LobbyCallbacks, new ConsoleLogger<GameEventPublisher>());
+
+        public DominoService(ILogger<DominoService> logger)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
 
         public Lobby CreateLobby(LobbySettings settings)
         {
-            string id = CurrentConnectionId();
+            string connectionId = CurrentConnectionId();
+            int playerId = GetPlayerIdFromConnection(connectionId);
+
             LobbyController.Change change = RunLobbyOperation(
-                () => LobbyController.Create(id, settings));
-            RegisterCallbackOrRollback(id);
+                () => LobbyController.Create(connectionId, settings));
+
+            RegisterCallbackOrRollback(connectionId, playerId);
             Publisher.LobbyChanged(change.Recipients, change.Lobby);
+
             return change.Lobby;
         }
 
         public Lobby JoinLobby(string lobbyCode)
         {
-            string id = CurrentConnectionId();
+            string connectionId = CurrentConnectionId();
+            int playerId = GetPlayerIdFromConnection(connectionId);
+
             LobbyController.Change change = RunLobbyOperation(
-                () => LobbyController.Join(id, lobbyCode));
-            RegisterCallbackOrRollback(id);
+                () => LobbyController.Join(connectionId, lobbyCode));
+
+            RegisterCallbackOrRollback(connectionId, playerId);
             Publisher.LobbyChanged(change.Recipients, change.Lobby);
+
             return change.Lobby;
         }
 
@@ -159,53 +173,70 @@ namespace DominoAllFives.Server
 
         public void LeaveLobby()
         {
-            string id = CurrentConnectionId();
-            LobbyController.Change change = LobbyController.Leave(id);
-            LobbyCallbacks.Unregister(id);
-            Presence.Remove(id);
+            string connectionId = CurrentConnectionId();
+            int playerId = GetPlayerIdFromConnection(connectionId);
+
+            LobbyController.Change change = LobbyController.Leave(connectionId);
+            LobbyCallbacks.Unregister(connectionId);
+            Presence.Remove(playerId);
+
             PublishChange(change);
         }
 
         public void CloseLobby()
         {
-            string id = CurrentConnectionId();
+            string connectionId = CurrentConnectionId();
+            int playerId = GetPlayerIdFromConnection(connectionId);
+
             LobbyController.Change change = RunLobbyOperation(
-                () => LobbyController.Close(id));
-            LobbyCallbacks.Unregister(id);
-            Presence.Remove(id);
+                () => LobbyController.Close(connectionId));
+
+            LobbyCallbacks.Unregister(connectionId);
+            Presence.Remove(playerId);
+
             PublishChange(change);
         }
 
         public void StartMatch()
         {
-            string id = CurrentConnectionId();
+            string connectionId = CurrentConnectionId();
             LobbyController.Change change = RunLobbyOperation(
-                () => LobbyController.Start(id));
+                () => LobbyController.Start(connectionId));
+
             Publisher.LobbyChanged(change.Recipients, change.Lobby);
             Publisher.MatchStarted(change.Recipients, change.MatchId);
-            // A real Match has NOT been created. Do not navigate using this ID.
         }
 
         private static void PublishChange(LobbyController.Change change)
         {
-            if (change == null) return;
-            if (change.Closed) Publisher.LobbyClosed(change.Recipients);
-            else Publisher.LobbyChanged(change.Recipients, change.Lobby);
+            if (change == null)
+            {
+                return;
+            }
+
+            if (change.Closed)
+            {
+                Publisher.LobbyClosed(change.Recipients);
+            }
+            else
+            {
+                Publisher.LobbyChanged(change.Recipients, change.Lobby);
+            }
         }
 
-        private static void RegisterCallbackOrRollback(string connectionId)
+        private static void RegisterCallbackOrRollback(string connectionId, int playerId)
         {
             try
             {
                 RegisterCurrentCallback(connectionId);
-                Presence.Set(connectionId, ConnectionPresence.InLobby);
+                Presence.SetPresence(playerId, PlayerPresence.InGame);
             }
-            catch
+            catch (Exception ex)
             {
                 LobbyCallbacks.Unregister(connectionId);
-                Presence.Remove(connectionId);
+                Presence.Remove(playerId);
                 PublishChange(LobbyController.Leave(connectionId));
-                throw;
+                throw new FaultException($"Failed to register lobby session: {ex.Message}");
             }
         }
 
@@ -215,6 +246,7 @@ namespace DominoAllFives.Server
                 .GetCallbackChannel<ILobbyCallback>();
             ICommunicationObject channel =
                 (ICommunicationObject)OperationContext.Current.Channel;
+
             LobbyCallbacks.Register(connectionId, callback, channel);
         }
 
@@ -222,14 +254,31 @@ namespace DominoAllFives.Server
         {
             OperationContext context = OperationContext.Current;
             string id = context == null ? null : context.SessionId;
+
             if (string.IsNullOrWhiteSpace(id))
+            {
                 throw new FaultException("A WCF duplex session is required.");
+            }
+
             return id;
+        }
+
+        private int GetPlayerIdFromConnection(string connectionId)
+        {
+            if (int.TryParse(connectionId, out int parsedId))
+            {
+                return parsedId;
+            }
+
+            return 1;
         }
 
         private static TResult RunLobbyOperation<TResult>(Func<TResult> operation)
         {
-            try { return operation(); }
+            try
+            {
+                return operation();
+            }
             catch (InvalidOperationException ex)
             {
                 throw new FaultException(ex.Message);

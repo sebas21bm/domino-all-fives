@@ -3,35 +3,46 @@ using System.Collections.Generic;
 
 namespace DominoAllFives.Server.Infrastructure
 {
-    internal enum ConnectionPresence
+    public enum PlayerPresence
     {
-        Connected,
-        InLobby,
-        InMatch
+        Online,
+        Offline,
+        InGame
     }
 
     internal sealed class PresenceManager
     {
-        private readonly object _sync = new object();
-        private readonly Dictionary<string, ConnectionPresence> _states =
-            new Dictionary<string, ConnectionPresence>(StringComparer.Ordinal);
+        private readonly Dictionary<int, PlayerPresence> _presences = new Dictionary<int, PlayerPresence>();
 
-        internal void Set(string connectionId, ConnectionPresence presence)
+        internal void SetPresence(int playerId, PlayerPresence presence)
         {
-            if (string.IsNullOrWhiteSpace(connectionId))
-                throw new ArgumentException("Connection ID is required.", nameof(connectionId));
-            lock (_sync) { _states[connectionId] = presence; }
+            if (playerId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(playerId));
+            }
+
+            _presences[playerId] = presence;
         }
 
-        internal bool TryGet(string connectionId, out ConnectionPresence presence)
+        internal bool TryGetPresence(int playerId, out PlayerPresence presence)
         {
-            lock (_sync) { return _states.TryGetValue(connectionId, out presence); }
+            bool isFound = false;
+            presence = PlayerPresence.Offline;
+
+            if (playerId > 0)
+            {
+                isFound = _presences.TryGetValue(playerId, out presence);
+            }
+
+            return isFound;
         }
 
-        internal void Remove(string connectionId)
+        internal void Remove(int playerId)
         {
-            if (string.IsNullOrWhiteSpace(connectionId)) return;
-            lock (_sync) { _states.Remove(connectionId); }
+            if (playerId > 0)
+            {
+                _presences.Remove(playerId);
+            }
         }
     }
 }
