@@ -10,8 +10,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class JoinGameViewModel : ViewModelBase
     {
-        private readonly IFrameNavigationService _navigation;
-        private readonly LobbySession _lobbySession;
+        private IFrameNavigationService _navigation;
+        private LobbySession _lobbySession;
         private bool _isBusy;
         private string _roomCode = string.Empty;
         private bool _isJoinByCodeMode = true;
@@ -44,14 +44,31 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand JoinRoomCommand { get; }
         public RelayCommand AcceptInvitationCommand { get; }
 
-        public JoinGameViewModel(IFrameNavigationService navigation, LobbySession lobbySession)
+        public JoinGameViewModel()
         {
-            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
-            _lobbySession = lobbySession ?? throw new ArgumentNullException(nameof(lobbySession));
             GoBackCommand = new RelayCommand(() => _navigation.GoBack(), () => !_isBusy);
             SwitchModeCommand = new RelayCommand(() => IsJoinByCodeMode = !IsJoinByCodeMode, () => !_isBusy);
             JoinRoomCommand = new RelayCommand(JoinRoom, () => !_isBusy && !string.IsNullOrWhiteSpace(RoomCode));
             AcceptInvitationCommand = new RelayCommand(() => { }, () => false);
+        }
+
+        public void Initialize(
+            IFrameNavigationService navigation,
+            LobbySession lobbySession)
+        {
+            if (_navigation != null)
+            {
+                throw new InvalidOperationException(
+                    "JoinGameViewModel has already been initialized.");
+            }
+
+            if (navigation == null)
+                throw new ArgumentNullException(nameof(navigation));
+            if (lobbySession == null)
+                throw new ArgumentNullException(nameof(lobbySession));
+
+            _navigation = navigation;
+            _lobbySession = lobbySession;
         }
 
         private void JoinRoom()

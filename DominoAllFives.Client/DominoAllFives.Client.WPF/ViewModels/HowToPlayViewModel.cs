@@ -9,16 +9,28 @@ namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class HowToPlayViewModel : ViewModelBase
     {
-        private readonly IFrameNavigationService _navigationService;
+        private IFrameNavigationService _navigationService;
 
         public ICommand NavigateBackCommand { get; }
 
-        public HowToPlayViewModel(IFrameNavigationService navigationService)
+        public HowToPlayViewModel()
         {
-            _navigationService = navigationService ?? 
+            NavigateBackCommand = new RelayCommand(ExecuteNavigateBack);
+        }
+
+        public void Initialize(
+            IFrameNavigationService navigationService)
+        {
+            if (_navigationService != null)
+            {
+                throw new InvalidOperationException(
+                    "HowToPlayViewModel has already been initialized.");
+            }
+
+            if (navigationService == null)
                 throw new ArgumentNullException(nameof(navigationService));
 
-            NavigateBackCommand = new RelayCommand(ExecuteNavigateBack);
+            _navigationService = navigationService;
         }
 
         private void ExecuteNavigateBack()

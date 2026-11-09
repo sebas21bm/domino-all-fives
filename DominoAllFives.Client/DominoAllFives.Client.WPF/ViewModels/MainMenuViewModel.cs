@@ -11,8 +11,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class MainMenuViewModel : ViewModelBase
     {
-        private readonly IFrameNavigationService _navigationService;
-        private readonly IDialogService _dialogService;
+        private IFrameNavigationService _navigationService;
         private readonly PlayerSession _playerSession;
         public string Username => _playerSession.Username;
         public bool IsGuest => !_playerSession.IsAuthenticated;
@@ -28,13 +27,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand GoToCreateGameCommand {  get; }
         public RelayCommand GoToJoinRoomCommand { get; }
 
-        public MainMenuViewModel(IFrameNavigationService navigationService, IDialogService dialogService, 
-            PlayerSession playerSession)
+        public MainMenuViewModel(PlayerSession playerSession)
         {
-            _navigationService = navigationService ?? 
-                throw new ArgumentNullException(nameof(navigationService));
-            _dialogService = dialogService ?? 
-                throw new ArgumentNullException(nameof(dialogService));
             _playerSession = playerSession ?? 
                 throw new ArgumentNullException(nameof(playerSession));
 
@@ -53,6 +47,21 @@ namespace DominoAllFives.Client.WPF.ViewModels
             GoToJoinRoomCommand = new RelayCommand(
                 _ => _navigationService.NavigateTo<JoinGameViewModel>());
             LogoutCommand = new RelayCommand(_ => ExecuteLogout());
+        }
+
+        public void Initialize(
+            IFrameNavigationService navigationService)
+        {
+            if (_navigationService != null)
+            {
+                throw new InvalidOperationException(
+                    "MainMenuViewModel has already been initialized.");
+            }
+
+            if (navigationService == null)
+                throw new ArgumentNullException(nameof(navigationService));
+
+            _navigationService = navigationService;
         }
 
         private void ExecuteLogout()

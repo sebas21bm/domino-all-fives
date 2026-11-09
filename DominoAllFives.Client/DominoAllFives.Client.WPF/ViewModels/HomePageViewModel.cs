@@ -11,9 +11,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class HomePageViewModel : ViewModelBase
     {
-        private readonly IFrameNavigationService _navigationService;
+        private IFrameNavigationService _navigationService;
         private readonly PlayerSession _playerSession;
-        private readonly ViewModelFactory _viewModelFactory;
+        private ViewModelFactory _viewModelFactory;
 
         private ViewModelBase _currentModal;
         private bool _isModalVisible;
@@ -50,19 +50,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand PlayAsGuestCommand { get; }
         public RelayCommand ExitGameCommand { get; }
 
-        public HomePageViewModel(
-            IFrameNavigationService navigationService,
-            PlayerSession playerSession,
-            ViewModelFactory viewModelFactory)
+        public HomePageViewModel(PlayerSession playerSession)
         {
-            _navigationService = navigationService
-                ?? throw new ArgumentNullException(nameof(navigationService));
-
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(nameof(playerSession));
-
-            _viewModelFactory = viewModelFactory
-                ?? throw new ArgumentNullException(nameof(viewModelFactory));
 
             AvailableLanguages = new List<LanguageOption>
             {
@@ -89,6 +80,25 @@ namespace DominoAllFives.Client.WPF.ViewModels
             ShowLoginCommand = new RelayCommand(OpenLoginModal);
             PlayAsGuestCommand = new RelayCommand(() => { }, () => false);
             ExitGameCommand = new RelayCommand(ExitGame);
+        }
+
+        public void Initialize(
+            IFrameNavigationService navigationService,
+            ViewModelFactory viewModelFactory)
+        {
+            if (_navigationService != null)
+            {
+                throw new InvalidOperationException(
+                    "HomePageViewModel has already been initialized.");
+            }
+
+            if (navigationService == null)
+                throw new ArgumentNullException(nameof(navigationService));
+            if (viewModelFactory == null)
+                throw new ArgumentNullException(nameof(viewModelFactory));
+
+            _navigationService = navigationService;
+            _viewModelFactory = viewModelFactory;
         }
 
         private void OnLanguageChanged(string cultureCode)

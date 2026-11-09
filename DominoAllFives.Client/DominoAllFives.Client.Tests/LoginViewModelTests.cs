@@ -164,6 +164,26 @@ namespace DominoAllFives.Client.Tests
             AssertFailure("Global_msgDefaultError", DialogType.Error);
         }
 
+        [Test]
+        public void Login_BeforeInitialization_DoesNotCallService()
+        {
+            var viewModel = new LoginViewModel(_session,
+                () => _navigations++, () => { }, () => { }, () => { });
+
+            Assert.Throws<InvalidOperationException>(() => viewModel.LoginCommand.Execute(null));
+            Assert.That(_client.CallCount, Is.Zero);
+        }
+
+        [Test]
+        public void Initialize_Twice_RejectsSecondInitialization()
+        {
+            LoginViewModel viewModel = CreateViewModel();
+
+            Assert.Throws<InvalidOperationException>(() =>
+                viewModel.Initialize(_dialogs, _client, _logger, _languages));
+            Assert.That(_client.CallCount, Is.Zero);
+        }
+
         private void AssertLog(LogLevel level)
         {
             Assert.That(_logger.Levels, Is.EqualTo(new[] { level }));
@@ -173,9 +193,11 @@ namespace DominoAllFives.Client.Tests
 
         private LoginViewModel CreateViewModel()
         {
-            return new LoginViewModel(_dialogs, _client, _session, _logger,
-                () => _navigations++, () => { }, () => { }, () => { }, _languages)
+            var viewModel = new LoginViewModel(_session,
+                () => _navigations++, () => { }, () => { }, () => { })
             { Email = " player ", Password = "password" };
+            viewModel.Initialize(_dialogs, _client, _logger, _languages);
+            return viewModel;
         }
 
         private void AssertFailure(string messageKey, DialogType dialogType)

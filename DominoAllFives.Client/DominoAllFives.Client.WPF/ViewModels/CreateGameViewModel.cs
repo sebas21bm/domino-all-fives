@@ -1,6 +1,7 @@
 using System;
 using System.ServiceModel;
 using DominoAllFives.Client.WPF.Commands;
+using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Wcf;
 using DominoAllFives.Client.WPF.ViewModels.Base;
@@ -10,10 +11,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class CreateGameViewModel : ViewModelBase
     {
-        private readonly IFrameNavigationService _navigation;
-        private readonly LobbySession _lobbySession;
+        private IFrameNavigationService _navigation;
+        private LobbySession _lobbySession;
         private bool _isBusy;
-        private readonly DominoAllFives.Client.WPF.Models.PlayerSession _playerSession;
+        private readonly PlayerSession _playerSession;
 
         public bool Is100PointsSelected { get; set; }
         public bool Is150PointsSelected { get; set; }
@@ -27,15 +28,32 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand GoBackCommand { get; }
         public RelayCommand CreateGameCommand { get; }
 
-        public CreateGameViewModel(IFrameNavigationService navigation, LobbySession lobbySession, DominoAllFives.Client.WPF.Models.PlayerSession playerSession = null)
+        public CreateGameViewModel(PlayerSession playerSession = null)
         {
-            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
-            _lobbySession = lobbySession ?? throw new ArgumentNullException(nameof(lobbySession));
             _playerSession = playerSession;
             Is2PlayersSelected = true;
             Is100PointsSelected = true;
             GoBackCommand = new RelayCommand(() => _navigation.GoBack(), () => !_isBusy);
             CreateGameCommand = new RelayCommand(CreateGame, () => !_isBusy);
+        }
+
+        public void Initialize(
+            IFrameNavigationService navigation,
+            LobbySession lobbySession)
+        {
+            if (_navigation != null)
+            {
+                throw new InvalidOperationException(
+                    "CreateGameViewModel has already been initialized.");
+            }
+
+            if (navigation == null)
+                throw new ArgumentNullException(nameof(navigation));
+            if (lobbySession == null)
+                throw new ArgumentNullException(nameof(lobbySession));
+
+            _navigation = navigation;
+            _lobbySession = lobbySession;
         }
 
         private void CreateGame()

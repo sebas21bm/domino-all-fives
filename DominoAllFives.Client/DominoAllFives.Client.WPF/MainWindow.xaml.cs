@@ -26,7 +26,8 @@ namespace DominoAllFives.Client.WPF
                 new PlayerSession();
 
             MainWindowViewModel mainWindowViewModel =
-                new MainWindowViewModel(navigationService);
+                new MainWindowViewModel();
+            mainWindowViewModel.Initialize(navigationService);
 
             ILoggerFactory loggerFactory =
                 LoggerFactoryProvider.Instance;

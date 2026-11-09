@@ -90,6 +90,84 @@ namespace DominoAllFives.Client.Tests
             Assert.That(dialogs.Requests, Is.Empty);
         }
 
+        [Test]
+        public void Initialize_ValidatesBeforeLoadingAndRejectsRepeatedLoad()
+        {
+            var session = new PlayerSession();
+            session.Start(42, "player");
+            var client = new RankingClient { TopRanking = new List<RankingEntry>(), Position = 7 };
+            var dialogs = new DialogService();
+            var pictures = new ProfilePictureImageService(NullLogger<ProfilePictureImageService>.Instance);
+            var navigation = new NavigationService();
+            var viewModel = new RankingsViewModel(session);
+
+            Assert.That(client.Calls, Is.Empty);
+            Assert.Throws<ArgumentNullException>(() =>
+                viewModel.Initialize(navigation, client, pictures, null));
+            Assert.That(client.Calls, Is.Empty);
+
+            viewModel.Initialize(navigation, client, pictures, dialogs);
+            Assert.Throws<InvalidOperationException>(() =>
+                viewModel.Initialize(navigation, client, pictures, dialogs));
+            Assert.That(client.Calls, Is.EqualTo(new[] { "top", "position:42" }));
+            Assert.That(viewModel.CurrentPlayerRank, Is.EqualTo("7"));
+        }
+
+        [Test]
+        public void Factory_ReturnsInitializedPagesAndModal()
+        {
+            var navigation = new NavigationService();
+            var session = new PlayerSession();
+            session.Start(42, "player");
+            var client = new RankingClient { TopRanking = new List<RankingEntry>(), Position = 7 };
+            using (var factory = new ViewModelFactory(navigation, new DialogService(),
+                new LoginClient(), client, session, NullLoggerFactory.Instance,
+                new ProfilePictureImageService(NullLogger<ProfilePictureImageService>.Instance)))
+            {
+                var home = factory.Create<HomePageViewModel>();
+                home.ShowLoginCommand.Execute(null);
+                Assert.That(home.IsModalVisible, Is.True);
+                Assert.That(home.CurrentModal, Is.TypeOf<LoginViewModel>());
+                var login = (LoginViewModel)home.CurrentModal;
+                login.LoginCommand.Execute(null);
+                Assert.That(login.IsEmailRequiredVisible, Is.True);
+                Assert.That(login.GoToRegisterCommand.CanExecute(null), Is.False);
+                login.CancelCommand.Execute(null);
+                Assert.That(home.CurrentModal, Is.Null);
+                Assert.That(home.IsModalVisible, Is.False);
+
+                Assert.That(factory.Create<MainMenuViewModel>().Username, Is.EqualTo("player"));
+                Assert.That(factory.Create<RankingsViewModel>().CurrentPlayerRank, Is.EqualTo("7"));
+                factory.Create<CreateGameViewModel>().GoBackCommand.Execute(null);
+                factory.Create<JoinGameViewModel>().GoBackCommand.Execute(null);
+                factory.Create<EditProfileViewModel>().GoBackCommand.Execute(null);
+                factory.Create<FriendsViewModel>().GoBackCommand.Execute(null);
+                factory.Create<GameSettingsViewModel>().GoBackCommand.Execute(null);
+                factory.Create<HowToPlayViewModel>().NavigateBackCommand.Execute(null);
+                factory.Create<MatchHistoryViewModel>().GoBackCommand.Execute(null);
+                factory.Create<ProfileViewModel>().GoBackCommand.Execute(null);
+                Assert.That(navigation.BackCalls, Is.EqualTo(8));
+                Assert.Throws<InvalidOperationException>(() => factory.Create<LobbyViewModel>());
+            }
+        }
+
+        [Test]
+        public void MainWindow_Initialize_SetsNavigationAndPreservesDialogService()
+        {
+            var navigation = new NavigationService();
+            var shell = new MainWindowViewModel();
+            shell.Initialize(navigation);
+
+            Assert.That(shell.Navigation, Is.SameAs(navigation));
+            Assert.That(shell.DialogService, Is.Not.Null);
+            Assert.Throws<InvalidOperationException>(() => shell.Initialize(navigation));
+        }
+
+        private sealed class LoginClient : ILoginClient
+        {
+            public PlayerAccount LoginWithAccount(Credentials credentials) => null;
+        }
+
         private static RankingsViewModel CreateViewModel(RankingClient client, DialogService dialogs, bool authenticated)
         {
             PlayerSession session = new PlayerSession();
@@ -98,8 +176,10 @@ namespace DominoAllFives.Client.Tests
                 session.Start(42, "player");
             }
 
-            return new RankingsViewModel(new NavigationService(), client, session,
+            var viewModel = new RankingsViewModel(session);
+            viewModel.Initialize(new NavigationService(), client,
                 new ProfilePictureImageService(NullLogger<ProfilePictureImageService>.Instance), dialogs);
+            return viewModel;
         }
 
         private sealed class RankingClient : IRankingClient
@@ -134,12 +214,13 @@ namespace DominoAllFives.Client.Tests
 
         private sealed class NavigationService : IFrameNavigationService
         {
+            public int BackCalls { get; private set; }
             public bool CanGoBack => false;
             public void NavigateTo<TViewModel>() where TViewModel : ViewModelBase { }
             public void NavigateTo<TViewModel>(object parameter) where TViewModel : ViewModelBase { }
             public void GoBackToRefresh<TViewModel>() where TViewModel : ViewModelBase { }
             public void NavigateAsRoot<TViewModel>() where TViewModel : ViewModelBase { }
-            public void GoBack() { }
+            public void GoBack() { BackCalls++; }
         }
     }
 }

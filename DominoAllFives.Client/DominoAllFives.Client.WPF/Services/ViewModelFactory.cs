@@ -102,52 +102,81 @@ namespace DominoAllFives.Client.WPF.Services
             switch (typeof(TViewModel).Name)
             {
                 case nameof(HomePageViewModel):
-                    viewModel = new HomePageViewModel(
-                        _navigationService,
-                        _playerSession,
-                        this);
+                    var homePage = new HomePageViewModel(_playerSession);
+                    homePage.Initialize(_navigationService, this);
+                    viewModel = homePage;
                     break;
 
                 case nameof(MainMenuViewModel):
-                    viewModel = new MainMenuViewModel(
-                        _navigationService,
-                        _dialogService,
-                        _playerSession);
+                    var mainMenu = new MainMenuViewModel(_playerSession);
+                    mainMenu.Initialize(_navigationService);
+                    viewModel = mainMenu;
                     break;
 
                 case nameof(RankingsViewModel):
-                    viewModel = new RankingsViewModel(
-                        _navigationService,
-                        _rankingClient,
-                        _playerSession,
-                        _profilePictureImageService,
-                        _dialogService);
+                    var rankings = new RankingsViewModel(_playerSession);
+                    rankings.Initialize(_navigationService, _rankingClient,
+                        _profilePictureImageService, _dialogService);
+                    viewModel = rankings;
                     break;
 
                 case nameof(CreateGameViewModel):
-                    viewModel = new CreateGameViewModel(
-                        _navigationService,
-                        _lobbySession,
-                        _playerSession);
+                    var createGame = new CreateGameViewModel(_playerSession);
+                    createGame.Initialize(_navigationService, _lobbySession);
+                    viewModel = createGame;
                     break;
 
                 case nameof(JoinGameViewModel):
-                    viewModel = new JoinGameViewModel(
-                        _navigationService,
-                        _lobbySession);
+                    var joinGame = new JoinGameViewModel();
+                    joinGame.Initialize(_navigationService, _lobbySession);
+                    viewModel = joinGame;
                     break;
 
                 case nameof(LobbyViewModel):
-                    viewModel = new LobbyViewModel(
-                        _navigationService,
-                        _lobbySession);
+                    var lobby = new LobbyViewModel();
+                    lobby.Initialize(_navigationService, _lobbySession);
+                    viewModel = lobby;
+                    break;
+
+                case nameof(EditProfileViewModel):
+                    var editProfile = new EditProfileViewModel();
+                    editProfile.Initialize(_navigationService);
+                    viewModel = editProfile;
+                    break;
+
+                case nameof(FriendsViewModel):
+                    var friends = new FriendsViewModel();
+                    friends.Initialize(_navigationService);
+                    viewModel = friends;
+                    break;
+
+                case nameof(GameSettingsViewModel):
+                    var gameSettings = new GameSettingsViewModel();
+                    gameSettings.Initialize(_navigationService);
+                    viewModel = gameSettings;
+                    break;
+
+                case nameof(HowToPlayViewModel):
+                    var howToPlay = new HowToPlayViewModel();
+                    howToPlay.Initialize(_navigationService);
+                    viewModel = howToPlay;
+                    break;
+
+                case nameof(MatchHistoryViewModel):
+                    var matchHistory = new MatchHistoryViewModel();
+                    matchHistory.Initialize(_navigationService);
+                    viewModel = matchHistory;
+                    break;
+
+                case nameof(ProfileViewModel):
+                    var profile = new ProfileViewModel();
+                    profile.Initialize(_navigationService);
+                    viewModel = profile;
                     break;
 
                 default:
-                    viewModel = (TViewModel)Activator.CreateInstance(
-                        typeof(TViewModel),
-                        _navigationService);
-                    break;
+                    throw new NotSupportedException(
+                        $"No creation method registered for {typeof(TViewModel).FullName}.");
             }
 
             return (TViewModel)viewModel;

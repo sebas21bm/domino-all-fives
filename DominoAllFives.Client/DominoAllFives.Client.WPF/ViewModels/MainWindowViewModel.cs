@@ -6,7 +6,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private readonly IFrameNavigationService _navigationService;
+        private IFrameNavigationService _navigationService;
         private bool _isDialogVisible;
         private CustomMessageViewModel _currentDialogViewModel;
 
@@ -26,16 +26,25 @@ namespace DominoAllFives.Client.WPF.ViewModels
         }
 
 
-        public MainWindowViewModel(IFrameNavigationService navigationService)
+        public MainWindowViewModel()
         {
-            _navigationService = navigationService ?? 
-                throw new ArgumentNullException(nameof(navigationService));
-
             DialogService = new DialogService(dialogVm =>
             {
                 CurrentDialogViewModel = dialogVm;
                 IsDialogVisible = dialogVm != null;
             });
+        }
+
+        public void Initialize(IFrameNavigationService navigationService)
+        {
+            if (_navigationService != null)
+            {
+                throw new InvalidOperationException(
+                    "MainWindowViewModel has already been initialized.");
+            }
+
+            _navigationService = navigationService
+                ?? throw new ArgumentNullException(nameof(navigationService));
         }
     }
 }

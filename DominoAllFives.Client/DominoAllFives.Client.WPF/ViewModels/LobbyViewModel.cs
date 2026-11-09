@@ -3,9 +3,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using DominoAllFives.Client.WPF.Commands;
+using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Wcf;
+using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFivesService;
 
@@ -13,9 +15,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class LobbyViewModel : ViewModelBase, IDisposable
     {
-        private readonly IFrameNavigationService _navigation;
-        private readonly LobbySession _session;
-        private readonly DominoAllFives.Client.WPF.Services.Wcf.Interfaces.ILobbyClient _client;
+        private IFrameNavigationService _navigation;
+        private LobbySession _session;
+        private ILobbyClient _client;
         private bool _isBusy;
         private bool _disposed;
         private string _roomCode = string.Empty;
@@ -57,19 +59,35 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand ViewProfileCommand { get; }
         public RelayCommand KickPlayerCommand { get; }
 
-        public LobbyViewModel(IFrameNavigationService navigation, LobbySession session)
+        public LobbyViewModel()
         {
-            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
-            _session = session ?? throw new ArgumentNullException(nameof(session));
-            if (!_session.IsActive)
-                throw new InvalidOperationException("No active lobby session.");
-
-            _client = _session.Client;
             GoBackCommand = new RelayCommand(Leave, () => !_isBusy);
             InviteFriendsCommand = new RelayCommand(() => { }, () => false);
             StartGameCommand = new RelayCommand(StartGame, () => !_disposed && !_isBusy && IsHost && Players.Count >= 2 && _session.CurrentLobby?.HasStarted == false);
             ViewProfileCommand = new RelayCommand(() => { }, () => false);
             KickPlayerCommand = new RelayCommand(() => { }, () => false);
+        }
+
+        public void Initialize(
+            IFrameNavigationService navigation,
+            LobbySession session)
+        {
+            if (_navigation != null)
+            {
+                throw new InvalidOperationException(
+                    "LobbyViewModel has already been initialized.");
+            }
+
+            if (navigation == null)
+                throw new ArgumentNullException(nameof(navigation));
+            if (session == null)
+                throw new ArgumentNullException(nameof(session));
+            if (!session.IsActive)
+                throw new InvalidOperationException("No active lobby session.");
+
+            _navigation = navigation;
+            _session = session;
+            _client = _session.Client;
 
             _client.LobbyChanged += OnLobbyChanged;
             _client.LobbyClosed += OnLobbyClosed;
@@ -94,7 +112,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
                 if (_disposed) return;
-                StatusMessage = DominoAllFives.Client.WPF.Localization.LanguageManager.Instance["Lobby_msgClosed"];
+                StatusMessage = LanguageManager.Instance["Lobby_msgClosed"];
                 UiOperationRunner.Run(() => { _session.Reset(); return true; },
                     result => { if (!_disposed) _navigation.GoBack(); },
                     error => { if (!_disposed) _navigation.GoBack(); });
@@ -106,7 +124,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
                 if (_disposed) return;
-                StatusMessage = DominoAllFives.Client.WPF.Localization.LanguageManager.Instance["Lobby_msgStarted"];
+                StatusMessage = LanguageManager.Instance["Lobby_msgStarted"];
                 StartGameCommand.RaiseCanExecuteChanged();
                 // Do not navigate to a real match: initial server ID is provisional.
             }));
@@ -148,7 +166,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     _session.StartMatch();
                     return true;
                 },
-                result => { _isBusy = false; StartGameCommand.RaiseCanExecuteChanged(); if (!_disposed && _session.ProvisionalMatchId == 0) StatusMessage = DominoAllFives.Client.WPF.Localization.LanguageManager.Instance["Lobby_msgStartRequested"]; },
+                result => { _isBusy = false; StartGameCommand.RaiseCanExecuteChanged(); if (!_disposed && _session.ProvisionalMatchId == 0) StatusMessage = LanguageManager.Instance["Lobby_msgStartRequested"]; },
                 error => { _isBusy = false; StartGameCommand.RaiseCanExecuteChanged(); if (!_disposed) StatusMessage = UiOperationRunner.ErrorMessage(error); });
         }
 
@@ -172,6 +190,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             if (_disposed) return;
             _disposed = true;
+            if (_client == null) return;
             _client.LobbyChanged -= OnLobbyChanged;
             _client.LobbyClosed -= OnLobbyClosed;
             _client.MatchStarted -= OnMatchStarted;
