@@ -18,8 +18,13 @@ namespace DominoAllFives.BusinessLogic.Managers
 
         public Lobby CreateLobby(Player host, LobbySettings settings)
         {
-            if (host == null) throw new ArgumentNullException(nameof(host));
-            if (settings == null) throw new ArgumentNullException(nameof(settings));
+            if (host == null)
+            {
+                throw new ArgumentNullException(nameof(host));
+            }
+            if (settings == null){
+                throw new ArgumentNullException(nameof(settings));
+            }
 
             lock (_syncRoot)
             {

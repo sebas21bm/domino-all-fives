@@ -1,12 +1,15 @@
 using System;
 using System.ServiceModel;
+
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Threading;
-using DominoAllFives.Client.WPF.Services.Wcf;
+using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.ViewModels.Base;
+
 using LobbyService;
+
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.ViewModels
@@ -15,7 +18,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
     {
         private readonly PlayerSession _playerSession;
         private IFrameNavigationService _navigation;
-        private LobbySession _lobbySession;
+        private ILobbyClient _lobbyService;
         private IDialogService _dialogService;
         private ILogger<CreateGameViewModel> _logger;
         private bool _isBusy;
@@ -27,49 +30,177 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private bool _is3PlayersSelected;
         private bool _is4PlayersSelected;
 
-        public bool Is100PointsSelected { get => _is100PointsSelected;
-            set => SetProperty(ref _is100PointsSelected, value); }
-        public bool Is150PointsSelected { get => _is150PointsSelected;
-            set => SetProperty(ref _is150PointsSelected, value); }
-        public bool Is200PointsSelected { get => _is200PointsSelected;
-            set => SetProperty(ref _is200PointsSelected, value); }
-        public bool Is250PointsSelected { get => _is250PointsSelected;
-            set => SetProperty(ref _is250PointsSelected, value); }
-        public bool Is2PlayersSelected { get => _is2PlayersSelected;
-            set => SetProperty(ref _is2PlayersSelected, value); }
-        public bool Is3PlayersSelected { get => _is3PlayersSelected;
-            set => SetProperty(ref _is3PlayersSelected, value); }
-        public bool Is4PlayersSelected { get => _is4PlayersSelected;
-            set => SetProperty(ref _is4PlayersSelected, value); }
+        public bool Is100PointsSelected
+        {
+            get
+            {
+                return _is100PointsSelected;
+            }
+            set
+            {
+                SetProperty(
+                    ref _is100PointsSelected,
+                    value);
+            }
+        }
+
+        public bool Is150PointsSelected
+        {
+            get
+            {
+                return _is150PointsSelected;
+            }
+            set
+            {
+                SetProperty(
+                    ref _is150PointsSelected,
+                    value);
+            }
+        }
+
+        public bool Is200PointsSelected
+        {
+            get
+            {
+                return _is200PointsSelected;
+            }
+            set
+            {
+                SetProperty(
+                    ref _is200PointsSelected,
+                    value);
+            }
+        }
+
+        public bool Is250PointsSelected
+        {
+            get
+            {
+                return _is250PointsSelected;
+            }
+            set
+            {
+                SetProperty(
+                    ref _is250PointsSelected,
+                    value);
+            }
+        }
+
+        public bool Is2PlayersSelected
+        {
+            get
+            {
+                return _is2PlayersSelected;
+            }
+            set
+            {
+                SetProperty(
+                    ref _is2PlayersSelected,
+                    value);
+            }
+        }
+
+        public bool Is3PlayersSelected
+        {
+            get
+            {
+                return _is3PlayersSelected;
+            }
+            set
+            {
+                SetProperty(
+                    ref _is3PlayersSelected,
+                    value);
+            }
+        }
+
+        public bool Is4PlayersSelected
+        {
+            get
+            {
+                return _is4PlayersSelected;
+            }
+            set
+            {
+                SetProperty(
+                    ref _is4PlayersSelected,
+                    value);
+            }
+        }
+
         public RelayCommand GoBackCommand { get; }
+
         public RelayCommand CreateGameCommand { get; }
 
         public CreateGameViewModel(PlayerSession playerSession)
         {
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(nameof(playerSession));
-            GoBackCommand = new RelayCommand(() => _navigation.GoBack(), CanInteract);
-            CreateGameCommand = new RelayCommand(CreateGame, CanCreateGame);
+            GoBackCommand =
+                new RelayCommand(
+                    GoBack,
+                    CanInteract);
+
+            CreateGameCommand =
+                new RelayCommand(
+                    CreateGame,
+                    CanCreateGame);
         }
 
-        public void Initialize(IFrameNavigationService navigation, LobbySession lobbySession,
-            IDialogService dialogService, ILogger<CreateGameViewModel> logger)
+        public void Initialize(
+            IFrameNavigationService navigation,
+            ILobbyClient lobbyService,
+            IDialogService dialogService,
+            ILogger<CreateGameViewModel> logger)
         {
-            if (_lobbySession != null) throw new InvalidOperationException();
-            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
-            _lobbySession = lobbySession ?? throw new ArgumentNullException(nameof(lobbySession));
+            if (_lobbyService != null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            _navigation = navigation
+                ?? throw new ArgumentNullException(
+                    nameof(navigation));
+
+            _lobbyService = lobbyService
+                ?? throw new ArgumentNullException(
+                    nameof(lobbyService));
+
             _dialogService = dialogService
-                ?? throw new ArgumentNullException(nameof(dialogService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+                ?? throw new ArgumentNullException(
+                    nameof(dialogService));
+
+            _logger = logger
+                ?? throw new ArgumentNullException(
+                    nameof(logger));
+
             RaiseCommands();
         }
 
-        private bool CanInteract() => _lobbySession != null && !_isBusy;
-        private bool CanCreateGame() => CanInteract() && _playerSession.HasServerSession;
+        private void GoBack()
+        {
+            _navigation.GoBack();
+        }
+
+        private bool CanInteract()
+        {
+            return _lobbyService != null &&
+                !_isBusy;
+        }
+
+        private bool CanCreateGame()
+        {
+            return CanInteract() &&
+                _playerSession.HasServerSession;
+        }
 
         private void CreateGame()
         {
-            if (!CanCreateGame()) return;
+            if (!CanCreateGame())
+            {
+                return;
+            }
+
             LobbySettings settings = new LobbySettings
             {
                 MaxPlayers = Is4PlayersSelected ? 4 : Is3PlayersSelected ? 3 : 2,
@@ -77,10 +208,29 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     Is150PointsSelected ? 150 : 100
             };
             SetBusy(true);
-            BackgroundWork.Start(new BackgroundJob<LobbySettings, Lobby>(
-                value => _lobbySession.Create(value), settings,
-                (lobby, value) => { SetBusy(false); _navigation.NavigateTo<LobbyViewModel>(); },
-                (error, value) => { SetBusy(false); HandleFailure(error); }));
+
+            BackgroundJob<LobbySettings, Lobby> job =
+                new BackgroundJob<LobbySettings, Lobby>(
+                    value =>
+                        _lobbyService.CreateLobby(
+                            value),
+                    settings,
+                    (lobby, value) =>
+                    {
+                        SetBusy(false);
+
+                        _navigation.NavigateTo<LobbyViewModel>();
+                    },
+                    (error, value) =>
+                    {
+                        SetBusy(false);
+
+                        HandleFailure(
+                            error);
+                    });
+
+            BackgroundWork.Start(
+                job);
         }
 
         private void HandleFailure(Exception error)
@@ -113,7 +263,14 @@ namespace DominoAllFives.Client.WPF.ViewModels
             });
         }
 
-        private void SetBusy(bool value) { _isBusy = value; RaiseCommands(); }
+        private void SetBusy(
+            bool value)
+        {
+            _isBusy = value;
+
+            RaiseCommands();
+        }
+
         private void RaiseCommands()
         {
             GoBackCommand.RaiseCanExecuteChanged();
