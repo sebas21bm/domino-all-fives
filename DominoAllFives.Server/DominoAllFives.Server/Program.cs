@@ -1,6 +1,5 @@
 using System;
 using System.ServiceModel;
-using System.Threading;
 
 namespace DominoAllFives.Server
 {
@@ -8,16 +7,20 @@ namespace DominoAllFives.Server
     {
         private static int Main()
         {
-            using (ServiceHost host = new ServiceHost(typeof(DominoService)))
+            using (ServiceHost dominoServiceHost = new ServiceHost(typeof(DominoService)))
+            using (ServiceHost lobbyServiceHost = new ServiceHost(typeof(LobbyService)))
             {
-                host.Open();
-                Console.WriteLine("Domino All Fives WCF server ready. Press Ctrl+C to stop.");
-                Console.WriteLine("Service discovery: http://localhost:8734/Domino/");
-                Console.WriteLine("WSDL: http://localhost:8734/Domino/?wsdl");
-                Console.ReadLine();
-                return 0;
+                dominoServiceHost.Open();
+                lobbyServiceHost.Open();
 
+                Console.WriteLine("Domino All Fives server is running.");
+
+                Console.WriteLine("Press Enter to stop the server.");
+
+                Console.ReadLine();
             }
+
+            return 0;
         }
     }
 }

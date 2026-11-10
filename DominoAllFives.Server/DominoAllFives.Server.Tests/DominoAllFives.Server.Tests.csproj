@@ -95,6 +95,8 @@
     <Compile Include="TestLogger.cs" />
     <Compile Include="CredentialsTests.cs" />
     <Compile Include="RankingControllerTests.cs" />
+    <Compile Include="LobbyManagerTests.cs" />
+    <Compile Include="LobbyServiceWcfTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

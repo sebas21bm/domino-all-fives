@@ -7,7 +7,7 @@ using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;
 
-namespace DominoAllFives.Server.Controllers
+namespace DominoAllFives.BusinessLogic.Controllers
 {
     /// <summary>
     /// Coordinates operations related to player rankings.

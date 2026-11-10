@@ -14,12 +14,18 @@ namespace DominoAllFives.Contracts.Domain
 
         [DataMember(Order = 1, IsRequired = true)]
         public int PlayerId { get; private set; }
+
         [DataMember(Order = 2, IsRequired = true)]
         public string Username { get; private set; }
+        
         [DataMember(Order = 3, IsRequired = true)]
         public string PreferredLanguageId { get; private set; }
+        
         [DataMember(Order = 4, IsRequired = true)]
         public AccountAccessStatus AccessStatus { get; private set; }
+
+        [DataMember(Order = 5)]
+        public string SessionKey { get; private set; }
 
         private PlayerAccount()
         {
@@ -86,6 +92,16 @@ namespace DominoAllFives.Contracts.Domain
                 throw new InvalidOperationException("Account access restrictions are unavailable.");
             }
             return AccessStatus.EnsureCanLogin(currentTime);
+        }
+
+        public void SetSessionKey(string sessionKey)
+        {
+            if (string.IsNullOrWhiteSpace(sessionKey))
+            {
+                throw new ArgumentException(null, nameof(sessionKey));
+            }
+
+            SessionKey = sessionKey;
         }
     }
 }

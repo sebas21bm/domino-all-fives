@@ -1,21 +1,29 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
+using System.ServiceModel;
 using System.Windows;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
+using DominoAllFives.Client.WPF.Services.ProfilePicture;
+using DominoAllFives.Client.WPF.Services.Threading;
 using DominoAllFives.Client.WPF.Services.Wcf;
+using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFivesService;
+using LobbyService;
+using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
-    public class LobbyViewModel : ViewModelBase, IDisposable
+    public sealed class LobbyViewModel : ViewModelBase, IDisposable
     {
-        private readonly IFrameNavigationService _navigation;
-        private readonly LobbySession _session;
-        private readonly DominoAllFives.Client.WPF.Services.Wcf.Interfaces.ILobbyClient _client;
+        private readonly PlayerSession _playerSession;
+        private IFrameNavigationService _navigation;
+        private LobbySession _session;
+        private ILobbyClient _client;
+        private ProfilePictureImageService _pictureService;
+        private IDialogService _dialogService;
+        private ILogger<LobbyViewModel> _logger;
         private bool _isBusy;
         private bool _disposed;
         private string _roomCode = string.Empty;
@@ -24,92 +32,94 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private ViewModelBase _currentModal;
         private string _statusMessage = string.Empty;
 
-        public ViewModelBase CurrentModal
-        {
-            get => _currentModal;
-            set => SetProperty(ref _currentModal, value);
-        }
-        public bool IsModalVisible
-        {
-            get => _isModalVisible;
-            set => SetProperty(ref _isModalVisible, value);
-        }
-        public string RoomCode
-        {
-            get => _roomCode;
-            private set => SetProperty(ref _roomCode, value);
-        }
-        public bool IsHost
-        {
-            get => _isHost;
-            private set => SetProperty(ref _isHost, value);
-        }
-        public string StatusMessage
-        {
-            get => _statusMessage;
-            private set => SetProperty(ref _statusMessage, value);
-        }
-        public ObservableCollection<LobbyPlayerRecord> Players { get; }
-            = new ObservableCollection<LobbyPlayerRecord>();
+        public ViewModelBase CurrentModal { get => _currentModal;
+            set => SetProperty(ref _currentModal, value); }
+        public bool IsModalVisible { get => _isModalVisible;
+            set => SetProperty(ref _isModalVisible, value); }
+        public string RoomCode { get => _roomCode;
+            private set => SetProperty(ref _roomCode, value); }
+        public bool IsHost { get => _isHost;
+            private set => SetProperty(ref _isHost, value); }
+        public string StatusMessage { get => _statusMessage;
+            private set => SetProperty(ref _statusMessage, value); }
+        public ObservableCollection<LobbyPlayerRecord> Players { get; } =
+            new ObservableCollection<LobbyPlayerRecord>();
         public RelayCommand GoBackCommand { get; }
         public RelayCommand InviteFriendsCommand { get; }
         public RelayCommand StartGameCommand { get; }
         public RelayCommand ViewProfileCommand { get; }
         public RelayCommand KickPlayerCommand { get; }
 
-        public LobbyViewModel(IFrameNavigationService navigation, LobbySession session)
+        public LobbyViewModel(PlayerSession playerSession)
         {
-            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
-            _session = session ?? throw new ArgumentNullException(nameof(session));
-            if (!_session.IsActive)
-                throw new InvalidOperationException("No active lobby session.");
-
-            _client = _session.Client;
-            GoBackCommand = new RelayCommand(Leave, () => !_isBusy);
+            _playerSession = playerSession
+                ?? throw new ArgumentNullException(nameof(playerSession));
+            GoBackCommand = new RelayCommand(Leave, () => !_isBusy && !_disposed);
             InviteFriendsCommand = new RelayCommand(() => { }, () => false);
-            StartGameCommand = new RelayCommand(StartGame, () => !_disposed && !_isBusy && IsHost && Players.Count >= 2 && _session.CurrentLobby?.HasStarted == false);
+            StartGameCommand = new RelayCommand(StartGame,
+                () => !_isBusy && !_disposed && IsHost && Players.Count >= 2);
             ViewProfileCommand = new RelayCommand(() => { }, () => false);
             KickPlayerCommand = new RelayCommand(() => { }, () => false);
+        }
 
+        public void Initialize(IFrameNavigationService navigation, LobbySession session,
+            ProfilePictureImageService pictureService, IDialogService dialogService,
+            ILogger<LobbyViewModel> logger)
+        {
+            if (_session != null) throw new InvalidOperationException();
+            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
+            _session = session ?? throw new ArgumentNullException(nameof(session));
+            _pictureService = pictureService
+                ?? throw new ArgumentNullException(nameof(pictureService));
+            _dialogService = dialogService
+                ?? throw new ArgumentNullException(nameof(dialogService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            if (!session.IsActive) throw new InvalidOperationException("No active lobby session.");
+            _client = session.Client;
             _client.LobbyChanged += OnLobbyChanged;
             _client.LobbyClosed += OnLobbyClosed;
             _client.MatchStarted += OnMatchStarted;
-            ApplyLobby(_session.CurrentLobby);
-            if (_session.WasClosed) OnLobbyClosed();
-            else if (_session.ProvisionalMatchId > 0) OnMatchStarted(_session.ProvisionalMatchId);
+            ApplyLobby(session.CurrentLobby);
+            if (session.WasClosed) OnLobbyClosed();
+            else if (session.ProvisionalMatchId > 0) OnMatchStarted(session.ProvisionalMatchId);
         }
 
         private void OnLobbyChanged(Lobby lobby)
         {
-            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                if (_disposed || !_session.IsActive) return;
-                // LobbySession caches callbacks even before this page subscribes.
-                ApplyLobby(_session.CurrentLobby);
-            }));
+            Dispatch(() => { if (!_disposed) ApplyLobby(_session.CurrentLobby ?? lobby); });
         }
 
         private void OnLobbyClosed()
         {
-            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            Dispatch(() =>
             {
                 if (_disposed) return;
-                StatusMessage = DominoAllFives.Client.WPF.Localization.LanguageManager.Instance["Lobby_msgClosed"];
-                UiOperationRunner.Run(() => { _session.Reset(); return true; },
-                    result => { if (!_disposed) _navigation.GoBack(); },
-                    error => { if (!_disposed) _navigation.GoBack(); });
-            }));
+                StatusMessage = "";
+                _dialogService.ShowDialog(new DialogRequest
+                {
+                    Type = DialogType.Information,
+                    TitleKey = "Global_msgDefaultErrorTitle",
+                    MessageKey = "Lobby_msgClosed"
+                });
+                _session.Reset();
+                _navigation.GoBack();
+            });
         }
 
         private void OnMatchStarted(int matchId)
         {
-            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            Dispatch(() =>
             {
                 if (_disposed) return;
-                StatusMessage = DominoAllFives.Client.WPF.Localization.LanguageManager.Instance["Lobby_msgStarted"];
-                StartGameCommand.RaiseCanExecuteChanged();
-                // Do not navigate to a real match: initial server ID is provisional.
-            }));
+                StatusMessage = string.Empty;
+                _dialogService.ShowDialog(new DialogRequest
+                {
+                    Type = DialogType.Information,
+                    TitleKey = "Global_msgDefaultErrorTitle",
+                    MessageKey = "Lobby_msgStarted"
+                });
+                RaiseCommands();
+            });
         }
 
         private void ApplyLobby(Lobby lobby)
@@ -119,63 +129,79 @@ namespace DominoAllFives.Client.WPF.ViewModels
             Players.Clear();
             if (lobby.Participants != null)
             {
-                foreach (LobbyParticipant participant in lobby.Participants)
+                foreach (Player player in lobby.Participants)
                 {
-                    Players.Add(new LobbyPlayerRecord
-                    {
-                        Username = participant.DisplayName,
-                        IsHost = participant.IsHost,
-                        IsCurrentPlayer = false, // No authenticated player identity in provisional contract.
-                        AvatarPath = string.Empty
-                    });
+                    Players.Add(new LobbyPlayerRecord(player.PlayerId, player.Username,
+                        _pictureService.GetProfilePicture(player.Picture?.ImageData),
+                        lobby.Host != null && player.PlayerId == lobby.Host.PlayerId,
+                        _playerSession.PlayerId == player.PlayerId));
                 }
             }
-            // The initial contract does not expose the local WCF session ID to the client.
-            // Until identity is integrated, do NOT infer IsHost from an arbitrary participant.
-            IsHost = _session.WasCreatedByThisClient; // UI-only flag, server still authorizes.
-            StartGameCommand.RaiseCanExecuteChanged();
+            IsHost = lobby.Host != null && _playerSession.PlayerId == lobby.Host.PlayerId;
+            RaiseCommands();
         }
 
         private void StartGame()
         {
-            if (_disposed || !StartGameCommand.CanExecute(null)) return;
-            _isBusy = true;
-            StartGameCommand.RaiseCanExecuteChanged();
-            GoBackCommand.RaiseCanExecuteChanged();
-            UiOperationRunner.Run(
-                () =>
-                {
-                    _session.StartMatch();
-                    return true;
-                },
-                result => { _isBusy = false; StartGameCommand.RaiseCanExecuteChanged(); if (!_disposed && _session.ProvisionalMatchId == 0) StatusMessage = DominoAllFives.Client.WPF.Localization.LanguageManager.Instance["Lobby_msgStartRequested"]; },
-                error => { _isBusy = false; StartGameCommand.RaiseCanExecuteChanged(); if (!_disposed) StatusMessage = UiOperationRunner.ErrorMessage(error); });
+            if (!StartGameCommand.CanExecute(null)) return;
+            SetBusy(true);
+            BackgroundWork.Start(new BackgroundJob<object, bool>(
+                state => { _session.StartMatch(); return true; }, null,
+                (result, state) => SetBusy(false),
+                (error, state) => { SetBusy(false); HandleOperationFailure(error); }));
         }
 
         private void Leave()
         {
-            if (_disposed || _isBusy) return;
-            _isBusy = true;
-            StartGameCommand.RaiseCanExecuteChanged();
-            GoBackCommand.RaiseCanExecuteChanged();
-            UiOperationRunner.Run(
-                () =>
+            if (_isBusy || _disposed) return;
+            SetBusy(true);
+            BackgroundWork.Start(new BackgroundJob<object, bool>(
+                state => { _session.Leave(); return true; }, null,
+                (result, state) => { SetBusy(false); if (!_disposed) _navigation.GoBack(); },
+                (error, state) =>
                 {
-                    _session.Leave();
-                    return true;
-                },
-                result => { _isBusy = false; if (!_disposed) _navigation.GoBack(); },
-                error => { _isBusy = false; if (!_disposed) { StatusMessage = UiOperationRunner.ErrorMessage(error); _navigation.GoBack(); } });
+                    SetBusy(false);
+                    _logger.LogError(error, "Lobby could not be left cleanly.");
+                    if (!_disposed) _navigation.GoBack();
+                }));
+        }
+
+        private void HandleOperationFailure(Exception error)
+        {
+            _logger.LogError(error, "Lobby operation failed.");
+            string key = error is FaultException<LobbyIssue> ? "Lobby_msgCannotStart" :
+                "Lobby_msgOperationFailed";
+            _dialogService.ShowDialog(new DialogRequest
+            {
+                Type = DialogType.Warning,
+                TitleKey = "Global_msgDefaultErrorTitle",
+                MessageKey = key
+            });
+        }
+
+        private static void Dispatch(Action action)
+        {
+            if (Application.Current.Dispatcher.CheckAccess()) action();
+            else Application.Current.Dispatcher.BeginInvoke(action);
+        }
+
+        private void SetBusy(bool value) { _isBusy = value; RaiseCommands(); }
+        private void RaiseCommands()
+        {
+            GoBackCommand.RaiseCanExecuteChanged();
+            StartGameCommand.RaiseCanExecuteChanged();
         }
 
         public void Dispose()
         {
             if (_disposed) return;
             _disposed = true;
-            _client.LobbyChanged -= OnLobbyChanged;
-            _client.LobbyClosed -= OnLobbyClosed;
-            _client.MatchStarted -= OnMatchStarted;
-            if (_session.IsActive) UiOperationRunner.Run(() => { _session.Leave(); return true; }, result => { }, error => { });
+            if (_client != null)
+            {
+                _client.LobbyChanged -= OnLobbyChanged;
+                _client.LobbyClosed -= OnLobbyClosed;
+                _client.MatchStarted -= OnMatchStarted;
+            }
         }
     }
 }

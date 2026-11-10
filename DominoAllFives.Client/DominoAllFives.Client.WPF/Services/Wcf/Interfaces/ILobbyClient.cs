@@ -1,6 +1,6 @@
 using System;
 using System.ServiceModel;
-using DominoAllFivesService;
+using LobbyService;
 
 namespace DominoAllFives.Client.WPF.Services.Wcf.Interfaces
 {

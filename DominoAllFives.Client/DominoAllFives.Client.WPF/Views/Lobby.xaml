@@ -107,7 +107,7 @@
 
                                         <Ellipse x:Name="ellPlayerAvatar" Width="210" Height="210" Stroke="{StaticResource CreamLightBrush}" StrokeThickness="4">
                                             <Ellipse.Fill>
-                                                <ImageBrush ImageSource="{Binding AvatarPath}"/>
+                                                <ImageBrush ImageSource="{Binding AvatarImage}"/>
                                             </Ellipse.Fill>
                                         </Ellipse>
                                     </Grid>

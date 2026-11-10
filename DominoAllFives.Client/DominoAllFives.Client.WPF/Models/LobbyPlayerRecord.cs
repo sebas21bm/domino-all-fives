@@ -1,13 +1,27 @@
-﻿namespace DominoAllFives.Client.WPF.Models
+using System;
+using System.Windows.Media.Imaging;
+
+namespace DominoAllFives.Client.WPF.Models
 {
-    /// <summary>
-    /// Represents a player displayed in the lobby.
-    /// </summary>
-    public class LobbyPlayerRecord
+    public sealed class LobbyPlayerRecord
     {
-        public string Username { get; set; } = string.Empty;
-        public string AvatarPath { get; set; } = string.Empty;
-        public bool IsHost { get; set; }
-        public bool IsCurrentPlayer { get; set; }
+        public int PlayerId { get; }
+        public string Username { get; }
+        public BitmapImage AvatarImage { get; }
+        public bool IsHost { get; }
+        public bool IsCurrentPlayer { get; }
+
+        public LobbyPlayerRecord(int playerId, string username, BitmapImage avatarImage,
+            bool isHost, bool isCurrentPlayer)
+        {
+            if (playerId <= 0) throw new ArgumentOutOfRangeException(nameof(playerId));
+            if (string.IsNullOrWhiteSpace(username))
+                throw new ArgumentException(null, nameof(username));
+            PlayerId = playerId;
+            Username = username;
+            AvatarImage = avatarImage ?? throw new ArgumentNullException(nameof(avatarImage));
+            IsHost = isHost;
+            IsCurrentPlayer = isCurrentPlayer;
+        }
     }
 }

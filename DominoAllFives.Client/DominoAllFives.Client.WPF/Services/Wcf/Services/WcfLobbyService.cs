@@ -1,61 +1,83 @@
 using System;
 using System.ServiceModel;
+using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services.Wcf.Callbacks;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
-using DominoAllFives.Client.WPF.Services.Wcf.Proxies;
-using DominoAllFivesService;
+using LobbyService;
 
 namespace DominoAllFives.Client.WPF.Services.Wcf.Services
 {
     public sealed class WcfLobbyService : ILobbyClient
     {
-        private readonly LobbyCallbackHandler _callback;
-        private readonly WcfDuplexConnectionManager<LobbyServiceClient> _connection;
+        private readonly PlayerSession _playerSession;
+        private readonly LobbyCallbackHandler _callback = new LobbyCallbackHandler();
+        private LobbyServiceClient _client;
 
         public event Action<Lobby> LobbyChanged;
         public event Action LobbyClosed;
         public event Action<int> MatchStarted;
+        public CommunicationState State => _client?.State ?? CommunicationState.Closed;
 
-        public CommunicationState State => _connection.State;
-
-        public WcfLobbyService()
+        public WcfLobbyService(PlayerSession playerSession)
         {
-            _callback = new LobbyCallbackHandler();
+            _playerSession = playerSession
+                ?? throw new ArgumentNullException(nameof(playerSession));
             _callback.LobbyChanged += lobby => LobbyChanged?.Invoke(lobby);
             _callback.LobbyClosed += () => LobbyClosed?.Invoke();
             _callback.MatchStarted += matchId => MatchStarted?.Invoke(matchId);
-
-            InstanceContext context = new InstanceContext(_callback);
-            _connection = new WcfDuplexConnectionManager<LobbyServiceClient>(
-                () => new LobbyServiceClient(context, "LobbyEndpoint"));
         }
 
-        public void Open() => _connection.Open();
-
-        public Lobby CreateLobby(LobbySettings settings)
+        public void Open()
         {
-            if (settings == null) throw new ArgumentNullException(nameof(settings));
-            return _connection.Invoke(proxy => proxy.CreateLobby(settings));
+            if (!_playerSession.HasServerSession)
+                throw new InvalidOperationException("A server session is required.");
+            if (_client != null) throw new InvalidOperationException("Connection already opened.");
+            _client = new LobbyServiceClient(new InstanceContext(_callback), "LobbyEndpoint");
+            try
+            {
+                _client.Open();
+                _client.OpenLobbySession(_playerSession.SessionKey);
+            }
+            catch
+            {
+                Abort();
+                throw;
+            }
         }
 
-        public Lobby JoinLobby(string lobbyCode)
+        public Lobby CreateLobby(LobbySettings settings) => GetClient().CreateLobby(settings);
+        public Lobby JoinLobby(string lobbyCode) => GetClient().JoinLobby(lobbyCode);
+        public Lobby GetLobby(string lobbyCode) => GetClient().GetLobby(lobbyCode);
+        public void LeaveLobby() => GetClient().LeaveLobby();
+        public void CloseLobby() => GetClient().CloseLobby();
+        public void StartMatch() => GetClient().StartMatch();
+
+        public void CloseConnection()
         {
-            if (string.IsNullOrWhiteSpace(lobbyCode))
-                throw new ArgumentException("Lobby code is required.", nameof(lobbyCode));
-            return _connection.Invoke(proxy => proxy.JoinLobby(lobbyCode.Trim()));
+            if (_client == null) return;
+            try
+            {
+                if (_client.State == CommunicationState.Faulted) _client.Abort();
+                else _client.Close();
+            }
+            catch (CommunicationException) { _client.Abort(); }
+            catch (TimeoutException) { _client.Abort(); }
+            finally { _client = null; }
         }
 
-        public Lobby GetLobby(string lobbyCode)
+        public void Dispose() => CloseConnection();
+
+        private LobbyServiceClient GetClient()
         {
-            if (string.IsNullOrWhiteSpace(lobbyCode))
-                throw new ArgumentException("Lobby code is required.", nameof(lobbyCode));
-            return _connection.Invoke(proxy => proxy.GetLobby(lobbyCode.Trim()));
+            if (_client == null || _client.State != CommunicationState.Opened)
+                throw new InvalidOperationException("Lobby connection is not open.");
+            return _client;
         }
 
-        public void LeaveLobby() => _connection.Invoke(proxy => proxy.LeaveLobby());
-        public void CloseLobby() => _connection.Invoke(proxy => proxy.CloseLobby());
-        public void StartMatch() => _connection.Invoke(proxy => proxy.StartMatch());
-        public void CloseConnection() => _connection.Close();
-        public void Dispose() => _connection.Dispose();
+        private void Abort()
+        {
+            _client?.Abort();
+            _client = null;
+        }
     }
 }

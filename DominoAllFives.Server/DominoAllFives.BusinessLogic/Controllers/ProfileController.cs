@@ -5,6 +5,7 @@ using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;
+using Player = DominoAllFives.DataAccess.Models.Player;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Data.Entity.Core;

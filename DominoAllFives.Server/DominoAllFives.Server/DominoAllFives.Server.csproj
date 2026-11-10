@@ -49,11 +49,11 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Exceptions\AccountRuleException.cs" />
     <Compile Include="DominoService.cs" />
+    <Compile Include="LobbyService.cs" />
+    <Compile Include="Infrastructure\Lobby\LobbyCallbackRegistry.cs" />
+    <Compile Include="Infrastructure\Lobby\LobbyEventPublisher.cs" />
     <Compile Include="Logging\ConsoleLogger.cs" />
-    <Compile Include="Controllers\AuthenticationController.cs" />
-    <Compile Include="Controllers\RankingController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DominoAllFives.Contracts\DominoAllFives.Contracts.csproj">
@@ -77,10 +77,4 @@
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Compile Include="Infrastructure\CallbackRegistry.cs" />
-    <Compile Include="Infrastructure\PresenceManager.cs" />
-    <Compile Include="Infrastructure\GameEventPublisher.cs" />
-    <Compile Include="Controllers\LobbyController.cs" />
-  </ItemGroup>
 </Project>

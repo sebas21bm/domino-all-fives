@@ -78,11 +78,16 @@
   <ItemGroup>
     <Compile Include="Controllers\AccountLanguageController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-
+    <Compile Include="Controllers\AuthenticationController.cs" />
+    <Compile Include="Controllers\LobbyController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\ProfilePictureController.cs" />
-
+    <Compile Include="Controllers\RankingController.cs" />
     <Compile Include="Controllers\RegistrationController.cs" />
+    <Compile Include="Exceptions\AccountRuleException.cs" />
+    <Compile Include="Exceptions\LobbyRuleException.cs" />
+    <Compile Include="Managers\LobbyManager.cs" />
+    <Compile Include="Managers\SessionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\PasswordHasher.cs" />
     <Compile Include="Storage\ProfilePictureStorage.cs" />

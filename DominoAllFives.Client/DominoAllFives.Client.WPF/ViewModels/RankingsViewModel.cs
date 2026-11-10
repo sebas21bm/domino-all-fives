@@ -19,11 +19,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
     /// </summary>
     public class RankingsViewModel : ViewModelBase
     {
-        private readonly IFrameNavigationService _navigationService;
-        private readonly IRankingClient _rankingService;
-        private readonly IDialogService _dialogService;
+        private IFrameNavigationService _navigationService;
+        private IRankingClient _rankingService;
+        private IDialogService _dialogService;
         private readonly PlayerSession _playerSession;
-        private readonly ProfilePictureImageService _profilePictureImageService;
+        private ProfilePictureImageService _profilePictureImageService;
 
         private ObservableCollection<PlayerRankingRecord> _leaderboard;
         private string _currentPlayerRank;
@@ -42,32 +42,42 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public RelayCommand GoBackCommand { get; }
 
-        public RankingsViewModel(
-            IFrameNavigationService navigationService,
-            IRankingClient rankingService,
-            PlayerSession playerSession,
-            ProfilePictureImageService profilePictureImageService,
-            IDialogService dialogService)
+        public RankingsViewModel(PlayerSession playerSession)
         {
-            _navigationService = navigationService
-                ?? throw new ArgumentNullException(nameof(navigationService));
-
-            _dialogService = dialogService
-                ?? throw new ArgumentNullException(nameof(dialogService));
-
-            _rankingService = rankingService
-                ?? throw new ArgumentNullException(nameof(rankingService));
-
             _playerSession = playerSession
                 ?? throw new ArgumentNullException(nameof(playerSession));
-
-            _profilePictureImageService = profilePictureImageService
-                ?? throw new ArgumentNullException(nameof(profilePictureImageService));
 
             _leaderboard = new ObservableCollection<PlayerRankingRecord>();
             _currentPlayerRank = string.Empty;
 
             GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
+        }
+
+        public void Initialize(
+            IFrameNavigationService navigationService,
+            IRankingClient rankingService,
+            ProfilePictureImageService profilePictureImageService,
+            IDialogService dialogService)
+        {
+            if (_navigationService != null)
+            {
+                throw new InvalidOperationException(
+                    "RankingsViewModel has already been initialized.");
+            }
+
+            if (navigationService == null)
+                throw new ArgumentNullException(nameof(navigationService));
+            if (rankingService == null)
+                throw new ArgumentNullException(nameof(rankingService));
+            if (profilePictureImageService == null)
+                throw new ArgumentNullException(nameof(profilePictureImageService));
+            if (dialogService == null)
+                throw new ArgumentNullException(nameof(dialogService));
+
+            _navigationService = navigationService;
+            _rankingService = rankingService;
+            _profilePictureImageService = profilePictureImageService;
+            _dialogService = dialogService;
 
             LoadRanking();
         }

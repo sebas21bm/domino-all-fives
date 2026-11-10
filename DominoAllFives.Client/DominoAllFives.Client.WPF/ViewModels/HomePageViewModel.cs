@@ -1,24 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
-using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
     public class HomePageViewModel : ViewModelBase
     {
-        private readonly IFrameNavigationService _navigationService;
-        private readonly IDialogService _dialogService;
-        private readonly ILoginClient _loginClient;
-        private readonly PlayerSession _playerSession;
-        private readonly ILoggerFactory _loggerFactory;
+        private IFrameNavigationService _navigationService;
+
+        private ViewModelFactory _viewModelFactory;
 
         private ViewModelBase _currentModal;
         private bool _isModalVisible;
@@ -55,31 +50,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand PlayAsGuestCommand { get; }
         public RelayCommand ExitGameCommand { get; }
 
-        public HomePageViewModel(
-            IFrameNavigationService navigationService,
-            IDialogService dialogService,
-            PlayerSession playerSession,
-            ILoginClient loginClient,
-            ILoggerFactory loggerFactory)
+        public HomePageViewModel(PlayerSession playerSession)
         {
-            _navigationService = navigationService
-                ?? throw new ArgumentNullException(
-                    nameof(navigationService));
-
-            _dialogService = dialogService
-                ?? throw new ArgumentNullException(
-                    nameof(dialogService));
-
-            _playerSession = playerSession
-                ?? throw new ArgumentNullException(
-                    nameof(playerSession));
-
-
-            _loginClient = loginClient ?? throw new ArgumentNullException(nameof(loginClient));
-
-            _loggerFactory = loggerFactory
-                ?? throw new ArgumentNullException(
-                    nameof(loggerFactory));
 
             AvailableLanguages = new List<LanguageOption>
             {
@@ -108,6 +80,25 @@ namespace DominoAllFives.Client.WPF.ViewModels
             ExitGameCommand = new RelayCommand(ExitGame);
         }
 
+        public void Initialize(
+            IFrameNavigationService navigationService,
+            ViewModelFactory viewModelFactory)
+        {
+            if (_navigationService != null)
+            {
+                throw new InvalidOperationException(
+                    "HomePageViewModel has already been initialized.");
+            }
+
+            if (navigationService == null)
+                throw new ArgumentNullException(nameof(navigationService));
+            if (viewModelFactory == null)
+                throw new ArgumentNullException(nameof(viewModelFactory));
+
+            _navigationService = navigationService;
+            _viewModelFactory = viewModelFactory;
+        }
+
         private void OnLanguageChanged(string cultureCode)
         {
             LanguageManager.Instance.ChangeLanguage(cultureCode);
@@ -115,11 +106,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OpenLoginModal()
         {
-            CurrentModal = new LoginViewModel(
-                _dialogService,
-                _loginClient,
-                _playerSession,
-                _loggerFactory.CreateLogger<LoginViewModel>(),
+            CurrentModal = _viewModelFactory.CreateLogin(
                 OnLoginSuccess,
                 CloseModal,
                 OpenRegisterModal,
@@ -137,19 +124,22 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void OnLoginSuccess()
         {
             CloseModal();
-
             _navigationService.NavigateTo<MainMenuViewModel>();
         }
 
         private void OpenRegisterModal()
         {
-            CurrentModal = new RegisterAccountViewModel(CloseModal);
+            CurrentModal = _viewModelFactory.CreateRegisterAccount(
+                CloseModal);
+
             IsModalVisible = true;
         }
 
         private void OpenRecoverModal()
         {
-            CurrentModal = new RecoverAccountViewModel(CloseModal);
+            CurrentModal = _viewModelFactory.CreateRecoverAccount(
+                CloseModal);
+
             IsModalVisible = true;
         }
 

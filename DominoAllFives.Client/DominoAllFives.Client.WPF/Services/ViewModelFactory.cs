@@ -3,13 +3,16 @@ using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
 using DominoAllFives.Client.WPF.Services.Wcf;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
+using DominoAllFives.Client.WPF.Services.Wcf.Services;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.Services
 {
-    /// <summary>Creates presentation models and injects implemented remote clients.</summary>
+    /// <summary>
+    /// Creates presentation models and injects implemented remote clients.
+    /// </summary>
     public class ViewModelFactory : IDisposable
     {
         private readonly IFrameNavigationService _navigationService;
@@ -30,48 +33,164 @@ namespace DominoAllFives.Client.WPF.Services
             ILoggerFactory loggerFactory,
             ProfilePictureImageService profilePictureImageService)
         {
-            _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
-            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
-            _loginClient = loginClient ?? throw new ArgumentNullException(nameof(loginClient));
-            _rankingClient = rankingClient ?? throw new ArgumentNullException(nameof(rankingClient));
-            _playerSession = playerSession ?? throw new ArgumentNullException(nameof(playerSession));
-            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-            _profilePictureImageService = profilePictureImageService ?? throw new ArgumentNullException(nameof(profilePictureImageService));
-            _lobbySession = new LobbySession();
+            _navigationService = navigationService
+                ?? throw new ArgumentNullException(nameof(navigationService));
+
+            _dialogService = dialogService
+                ?? throw new ArgumentNullException(nameof(dialogService));
+
+            _loginClient = loginClient
+                ?? throw new ArgumentNullException(nameof(loginClient));
+
+            _rankingClient = rankingClient
+                ?? throw new ArgumentNullException(nameof(rankingClient));
+
+            _playerSession = playerSession
+                ?? throw new ArgumentNullException(nameof(playerSession));
+
+            _loggerFactory = loggerFactory
+                ?? throw new ArgumentNullException(nameof(loggerFactory));
+
+            _profilePictureImageService = profilePictureImageService
+                ?? throw new ArgumentNullException(nameof(profilePictureImageService));
+
+            _lobbySession = new LobbySession(CreateLobbyClient);
         }
 
-        public void Dispose() => _lobbySession.Dispose();
+        public void Dispose()
+        {
+            _lobbySession.Dispose();
+        }
 
-        public TViewModel Create<TViewModel>() where TViewModel : ViewModelBase
+        public LoginViewModel CreateLogin(
+            Action onLoginSuccess,
+            Action onCancel,
+            Action onGoToRegister,
+            Action onGoToRecover)
+        {
+            var viewModel = new LoginViewModel(
+                _playerSession,
+                onLoginSuccess,
+                onCancel,
+                onGoToRegister,
+                onGoToRecover);
+
+            viewModel.Initialize(
+                _dialogService,
+                _loginClient,
+                _loggerFactory.CreateLogger<LoginViewModel>());
+
+            return viewModel;
+        }
+
+        public RegisterAccountViewModel CreateRegisterAccount(
+            Action onCancel)
+        {
+            return new RegisterAccountViewModel(onCancel);
+        }
+
+        public RecoverAccountViewModel CreateRecoverAccount(
+            Action onCancel)
+        {
+            return new RecoverAccountViewModel(onCancel);
+        }
+
+        public TViewModel Create<TViewModel>()
+            where TViewModel : ViewModelBase
         {
             ViewModelBase viewModel;
+
             switch (typeof(TViewModel).Name)
             {
                 case nameof(HomePageViewModel):
-                    viewModel = new HomePageViewModel(_navigationService, _dialogService,
-                        _playerSession, _loginClient, _loggerFactory);
+                    var homePage = new HomePageViewModel(_playerSession);
+                    homePage.Initialize(_navigationService, this);
+                    viewModel = homePage;
                     break;
+
                 case nameof(MainMenuViewModel):
-                    viewModel = new MainMenuViewModel(_navigationService, _dialogService, _playerSession);
+                    var mainMenu = new MainMenuViewModel(_playerSession);
+                    mainMenu.Initialize(_navigationService);
+                    viewModel = mainMenu;
                     break;
+
                 case nameof(RankingsViewModel):
-                    viewModel = new RankingsViewModel(_navigationService, _rankingClient,
-                        _playerSession, _profilePictureImageService, _dialogService);
+                    var rankings = new RankingsViewModel(_playerSession);
+                    rankings.Initialize(_navigationService, _rankingClient,
+                        _profilePictureImageService, _dialogService);
+                    viewModel = rankings;
                     break;
+
                 case nameof(CreateGameViewModel):
-                    viewModel = new CreateGameViewModel(_navigationService, _lobbySession, _playerSession);
+                    var createGame = new CreateGameViewModel(_playerSession);
+                    createGame.Initialize(_navigationService, _lobbySession, _dialogService,
+                        _loggerFactory.CreateLogger<CreateGameViewModel>());
+                    viewModel = createGame;
                     break;
+
                 case nameof(JoinGameViewModel):
-                    viewModel = new JoinGameViewModel(_navigationService, _lobbySession);
+                    var joinGame = new JoinGameViewModel(_playerSession);
+                    joinGame.Initialize(_navigationService, _lobbySession, _dialogService,
+                        _loggerFactory.CreateLogger<JoinGameViewModel>());
+                    viewModel = joinGame;
                     break;
+
                 case nameof(LobbyViewModel):
-                    viewModel = new LobbyViewModel(_navigationService, _lobbySession);
+                    var lobby = new LobbyViewModel(_playerSession);
+                    lobby.Initialize(_navigationService, _lobbySession,
+                        _profilePictureImageService, _dialogService,
+                        _loggerFactory.CreateLogger<LobbyViewModel>());
+                    viewModel = lobby;
                     break;
+
+                case nameof(EditProfileViewModel):
+                    var editProfile = new EditProfileViewModel();
+                    editProfile.Initialize(_navigationService);
+                    viewModel = editProfile;
+                    break;
+
+                case nameof(FriendsViewModel):
+                    var friends = new FriendsViewModel();
+                    friends.Initialize(_navigationService);
+                    viewModel = friends;
+                    break;
+
+                case nameof(GameSettingsViewModel):
+                    var gameSettings = new GameSettingsViewModel();
+                    gameSettings.Initialize(_navigationService);
+                    viewModel = gameSettings;
+                    break;
+
+                case nameof(HowToPlayViewModel):
+                    var howToPlay = new HowToPlayViewModel();
+                    howToPlay.Initialize(_navigationService);
+                    viewModel = howToPlay;
+                    break;
+
+                case nameof(MatchHistoryViewModel):
+                    var matchHistory = new MatchHistoryViewModel();
+                    matchHistory.Initialize(_navigationService);
+                    viewModel = matchHistory;
+                    break;
+
+                case nameof(ProfileViewModel):
+                    var profile = new ProfileViewModel();
+                    profile.Initialize(_navigationService);
+                    viewModel = profile;
+                    break;
+
                 default:
-                    viewModel = (TViewModel)Activator.CreateInstance(typeof(TViewModel), _navigationService);
-                    break;
+                    throw new NotSupportedException(
+                        $"No creation method registered for {typeof(TViewModel).FullName}.");
             }
+
             return (TViewModel)viewModel;
+        }
+
+        private ILobbyClient CreateLobbyClient()
+        {
+            return new WcfLobbyService(_playerSession);
         }
     }
 }
+
