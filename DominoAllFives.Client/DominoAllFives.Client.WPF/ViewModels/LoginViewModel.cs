@@ -33,30 +33,41 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public string Email
         {
             get => _email;
-            set => SetProperty(ref _email, value);
+            set => SetProperty(
+                ref _email,
+                value);
         }
 
         public string Password
         {
             get => _password;
-            set => SetProperty(ref _password, value);
+            set => SetProperty(
+                ref _password,
+                value);
         }
 
         public bool IsEmailRequiredVisible
         {
             get => _isEmailRequiredVisible;
-            set => SetProperty(ref _isEmailRequiredVisible, value);
+            set => SetProperty(
+                ref _isEmailRequiredVisible,
+                value);
         }
 
         public bool IsPasswordRequiredVisible
         {
             get => _isPasswordRequiredVisible;
-            set => SetProperty(ref _isPasswordRequiredVisible, value);
+            set => SetProperty(
+                ref _isPasswordRequiredVisible,
+                value);
         }
 
         public RelayCommand LoginCommand { get; }
+
         public RelayCommand CancelCommand { get; }
+
         public RelayCommand GoToRegisterCommand { get; }
+
         public RelayCommand GoToRecoverCommand { get; }
 
         public LoginViewModel(
@@ -67,31 +78,43 @@ namespace DominoAllFives.Client.WPF.ViewModels
             Action onGoToRecover)
         {
             _playerSession = playerSession
-                ?? throw new ArgumentNullException(nameof(playerSession));
+                ?? throw new ArgumentNullException(
+                    nameof(playerSession));
 
             _onLoginSuccess = onLoginSuccess
-                ?? throw new ArgumentNullException(nameof(onLoginSuccess));
+                ?? throw new ArgumentNullException(
+                    nameof(onLoginSuccess));
 
             _onCancel = onCancel
-                ?? throw new ArgumentNullException(nameof(onCancel));
+                ?? throw new ArgumentNullException(
+                    nameof(onCancel));
 
             _onGoToRegister = onGoToRegister
-                ?? throw new ArgumentNullException(nameof(onGoToRegister));
+                ?? throw new ArgumentNullException(
+                    nameof(onGoToRegister));
 
             _onGoToRecover = onGoToRecover
-                ?? throw new ArgumentNullException(nameof(onGoToRecover));
+                ?? throw new ArgumentNullException(
+                    nameof(onGoToRecover));
 
             _email = string.Empty;
             _password = string.Empty;
             _isEmailRequiredVisible = false;
             _isPasswordRequiredVisible = false;
 
-            LoginCommand = new RelayCommand(ExecuteLogin);
-            CancelCommand = new RelayCommand(_onCancel);
+            LoginCommand = new RelayCommand(
+                ExecuteLogin);
+
+            CancelCommand = new RelayCommand(
+                _onCancel);
+
             GoToRegisterCommand = new RelayCommand(
-                _onGoToRegister, () => false);
+                _onGoToRegister,
+                () => false);
+
             GoToRecoverCommand = new RelayCommand(
-                _onGoToRecover, () => false);
+                _onGoToRecover,
+                () => false);
         }
 
         public void Initialize(
@@ -105,14 +128,21 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 throw new InvalidOperationException(
                     "LoginViewModel has already been initialized.");
             }
+
             _dialogService = dialogService
-                ?? throw new ArgumentNullException(nameof(dialogService));
+                ?? throw new ArgumentNullException(
+                    nameof(dialogService));
+
             _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
-            _languageManager = languageManager 
+                ?? throw new ArgumentNullException(
+                    nameof(logger));
+
+            _languageManager = languageManager
                 ?? LanguageManager.Instance;
+
             _loginClient = loginClient
-                ?? throw new ArgumentNullException(nameof(loginClient));
+                ?? throw new ArgumentNullException(
+                    nameof(loginClient));
         }
 
         private void ExecuteLogin(object parameter)
@@ -141,14 +171,16 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             try
             {
-                Credentials credentials = new Credentials
-                {
-                    EmailOrUsername = Email.Trim(),
-                    Password = Password
-                };
+                Credentials credentials =
+                    new Credentials
+                    {
+                        EmailOrUsername = Email.Trim(),
+                        Password = Password
+                    };
 
                 authenticatedAccount =
-                    _loginClient.LoginWithAccount(credentials);
+                    _loginClient.LoginWithAccount(
+                        credentials);
             }
             catch (FaultException<AccountIssue> ex)
             {
@@ -157,7 +189,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     "Login rejected. Account issue: {AccountIssue}.",
                     ex.Detail);
 
-                ShowMessageFailure(ex.Detail);
+                ShowMessageFailure(
+                    ex.Detail);
+
                 return;
             }
             catch (FaultException ex)
@@ -167,6 +201,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     "Authentication service could not complete login.");
 
                 ShowMessageFailure();
+
                 return;
             }
             catch (TimeoutException ex)
@@ -175,7 +210,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     ex,
                     "Authentication service timed out.");
 
-                ShowMessageFailure(connectionFailure: true);
+                ShowMessageFailure(
+                    connectionFailure: true);
+
                 return;
             }
             catch (CommunicationException ex)
@@ -184,18 +221,24 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     ex,
                     "Authentication service unavailable.");
 
-                ShowMessageFailure(connectionFailure: true);
+                ShowMessageFailure(
+                    connectionFailure: true);
+
                 return;
             }
 
             if (authenticatedAccount == null ||
                 authenticatedAccount.PlayerId <= 0 ||
-                string.IsNullOrWhiteSpace(authenticatedAccount.Username))
+                string.IsNullOrWhiteSpace(
+                    authenticatedAccount.Username) ||
+                string.IsNullOrWhiteSpace(
+                    authenticatedAccount.SessionKey))
             {
                 _logger.LogError(
                     "Authentication service returned an invalid account.");
 
                 ShowMessageFailure();
+
                 return;
             }
 
@@ -214,7 +257,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _playerSession.Start(
                 authenticatedAccount.PlayerId,
                 authenticatedAccount.Username,
-                authenticatedAccount.PreferredLanguageId);
+                authenticatedAccount.PreferredLanguageId,
+                authenticatedAccount.SessionKey);
 
             _logger.LogInformation(
                 "User {EmailOrUsername} logged in successfully with " +
@@ -228,13 +272,15 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private bool ValidateInput()
         {
             IsEmailRequiredVisible =
-                string.IsNullOrWhiteSpace(Email);
+                string.IsNullOrWhiteSpace(
+                    Email);
 
             IsPasswordRequiredVisible =
-                string.IsNullOrWhiteSpace(Password);
+                string.IsNullOrWhiteSpace(
+                    Password);
 
-            return !IsEmailRequiredVisible &&
-                   !IsPasswordRequiredVisible;
+            return !IsEmailRequiredVisible
+                && !IsPasswordRequiredVisible;
         }
 
         private void ShowMessageFailure(

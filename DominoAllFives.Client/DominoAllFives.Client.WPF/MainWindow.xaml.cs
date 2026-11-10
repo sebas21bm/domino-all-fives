@@ -5,6 +5,7 @@ using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.Services.Wcf.Services;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
+using DominoAllFives.Client.WPF.Services.Threading;
 using DominoAllFives.Client.WPF.ViewModels;
 using Microsoft.Extensions.Logging;
 
@@ -55,10 +56,11 @@ namespace DominoAllFives.Client.WPF
                 args.Cancel = true;
                 if (closingStarted) return;
                 closingStarted = true;
-                UiOperationRunner.Run(
-                    () => { viewModelFactory.Dispose(); return true; },
-                    result => { closingCompleted = true; Close(); },
-                    error => { closingCompleted = true; Close(); });
+                BackgroundWork.Start(new BackgroundJob<object, bool>(
+                    state => { viewModelFactory.Dispose(); return true; },
+                    null,
+                    (result, state) => { closingCompleted = true; Close(); },
+                    (error, state) => { closingCompleted = true; Close(); }));
             };
 
             navigationService.SetViewModelFactory(viewModelFactory);

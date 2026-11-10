@@ -3,98 +3,121 @@ using System.ServiceModel;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
+using DominoAllFives.Client.WPF.Services.Threading;
 using DominoAllFives.Client.WPF.Services.Wcf;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFivesService;
+using LobbyService;
+using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {
-    public class CreateGameViewModel : ViewModelBase
+    public sealed class CreateGameViewModel : ViewModelBase
     {
+        private readonly PlayerSession _playerSession;
         private IFrameNavigationService _navigation;
         private LobbySession _lobbySession;
+        private IDialogService _dialogService;
+        private ILogger<CreateGameViewModel> _logger;
         private bool _isBusy;
-        private readonly PlayerSession _playerSession;
+        private bool _is100PointsSelected = true;
+        private bool _is150PointsSelected;
+        private bool _is200PointsSelected;
+        private bool _is250PointsSelected;
+        private bool _is2PlayersSelected = true;
+        private bool _is3PlayersSelected;
+        private bool _is4PlayersSelected;
 
-        public bool Is100PointsSelected { get; set; }
-        public bool Is150PointsSelected { get; set; }
-        public bool Is200PointsSelected { get; set; }
-        public bool Is250PointsSelected { get; set; }
-        public bool Is2PlayersSelected { get; set; }
-        public bool Is3PlayersSelected { get; set; }
-        public bool Is4PlayersSelected { get; set; }
-        public string ErrorMessage { get; private set; }
-        public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
+        public bool Is100PointsSelected { get => _is100PointsSelected;
+            set => SetProperty(ref _is100PointsSelected, value); }
+        public bool Is150PointsSelected { get => _is150PointsSelected;
+            set => SetProperty(ref _is150PointsSelected, value); }
+        public bool Is200PointsSelected { get => _is200PointsSelected;
+            set => SetProperty(ref _is200PointsSelected, value); }
+        public bool Is250PointsSelected { get => _is250PointsSelected;
+            set => SetProperty(ref _is250PointsSelected, value); }
+        public bool Is2PlayersSelected { get => _is2PlayersSelected;
+            set => SetProperty(ref _is2PlayersSelected, value); }
+        public bool Is3PlayersSelected { get => _is3PlayersSelected;
+            set => SetProperty(ref _is3PlayersSelected, value); }
+        public bool Is4PlayersSelected { get => _is4PlayersSelected;
+            set => SetProperty(ref _is4PlayersSelected, value); }
         public RelayCommand GoBackCommand { get; }
         public RelayCommand CreateGameCommand { get; }
 
-        public CreateGameViewModel(PlayerSession playerSession = null)
+        public CreateGameViewModel(PlayerSession playerSession)
         {
-            _playerSession = playerSession;
-            Is2PlayersSelected = true;
-            Is100PointsSelected = true;
-            GoBackCommand = new RelayCommand(() => _navigation.GoBack(), () => !_isBusy);
-            CreateGameCommand = new RelayCommand(CreateGame, () => !_isBusy);
+            _playerSession = playerSession
+                ?? throw new ArgumentNullException(nameof(playerSession));
+            GoBackCommand = new RelayCommand(() => _navigation.GoBack(), CanInteract);
+            CreateGameCommand = new RelayCommand(CreateGame, CanCreateGame);
         }
 
-        public void Initialize(
-            IFrameNavigationService navigation,
-            LobbySession lobbySession)
+        public void Initialize(IFrameNavigationService navigation, LobbySession lobbySession,
+            IDialogService dialogService, ILogger<CreateGameViewModel> logger)
         {
-            if (_navigation != null)
-            {
-                throw new InvalidOperationException(
-                    "CreateGameViewModel has already been initialized.");
-            }
-
-            if (navigation == null)
-                throw new ArgumentNullException(nameof(navigation));
-            if (lobbySession == null)
-                throw new ArgumentNullException(nameof(lobbySession));
-
-            _navigation = navigation;
-            _lobbySession = lobbySession;
+            if (_lobbySession != null) throw new InvalidOperationException();
+            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
+            _lobbySession = lobbySession ?? throw new ArgumentNullException(nameof(lobbySession));
+            _dialogService = dialogService
+                ?? throw new ArgumentNullException(nameof(dialogService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            RaiseCommands();
         }
+
+        private bool CanInteract() => _lobbySession != null && !_isBusy;
+        private bool CanCreateGame() => CanInteract() && _playerSession.HasServerSession;
 
         private void CreateGame()
         {
-            if (_isBusy) return;
-            int maxPlayers = Is4PlayersSelected ? 4 : Is3PlayersSelected ? 3 : 2;
-
+            if (!CanCreateGame()) return;
             LobbySettings settings = new LobbySettings
             {
-                HostDisplayName = _playerSession != null && _playerSession.IsAuthenticated ? _playerSession.Username : "Host", // Provisional: replace with verified session display name if available.
-                MaximumPlayers = maxPlayers
+                MaxPlayers = Is4PlayersSelected ? 4 : Is3PlayersSelected ? 3 : 2,
+                TargetPoints = Is250PointsSelected ? 250 : Is200PointsSelected ? 200 :
+                    Is150PointsSelected ? 150 : 100
             };
-
-            SetError(null);
             SetBusy(true);
-            UiOperationRunner.Run(
-                () => _lobbySession.Create(settings),
-                lobby =>
-                {
-                    SetBusy(false);
-                    _navigation.NavigateTo<LobbyViewModel>();
-                },
-                error =>
-                {
-                    SetBusy(false);
-                    SetError(UiOperationRunner.ErrorMessage(error));
-                });
+            BackgroundWork.Start(new BackgroundJob<LobbySettings, Lobby>(
+                value => _lobbySession.Create(value), settings,
+                (lobby, value) => { SetBusy(false); _navigation.NavigateTo<LobbyViewModel>(); },
+                (error, value) => { SetBusy(false); HandleFailure(error); }));
         }
 
-        private void SetBusy(bool busy)
+        private void HandleFailure(Exception error)
         {
-            _isBusy = busy;
-            CreateGameCommand.RaiseCanExecuteChanged();
+            FaultException<LobbyIssue> lobbyFault = error as FaultException<LobbyIssue>;
+            if (lobbyFault != null)
+            {
+                _logger.LogWarning(lobbyFault, "Create lobby rejected: {Issue}.",
+                    lobbyFault.Detail);
+                string key = lobbyFault.Detail == LobbyIssue.PlayerAlreadyInLobby
+                    ? "Lobby_msgAlreadyJoined" : "Lobby_msgInvalidSettings";
+                Show(DialogType.Warning, key);
+                return;
+            }
+            _logger.LogError(error, "Lobby could not be created.");
+            bool connection = error is CommunicationException || error is TimeoutException;
+            Show(DialogType.Error, connection ? "Global_msgConnectionError" :
+                "Lobby_msgOperationFailed", connection ? "Global_msgConnectionErrorTitle" :
+                "Global_msgDefaultErrorTitle");
+        }
+
+        private void Show(DialogType type, string message,
+            string title = "Global_msgDefaultErrorTitle")
+        {
+            _dialogService.ShowDialog(new DialogRequest
+            {
+                Type = type,
+                TitleKey = title,
+                MessageKey = message
+            });
+        }
+
+        private void SetBusy(bool value) { _isBusy = value; RaiseCommands(); }
+        private void RaiseCommands()
+        {
             GoBackCommand.RaiseCanExecuteChanged();
-        }
-
-        private void SetError(string message)
-        {
-            ErrorMessage = message;
-            OnPropertyChanged(nameof(ErrorMessage));
-            OnPropertyChanged(nameof(HasError));
+            CreateGameCommand.RaiseCanExecuteChanged();
         }
     }
 }

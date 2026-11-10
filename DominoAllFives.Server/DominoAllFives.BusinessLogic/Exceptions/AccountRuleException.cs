@@ -1,10 +1,12 @@
 using System;
 using DominoAllFives.Contracts.Enums;
 
-namespace DominoAllFives.Server.Exceptions
+namespace DominoAllFives.BusinessLogic.Exceptions
 {
-    /// <summary>Signals an expected account rule rejection inside the server.</summary>
-    internal sealed class AccountRuleException : Exception
+    /// <summary>
+    /// Signals an expected account rule rejection inside the server.
+    /// </summary>
+    public sealed class AccountRuleException : Exception
     {
         public AccountIssue Issue { get; }
 

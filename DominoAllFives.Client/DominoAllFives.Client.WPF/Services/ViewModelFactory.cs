@@ -3,6 +3,7 @@ using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
 using DominoAllFives.Client.WPF.Services.Wcf;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
+using DominoAllFives.Client.WPF.Services.Wcf.Services;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using Microsoft.Extensions.Logging;
@@ -53,7 +54,7 @@ namespace DominoAllFives.Client.WPF.Services
             _profilePictureImageService = profilePictureImageService
                 ?? throw new ArgumentNullException(nameof(profilePictureImageService));
 
-            _lobbySession = new LobbySession();
+            _lobbySession = new LobbySession(CreateLobbyClient);
         }
 
         public void Dispose()
@@ -122,19 +123,23 @@ namespace DominoAllFives.Client.WPF.Services
 
                 case nameof(CreateGameViewModel):
                     var createGame = new CreateGameViewModel(_playerSession);
-                    createGame.Initialize(_navigationService, _lobbySession);
+                    createGame.Initialize(_navigationService, _lobbySession, _dialogService,
+                        _loggerFactory.CreateLogger<CreateGameViewModel>());
                     viewModel = createGame;
                     break;
 
                 case nameof(JoinGameViewModel):
-                    var joinGame = new JoinGameViewModel();
-                    joinGame.Initialize(_navigationService, _lobbySession);
+                    var joinGame = new JoinGameViewModel(_playerSession);
+                    joinGame.Initialize(_navigationService, _lobbySession, _dialogService,
+                        _loggerFactory.CreateLogger<JoinGameViewModel>());
                     viewModel = joinGame;
                     break;
 
                 case nameof(LobbyViewModel):
-                    var lobby = new LobbyViewModel();
-                    lobby.Initialize(_navigationService, _lobbySession);
+                    var lobby = new LobbyViewModel(_playerSession);
+                    lobby.Initialize(_navigationService, _lobbySession,
+                        _profilePictureImageService, _dialogService,
+                        _loggerFactory.CreateLogger<LobbyViewModel>());
                     viewModel = lobby;
                     break;
 
@@ -180,6 +185,11 @@ namespace DominoAllFives.Client.WPF.Services
             }
 
             return (TViewModel)viewModel;
+        }
+
+        private ILobbyClient CreateLobbyClient()
+        {
+            return new WcfLobbyService(_playerSession);
         }
     }
 }

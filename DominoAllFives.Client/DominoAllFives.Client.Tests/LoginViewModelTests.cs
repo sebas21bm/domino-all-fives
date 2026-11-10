@@ -73,11 +73,18 @@ namespace DominoAllFives.Client.Tests
         [Test]
         public void Login_Success_StartsSessionAndAppliesAccountLanguage()
         {
-            _client.Account = new PlayerAccount { PlayerId = 42, Username = "player", PreferredLanguageId = "en-US" };
+            _client.Account = new PlayerAccount
+            {
+                PlayerId = 42,
+                Username = "player",
+                PreferredLanguageId = "en-US",
+                SessionKey = "valid-session-key"
+            };
             CreateViewModel().LoginCommand.Execute(null);
             Assert.That(_session.PlayerId, Is.EqualTo(42));
             Assert.That(_session.Username, Is.EqualTo("player"));
             Assert.That(_session.PreferredLanguageId, Is.EqualTo("en-US"));
+            Assert.That(_session.SessionKey, Is.EqualTo("valid-session-key"));
             Assert.That(_languages.CurrentLanguageCode, Is.EqualTo("en-US"));
             Assert.That(_savedPreferences, Is.Zero);
             Assert.That(_navigations, Is.EqualTo(1));

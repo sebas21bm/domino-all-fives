@@ -3,11 +3,12 @@ using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
 using System.ServiceModel;
 using DominoAllFives.BusinessLogic.Security;
+using DominoAllFives.BusinessLogic.Controllers;
+using DominoAllFives.BusinessLogic.Exceptions;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Models;
-using DominoAllFives.Server.Controllers;
-using DominoAllFives.Server.Exceptions;
+using Player = DominoAllFives.DataAccess.Models.Player;
 using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 
@@ -176,14 +177,12 @@ namespace DominoAllFives.Server.Tests
         }
 
         [Test]
-        public void RemoteControllers_AreOwnedOnlyByServerAssembly()
+        public void RemoteControllers_AreOwnedByBusinessLogicAssembly()
         {
-            var serverAssembly = typeof(DominoService).Assembly;
             var businessAssembly = typeof(DominoAllFives.BusinessLogic.Controllers.RegistrationController).Assembly;
-            Assert.That(typeof(AuthenticationController).Assembly, Is.SameAs(serverAssembly));
-            Assert.That(typeof(RankingController).Assembly, Is.SameAs(serverAssembly));
-            Assert.That(businessAssembly.GetType("DominoAllFives.BusinessLogic.Controllers.AuthenticationController"), Is.Null);
-            Assert.That(businessAssembly.GetType("DominoAllFives.BusinessLogic.Controllers.RankingController"), Is.Null);
+            Assert.That(typeof(AuthenticationController).Assembly, Is.SameAs(businessAssembly));
+            Assert.That(typeof(RankingController).Assembly, Is.SameAs(businessAssembly));
+            Assert.That(typeof(LobbyController).Assembly, Is.SameAs(businessAssembly));
         }
 
         private Player PlayerWithAccount()

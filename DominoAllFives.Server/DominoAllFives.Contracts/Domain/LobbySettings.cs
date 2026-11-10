@@ -5,10 +5,7 @@ namespace DominoAllFives.Contracts.Domain
     [DataContract]
     public sealed class LobbySettings
     {
-        [DataMember(Order = 1, IsRequired = true)]
-        public string HostDisplayName { get; set; }
-
-        [DataMember(Order = 2, IsRequired = true)]
-        public int MaximumPlayers { get; set; }
+        [DataMember] public int MaxPlayers { get; set; }
+        [DataMember] public int TargetPoints { get; set; }
     }
 }

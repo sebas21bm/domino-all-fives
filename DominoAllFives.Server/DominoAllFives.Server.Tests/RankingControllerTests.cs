@@ -1,7 +1,7 @@
 using System;
 using System.ServiceModel;
 using DominoAllFives.BusinessLogic.Storage;
-using DominoAllFives.Server.Controllers;
+using DominoAllFives.BusinessLogic.Controllers;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 

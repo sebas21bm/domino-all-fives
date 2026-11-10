@@ -4,9 +4,10 @@ using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Models;
 using DominoAllFives.DataAccess.Repositories;
-using DominoAllFives.Server.Exceptions;
+using DominoAllFives.BusinessLogic.Exceptions;
+using Player = DominoAllFives.DataAccess.Models.Player;
 
-namespace DominoAllFives.Server.Controllers
+namespace DominoAllFives.BusinessLogic.Controllers
 {
     /// <summary>Authenticates accounts and enforces their access restrictions.</summary>
     public class AuthenticationController
@@ -18,7 +19,7 @@ namespace DominoAllFives.Server.Controllers
         {
         }
 
-        internal AuthenticationController(Func<string, Player> findPlayer, Func<DateTime> utcNow)
+        public AuthenticationController(Func<string, Player> findPlayer, Func<DateTime> utcNow)
         {
             _findPlayer = findPlayer ?? throw new ArgumentNullException(nameof(findPlayer));
             _utcNow = utcNow ?? throw new ArgumentNullException(nameof(utcNow));

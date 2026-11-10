@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ServiceModel;
 using DominoAllFives.Client.WPF.Services.Wcf;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
-using DominoAllFivesService;
+using LobbyService;
 using NUnit.Framework;
 
 namespace DominoAllFives.Client.Tests
@@ -144,10 +144,18 @@ namespace DominoAllFives.Client.Tests
             }
             private static Lobby Snapshot(int count)
             {
-                Lobby result = new Lobby { LobbyCode = "ROOM", MaximumPlayers = 2,
-                    Participants = new List<LobbyParticipant>() };
+                Lobby result = new Lobby
+                {
+                    LobbyCode = "ROOM",
+                    Settings = new LobbySettings { MaxPlayers = 2, TargetPoints = 100 },
+                    Participants = new List<Player>()
+                };
                 for (int i = 0; i < count; i++)
-                    result.Participants.Add(new LobbyParticipant { DisplayName = "Player", IsHost = i == 0 });
+                {
+                    Player player = new Player { PlayerId = i + 1, Username = "Player" };
+                    result.Participants.Add(player);
+                    if (i == 0) result.Host = player;
+                }
                 return result;
             }
             public Lobby GetLobby(string code) => Snapshot(2);

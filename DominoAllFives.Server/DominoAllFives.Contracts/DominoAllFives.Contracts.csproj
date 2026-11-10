@@ -45,7 +45,6 @@
   <ItemGroup>
     <Compile Include="Services\ISessionAccount.cs" />
     <Compile Include="Services\IRankingService.cs" />
-    <Compile Include="Domain\LoginResult.cs" />
     <Compile Include="Domain\RegistrationResult.cs" />
     <Compile Include="Domain\ProfilePicture.cs" />
     <Compile Include="Domain\PlayerStatistics.cs" />
@@ -58,22 +57,26 @@
     <Compile Include="Domain\AccountRules.cs" />
     <Compile Include="Enums\LanguagePreferenceStatus.cs" />
     <Compile Include="Domain\PlayerAccount.cs" />
+    <Compile Include="Domain\Player.cs" />
+    <Compile Include="Domain\Lobby.cs" />
+    <Compile Include="Domain\LobbySettings.cs" />
+    <Compile Include="Enums\AccessIssue.cs" />
+    <Compile Include="Enums\LobbyIssue.cs" />
+    <Compile Include="Enums\LobbyState.cs" />
+    <Compile Include="Enums\PlayerPresence.cs" />
     <Compile Include="Enums\ChangePasswordStatus.cs" />
     <Compile Include="Enums\DeleteStatus.cs" />
-    <Compile Include="Enums\LoginStatus.cs" /><Compile Include="Enums\AccountIssue.cs" />
+    <Compile Include="Enums\LoginStatus.cs" />
+    <Compile Include="Enums\AccountIssue.cs" />
     <Compile Include="Enums\ProfilePictureStatus.cs" />
     <Compile Include="Enums\RetrieveInformationStatus.cs" />
     <Compile Include="Enums\RegistrationStatus.cs" />
     <Compile Include="Enums\UpdateProfileStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="OldServices\IAccountService.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="Domain\LobbySettings.cs" />
-    <Compile Include="Domain\LobbyParticipant.cs" />
-    <Compile Include="Domain\Lobby.cs" />
     <Compile Include="Services\ILobbyCallback.cs" />
     <Compile Include="Services\ILobbyService.cs" />
   </ItemGroup>
