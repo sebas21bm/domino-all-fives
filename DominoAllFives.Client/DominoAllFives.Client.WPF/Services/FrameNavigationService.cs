@@ -17,8 +17,7 @@ namespace DominoAllFives.Client.WPF.Services
 
         public FrameNavigationService(Frame navigationFrame)
         {
-            _navigationFrame = navigationFrame ?? throw new ArgumentNullException(
-                nameof(
+            _navigationFrame = navigationFrame ?? throw new ArgumentNullException(nameof(
                 navigationFrame));
             _viewModelToPageMap = new Dictionary<Type, Type>();
             RegisterRoutes();
@@ -72,8 +71,7 @@ namespace DominoAllFives.Client.WPF.Services
 
         public void SetViewModelFactory(ViewModelFactory viewModelFactory)
         {
-            _viewModelFactory = viewModelFactory ?? throw new ArgumentNullException(
-                nameof(
+            _viewModelFactory = viewModelFactory ?? throw new ArgumentNullException(nameof(
                 viewModelFactory));
         }
 
@@ -86,10 +84,8 @@ namespace DominoAllFives.Client.WPF.Services
             {
                 if (parameter != null)
                 {
-                    viewModelInstance = (ViewModelBase)Activator.CreateInstance(
-                        viewModelType,
-                        this,
-                        parameter);
+                    viewModelInstance = (ViewModelBase)Activator.CreateInstance(viewModelType,
+                        this, parameter);
                 }
                 else
                 {
@@ -106,8 +102,7 @@ namespace DominoAllFives.Client.WPF.Services
             {
                 throw new InvalidOperationException(
                     $"The ViewModel {viewModelType.Name} must have a "
-                        + $"constructor accepting IFrameNavigationService.",
-                    ex);
+                    + $"constructor accepting IFrameNavigationService.", ex);
             }
 
             return (TViewModel)viewModelInstance;
@@ -119,8 +114,8 @@ namespace DominoAllFives.Client.WPF.Services
             Type viewModelType = typeof(TViewModel);
             if (!_viewModelToPageMap.TryGetValue(viewModelType, out Type pageType))
             {
-                throw new InvalidOperationException(
-                    $"No page registered for ViewModel type: " + $"{viewModelType.FullName}");
+                throw new InvalidOperationException($"No page registered for ViewModel type: "
+                    + $"{viewModelType.FullName}");
             }
 
             TViewModel viewModelInstance = CreateViewModel<TViewModel>(parameter);
@@ -131,6 +126,7 @@ namespace DominoAllFives.Client.WPF.Services
 
         private void RegisterRoutes()
         {
+            _viewModelToPageMap.Add(typeof(MatchViewModel), typeof(Match));
             _viewModelToPageMap.Add(typeof(HomePageViewModel), typeof(HomePage));
             _viewModelToPageMap.Add(typeof(MainMenuViewModel), typeof(MainMenu));
             _viewModelToPageMap.Add(typeof(GameSettingsViewModel), typeof(GameSettings));

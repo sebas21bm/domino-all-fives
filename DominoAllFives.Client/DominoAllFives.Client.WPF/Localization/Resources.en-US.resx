@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1046,14 +1046,100 @@ Only the following are allowed: .png, .jpg, .jpeg.</value>
   <data name="MessageLanguage_msgSaveFailed" xml:space="preserve">
     <value>The language could not be saved. Try again or select an available language.</value>
   </data>
-  <data name="Lobby_msgAlreadyJoined" xml:space="preserve"><value>You are already in a lobby.</value></data>
-  <data name="Lobby_msgCannotStart" xml:space="preserve"><value>At least two participants and a lobby that has not started are required.</value></data>
-  <data name="Lobby_msgClosed" xml:space="preserve"><value>The host closed the lobby.</value></data>
-  <data name="Lobby_msgHostOnly" xml:space="preserve"><value>Only the host can perform this operation.</value></data>
-  <data name="Lobby_msgInvalidSettings" xml:space="preserve"><value>Invalid lobby settings.</value></data>
-  <data name="Lobby_msgNotFound" xml:space="preserve"><value>Lobby not found.</value></data>
-  <data name="Lobby_msgOperationFailed" xml:space="preserve"><value>The operation could not be completed. Check your connection and rejoin the lobby.</value></data>
-  <data name="Lobby_msgStarted" xml:space="preserve"><value>Start notification received. The match is not available yet.</value></data>
-  <data name="Lobby_msgStartRequested" xml:space="preserve"><value>Start requested.</value></data>
-  <data name="Lobby_msgUnavailable" xml:space="preserve"><value>The lobby is full or has already started.</value></data>
+  <data name="Lobby_msgAlreadyJoined" xml:space="preserve">
+    <value>You are already in a lobby.</value>
+  </data>
+  <data name="Lobby_msgCannotStart" xml:space="preserve">
+    <value>At least two participants and a lobby that has not started are required.</value>
+  </data>
+  <data name="Lobby_msgClosed" xml:space="preserve">
+    <value>The host closed the lobby.</value>
+  </data>
+  <data name="Lobby_msgHostOnly" xml:space="preserve">
+    <value>Only the host can perform this operation.</value>
+  </data>
+  <data name="Lobby_msgInvalidSettings" xml:space="preserve">
+    <value>Invalid lobby settings.</value>
+  </data>
+  <data name="Lobby_msgNotFound" xml:space="preserve">
+    <value>Lobby not found.</value>
+  </data>
+  <data name="Lobby_msgOperationFailed" xml:space="preserve">
+    <value>The operation could not be completed. Check your connection and rejoin the lobby.</value>
+  </data>
+  <data name="Lobby_msgStarted" xml:space="preserve">
+    <value>Start notification received. The match is not available yet.</value>
+  </data>
+  <data name="Lobby_msgStartRequested" xml:space="preserve">
+    <value>Start requested.</value>
+  </data>
+  <data name="Lobby_msgUnavailable" xml:space="preserve">
+    <value>The lobby is full or has already started.</value>
+  </data>
+  <data name="Match_btnPass">
+    <value>Pass</value>
+  </data>
+  <data name="Match_msgRejected">
+    <value>The move was rejected. Check the updated state.</value>
+  </data>
+  <data name="Match_btnLeave">
+    <value>Leave</value>
+  </data>
+  <data name="Match_lblPreviousRound">
+    <value>Hands revealed at the end of the previous round</value>
+  </data>
+  <data name="Match_lblTurn">
+    <value>Player {0} turn</value>
+  </data>
+  <data name="Match_lblRevealed">
+    <value>Player {0}: {1}</value>
+  </data>
+  <data name="Match_endLeft">
+    <value>Left</value>
+  </data>
+  <data name="Match_endBottom">
+    <value>Bottom</value>
+  </data>
+  <data name="Match_msgConnectionFailed">
+    <value>The server could not be reached. Press Refresh to reconnect.</value>
+  </data>
+  <data name="Match_lblScore">
+    <value>Player {0}: {1} points · {2} tiles</value>
+  </data>
+  <data name="Match_msgCancelled">
+    <value>Match cancelled without a winner.</value>
+  </data>
+  <data name="Match_btnRefresh">
+    <value>Refresh</value>
+  </data>
+  <data name="Match_endRight">
+    <value>Right</value>
+  </data>
+  <data name="Match_endTop">
+    <value>Top</value>
+  </data>
+  <data name="Match_btnPlay">
+    <value>Play</value>
+  </data>
+  <data name="Match_btnDraw">
+    <value>Draw from stock</value>
+  </data>
+  <data name="Match_lblRound">
+    <value>Round {0} · Stock: {1}</value>
+  </data>
+  <data name="Match_msgCompleted">
+    <value>Match completed. The highest score identifies the winner.</value>
+  </data>
+  <data name="Match_lblScores">
+    <value>SCORES</value>
+  </data>
+  <data name="Match_lblTarget">
+    <value>TARGET</value>
+  </data>
+  <data name="Match_btnStock">
+    <value>STOCK</value>
+  </data>
+  <data name="Match_lblChat">
+    <value>CHAT</value>
+  </data>
 </root>

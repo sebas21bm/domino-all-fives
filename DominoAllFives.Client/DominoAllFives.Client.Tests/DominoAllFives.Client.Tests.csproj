@@ -7,9 +7,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Runtime.Serialization" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
     <PackageReference Include="NUnit" Version="3.14.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <ProjectReference Include="..\DominoAllFives.Client.WPF\DominoAllFives.Client.WPF.csproj" />
+    <ProjectReference Include="..\..\DominoAllFives.Server\DominoAllFives.Contracts\DominoAllFives.Contracts.csproj" />
   </ItemGroup>
 </Project>
