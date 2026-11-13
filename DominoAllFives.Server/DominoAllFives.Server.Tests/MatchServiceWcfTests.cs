@@ -64,6 +64,10 @@ namespace DominoAllFives.Server.Tests
                         DominoTile).Assembly));
                     Assert.That(after.Board.Tiles[0].Tile.FirstValue, Is.EqualTo(originalValue));
                     Assert.That(after.Version, Is.EqualTo(view.Version + 1));
+                    Assert.That(after.LastPlay.PlayerId, Is.EqualTo(view.CurrentPlayerId));
+                    Assert.That(after.LastPlay.Total, Is.EqualTo(after.LastPlay.EndValues.Sum()));
+                    Assert.That(after.LastPlay.Points, Is.EqualTo(
+                        after.LastPlay.BasePoints * after.LastPlay.Multiplier));
                     Assert.That(received, Is.True);
                     Assert.That(callbacks[0].Hands.All(hand => hand.PlayerId == FirstPlayerId),
                         Is.True);

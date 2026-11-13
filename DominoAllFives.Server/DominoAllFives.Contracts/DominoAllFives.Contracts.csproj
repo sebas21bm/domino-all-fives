@@ -125,4 +125,13 @@
   <ItemGroup>
     <Compile Include="Services\IMatchService.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\PlayScore.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Domain\ChatMessage.cs" />
+    <Compile Include="Domain\ChatContext.cs" />
+    <Compile Include="Enums\ChatScope.cs" />
+    <Compile Include="Enums\ChatIssue.cs" />
+  </ItemGroup>
 </Project>

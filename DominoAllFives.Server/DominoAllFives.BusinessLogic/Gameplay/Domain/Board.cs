@@ -79,16 +79,24 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 
         public int CalculatePoints(int turnNumber)
         {
+            int sum = GetScoringValues(turnNumber)
+                .Sum();
+            return sum % ScoringMultiple == 0 ? sum : 0;
+        }
+
+        public int[] GetScoringValues(int turnNumber)
+        {
             List<BoardEnd> available = _ends.Where(end => end.BlockedTurn != turnNumber)
                 .ToList();
-            int sum = available.Where(end => !end.IsOpeningEnd)
-                .Sum(end => end.ScoreValue);
+            List<int> values = available.Where(end => !end.IsOpeningEnd)
+                .Select(end => end.ScoreValue)
+                .ToList();
             if (available.Any(end => end.IsOpeningEnd))
             {
-                sum += _tiles[0].Tile.TotalPips;
+                values.Add(_tiles[0].Tile.TotalPips);
             }
 
-            return sum % ScoringMultiple == 0 ? sum : 0;
+            return values.ToArray();
         }
 
         private void OpenBoard(Tile tile)

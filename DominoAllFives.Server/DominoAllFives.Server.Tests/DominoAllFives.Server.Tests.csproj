@@ -114,4 +114,10 @@
       <Link>Proxy\MatchServiceReference.cs</Link>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="PlayScoreTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="LobbyMergeTests.cs" />
+  </ItemGroup>
 </Project>

@@ -38,6 +38,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
         public Board Board { get; private set; }
         public MatchPhase Phase { get; private set; }
         public RoundSummary LastRound { get; private set; }
+        public PlayScore LastPlay { get; private set; }
 
         public int StockCount
         {
@@ -129,6 +130,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             int points = Board.CalculatePoints(TurnNumber);
             player.Points += tile.SpecialPower == SpecialPower.DoublePoints
                 ? points * DoublePointsMultiplier : points;
+            LastPlay = CreatePlayScore(playerId, tile, end, points);
             _consecutivePasses = 0;
             Version++;
             if (player.Points >= TargetPoints)
@@ -140,6 +142,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             if (player.Hand.Count == 0)
             {
                 FinishRound(player.PlayerId);
+                LastPlay.RoundPoints = LastRound.AwardedPoints;
                 return;
             }
 
@@ -222,6 +225,30 @@ namespace DominoAllFives.BusinessLogic.Gameplay
         {
             _currentPlayerIndex = (_currentPlayerIndex + 1) % _players.Count;
             TurnNumber++;
+        }
+
+        private PlayScore CreatePlayScore(int playerId, Tile tile, End end, int points)
+        {
+            int multiplier = tile.SpecialPower == SpecialPower.DoublePoints
+                ? DoublePointsMultiplier : 1;
+            int[] values = Board.GetScoringValues(TurnNumber);
+            return new PlayScore
+            {
+                PlayerId = playerId,
+                RoundNumber = RoundNumber,
+                Tile = tile,
+                PlayedEnd = end,
+                EndValues = Array.AsReadOnly(values),
+                BlockedEnds = Board.Ends.Where(target => target.BlockedTurn == TurnNumber)
+                    .Select(target => target.End)
+                    .ToList().AsReadOnly(),
+                IncludesOpeningDouble = Board.Ends.Any(target => target.IsOpeningEnd
+                    && target.BlockedTurn != TurnNumber),
+                Total = values.Sum(),
+                BasePoints = points,
+                Multiplier = multiplier,
+                Points = points * multiplier
+            };
         }
 
         private void FinishRound(int? winnerId)

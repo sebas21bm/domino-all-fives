@@ -19,6 +19,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 StockCount = match.StockCount,
                 Scores = CreateScores(match),
                 LastRound = CreateRoundResult(match),
+                LastPlay = CreatePlayScore(match.LastPlay),
                 Board = new Network.PublicBoard
                 {
                     Tiles = match.Board.Tiles.Select(placement
@@ -67,6 +68,31 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             return match.Players.Select(player => new Network.PlayerScore { PlayerId =
                 player.PlayerId, Points = player.Points, TileCount = player.Tiles.Count })
                 .ToList();
+        }
+
+        private static Network.PlayScore CreatePlayScore(PlayScore score)
+        {
+            if (score == null)
+            {
+                return null;
+            }
+
+            return new Network.PlayScore
+            {
+                PlayerId = score.PlayerId,
+                RoundNumber = score.RoundNumber,
+                Tile = CreateTile(score.Tile),
+                PlayedEnd = (Network.BoardEnd)score.PlayedEnd,
+                EndValues = score.EndValues.ToList(),
+                BlockedEnds = score.BlockedEnds.Select(end => (Network.BoardEnd)end)
+                    .ToList(),
+                IncludesOpeningDouble = score.IncludesOpeningDouble,
+                Total = score.Total,
+                BasePoints = score.BasePoints,
+                Multiplier = score.Multiplier,
+                Points = score.Points,
+                RoundPoints = score.RoundPoints
+            };
         }
 
         private static Network.RoundResult CreateRoundResult(Match match)

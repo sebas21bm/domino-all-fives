@@ -1142,4 +1142,34 @@ Only the following are allowed: .png, .jpg, .jpeg.</value>
   <data name="Match_lblChat">
     <value>CHAT</value>
   </data>
+  <data name="Match_lblPlayPending" xml:space="preserve">
+    <value>Last play: no tile has been placed yet.</value>
+  </data>
+  <data name="Match_lblPlayHeader" xml:space="preserve">
+    <value>Last play: {0} placed {1}|{2} (round {3}).</value>
+  </data>
+  <data name="Match_lblPlaySum" xml:space="preserve">
+    <value>Ends: {0} = {1}. Base points: {2}.</value>
+  </data>
+  <data name="Match_lblPlayOpeningDouble" xml:space="preserve">
+    <value>Includes the full opening double once: it still has free connections.</value>
+  </data>
+  <data name="Match_lblPlayBlocked" xml:space="preserve">
+    <value>Excluded from this play by a purple block: {0}.</value>
+  </data>
+  <data name="Match_lblPlayNoPoints" xml:space="preserve">
+    <value>This sum awards no points: it must be a positive multiple of 5.</value>
+  </data>
+  <data name="Match_lblPlayRed" xml:space="preserve">
+    <value>Red: doubles only this play. {0} × {1} = {2} points.</value>
+  </data>
+  <data name="Match_lblPlayPurple" xml:space="preserve">
+    <value>Purple: blocks {0} next turn; that end will not score or accept tiles.</value>
+  </data>
+  <data name="Match_lblPlayPoints" xml:space="preserve">
+    <value>Points earned for this placement: +{0}.</value>
+  </data>
+  <data name="Match_lblPlayRoundBonus" xml:space="preserve">
+    <value>Additional end-of-round award: +{0} (added separately).</value>
+  </data>
 </root>

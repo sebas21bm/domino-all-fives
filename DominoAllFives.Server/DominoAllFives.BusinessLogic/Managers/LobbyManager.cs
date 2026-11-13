@@ -125,7 +125,7 @@ namespace DominoAllFives.BusinessLogic.Managers
             }
         }
 
-        public Lobby StartLobby(int playerId)
+        public Lobby StartLobby(int playerId, Action<Lobby> initializeMatch = null)
         {
             lock (_syncRoot)
             {
@@ -141,9 +141,22 @@ namespace DominoAllFives.BusinessLogic.Managers
                     throw new LobbyRuleException(LobbyIssue.InsufficientPlayers);
                 }
 
-                lobby.State = LobbyState.Starting;
+                initializeMatch?.Invoke(CreateSnapshot(lobby));
+                lobby.State = initializeMatch == null ? LobbyState.Starting : LobbyState.InProgress;
                 _lobbyMessages.Remove(lobby.LobbyId);
                 return CreateSnapshot(lobby);
+            }
+        }
+
+        public void ReleaseMatch(int lobbyId)
+        {
+            lock (_syncRoot)
+            {
+                Lobby lobby = FindLobbyByIdInternal(lobbyId);
+                if (lobby != null)
+                {
+                    CloseLobbyInternal(lobby);
+                }
             }
         }
 
