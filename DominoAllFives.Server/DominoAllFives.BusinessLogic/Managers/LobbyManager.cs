@@ -10,11 +10,24 @@ namespace DominoAllFives.BusinessLogic.Managers
     {
         private const int MinimumPlayersToStart = 2;
         private const int LobbyCodeLength = 6;
-        private readonly object _syncRoot = new object ();
-        private readonly Dictionary<string, Lobby> _lobbies = new Dictionary<string, Lobby>(
+        private static readonly LobbyManager instance = new LobbyManager();
+        private readonly object _syncRoot = new object();
+        private readonly Dictionary<string, Lobby> _lobbies =
+            new Dictionary<string, Lobby>(
             StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, string> _playerLobbyCodes = new Dictionary<int, string>();
+        private readonly Dictionary<int, List<ChatMessage>> _lobbyMessages =
+            new Dictionary<int, List<ChatMessage>>();
         private int _nextLobbyId = 1;
+        private int _nextMessageId = 1;
+        public static LobbyManager Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+
         public Lobby CreateLobby(Player host, LobbySettings settings)
         {
             if (host == null)
@@ -46,6 +59,7 @@ namespace DominoAllFives.BusinessLogic.Managers
                 };
                 _lobbies.Add(code, lobby);
                 _playerLobbyCodes.Add(host.PlayerId, code);
+                _lobbyMessages[lobby.LobbyId] = new List<ChatMessage>();
                 return CreateSnapshot(lobby);
             }
         }
@@ -111,7 +125,7 @@ namespace DominoAllFives.BusinessLogic.Managers
             }
         }
 
-        public Lobby StartLobby(int playerId, Action<Lobby> initializeMatch = null)
+        public Lobby StartLobby(int playerId)
         {
             lock (_syncRoot)
             {
@@ -127,30 +141,9 @@ namespace DominoAllFives.BusinessLogic.Managers
                     throw new LobbyRuleException(LobbyIssue.InsufficientPlayers);
                 }
 
-                initializeMatch?.Invoke(CreateSnapshot(lobby));
-                lobby.State = initializeMatch == null ? LobbyState.Starting : LobbyState.InProgress;
+                lobby.State = LobbyState.Starting;
+                _lobbyMessages.Remove(lobby.LobbyId);
                 return CreateSnapshot(lobby);
-            }
-        }
-
-        public void ReleaseMatch(int lobbyId)
-        {
-            lock (_syncRoot)
-            {
-                Lobby lobby = null;
-                foreach (Lobby candidate in _lobbies.Values)
-                {
-                    if (candidate.LobbyId == lobbyId)
-                    {
-                        lobby = candidate;
-                        break;
-                    }
-                }
-
-                if (lobby != null)
-                {
-                    CloseLobbyInternal(lobby);
-                }
             }
         }
 
@@ -161,6 +154,87 @@ namespace DominoAllFives.BusinessLogic.Managers
                 Lobby lobby = GetPlayerLobbyInternal(playerId);
                 EnsureHost(lobby, playerId);
                 return CloseLobbyInternal(lobby);
+            }
+        }
+
+        public ChatMessage AddChatMessage(Player sender, int lobbyId, string content)
+        {
+            if (sender == null)
+            {
+                throw new ArgumentNullException(nameof(sender));
+            }
+
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                throw new ArgumentException(null, nameof(content));
+            }
+
+            lock (_syncRoot)
+            {
+                Lobby lobby = GetAuthorizedChatLobbyInternal(lobbyId, sender.PlayerId);
+                List<ChatMessage> messages;
+                if (!_lobbyMessages.TryGetValue(lobby.LobbyId, out messages))
+                {
+                    messages = new List<ChatMessage>();
+                    _lobbyMessages[lobby.LobbyId] = messages;
+                }
+
+                ChatMessage registeredMessage = new ChatMessage
+                {
+                    MessageId = _nextMessageId++,
+                    Context = new ChatContext
+                    {
+                        Scope = ChatScope.Lobby,
+                        ContextId = lobby.LobbyId
+                    },
+                    SenderId = sender.PlayerId,
+                    SenderUsername = sender.Username,
+                    Content = content,
+                    SentAtUtc = DateTime.UtcNow
+                };
+                messages.Add(registeredMessage);
+                return CopyChatMessage(registeredMessage);
+            }
+        }
+
+        public List<ChatMessage> GetChatMessages(int lobbyId, int playerId)
+        {
+            lock (_syncRoot)
+            {
+                Lobby lobby = GetAuthorizedChatLobbyInternal(lobbyId, playerId);
+                List<ChatMessage> storedMessages;
+                if (!_lobbyMessages.TryGetValue(lobby.LobbyId, out storedMessages))
+                {
+                    return new List<ChatMessage>();
+                }
+
+                List<ChatMessage> snapshot = new List<ChatMessage>(storedMessages.Count);
+                foreach (ChatMessage message in storedMessages)
+                {
+                    snapshot.Add(CopyChatMessage(message));
+                }
+
+                return snapshot;
+            }
+        }
+
+        public List<Player> GetChatRecipients(int lobbyId)
+        {
+            lock (_syncRoot)
+            {
+                Lobby lobby = FindLobbyByIdInternal(lobbyId);
+                if (lobby == null || lobby.State != LobbyState.Waiting)
+                {
+                    return new List<Player>();
+                }
+
+                List<Player> recipients = new List<Player>(lobby.Participants.Count);
+                foreach (Player participant in lobby.Participants)
+                {
+                    recipients.Add(CopyPlayer(participant));
+                }
+
+                return recipients;
             }
         }
 
@@ -194,6 +268,37 @@ namespace DominoAllFives.BusinessLogic.Managers
             return GetLobbyInternal(code);
         }
 
+        private Lobby GetAuthorizedChatLobbyInternal(int lobbyId, int playerId)
+        {
+            Lobby lobby = FindLobbyByIdInternal(lobbyId);
+            if (lobby == null ||
+                lobby.State != LobbyState.Waiting ||
+                !ContainsPlayer(lobby.Participants, playerId))
+            {
+                throw new ChatRuleException(ChatIssue.PlayerNotInChat);
+            }
+
+            return lobby;
+        }
+
+        private Lobby FindLobbyByIdInternal(int lobbyId)
+        {
+            if (lobbyId <= 0)
+            {
+                return null;
+            }
+
+            foreach (Lobby lobby in _lobbies.Values)
+            {
+                if (lobby.LobbyId == lobbyId)
+                {
+                    return lobby;
+                }
+            }
+
+            return null;
+        }
+
         private Lobby CloseLobbyInternal(Lobby lobby)
         {
             lobby.State = LobbyState.Closed;
@@ -203,6 +308,7 @@ namespace DominoAllFives.BusinessLogic.Managers
                 _playerLobbyCodes.Remove(player.PlayerId);
             }
 
+            _lobbyMessages.Remove(lobby.LobbyId);
             _lobbies.Remove(lobby.LobbyCode);
             return snapshot;
         }
@@ -212,8 +318,13 @@ namespace DominoAllFives.BusinessLogic.Managers
             string code;
             do
             {
-                code = Guid.NewGuid().ToString("N").Substring(0,
-                    LobbyCodeLength).ToUpperInvariant();
+                code = Guid.NewGuid()
+                    .ToString(
+                    "N")
+                    .Substring(
+                    0,
+                    LobbyCodeLength)
+                    .ToUpperInvariant();
             }
             while (_lobbies.ContainsKey(code));
             return code;
@@ -298,6 +409,23 @@ namespace DominoAllFives.BusinessLogic.Managers
             {
                 MaxPlayers = settings.MaxPlayers,
                 TargetPoints = settings.TargetPoints
+            };
+        }
+
+        private static ChatMessage CopyChatMessage(ChatMessage message)
+        {
+            return new ChatMessage
+            {
+                MessageId = message.MessageId,
+                Context = new ChatContext
+                {
+                    Scope = message.Context.Scope,
+                    ContextId = message.Context.ContextId
+                },
+                SenderId = message.SenderId,
+                SenderUsername = message.SenderUsername,
+                Content = message.Content,
+                SentAtUtc = message.SentAtUtc
             };
         }
     }
