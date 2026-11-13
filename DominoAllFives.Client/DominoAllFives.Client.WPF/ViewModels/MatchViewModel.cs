@@ -76,7 +76,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public string TurnText { get; private set; }
         public string RoundText { get; private set; }
-        public string ScoreBreakdown { get; private set; } = PlayScoreFormatter.Format(null, null);
+        public string AwardedPointsText { get; private set; } = string.Empty;
+        public string ScoreMultiplierText { get; private set; } = string.Empty;
+        public bool HasScoredPlay { get; private set; }
 
         public DominoTile SelectedTile
         {
@@ -416,7 +418,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             _match = _pendingView;
-            UpdateScoreBreakdown();
+            UpdateScoreIndicator();
             Hand = _pendingHand.Tiles;
             BoardTiles = BoardLayout.Arrange(_match.Board);
             FitBoard();
@@ -453,11 +455,18 @@ namespace DominoAllFives.Client.WPF.ViewModels
             RaiseCommands();
         }
 
-        private void UpdateScoreBreakdown()
+        private void UpdateScoreIndicator()
         {
-            ScoreBreakdown = PlayScoreFormatter.Format(_match.LastPlay, _match.LastPlay == null
-                ? string.Empty : GetPlayerName(_match.LastPlay.PlayerId));
-            OnPropertyChanged(nameof(ScoreBreakdown));
+            PlayScore score = _match.LastPlay;
+            HasScoredPlay = score != null && score.Points > 0;
+            AwardedPointsText = HasScoredPlay ? score.Points.ToString("+0",
+                System.Globalization.CultureInfo.CurrentCulture) : string.Empty;
+            ScoreMultiplierText = HasScoredPlay && score.Multiplier > 1 ? "×"
+                + score.Multiplier.ToString(
+                System.Globalization.CultureInfo.CurrentCulture) : string.Empty;
+            OnPropertyChanged(nameof(AwardedPointsText));
+            OnPropertyChanged(nameof(ScoreMultiplierText));
+            OnPropertyChanged(nameof(HasScoredPlay));
         }
 
         private void FitBoard()

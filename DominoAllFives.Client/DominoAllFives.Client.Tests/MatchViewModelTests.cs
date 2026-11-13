@@ -15,8 +15,11 @@ namespace DominoAllFives.Client.Tests
     [TestFixture, Apartment(ApartmentState.STA)]
     public sealed class MatchViewModelTests
     {
-        [Test]
-        public void Callbacks_PlayScore_PublishesBreakdownWithCoherentSnapshot()
+        [TestCase(20, 1, "+20", "")]
+        [TestCase(40, 2, "+40", "×2")]
+        [TestCase(0, 2, "", "")]
+        public void Callbacks_PlayScore_ShowsOnlyAwardAndApplicableMultiplier(int points,
+            int multiplier, string pointsText, string multiplierText)
         {
             // Arrange
             Client client = new Client();
@@ -42,16 +45,16 @@ namespace DominoAllFives.Client.Tests
                     BlockedEnds = new List<BoardEnd>(),
                     Total = 20,
                     BasePoints = 20,
-                    Multiplier = 2,
-                    Points = 40
+                    Multiplier = multiplier,
+                    Points = points
                 };
                 // Act
                 client.Emit(view, Hand(1));
                 Pump();
                 // Assert
-                Assert.That(model.ScoreBreakdown, Does.Contain("Bob"));
-                Assert.That(model.ScoreBreakdown, Does.Contain("12 + 5 + 3 = 20"));
-                Assert.That(model.ScoreBreakdown, Does.Contain("20 × 2 = 40"));
+                Assert.That(model.AwardedPointsText, Is.EqualTo(pointsText));
+                Assert.That(model.ScoreMultiplierText, Is.EqualTo(multiplierText));
+                Assert.That(model.HasScoredPlay, Is.EqualTo(points > 0));
             }
         }
 

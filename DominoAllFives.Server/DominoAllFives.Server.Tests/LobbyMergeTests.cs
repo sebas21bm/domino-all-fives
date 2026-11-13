@@ -38,12 +38,13 @@ namespace DominoAllFives.Server.Tests
             Lobby lobby = CreateLobby(controller);
             manager.AddChatMessage(CreatePlayer(1), lobby.LobbyId, "Hello");
             // Act
-            TestDelegate start = () => controller.StartLobby(1,
-                snapshot => throw new InvalidOperationException("Test initialization failure."));
+            TestDelegate start = () => controller.StartLobby(1, snapshot
+                => throw new InvalidOperationException("Test initialization failure."));
             // Assert
             Assert.Throws<InvalidOperationException>(start);
             Assert.That(controller.GetLobby(lobby.LobbyCode).State, Is.EqualTo(LobbyState.Waiting));
-            Assert.That(manager.GetChatMessages(lobby.LobbyId, 1).Count, Is.EqualTo(1));
+            Assert.That(manager.GetChatMessages(lobby.LobbyId, 1)
+                .Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -71,7 +72,11 @@ namespace DominoAllFives.Server.Tests
 
         private static LobbySettings CreateSettings()
         {
-            return new LobbySettings { MaxPlayers = 2, TargetPoints = 100 };
+            return new LobbySettings
+            {
+                MaxPlayers = 2,
+                TargetPoints = 100
+            };
         }
 
         private static Player CreatePlayer(int playerId)
