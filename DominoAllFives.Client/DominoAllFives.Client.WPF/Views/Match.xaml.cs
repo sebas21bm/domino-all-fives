@@ -11,12 +11,12 @@ namespace DominoAllFives.Client.WPF.Views
             InitializeComponent();
         }
 
-        private async void OnLoaded(object sender, RoutedEventArgs eventArgs)
+        private void OnLoaded(object sender, RoutedEventArgs eventArgs)
         {
             MatchViewModel model = DataContext as MatchViewModel;
             if (model != null)
             {
-                await model.InitializeAsync();
+                model.Initialize();
             }
         }
 

@@ -15,7 +15,7 @@ namespace DominoAllFives.Server
     /// Validates the session identity before applying authoritative match operations.
     /// </summary>
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode =
-        ConcurrencyMode.Single, IncludeExceptionDetailInFaults = false)]
+        ConcurrencyMode.Reentrant, IncludeExceptionDetailInFaults = false)]
     public sealed class MatchService : IMatchService
     {
         private string _sessionKey;
@@ -23,6 +23,7 @@ namespace DominoAllFives.Server
         private int _matchId;
         private IMatchCallback _callback;
         private ICommunicationObject _channel;
+
         /// <summary>
         /// Binds the authenticated player and callback to a match they participate in.
         /// </summary>
