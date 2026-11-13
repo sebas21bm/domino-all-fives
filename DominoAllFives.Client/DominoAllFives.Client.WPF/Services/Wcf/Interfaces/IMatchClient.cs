@@ -1,5 +1,5 @@
 using System;
-using DominoAllFives.Contracts.Gameplay;
+using MatchService;
 
 namespace DominoAllFives.Client.WPF.Services.Wcf.Interfaces
 {

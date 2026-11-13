@@ -37,14 +37,52 @@ y sus hashes finales. Las áreas principales son Gameplay y sus carpetas Domain
 y Enum, Controllers, Managers, Contracts/Gameplay, MatchService, la comunicación
 del cliente, MatchViewModel y Match.xaml.
 
-Se conservaron las responsabilidades, los namespaces y los atributos de
-serialización de la entrega. Los proyectos clásicos incorporan cada nuevo
-archivo mediante Compile; el cliente SDK los incluye automáticamente.
-`DominoTileType` se trasladó a Models/Enum sin dejar una definición duplicada.
+Se conservaron las responsabilidades del servidor y los atributos de
+serialización. Los proyectos clásicos incorporan cada nuevo archivo mediante
+Compile; el cliente SDK los incluye automáticamente. DominoTileType se trasladó
+a Models/Enum sin dejar una definición duplicada.
 
-Se añadieron referencias directas a Contracts y System.Runtime.Serialization
-en las pruebas del cliente: la referencia al proyecto clásico no resultaba
-transitiva para ese proyecto. No se incorporaron paquetes adicionales.
+### Referencia de servicio generada
+
+Por solicitud del usuario, la jugabilidad utiliza ahora el mismo enfoque de
+proxy generado que autenticación y lobby. Esta decisión sustituye la referencia
+directa a Contracts propuesta en el ZIP y la solución provisional de añadir
+ese proyecto al archivo de solución del cliente.
+
+Se generó Connected Services/MatchService/Reference.cs con SvcUtil de .NET
+Framework 4.8, a partir de los metadatos WCF exportados del contrato real de
+partidas. No se escribió ni modificó manualmente el código generado. Los WSDL
+y XSD se conservan en Metadata, junto con RegenerateProxy.ps1 para reproducir
+la generación sin conectarse al servidor. La regeneración se comprobó idéntica
+byte por byte. Si cambia el contrato remoto, es necesario volver a exportar
+sus metadatos antes de regenerar.
+
+WcfMatchClient utiliza MatchServiceClient e implementa IMatchServiceCallback.
+Los modelos, el ViewModel y las pruebas del cliente consumen los DTO y enums
+del namespace MatchService. MatchEndpoint apunta a MatchService.IMatchService;
+se conserva la dirección real configurada por el usuario.
+
+Se retiraron las referencias a DominoAllFives.Contracts.csproj de WPF y de sus
+pruebas, así como la entrada de Contracts y sus configuraciones en la solución
+del cliente. System.Runtime.Serialization es una referencia del framework y
+permanece para soportar los datos serializados. No se añadieron paquetes.
+
+El cliente puede restaurarse y compilarse sin los proyectos del servidor.
+La prueba ClientAssemblies_GeneratedProxy_DoNotReferenceServerContracts comprueba
+que los ensamblados de WPF y sus pruebas no referencian el ensamblado Contracts.
+El grafo de restauración también contiene exclusivamente los dos proyectos del
+cliente. Los namespaces XML que contienen el texto DominoAllFives.Contracts
+permanecen en los metadatos y atributos generados porque forman parte del
+formato publicado en la red; no constituyen referencias de ensamblado.
+
+Las pruebas del servidor enlazan el archivo generado como código de prueba
+para verificarlo contra MatchService real. Ese enlace no afecta al ejecutable
+del servidor ni añade una dependencia del servidor al cliente.
+
+Después de actualizar estos archivos, cerrar y volver a abrir la solución del
+cliente, restaurar NuGet y recompilar. No hace falta iniciar el servidor para
+compilar o abrir la vista WPF. Se validó el render de Match con los tipos del
+proxy; no se inspeccionó la sesión del diseñador de Visual Studio del compañero.
 
 La configuración añade MatchService y MatchEndpoint en el puerto 8737, sobre
 el mismo host configurado para el lobby. No se sustituyó la configuración local
@@ -71,8 +109,8 @@ y del [reglamento del Equipo 4](https://docs.google.com/document/d/19LjewYpM6IVi
 Las decisiones complementarias de apertura, poderes y abandono proceden de
 LEEME.md del ZIP, cuya implementación solicitó el usuario.
 
-El alcance revisado comprende los 59 archivos C# de la entrega, con la excepción
-documentada del diseñador generado de recursos, más proyectos, configuración,
+El alcance revisado comprende 62 archivos C# relacionados, con las excepciones
+documentadas del diseñador de recursos y del proxy generado, más proyectos, configuración,
 XAML y recursos afectados. La revisión sintáctica verificó nombres de campos y
 parámetros, llaves, correspondencia entre tipo y archivo, líneas de hasta 100
 caracteres, máximo de cuatro parámetros, complejidad ciclomática hasta diez,
@@ -88,19 +126,21 @@ ni garantiza la ausencia de defectos no detectados.
 |---|---|
 | Solución Server, Debug, .NET Framework 4.8 | Compilación correcta |
 | Solución Client, Debug, net48 | Compilación correcta |
-| Suite Server | 79 aprobadas, 0 fallidas, 0 omitidas |
-| Suite Client | 52 aprobadas, 0 fallidas, 0 omitidas |
-| Total | 131 aprobadas |
+| Suite Server | 80 aprobadas, 0 fallidas, 0 omitidas |
+| Suite Client | 53 aprobadas, 0 fallidas, 0 omitidas |
+| Total | 133 aprobadas |
 | Análisis sintáctico del código integrado | Sin hallazgos pendientes |
-| Entradas Compile explícitas inspeccionadas | 121; sin ausencias ni duplicados |
+| Entradas Compile explícitas inspeccionadas | 123; sin ausencias ni duplicados |
 | Claves Match en tres idiomas | 22; traducciones y marcadores coherentes |
 | Recursos anteriores de los tres idiomas | Conservados |
 | Presentación WPF a 1600 × 900 | Render inspeccionado con datos de muestra |
 
-Se conservaron las 116 pruebas de referencia y se añadieron quince casos:
+Se conservaron las 116 pruebas de referencia y se añadieron diecisiete casos:
 identidades y valores de ficha inválidos (cinco), objetivos inválidos (cuatro),
 extremos inexistentes (dos), pozo indebido, cancelación repetida, snapshot de
-otra partida y callback encolado después de Dispose.
+otra partida y callback encolado después de Dispose, ausencia de referencias
+al servidor en los ensamblados del cliente y comunicación del proxy generado
+con el servicio real.
 
 Las pruebas incluyen WCF NetTcp con dos clientes, privacidad de manos,
 valores falsificados, faults tipados y revocación de sesión; las simulaciones
@@ -109,7 +149,8 @@ El layout se prueba con cadenas largas y cien distribuciones mixtas.
 
 La ejecución inicial restringida del servidor obtuvo 76/79 por el bloqueo
 de sockets TCP 10013 del entorno. La ejecución con permiso de sockets locales
-y la repetición final aprobaron 79/79 sin omitir ni debilitar esas pruebas.
+aprobaron 79/79 sin omitir ni debilitar esas pruebas. Después de migrar al
+proxy generado, la suite final aprobó 80/80.
 Las sesiones de prueba son en memoria y no requieren modificar SQL Server.
 
 Las evidencias finales están en [Validation](Validation/): client.trx,
@@ -140,5 +181,5 @@ No se ejecutó aquí ese recorrido con cuentas reales y la base SQL del usuario.
 El chat solo conserva su espacio visual. No se integraron historial/ranking de
 resultados, persistencia de partidas ni recuperación tras reiniciar el proceso
 del servidor. Las partidas terminadas se conservan treinta minutos en memoria.
-Las 131 pruebas tampoco completan el requisito académico global de 300 pruebas.
+Las 133 pruebas tampoco completan el requisito académico global de 300 pruebas.
 No se realizaron commits, cambios de rama ni publicaciones.

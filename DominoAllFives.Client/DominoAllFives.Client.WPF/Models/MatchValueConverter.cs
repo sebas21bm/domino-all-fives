@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 using System.Windows.Data;
-using DominoAllFives.Contracts.Gameplay;
+using MatchService;
 
 namespace DominoAllFives.Client.WPF.Models
 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using DominoAllFives.Client.WPF.Models;
-using DominoAllFives.Contracts.Gameplay;
+using MatchService;
 using NUnit.Framework;
 
 namespace DominoAllFives.Client.Tests

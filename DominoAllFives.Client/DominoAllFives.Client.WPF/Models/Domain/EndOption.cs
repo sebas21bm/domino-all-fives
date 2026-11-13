@@ -1,4 +1,4 @@
-using DominoAllFives.Contracts.Gameplay;
+using MatchService;
 
 namespace DominoAllFives.Client.WPF.Models
 {

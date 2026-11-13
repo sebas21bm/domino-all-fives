@@ -108,4 +108,10 @@
   <ItemGroup>
     <Compile Include="MatchServiceWcfTests.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MatchProxyCallback.cs" />
+    <Compile Include="..\..\DominoAllFives.Client\DominoAllFives.Client.WPF\Connected Services\MatchService\Reference.cs">
+      <Link>Proxy\MatchServiceReference.cs</Link>
+    </Compile>
+  </ItemGroup>
 </Project>
