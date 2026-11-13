@@ -1,4 +1,4 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
 namespace DominoAllFives.Client.WPF.Views
 {
@@ -8,6 +8,5 @@ namespace DominoAllFives.Client.WPF.Views
         {
             InitializeComponent();
         }
-
     }
 }

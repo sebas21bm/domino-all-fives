@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 
@@ -18,7 +18,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public RegisterAccountViewModel(Action onCancel = null)
         {
-            RegisterCommand = new RelayCommand(() => { }, () => false);
+            RegisterCommand = new RelayCommand(() =>
+            {
+            }, () => false);
             CancelCommand = new RelayCommand(() => onCancel?.Invoke());
         }
     }

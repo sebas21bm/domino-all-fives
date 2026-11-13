@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.IO;
-
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.BusinessLogic.Storage
@@ -12,63 +11,53 @@ namespace DominoAllFives.BusinessLogic.Storage
     {
         private const string ApplicationFolderName = "DominoAllFives";
         private const string ProfilePicturesFolderName = "ProfilePictures";
-
         private readonly ILogger<ProfilePictureStorage> _logger;
-
-        public ProfilePictureStorage(
-            ILogger<ProfilePictureStorage> logger)
+        public ProfilePictureStorage(ILogger<ProfilePictureStorage> logger)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
         /// Generates a unique file name for a player's profile picture.
         /// </summary>
-        /// <param name="playerId">
+        /// <param name = "playerId">
         /// Identifier of the player who owns the profile picture.
         /// </param>
-        /// <param name="originalFileName">
+        /// <param name = "originalFileName">
         /// Original name of the selected image file.
         /// </param>
         /// <returns>
         /// A unique file name for storing the profile picture.
         /// </returns>
-        public string GenerateFileName(
-            int playerId,
-            string originalFileName)
+        public string GenerateFileName(int playerId, string originalFileName)
         {
-            string extension =
-                Path.GetExtension(originalFileName).ToLowerInvariant();
-
+            string extension = Path.GetExtension(originalFileName).ToLowerInvariant();
             return string.Format(
                 "player_{0}_{1}{2}",
                 playerId,
-                Guid.NewGuid().ToString("N"),
+                Guid.NewGuid().ToString(
+                "N"),
                 extension);
         }
 
         /// <summary>
         /// Gets the data of a stored profile picture.
         /// </summary>
-        /// <param name="profilePictureFileName">
+        /// <param name = "profilePictureFileName">
         /// The name of the stored profile picture file.
         /// </param>
         /// <returns>
         /// The profile picture data, or an empty array when the picture
         /// is not available.
         /// </returns>
-        public byte[] GetProfilePictureData(
-            string profilePictureFileName)
+        public byte[] GetProfilePictureData(string profilePictureFileName)
         {
             if (string.IsNullOrWhiteSpace(profilePictureFileName))
             {
                 return Array.Empty<byte>();
             }
 
-            string profilePicturePath =
-                GetProfilePicturePath(profilePictureFileName);
-
+            string profilePicturePath = GetProfilePicturePath(profilePictureFileName);
             if (!File.Exists(profilePicturePath))
             {
                 return Array.Empty<byte>();
@@ -78,17 +67,36 @@ namespace DominoAllFives.BusinessLogic.Storage
             {
                 return File.ReadAllBytes(profilePicturePath);
             }
-            catch (Exception ex) when (
-                ex is UnauthorizedAccessException ||
-                ex is PathTooLongException ||
-                ex is DirectoryNotFoundException ||
-                ex is IOException)
+            catch (UnauthorizedAccessException ex)
             {
                 _logger.LogWarning(
                     ex,
                     "Unable to read profile picture file {ProfilePictureFileName}.",
                     profilePictureFileName);
-
+                return Array.Empty<byte>();
+            }
+            catch (PathTooLongException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Unable to read profile picture file {ProfilePictureFileName}.",
+                    profilePictureFileName);
+                return Array.Empty<byte>();
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Unable to read profile picture file {ProfilePictureFileName}.",
+                    profilePictureFileName);
+                return Array.Empty<byte>();
+            }
+            catch (IOException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Unable to read profile picture file {ProfilePictureFileName}.",
+                    profilePictureFileName);
                 return Array.Empty<byte>();
             }
         }
@@ -96,49 +104,38 @@ namespace DominoAllFives.BusinessLogic.Storage
         /// <summary>
         /// Saves profile picture data using the specified file name.
         /// </summary>
-        /// <param name="profilePictureFileName">
+        /// <param name = "profilePictureFileName">
         /// The name used to store the profile picture.
         /// </param>
-        /// <param name="imageData">
+        /// <param name = "imageData">
         /// The profile picture data.
         /// </param>
-        public void SaveProfilePicture(
-            string profilePictureFileName,
-            byte[] imageData)
+        public void SaveProfilePicture(string profilePictureFileName, byte[] imageData)
         {
-            string profilePicturesDirectory =
-                GetProfilePicturesDirectory();
-
+            string profilePicturesDirectory = GetProfilePicturesDirectory();
             if (!Directory.Exists(profilePicturesDirectory))
             {
                 Directory.CreateDirectory(profilePicturesDirectory);
             }
 
-            string profilePicturePath =
-                GetProfilePicturePath(profilePictureFileName);
-
-            File.WriteAllBytes(
-                profilePicturePath,
-                imageData);
+            string profilePicturePath = GetProfilePicturePath(profilePictureFileName);
+            File.WriteAllBytes(profilePicturePath, imageData);
         }
 
         /// <summary>
         /// Deletes a stored profile picture when it exists.
         /// </summary>
-        /// <param name="profilePictureFileName">
+        /// <param name = "profilePictureFileName">
         /// The name of the stored profile picture file.
         /// </param>
-        public void DeleteProfilePicture(
-            string profilePictureFileName)
+        public void DeleteProfilePicture(string profilePictureFileName)
         {
             if (string.IsNullOrWhiteSpace(profilePictureFileName))
             {
                 return;
             }
 
-            string profilePicturePath =
-                GetProfilePicturePath(profilePictureFileName);
-
+            string profilePicturePath = GetProfilePicturePath(profilePictureFileName);
             if (!File.Exists(profilePicturePath))
             {
                 return;
@@ -150,15 +147,14 @@ namespace DominoAllFives.BusinessLogic.Storage
         /// <summary>
         /// Attempts to delete a stored profile picture during a cleanup operation.
         /// </summary>
-        /// <param name="profilePictureFileName">
+        /// <param name = "profilePictureFileName">
         /// The name of the stored profile picture file.
         /// </param>
         /// <returns>
         /// True when the file does not exist or was successfully deleted;
         /// otherwise, false.
         /// </returns>
-        public bool TryDeleteProfilePicture(
-            string profilePictureFileName)
+        public bool TryDeleteProfilePicture(string profilePictureFileName)
         {
             if (string.IsNullOrWhiteSpace(profilePictureFileName))
             {
@@ -170,17 +166,36 @@ namespace DominoAllFives.BusinessLogic.Storage
                 DeleteProfilePicture(profilePictureFileName);
                 return true;
             }
-            catch (Exception ex) when (
-                ex is UnauthorizedAccessException ||
-                ex is PathTooLongException ||
-                ex is DirectoryNotFoundException ||
-                ex is IOException)
+            catch (UnauthorizedAccessException ex)
             {
                 _logger.LogWarning(
                     ex,
                     "Unable to delete profile picture file {ProfilePictureFileName}.",
                     profilePictureFileName);
-
+                return false;
+            }
+            catch (PathTooLongException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Unable to delete profile picture file {ProfilePictureFileName}.",
+                    profilePictureFileName);
+                return false;
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Unable to delete profile picture file {ProfilePictureFileName}.",
+                    profilePictureFileName);
+                return false;
+            }
+            catch (IOException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Unable to delete profile picture file {ProfilePictureFileName}.",
+                    profilePictureFileName);
                 return false;
             }
         }
@@ -189,20 +204,16 @@ namespace DominoAllFives.BusinessLogic.Storage
         {
             string localApplicationData =
                 Environment.GetFolderPath(
-                    Environment.SpecialFolder.LocalApplicationData);
-
+                Environment.SpecialFolder.LocalApplicationData);
             return Path.Combine(
                 localApplicationData,
                 ApplicationFolderName,
                 ProfilePicturesFolderName);
         }
 
-        private string GetProfilePicturePath(
-            string profilePictureFileName)
+        private string GetProfilePicturePath(string profilePictureFileName)
         {
-            return Path.Combine(
-                GetProfilePicturesDirectory(),
-                profilePictureFileName);
+            return Path.Combine(GetProfilePicturesDirectory(), profilePictureFileName);
         }
     }
 }

@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
-
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 
@@ -13,74 +12,66 @@ namespace DominoAllFives.DataAccess.Repositories
     public class PlayerStatsRepository : IPlayerStatsRepository
     {
         private readonly DominoAllFivesEntities _context;
-
         /// <summary>
         /// Initializes a new repository with the specified
         /// database context.
         /// </summary>
-        /// <param name="databaseContext">
+        /// <param name = "databaseContext">
         /// The database context used by the repository.
         /// </param>
-        public PlayerStatsRepository(
-            DominoAllFivesEntities databaseContext)
+        public PlayerStatsRepository(DominoAllFivesEntities databaseContext)
         {
             _context = databaseContext;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public PlayerStats GetByPlayerId(int playerId)
         {
-            return _context.PlayerStats.FirstOrDefault(
-                stats => stats.IdPlayer == playerId);
+            return _context.PlayerStats.FirstOrDefault(stats => stats.IdPlayer == playerId);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public IEnumerable<PlayerStats> GetTopByGamesWon(int limit)
         {
-            return _context.PlayerStats
-                .Where(stats =>
-                    !stats.Player.IsGuest &&
-                    stats.GamesWon > 0)
-                .OrderByDescending(stats => stats.GamesWon)
-                .ThenByDescending(stats => stats.LastVictoryDate)
-                .Take(limit)
+            return _context.PlayerStats.Where(
+                stats => !stats.Player.IsGuest
+                && stats.GamesWon > 0)
+                .OrderByDescending(
+                stats => stats.GamesWon)
+                .ThenByDescending(
+                stats => stats.LastVictoryDate)
+                .Take(
+                limit)
                 .ToList();
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public void Add(PlayerStats playerStatsToAdd)
         {
             _context.PlayerStats.Add(playerStatsToAdd);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public int GetRankByPlayerId(int playerId)
         {
             int ranking;
-
-            PlayerStats playerStats =
-                GetByPlayerId(playerId);
-
-            if (playerStats == null ||
-                playerStats.GamesWon <= 0)
+            PlayerStats playerStats = GetByPlayerId(playerId);
+            if (playerStats == null || playerStats.GamesWon <= 0)
             {
                 ranking = 0;
             }
             else
             {
-
                 int playersAhead =
                     _context.PlayerStats.Count(
-                        stats =>
-                            !stats.Player.IsGuest &&
-                            stats.GamesWon > 0 &&
-                            (stats.GamesWon > playerStats.GamesWon ||
-                            (stats.GamesWon == playerStats.GamesWon &&
-                             stats.LastVictoryDate >
-                             playerStats.LastVictoryDate)));
-
+                    stats => !stats.Player.IsGuest
+                    && stats.GamesWon > 0
+                    && (stats.GamesWon > playerStats.GamesWon
+                    || (stats.GamesWon == playerStats.GamesWon
+                    && stats.LastVictoryDate > playerStats.LastVictoryDate)));
                 ranking = playersAhead + 1;
             }
+
             return ranking;
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace DominoAllFives.Client.WPF.Models
+namespace DominoAllFives.Client.WPF.Models
 {
     /// <summary>
     /// Represents a player that is displayed in the InviteFriends interface.

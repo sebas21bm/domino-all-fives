@@ -1,11 +1,11 @@
 using System;
+using DominoAllFives.BusinessLogic.Exceptions;
 using DominoAllFives.BusinessLogic.Security;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Models;
-using DominoAllFives.DataAccess.Repositories;
-using DominoAllFives.BusinessLogic.Exceptions;
 using Player = DominoAllFives.DataAccess.Models.Player;
+using DominoAllFives.DataAccess.Repositories;
 
 namespace DominoAllFives.BusinessLogic.Controllers
 {
@@ -14,7 +14,6 @@ namespace DominoAllFives.BusinessLogic.Controllers
     {
         private readonly Func<string, Player> _findPlayer;
         private readonly Func<DateTime> _utcNow;
-
         public AuthenticationController() : this(FindStoredPlayer, () => DateTime.UtcNow)
         {
         }
@@ -27,15 +26,21 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
         public PlayerAccount LoginWithAccount(Credentials credentials)
         {
-            if (credentials == null || string.IsNullOrWhiteSpace(credentials.EmailOrUsername) ||
-                string.IsNullOrWhiteSpace(credentials.Password))
+            if (credentials == null
+                || string.IsNullOrWhiteSpace(
+                credentials.EmailOrUsername)
+                || string.IsNullOrWhiteSpace(
+                credentials.Password))
             {
                 throw new AccountRuleException(AccountIssue.InvalidCredentials);
             }
 
             Player player = _findPlayer(credentials.EmailOrUsername);
-            if (player == null || player.IsDeleted ||
-                !PasswordHasher.VerifyPassword(credentials.Password, player.PasswordHash))
+            if (player == null
+                || player.IsDeleted
+                || !PasswordHasher.VerifyPassword(
+                credentials.Password,
+                player.PasswordHash))
             {
                 throw new AccountRuleException(AccountIssue.InvalidCredentials);
             }
@@ -46,18 +51,23 @@ namespace DominoAllFives.BusinessLogic.Controllers
             }
 
             DateTime utcNow = _utcNow();
-            DateTime evaluationTime = player.SuspensionUntil.HasValue &&
-                player.SuspensionUntil.Value.Kind != DateTimeKind.Utc
-                ? utcNow.ToLocalTime()
-                : utcNow;
+            DateTime evaluationTime =
+                player.SuspensionUntil.HasValue
+                && player.SuspensionUntil.Value.Kind != DateTimeKind.Utc
+                ? utcNow.ToLocalTime() : utcNow;
             if (player.SuspensionUntil.HasValue && player.SuspensionUntil.Value > evaluationTime)
             {
                 throw new AccountRuleException(AccountIssue.Suspended);
             }
 
-            return PlayerAccount.FromStoredAccount(player.IdPlayer, player.Username,
-                player.PreferredLanguageId, AccountAccessStatus.FromStoredState(
-                    player.IsDeleted, player.IsBanned, player.SuspensionUntil));
+            return PlayerAccount.FromStoredAccount(
+                player.IdPlayer,
+                player.Username,
+                player.PreferredLanguageId,
+                AccountAccessStatus.FromStoredState(
+                player.IsDeleted,
+                player.IsBanned,
+                player.SuspensionUntil));
         }
 
         private static Player FindStoredPlayer(string identifier)

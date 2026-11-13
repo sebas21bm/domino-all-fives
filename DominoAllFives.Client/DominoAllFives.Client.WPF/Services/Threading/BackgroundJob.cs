@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace DominoAllFives.Client.WPF.Services.Threading
 {
@@ -16,17 +17,33 @@ namespace DominoAllFives.Client.WPF.Services.Threading
 
         public bool IsCancelled
         {
-            get { lock (_stateLock) return _isCancelled; }
+            get
+            {
+                lock (_stateLock)
+                {
+                    return _isCancelled;
+                }
+            }
         }
 
-        public BackgroundJob(Func<TState, TResult> work, TState state,
-            Action<TResult, TState> onCompleted, Action<Exception, TState> onFailed)
-            : this(work, state, onCompleted, onFailed, null)
+        public BackgroundJob(
+            Func<TState, TResult> work,
+            TState state,
+            Action<TResult, TState> onCompleted,
+            Action<Exception, TState> onFailed) : this(
+            work,
+            state,
+            onCompleted,
+            onFailed,
+            null)
         {
         }
 
-        public BackgroundJob(Func<TState, TResult> work, TState state,
-            Action<TResult, TState> onCompleted, Action<Exception, TState> onFailed,
+        public BackgroundJob(
+            Func<TState, TResult> work,
+            TState state,
+            Action<TResult, TState> onCompleted,
+            Action<Exception, TState> onFailed,
             Action<TResult, TState> onCompletedAfterCancel)
         {
             Work = work ?? throw new ArgumentNullException(nameof(work));
@@ -38,24 +55,46 @@ namespace DominoAllFives.Client.WPF.Services.Threading
 
         public void Cancel()
         {
-            lock (_stateLock) _isCancelled = true;
+            lock (_stateLock)
+            {
+                _isCancelled = true;
+            }
         }
 
         void IBackgroundJob.Execute()
         {
-            try { Result = Work(State); }
-            catch (Exception ex) { Error = ex; }
+            Task<TResult> operation = new Task<TResult>(() => Work(State));
+            operation.RunSynchronously();
+            if (operation.IsFaulted)
+            {
+                Error = operation.Exception.InnerException;
+            }
+            else
+            {
+                Result = operation.Result;
+            }
         }
 
         void IBackgroundJob.Complete()
         {
             if (Error != null)
             {
-                if (!IsCancelled) OnFailed(Error, State);
+                if (!IsCancelled)
+                {
+                    OnFailed(Error, State);
+                }
+
                 return;
             }
-            if (IsCancelled) OnCompletedAfterCancel?.Invoke(Result, State);
-            else OnCompleted(Result, State);
+
+            if (IsCancelled)
+            {
+                OnCompletedAfterCancel?.Invoke(Result, State);
+            }
+            else
+            {
+                OnCompleted(Result, State);
+            }
         }
     }
 }

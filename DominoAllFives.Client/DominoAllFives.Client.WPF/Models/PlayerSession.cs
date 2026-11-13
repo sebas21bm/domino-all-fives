@@ -1,15 +1,12 @@
-﻿using System;
+using System;
 
 namespace DominoAllFives.Client.WPF.Models
 {
     public class PlayerSession
     {
         public int? PlayerId { get; private set; }
-
         public string Username { get; private set; }
-
         public string PreferredLanguageId { get; private set; }
-
         public string SessionKey { get; private set; }
 
         public bool IsAuthenticated
@@ -24,37 +21,25 @@ namespace DominoAllFives.Client.WPF.Models
         {
             get
             {
-                return IsAuthenticated
-                    && !string.IsNullOrWhiteSpace(SessionKey);
+                return IsAuthenticated && !string.IsNullOrWhiteSpace(SessionKey);
             }
         }
 
-        public void Start(
-            int playerId,
-            string username)
+        public void Start(int playerId, string username)
         {
-            Start(
-                playerId,
-                username,
-                null);
+            Start(playerId, username, null);
         }
 
-        public void Start(
-            int playerId,
-            string username,
-            string preferredLanguageId)
+        public void Start(int playerId, string username, string preferredLanguageId)
         {
             if (playerId <= 0)
             {
-                throw new ArgumentOutOfRangeException(
-                    nameof(playerId));
+                throw new ArgumentOutOfRangeException(nameof(playerId));
             }
 
             if (string.IsNullOrWhiteSpace(username))
             {
-                throw new ArgumentException(
-                    null,
-                    nameof(username));
+                throw new ArgumentException(null, nameof(username));
             }
 
             PlayerId = playerId;
@@ -71,22 +56,17 @@ namespace DominoAllFives.Client.WPF.Models
         {
             if (playerId <= 0)
             {
-                throw new ArgumentOutOfRangeException(
-                    nameof(playerId));
+                throw new ArgumentOutOfRangeException(nameof(playerId));
             }
 
             if (string.IsNullOrWhiteSpace(username))
             {
-                throw new ArgumentException(
-                    null,
-                    nameof(username));
+                throw new ArgumentException(null, nameof(username));
             }
 
             if (string.IsNullOrWhiteSpace(sessionKey))
             {
-                throw new ArgumentException(
-                    null,
-                    nameof(sessionKey));
+                throw new ArgumentException(null, nameof(sessionKey));
             }
 
             PlayerId = playerId;
@@ -95,8 +75,7 @@ namespace DominoAllFives.Client.WPF.Models
             SessionKey = sessionKey;
         }
 
-        public void UpdatePreferredLanguage(
-            string preferredLanguageId)
+        public void UpdatePreferredLanguage(string preferredLanguageId)
         {
             PreferredLanguageId = preferredLanguageId;
         }
@@ -105,9 +84,7 @@ namespace DominoAllFives.Client.WPF.Models
         {
             if (string.IsNullOrWhiteSpace(username))
             {
-                throw new ArgumentException(
-                    null,
-                    nameof(username));
+                throw new ArgumentException(null, nameof(username));
             }
 
             Username = username;

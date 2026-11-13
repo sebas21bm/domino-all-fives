@@ -1,4 +1,3 @@
-
 namespace DominoAllFives.Contracts.Enums
 {
     /// <summary>

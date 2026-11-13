@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Services;
@@ -10,11 +10,16 @@ namespace DominoAllFives.Client.WPF.ViewModels
     public class FriendsViewModel : ViewModelBase
     {
         private IFrameNavigationService _navigationService;
-        public ObservableCollection<string> OnlineFriends { get; } = new ObservableCollection<string>();
-        public ObservableCollection<string> OfflineFriends { get; } = new ObservableCollection<string>();
-        public ObservableCollection<string> SearchResults { get; } = new ObservableCollection<string>();
-        public ObservableCollection<string> SentRequests { get; } = new ObservableCollection<string>();
-        public ObservableCollection<string> ReceivedRequests { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> OnlineFriends { get; } =
+            new ObservableCollection<string>();
+        public ObservableCollection<string> OfflineFriends { get; } =
+            new ObservableCollection<string>();
+        public ObservableCollection<string> SearchResults { get; } =
+            new ObservableCollection<string>();
+        public ObservableCollection<string> SentRequests { get; } =
+            new ObservableCollection<string>();
+        public ObservableCollection<string> ReceivedRequests { get; } =
+            new ObservableCollection<string>();
         public bool IsFriendsListVisible { get; set; }
         public bool IsAddFriendsVisible { get; set; }
         public bool IsFriendRequestsVisible { get; set; }
@@ -25,14 +30,19 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public FriendsViewModel()
         {
-            ShowFriendsListCommand = new RelayCommand(() => { }, () => false);
-            ShowAddFriendsCommand = new RelayCommand(() => { }, () => false);
-            ShowFriendRequestsCommand = new RelayCommand(() => { }, () => false);
+            ShowFriendsListCommand = new RelayCommand(() =>
+            {
+            }, () => false);
+            ShowAddFriendsCommand = new RelayCommand(() =>
+            {
+            }, () => false);
+            ShowFriendRequestsCommand = new RelayCommand(() =>
+            {
+            }, () => false);
             GoBackCommand = new RelayCommand(() => _navigationService.GoBack());
         }
 
-        public void Initialize(
-            IFrameNavigationService navigationService)
+        public void Initialize(IFrameNavigationService navigationService)
         {
             if (_navigationService != null)
             {
@@ -41,7 +51,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             if (navigationService == null)
+            {
                 throw new ArgumentNullException(nameof(navigationService));
+            }
 
             _navigationService = navigationService;
         }

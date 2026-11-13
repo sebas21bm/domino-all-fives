@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Media.Imaging;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Services;
@@ -20,13 +20,18 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public EditProfileViewModel()
         {
             GoBackCommand = new RelayCommand(() => _navigationService.GoBack());
-            ChangePictureCommand = new RelayCommand(() => { }, () => false);
-            SaveCommand = new RelayCommand(() => { }, () => false);
-            DiscardCommand = new RelayCommand(() => { }, () => false);
+            ChangePictureCommand = new RelayCommand(() =>
+            {
+            }, () => false);
+            SaveCommand = new RelayCommand(() =>
+            {
+            }, () => false);
+            DiscardCommand = new RelayCommand(() =>
+            {
+            }, () => false);
         }
 
-        public void Initialize(
-            IFrameNavigationService navigationService)
+        public void Initialize(IFrameNavigationService navigationService)
         {
             if (_navigationService != null)
             {
@@ -35,7 +40,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             if (navigationService == null)
+            {
                 throw new ArgumentNullException(nameof(navigationService));
+            }
 
             _navigationService = navigationService;
         }

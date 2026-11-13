@@ -19,8 +19,11 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Captures registration data; EnsureValid evaluates username, email and password in order.
         /// </summary>
-        public static AccountRegistration Create(string username, string email,
-            string password, string preferredLanguageId)
+        public static AccountRegistration Create(
+            string username,
+            string email,
+            string password,
+            string preferredLanguageId)
         {
             AccountRegistration registration = new AccountRegistration
             {
@@ -41,14 +44,17 @@ namespace DominoAllFives.Contracts.Domain
             {
                 return RegistrationStatus.InvalidUsername;
             }
+
             if (!AccountRules.IsEmailValid(Email))
             {
                 return RegistrationStatus.InvalidEmail;
             }
+
             if (!AccountRules.IsPasswordValid(Password))
             {
                 return RegistrationStatus.InvalidPassword;
             }
+
             return RegistrationStatus.None;
         }
     }

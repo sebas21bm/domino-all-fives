@@ -1,5 +1,4 @@
-﻿using System;
-
+using System;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.ViewModels;
@@ -12,26 +11,26 @@ namespace DominoAllFives.Client.WPF.Services
     public class DialogService : IDialogService
     {
         private readonly Action<CustomMessageViewModel> _showDialogCallback;
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="DialogService"/> class.
+        /// Initializes a new instance of the <see cref = "DialogService"/> class.
         /// </summary>
-        /// <param name="showDialogCallback">The delegate action used to trigger 
+        /// <param name = "showDialogCallback">The delegate action used to trigger
         /// UI rendering of the dialog.
         /// </param>
-        /// <exception cref="ArgumentNullException">Thrown when showDialogCallback 
+        /// <exception cref = "ArgumentNullException">Thrown when showDialogCallback
         /// is null.
         /// </exception>
         public DialogService(Action<CustomMessageViewModel> showDialogCallback)
         {
-            _showDialogCallback = showDialogCallback ?? 
-                throw new ArgumentNullException(nameof(showDialogCallback));
+            _showDialogCallback = showDialogCallback ?? throw new ArgumentNullException(
+                nameof(
+                showDialogCallback));
         }
 
         /// <summary>
         /// Displays a custom modal dialog based on the specified request settings.
         /// </summary>
-        /// <param name="request">The dialog configuration details.</param>
+        /// <param name = "request">The dialog configuration details.</param>
         public void ShowDialog(DialogRequest request)
         {
             if (request == null)
@@ -43,20 +42,13 @@ namespace DominoAllFives.Client.WPF.Services
             string message = LanguageManager.Instance[request.MessageKey] ?? request.MessageKey;
             string acceptText = LanguageManager.Instance["Global_btnAccept"] ?? "Accept";
             string cancelText = LanguageManager.Instance["Global_btnCancel"] ?? "Cancel";
-
             string iconPath = GetIconPath(request.Type);
-
             string resolvedCancelText = null;
             Action resolvedCancelAction = null;
-
             if (request.Type == DialogType.Confirmation)
             {
                 resolvedCancelText = cancelText;
-                resolvedCancelAction = () =>
-                {
-                    CloseDialog();
-                    request.OnCancel?.Invoke();
-                };
+                resolvedCancelAction = () => CompleteDialog(request.OnCancel);
             }
 
             var dialogVm = new CustomMessageViewModel
@@ -65,15 +57,10 @@ namespace DominoAllFives.Client.WPF.Services
                 Message = message,
                 IconPath = iconPath,
                 AcceptButtonText = acceptText,
-                OnAcceptAction = () =>
-                {
-                    CloseDialog();
-                    request.OnAccept?.Invoke();
-                },
+                OnAcceptAction = () => CompleteDialog(request.OnAccept),
                 CancelButtonText = resolvedCancelText,
                 OnCancelAction = resolvedCancelAction
             };
-
             _showDialogCallback.Invoke(dialogVm);
         }
 
@@ -99,6 +86,12 @@ namespace DominoAllFives.Client.WPF.Services
         private void CloseDialog()
         {
             _showDialogCallback.Invoke(null);
+        }
+
+        private void CompleteDialog(Action action)
+        {
+            CloseDialog();
+            action?.Invoke();
         }
     }
 }

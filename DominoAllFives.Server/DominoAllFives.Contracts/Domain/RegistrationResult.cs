@@ -29,6 +29,7 @@ namespace DominoAllFives.Contracts.Domain
             {
                 throw new ArgumentNullException(nameof(account));
             }
+
             return new RegistrationResult(account, RegistrationStatus.None);
         }
 
@@ -36,19 +37,22 @@ namespace DominoAllFives.Contracts.Domain
         {
             if (!IsRejection(reason))
             {
-                throw new ArgumentOutOfRangeException(nameof(reason),
+                throw new ArgumentOutOfRangeException(
+                    nameof(
+                    reason),
                     "Only expected business rejection reasons are allowed.");
             }
+
             return new RegistrationResult(null, reason);
         }
 
         private static bool IsRejection(RegistrationStatus reason)
         {
-            return reason == RegistrationStatus.InvalidUsername ||
-                reason == RegistrationStatus.InvalidEmail ||
-                reason == RegistrationStatus.InvalidPassword ||
-                reason == RegistrationStatus.UsernameAlreadyExists ||
-                reason == RegistrationStatus.EmailAlreadyExists;
+            return reason == RegistrationStatus.InvalidUsername
+                || reason == RegistrationStatus.InvalidEmail
+                || reason == RegistrationStatus.InvalidPassword
+                || reason == RegistrationStatus.UsernameAlreadyExists
+                || reason == RegistrationStatus.EmailAlreadyExists;
         }
 
         [OnDeserialized]

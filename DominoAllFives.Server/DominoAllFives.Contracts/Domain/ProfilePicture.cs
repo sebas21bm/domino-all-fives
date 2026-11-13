@@ -1,4 +1,5 @@
 using System.Runtime.Serialization;
+
 namespace DominoAllFives.Contracts.Domain
 {
     /// <summary>
@@ -22,7 +23,7 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Captures stored content, including an absent picture, without upload validation.
         /// </summary>
-        /// <param name="imageData">Stored content or null for an absent picture.</param>
+        /// <param name = "imageData">Stored content or null for an absent picture.</param>
         /// <returns>An independent picture snapshot.</returns>
         public static ProfilePicture FromStoredContent(byte[] imageData)
         {
@@ -32,8 +33,8 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Captures selection metadata while leaving ordered upload validation to the operation.
         /// </summary>
-        /// <param name="originalFileName">The selected name, never a trusted storage path.</param>
-        /// <param name="imageData">The selected content to copy.</param>
+        /// <param name = "originalFileName">The selected name, never a trusted storage path.</param>
+        /// <param name = "imageData">The selected content to copy.</param>
         /// <returns>An independent selection snapshot.</returns>
         public static ProfilePicture FromSelectedContent(string originalFileName, byte[] imageData)
         {

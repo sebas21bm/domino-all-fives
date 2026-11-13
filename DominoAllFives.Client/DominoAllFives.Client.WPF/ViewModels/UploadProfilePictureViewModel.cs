@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Media.Imaging;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.ViewModels.Base;
@@ -16,9 +16,15 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public UploadProfilePictureViewModel(Action onCancel = null)
         {
-            SelectPhotoCommand = new RelayCommand(() => { }, () => false);
-            AddPhotoCommand = new RelayCommand(() => { }, () => false);
-            SkipPhotoCommand = new RelayCommand(() => { }, () => false);
+            SelectPhotoCommand = new RelayCommand(() =>
+            {
+            }, () => false);
+            AddPhotoCommand = new RelayCommand(() =>
+            {
+            }, () => false);
+            SkipPhotoCommand = new RelayCommand(() =>
+            {
+            }, () => false);
             CancelCommand = new RelayCommand(() => onCancel?.Invoke());
         }
     }

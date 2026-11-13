@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Windows.Input;
-
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
@@ -10,7 +9,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
     public class HowToPlayViewModel : ViewModelBase
     {
         private IFrameNavigationService _navigationService;
-
         public ICommand NavigateBackCommand { get; }
 
         public HowToPlayViewModel()
@@ -18,8 +16,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             NavigateBackCommand = new RelayCommand(ExecuteNavigateBack);
         }
 
-        public void Initialize(
-            IFrameNavigationService navigationService)
+        public void Initialize(IFrameNavigationService navigationService)
         {
             if (_navigationService != null)
             {
@@ -28,7 +25,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             if (navigationService == null)
+            {
                 throw new ArgumentNullException(nameof(navigationService));
+            }
 
             _navigationService = navigationService;
         }

@@ -11,6 +11,7 @@ namespace DominoAllFives.Contracts.Domain
     {
         [DataMember(Order = 1, IsRequired = true)]
         public string EmailOrUsername { get; private set; }
+
         [DataMember(Order = 2, IsRequired = true)]
         public string Password { get; private set; }
 
@@ -21,8 +22,8 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Creates credentials without applying new-password policies.
         /// </summary>
-        /// <param name="identifier">The username or email supplied for login.</param>
-        /// <param name="password">The password supplied by the player.</param>
+        /// <param name = "identifier">The username or email supplied for login.</param>
+        /// <param name = "password">The password supplied by the player.</param>
         /// <returns>The domain value produced by the operation.</returns>
         public static Credentials ForLogin(string identifier, string password)
         {
@@ -44,6 +45,7 @@ namespace DominoAllFives.Contracts.Domain
             {
                 return LoginStatus.InvalidCredentials;
             }
+
             return LoginStatus.None;
         }
     }

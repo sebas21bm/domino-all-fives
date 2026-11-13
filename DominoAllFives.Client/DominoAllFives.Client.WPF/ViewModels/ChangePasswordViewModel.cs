@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.ViewModels.Base;
@@ -17,7 +17,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public ChangePasswordViewModel(Action onCancel = null)
         {
-            ChangePasswordCommand = new RelayCommand(() => { }, () => false);
+            ChangePasswordCommand = new RelayCommand(() =>
+            {
+            }, () => false);
             CancelCommand = new RelayCommand(() => onCancel?.Invoke());
         }
     }

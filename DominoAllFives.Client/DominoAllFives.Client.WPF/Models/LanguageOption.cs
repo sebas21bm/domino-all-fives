@@ -1,4 +1,4 @@
-﻿namespace DominoAllFives.Client.WPF.Models
+namespace DominoAllFives.Client.WPF.Models
 {
     /// <summary>
     /// Represents the language options available.

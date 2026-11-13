@@ -1,15 +1,12 @@
 using System;
 using System.ServiceModel;
-
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Threading;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-
 using LobbyService;
-
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.ViewModels
@@ -29,18 +26,16 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private bool _is2PlayersSelected = true;
         private bool _is3PlayersSelected;
         private bool _is4PlayersSelected;
-
         public bool Is100PointsSelected
         {
             get
             {
                 return _is100PointsSelected;
             }
+
             set
             {
-                SetProperty(
-                    ref _is100PointsSelected,
-                    value);
+                SetProperty(ref _is100PointsSelected, value);
             }
         }
 
@@ -50,11 +45,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
             {
                 return _is150PointsSelected;
             }
+
             set
             {
-                SetProperty(
-                    ref _is150PointsSelected,
-                    value);
+                SetProperty(ref _is150PointsSelected, value);
             }
         }
 
@@ -64,11 +58,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
             {
                 return _is200PointsSelected;
             }
+
             set
             {
-                SetProperty(
-                    ref _is200PointsSelected,
-                    value);
+                SetProperty(ref _is200PointsSelected, value);
             }
         }
 
@@ -78,11 +71,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
             {
                 return _is250PointsSelected;
             }
+
             set
             {
-                SetProperty(
-                    ref _is250PointsSelected,
-                    value);
+                SetProperty(ref _is250PointsSelected, value);
             }
         }
 
@@ -92,11 +84,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
             {
                 return _is2PlayersSelected;
             }
+
             set
             {
-                SetProperty(
-                    ref _is2PlayersSelected,
-                    value);
+                SetProperty(ref _is2PlayersSelected, value);
             }
         }
 
@@ -106,11 +97,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
             {
                 return _is3PlayersSelected;
             }
+
             set
             {
-                SetProperty(
-                    ref _is3PlayersSelected,
-                    value);
+                SetProperty(ref _is3PlayersSelected, value);
             }
         }
 
@@ -120,31 +110,23 @@ namespace DominoAllFives.Client.WPF.ViewModels
             {
                 return _is4PlayersSelected;
             }
+
             set
             {
-                SetProperty(
-                    ref _is4PlayersSelected,
-                    value);
+                SetProperty(ref _is4PlayersSelected, value);
             }
         }
 
         public RelayCommand GoBackCommand { get; }
-
         public RelayCommand CreateGameCommand { get; }
 
         public CreateGameViewModel(PlayerSession playerSession)
         {
-            _playerSession = playerSession
-                ?? throw new ArgumentNullException(nameof(playerSession));
-            GoBackCommand =
-                new RelayCommand(
-                    GoBack,
-                    CanInteract);
-
-            CreateGameCommand =
-                new RelayCommand(
-                    CreateGame,
-                    CanCreateGame);
+            _playerSession = playerSession ?? throw new ArgumentNullException(
+                nameof(
+                playerSession));
+            GoBackCommand = new RelayCommand(GoBack, CanInteract);
+            CreateGameCommand = new RelayCommand(CreateGame, CanCreateGame);
         }
 
         public void Initialize(
@@ -158,22 +140,12 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 throw new InvalidOperationException();
             }
 
-            _navigation = navigation
-                ?? throw new ArgumentNullException(
-                    nameof(navigation));
-
-            _lobbyService = lobbyService
-                ?? throw new ArgumentNullException(
-                    nameof(lobbyService));
-
-            _dialogService = dialogService
-                ?? throw new ArgumentNullException(
-                    nameof(dialogService));
-
-            _logger = logger
-                ?? throw new ArgumentNullException(
-                    nameof(logger));
-
+            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
+            _lobbyService = lobbyService ?? throw new ArgumentNullException(nameof(lobbyService));
+            _dialogService = dialogService ?? throw new ArgumentNullException(
+                nameof(
+                dialogService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             RaiseCommands();
         }
 
@@ -184,14 +156,12 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private bool CanInteract()
         {
-            return _lobbyService != null &&
-                !_isBusy;
+            return _lobbyService != null && !_isBusy;
         }
 
         private bool CanCreateGame()
         {
-            return CanInteract() &&
-                _playerSession.HasServerSession;
+            return CanInteract() && _playerSession.HasServerSession;
         }
 
         private void CreateGame()
@@ -203,34 +173,18 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             LobbySettings settings = new LobbySettings
             {
-                MaxPlayers = Is4PlayersSelected ? 4 : Is3PlayersSelected ? 3 : 2,
-                TargetPoints = Is250PointsSelected ? 250 : Is200PointsSelected ? 200 :
-                    Is150PointsSelected ? 150 : 100
+                MaxPlayers = GetMaximumPlayers(),
+                TargetPoints = GetTargetPoints()
             };
             SetBusy(true);
-
             BackgroundJob<LobbySettings, Lobby> job =
                 new BackgroundJob<LobbySettings, Lobby>(
-                    value =>
-                        _lobbyService.CreateLobby(
-                            value),
-                    settings,
-                    (lobby, value) =>
-                    {
-                        SetBusy(false);
-
-                        _navigation.NavigateTo<LobbyViewModel>();
-                    },
-                    (error, value) =>
-                    {
-                        SetBusy(false);
-
-                        HandleFailure(
-                            error);
-                    });
-
-            BackgroundWork.Start(
-                job);
+                value => _lobbyService.CreateLobby(
+                value),
+                settings,
+                OnLobbyReady,
+                OnLobbyFailed);
+            BackgroundWork.Start(job);
         }
 
         private void HandleFailure(Exception error)
@@ -238,36 +192,40 @@ namespace DominoAllFives.Client.WPF.ViewModels
             FaultException<LobbyIssue> lobbyFault = error as FaultException<LobbyIssue>;
             if (lobbyFault != null)
             {
-                _logger.LogWarning(lobbyFault, "Create lobby rejected: {Issue}.",
+                _logger.LogWarning(
+                    lobbyFault,
+                    "Create lobby rejected: {Issue}.",
                     lobbyFault.Detail);
-                string key = lobbyFault.Detail == LobbyIssue.PlayerAlreadyInLobby
+                string key =
+                    lobbyFault.Detail == LobbyIssue.PlayerAlreadyInLobby
                     ? "Lobby_msgAlreadyJoined" : "Lobby_msgInvalidSettings";
                 Show(DialogType.Warning, key);
                 return;
             }
+
             _logger.LogError(error, "Lobby could not be created.");
             bool connection = error is CommunicationException || error is TimeoutException;
-            Show(DialogType.Error, connection ? "Global_msgConnectionError" :
-                "Lobby_msgOperationFailed", connection ? "Global_msgConnectionErrorTitle" :
-                "Global_msgDefaultErrorTitle");
+            Show(
+                DialogType.Error,
+                connection
+                ? "Global_msgConnectionError" : "Lobby_msgOperationFailed",
+                connection
+                ? "Global_msgConnectionErrorTitle" : "Global_msgDefaultErrorTitle");
         }
 
-        private void Show(DialogType type, string message,
-            string title = "Global_msgDefaultErrorTitle")
+        private void Show(
+            DialogType type,
+            string message,
+            string title =
+            "Global_msgDefaultErrorTitle")
         {
-            _dialogService.ShowDialog(new DialogRequest
-            {
-                Type = type,
-                TitleKey = title,
-                MessageKey = message
-            });
+            _dialogService.ShowDialog(
+                new DialogRequest { Type = type, TitleKey = title, MessageKey = message });
         }
 
-        private void SetBusy(
-            bool value)
+        private void SetBusy(bool value)
         {
             _isBusy = value;
-
             RaiseCommands();
         }
 
@@ -275,6 +233,43 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             GoBackCommand.RaiseCanExecuteChanged();
             CreateGameCommand.RaiseCanExecuteChanged();
+        }
+
+        private void OnLobbyReady(Lobby lobby, LobbySettings state)
+        {
+            SetBusy(false);
+            _navigation.NavigateTo<LobbyViewModel>();
+        }
+
+        private void OnLobbyFailed(Exception error, LobbySettings state)
+        {
+            SetBusy(false);
+            HandleFailure(error);
+        }
+
+        private int GetMaximumPlayers()
+        {
+            if (Is4PlayersSelected)
+            {
+                return 4;
+            }
+
+            return Is3PlayersSelected ? 3 : 2;
+        }
+
+        private int GetTargetPoints()
+        {
+            if (Is250PointsSelected)
+            {
+                return 250;
+            }
+
+            if (Is200PointsSelected)
+            {
+                return 200;
+            }
+
+            return Is150PointsSelected ? 150 : 100;
         }
     }
 }

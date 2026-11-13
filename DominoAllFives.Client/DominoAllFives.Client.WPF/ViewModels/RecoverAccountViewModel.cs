@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 
@@ -13,7 +13,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public RecoverAccountViewModel(Action onCancel = null)
         {
-            SendCodeCommand = new RelayCommand(() => { }, () => false);
+            SendCodeCommand = new RelayCommand(() =>
+            {
+            }, () => false);
             CancelCommand = new RelayCommand(() => onCancel?.Invoke());
         }
     }

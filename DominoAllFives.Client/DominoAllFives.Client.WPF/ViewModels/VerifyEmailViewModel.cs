@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 
@@ -15,8 +15,12 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public VerifyEmailViewModel(Action onCancel = null)
         {
-            VerifyCodeCommand = new RelayCommand(() => { }, () => false);
-            ResendCodeCommand = new RelayCommand(() => { }, () => false);
+            VerifyCodeCommand = new RelayCommand(() =>
+            {
+            }, () => false);
+            ResendCodeCommand = new RelayCommand(() =>
+            {
+            }, () => false);
             CancelCommand = new RelayCommand(() => onCancel?.Invoke());
         }
     }

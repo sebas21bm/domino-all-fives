@@ -1,4 +1,3 @@
-
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 
@@ -13,15 +12,14 @@ namespace DominoAllFives.BusinessLogic.Validation
         /// Validates the registration data against the account
         /// registration business rules.
         /// </summary>
-        /// <param name="registrationData">
+        /// <param name = "registrationData">
         /// The registration information to validate.
         /// </param>
         /// <returns>
         /// None when the data is valid; otherwise, the reason
         /// why validation failed.
         /// </returns>
-        public static RegistrationStatus Validate(
-            AccountRegistration registrationData)
+        public static RegistrationStatus Validate(AccountRegistration registrationData)
         {
             if (registrationData == null)
             {

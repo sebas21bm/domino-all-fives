@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using DominoAllFives.Contracts.Domain;
+using LobbyModel = DominoAllFives.Contracts.Domain.Lobby;
 using DominoAllFives.Contracts.Services;
 using Microsoft.Extensions.Logging;
-using LobbyModel = DominoAllFives.Contracts.Domain.Lobby;
 
 namespace DominoAllFives.Server.Infrastructure.Lobby
 {
@@ -12,38 +12,77 @@ namespace DominoAllFives.Server.Infrastructure.Lobby
     {
         private readonly LobbyCallbackRegistry _callbacks;
         private readonly ILogger<LobbyEventPublisher> _logger;
-
-        public LobbyEventPublisher(LobbyCallbackRegistry callbacks,
+        public LobbyEventPublisher(
+            LobbyCallbackRegistry callbacks,
             ILogger<LobbyEventPublisher> logger)
         {
             _callbacks = callbacks ?? throw new ArgumentNullException(nameof(callbacks));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public void PublishLobbyChanged(LobbyModel lobby) =>
-            Publish(lobby, callback => callback.OnLobbyChanged(lobby));
-
-        public void PublishLobbyClosed(LobbyModel lobby) =>
-            Publish(lobby, callback => callback.OnLobbyClosed());
-
-        public void PublishMatchStarted(LobbyModel lobby, int matchId) =>
-            Publish(lobby, callback => callback.OnMatchStarted(matchId));
-
+        public void PublishLobbyChanged(
+            LobbyModel lobby) =>
+            Publish(
+            lobby,
+            callback => callback.OnLobbyChanged(
+            lobby));
+        public void PublishLobbyClosed(
+            LobbyModel lobby) =>
+            Publish(
+            lobby,
+            callback => callback.OnLobbyClosed());
+        public void PublishMatchStarted(
+            LobbyModel lobby,
+            int matchId) =>
+            Publish(
+            lobby,
+            callback => callback.OnMatchStarted(
+            matchId));
         private void Publish(LobbyModel lobby, Action<ILobbyCallback> notification)
         {
-            if (lobby == null) throw new ArgumentNullException(nameof(lobby));
+            if (lobby == null)
+            {
+                throw new ArgumentNullException(nameof(lobby));
+            }
+
             foreach (Player player in lobby.Participants)
             {
                 ILobbyCallback callback;
-                try { callback = _callbacks.GetCallback(player.PlayerId); }
-                catch (KeyNotFoundException) { continue; }
+                try
+                {
+                    callback = _callbacks.GetCallback(player.PlayerId);
+                }
+                catch (KeyNotFoundException)
+                {
+                    continue;
+                }
 
-                try { notification(callback); }
-                catch (Exception ex) when (ex is CommunicationException ||
-                    ex is TimeoutException || ex is ObjectDisposedException)
+                try
+                {
+                    notification(callback);
+                }
+                catch (CommunicationException ex)
                 {
                     _callbacks.RemoveCallback(player.PlayerId, callback);
-                    _logger.LogWarning(ex, "Lobby callback failed for player {PlayerId}.",
+                    _logger.LogWarning(
+                        ex,
+                        "Lobby callback failed for player {PlayerId}.",
+                        player.PlayerId);
+                }
+                catch (TimeoutException ex)
+                {
+                    _callbacks.RemoveCallback(player.PlayerId, callback);
+                    _logger.LogWarning(
+                        ex,
+                        "Lobby callback failed for player {PlayerId}.",
+                        player.PlayerId);
+                }
+                catch (ObjectDisposedException ex)
+                {
+                    _callbacks.RemoveCallback(player.PlayerId, callback);
+                    _logger.LogWarning(
+                        ex,
+                        "Lobby callback failed for player {PlayerId}.",
                         player.PlayerId);
                 }
             }

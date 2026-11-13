@@ -5,8 +5,11 @@ namespace DominoAllFives.Contracts.Enums
     [DataContract]
     public enum AccessIssue
     {
-        [EnumMember] SessionRequired,
-        [EnumMember] RegisteredAccountRequired,
-        [EnumMember] PermissionDenied
+        [EnumMember]
+        SessionRequired,
+        [EnumMember]
+        RegisteredAccountRequired,
+        [EnumMember]
+        PermissionDenied
     }
 }

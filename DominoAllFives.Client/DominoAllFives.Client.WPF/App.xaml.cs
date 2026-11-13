@@ -1,5 +1,4 @@
-﻿using System.Windows;
-
+using System.Windows;
 using DominoAllFives.Client.WPF.Localization;
 
 namespace DominoAllFives.Client.WPF

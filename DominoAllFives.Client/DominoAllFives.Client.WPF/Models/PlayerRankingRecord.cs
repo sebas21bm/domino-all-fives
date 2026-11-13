@@ -1,4 +1,4 @@
-﻿using System.Windows.Media.Imaging;
+using System.Windows.Media.Imaging;
 
 namespace DominoAllFives.Client.WPF.Models
 {
@@ -8,11 +8,8 @@ namespace DominoAllFives.Client.WPF.Models
     public class PlayerRankingRecord
     {
         public int Rank { get; set; }
-
         public string Username { get; set; }
-
         public int StatisticValue { get; set; }
-
         public BitmapImage Avatar { get; set; }
     }
 }

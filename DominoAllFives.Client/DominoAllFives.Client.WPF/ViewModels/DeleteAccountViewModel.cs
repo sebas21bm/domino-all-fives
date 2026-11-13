@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 
@@ -13,7 +13,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public DeleteAccountViewModel(Action onCancel = null)
         {
-            ConfirmDeleteCommand = new RelayCommand(() => { }, () => false);
+            ConfirmDeleteCommand = new RelayCommand(() =>
+            {
+            }, () => false);
             CancelCommand = new RelayCommand(() => onCancel?.Invoke());
         }
     }

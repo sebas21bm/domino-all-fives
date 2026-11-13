@@ -9,20 +9,25 @@ namespace DominoAllFives.Client.WPF.Services.Wcf
     internal static class WcfInvoker
     {
         public static TResult Invoke<TProxy, TResult>(
-            Func<TProxy> createProxy, Func<TProxy, TResult> operation)
+            Func<TProxy> createProxy,
+            Func<TProxy, TResult> operation)
             where TProxy : ICommunicationObject
         {
             TProxy proxy = createProxy();
+            bool completed = false;
             try
             {
                 TResult result = operation(proxy);
                 proxy.Close();
+                completed = true;
                 return result;
             }
-            catch
+            finally
             {
-                proxy.Abort();
-                throw;
+                if (!completed)
+                {
+                    proxy.Abort();
+                }
             }
         }
     }

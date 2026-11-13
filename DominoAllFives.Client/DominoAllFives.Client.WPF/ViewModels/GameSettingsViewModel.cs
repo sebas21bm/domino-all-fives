@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Services;
@@ -31,18 +31,31 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public GameSettingsViewModel()
         {
-            ShowAccountSectionCommand = new RelayCommand(() => { }, () => false);
-            ShowLanguageSectionCommand = new RelayCommand(() => { }, () => false);
-            SelectLanguageCommand = new RelayCommand(() => { }, () => false);
-            SaveLanguageCommand = new RelayCommand(() => { }, () => false);
+            ShowAccountSectionCommand = new RelayCommand(() =>
+            {
+            }, () => false);
+            ShowLanguageSectionCommand = new RelayCommand(() =>
+            {
+            }, () => false);
+            SelectLanguageCommand = new RelayCommand(() =>
+            {
+            }, () => false);
+            SaveLanguageCommand = new RelayCommand(() =>
+            {
+            }, () => false);
             GoBackCommand = new RelayCommand(() => _navigationService.GoBack());
-            LogoutCommand = new RelayCommand(() => { }, () => false);
-            GoToChangePassword = new RelayCommand(() => { }, () => false);
-            GoToDeleteAccount = new RelayCommand(() => { }, () => false);
+            LogoutCommand = new RelayCommand(() =>
+            {
+            }, () => false);
+            GoToChangePassword = new RelayCommand(() =>
+            {
+            }, () => false);
+            GoToDeleteAccount = new RelayCommand(() =>
+            {
+            }, () => false);
         }
 
-        public void Initialize(
-            IFrameNavigationService navigationService)
+        public void Initialize(IFrameNavigationService navigationService)
         {
             if (_navigationService != null)
             {
@@ -51,7 +64,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             if (navigationService == null)
+            {
                 throw new ArgumentNullException(nameof(navigationService));
+            }
 
             _navigationService = navigationService;
         }

@@ -16,6 +16,7 @@ namespace DominoAllFives.BusinessLogic.Exceptions
             {
                 throw new ArgumentOutOfRangeException(nameof(issue));
             }
+
             Issue = issue;
         }
     }
