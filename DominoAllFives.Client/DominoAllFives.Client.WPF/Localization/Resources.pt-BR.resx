@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1141,35 +1141,5 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
   </data>
   <data name="Match_lblChat">
     <value>CHAT</value>
-  </data>
-  <data name="Match_lblPlayPending" xml:space="preserve">
-    <value>Última jogada: nenhuma peça foi colocada ainda.</value>
-  </data>
-  <data name="Match_lblPlayHeader" xml:space="preserve">
-    <value>Última jogada: {0} colocou {1}|{2} (rodada {3}).</value>
-  </data>
-  <data name="Match_lblPlaySum" xml:space="preserve">
-    <value>Extremidades: {0} = {1}. Pontos base: {2}.</value>
-  </data>
-  <data name="Match_lblPlayOpeningDouble" xml:space="preserve">
-    <value>Inclui o duplo inicial completo uma única vez: ainda há conexões livres.</value>
-  </data>
-  <data name="Match_lblPlayBlocked" xml:space="preserve">
-    <value>Não somaram nesta jogada por bloqueio roxo: {0}.</value>
-  </data>
-  <data name="Match_lblPlayNoPoints" xml:space="preserve">
-    <value>Esta soma não concede pontos: deve ser um múltiplo de 5 maior que zero.</value>
-  </data>
-  <data name="Match_lblPlayRed" xml:space="preserve">
-    <value>Vermelha: dobra apenas esta jogada. {0} × {1} = {2} pontos.</value>
-  </data>
-  <data name="Match_lblPlayPurple" xml:space="preserve">
-    <value>Roxa: bloqueará {0} no próximo turno; essa extremidade não pontuará nem aceitará peças.</value>
-  </data>
-  <data name="Match_lblPlayPoints" xml:space="preserve">
-    <value>Pontos ganhos por esta colocação: +{0}.</value>
-  </data>
-  <data name="Match_lblPlayRoundBonus" xml:space="preserve">
-    <value>Além disso, prêmio de fim de rodada: +{0} (adicionado separadamente).</value>
   </data>
 </root>

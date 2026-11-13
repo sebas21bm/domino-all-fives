@@ -83,16 +83,7 @@
             <Border Grid.Row="2" BorderBrush="#7B4A34" BorderThickness="16"
                     Background="{StaticResource GameBoardBackgroundBrush}">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <Border Background="{StaticResource DarkBgBrush}" Padding="12,8" Margin="12,10,12,0">
-                        <TextBlock x:Name="txbScoreBreakdown" Text="{Binding ScoreBreakdown}"
-                                   Style="{StaticResource BodyText}" FontSize="12"
-                                   LineHeight="20" LineStackingStrategy="BlockLineHeight"/>
-                    </Border>
-                    <Viewbox Grid.Row="1" Stretch="Uniform" StretchDirection="DownOnly" Margin="12">
+                    <Viewbox Stretch="Uniform" StretchDirection="DownOnly" Margin="12">
                         <ItemsControl ItemsSource="{Binding BoardTiles}"
                                       Width="{Binding BoardWidth}" Height="{Binding BoardHeight}">
                             <ItemsControl.ItemsPanel>
@@ -115,6 +106,24 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </Viewbox>
+                    <Grid Width="190" Height="100" HorizontalAlignment="Right"
+                          VerticalAlignment="Top" Margin="0,28,38,0" IsHitTestVisible="False"
+                          Visibility="{Binding HasScoredPlay, Converter={StaticResource BoolToVis}}">
+                        <Ellipse Height="16" VerticalAlignment="Bottom" Margin="18,0,18,12"
+                                 Fill="{StaticResource DarkBgBrush}">
+                            <Ellipse.Effect>
+                                <DropShadowEffect Color="#E8DFC8" BlurRadius="28" ShadowDepth="0" Opacity="0.8"/>
+                            </Ellipse.Effect>
+                        </Ellipse>
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock x:Name="txbAwardedPoints" Text="{Binding AwardedPointsText}"
+                                       Style="{StaticResource TextCream}" FontSize="38"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="txbScoreMultiplier" Text="{Binding ScoreMultiplierText}"
+                                       Style="{StaticResource TextRed}" FontSize="22" Margin="0,8,0,0"
+                                       HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </Border>
 

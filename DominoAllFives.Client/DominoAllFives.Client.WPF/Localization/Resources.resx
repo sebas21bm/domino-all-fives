@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1140,35 +1140,5 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
   </data>
   <data name="Match_lblChat">
     <value>CHAT</value>
-  </data>
-  <data name="Match_lblPlayPending" xml:space="preserve">
-    <value>Última jugada: aún no se ha colocado ninguna ficha.</value>
-  </data>
-  <data name="Match_lblPlayHeader" xml:space="preserve">
-    <value>Última jugada: {0} colocó {1}|{2} (ronda {3}).</value>
-  </data>
-  <data name="Match_lblPlaySum" xml:space="preserve">
-    <value>Extremos: {0} = {1}. Puntos base: {2}.</value>
-  </data>
-  <data name="Match_lblPlayOpeningDouble" xml:space="preserve">
-    <value>Incluye el doble inicial completo una sola vez: aún tiene conexiones libres.</value>
-  </data>
-  <data name="Match_lblPlayBlocked" xml:space="preserve">
-    <value>No sumaron en esta jugada por bloqueo morado: {0}.</value>
-  </data>
-  <data name="Match_lblPlayNoPoints" xml:space="preserve">
-    <value>Esta suma no otorga puntos: debe ser un múltiplo de 5 mayor que cero.</value>
-  </data>
-  <data name="Match_lblPlayRed" xml:space="preserve">
-    <value>Roja: duplica solo esta jugada. {0} × {1} = {2} puntos.</value>
-  </data>
-  <data name="Match_lblPlayPurple" xml:space="preserve">
-    <value>Morada: bloqueará {0} durante el siguiente turno; no sumará ni admitirá fichas.</value>
-  </data>
-  <data name="Match_lblPlayPoints" xml:space="preserve">
-    <value>Puntos ganados por esta colocación: +{0}.</value>
-  </data>
-  <data name="Match_lblPlayRoundBonus" xml:space="preserve">
-    <value>Además, premio de fin de ronda: +{0} (se añade por separado).</value>
   </data>
 </root>

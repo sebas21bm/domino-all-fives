@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using DominoAllFives.Contracts.Enums;
 
 namespace DominoAllFives.Contracts.Domain

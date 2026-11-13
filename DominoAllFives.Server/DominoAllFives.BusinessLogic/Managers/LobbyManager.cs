@@ -11,13 +11,12 @@ namespace DominoAllFives.BusinessLogic.Managers
         private const int MinimumPlayersToStart = 2;
         private const int LobbyCodeLength = 6;
         private static readonly LobbyManager instance = new LobbyManager();
-        private readonly object _syncRoot = new object();
-        private readonly Dictionary<string, Lobby> _lobbies =
-            new Dictionary<string, Lobby>(
+        private readonly object _syncRoot = new object ();
+        private readonly Dictionary<string, Lobby> _lobbies = new Dictionary<string, Lobby>(
             StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, string> _playerLobbyCodes = new Dictionary<int, string>();
-        private readonly Dictionary<int, List<ChatMessage>> _lobbyMessages =
-            new Dictionary<int, List<ChatMessage>>();
+        private readonly Dictionary<int, List<ChatMessage>> _lobbyMessages = new Dictionary<int,
+            List<ChatMessage>>();
         private int _nextLobbyId = 1;
         private int _nextMessageId = 1;
         public static LobbyManager Instance
@@ -284,9 +283,8 @@ namespace DominoAllFives.BusinessLogic.Managers
         private Lobby GetAuthorizedChatLobbyInternal(int lobbyId, int playerId)
         {
             Lobby lobby = FindLobbyByIdInternal(lobbyId);
-            if (lobby == null ||
-                lobby.State != LobbyState.Waiting ||
-                !ContainsPlayer(lobby.Participants, playerId))
+            if (lobby == null || lobby.State != LobbyState.Waiting || !ContainsPlayer(
+                lobby.Participants, playerId))
             {
                 throw new ChatRuleException(ChatIssue.PlayerNotInChat);
             }
@@ -331,13 +329,8 @@ namespace DominoAllFives.BusinessLogic.Managers
             string code;
             do
             {
-                code = Guid.NewGuid()
-                    .ToString(
-                    "N")
-                    .Substring(
-                    0,
-                    LobbyCodeLength)
-                    .ToUpperInvariant();
+                code = Guid.NewGuid().ToString("N").Substring(0,
+                    LobbyCodeLength).ToUpperInvariant();
             }
             while (_lobbies.ContainsKey(code));
             return code;
