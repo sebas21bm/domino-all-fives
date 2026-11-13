@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:complexType name="MatchView">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="MatchId" type="xs:int" />
+      <xs:element minOccurs="0" name="Board" nillable="true" type="tns:PublicBoard" />
+      <xs:element minOccurs="0" name="CurrentPlayerId" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="Scores" nillable="true" type="tns:ArrayOfPlayerScore" />
+      <xs:element minOccurs="0" name="Phase" type="tns:MatchPhase" />
+      <xs:element minOccurs="0" name="Version" type="xs:long" />
+      <xs:element minOccurs="0" name="StockCount" type="xs:int" />
+      <xs:element minOccurs="0" name="RoundNumber" type="xs:int" />
+      <xs:element minOccurs="0" name="LastRound" nillable="true" type="tns:RoundResult" />
+      <xs:element minOccurs="0" name="OpeningTileId" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="MatchView" nillable="true" type="tns:MatchView" />
+  <xs:complexType name="PublicBoard">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Tiles" nillable="true" type="tns:ArrayOfPlacedTile" />
+      <xs:element minOccurs="0" name="Ends" nillable="true" type="tns:ArrayOfPublicEnd" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PublicBoard" nillable="true" type="tns:PublicBoard" />
+  <xs:complexType name="ArrayOfPlacedTile">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PlacedTile" nillable="true" type="tns:PlacedTile" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPlacedTile" nillable="true" type="tns:ArrayOfPlacedTile" />
+  <xs:complexType name="PlacedTile">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Tile" nillable="true" type="tns:DominoTile" />
+      <xs:element minOccurs="0" name="End" type="tns:BoardEnd" />
+      <xs:element minOccurs="0" name="ConnectingValue" type="xs:int" />
+      <xs:element minOccurs="0" name="ExposedValue" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PlacedTile" nillable="true" type="tns:PlacedTile" />
+  <xs:complexType name="DominoTile">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="TileId" type="xs:int" />
+      <xs:element minOccurs="0" name="FirstValue" type="xs:int" />
+      <xs:element minOccurs="0" name="SecondValue" type="xs:int" />
+      <xs:element minOccurs="0" name="SpecialPower" type="tns:SpecialPower" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DominoTile" nillable="true" type="tns:DominoTile" />
+  <xs:simpleType name="SpecialPower">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None" />
+      <xs:enumeration value="DoublePoints" />
+      <xs:enumeration value="Block" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="SpecialPower" nillable="true" type="tns:SpecialPower" />
+  <xs:simpleType name="BoardEnd">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Left" />
+      <xs:enumeration value="Right" />
+      <xs:enumeration value="Top" />
+      <xs:enumeration value="Bottom" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="BoardEnd" nillable="true" type="tns:BoardEnd" />
+  <xs:complexType name="ArrayOfPublicEnd">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PublicEnd" nillable="true" type="tns:PublicEnd" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPublicEnd" nillable="true" type="tns:ArrayOfPublicEnd" />
+  <xs:complexType name="PublicEnd">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="End" type="tns:BoardEnd" />
+      <xs:element minOccurs="0" name="Value" type="xs:int" />
+      <xs:element minOccurs="0" name="ScoreValue" type="xs:int" />
+      <xs:element minOccurs="0" name="IsBlocked" type="xs:boolean" />
+      <xs:element minOccurs="0" name="IsOpeningEnd" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PublicEnd" nillable="true" type="tns:PublicEnd" />
+  <xs:complexType name="ArrayOfPlayerScore">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PlayerScore" nillable="true" type="tns:PlayerScore" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPlayerScore" nillable="true" type="tns:ArrayOfPlayerScore" />
+  <xs:complexType name="PlayerScore">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="PlayerId" type="xs:int" />
+      <xs:element minOccurs="0" name="Points" type="xs:int" />
+      <xs:element minOccurs="0" name="TileCount" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PlayerScore" nillable="true" type="tns:PlayerScore" />
+  <xs:simpleType name="MatchPhase">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="InProgress" />
+      <xs:enumeration value="Completed" />
+      <xs:enumeration value="Cancelled" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="MatchPhase" nillable="true" type="tns:MatchPhase" />
+  <xs:complexType name="RoundResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="RoundNumber" type="xs:int" />
+      <xs:element minOccurs="0" name="WinnerId" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="AwardedPoints" type="xs:int" />
+      <xs:element minOccurs="0" name="Scores" nillable="true" type="tns:ArrayOfPlayerScore" />
+      <xs:element minOccurs="0" name="RevealedHands" nillable="true" type="tns:ArrayOfPlayerHand" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="RoundResult" nillable="true" type="tns:RoundResult" />
+  <xs:complexType name="ArrayOfPlayerHand">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PlayerHand" nillable="true" type="tns:PlayerHand" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPlayerHand" nillable="true" type="tns:ArrayOfPlayerHand" />
+  <xs:complexType name="PlayerHand">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="MatchId" type="xs:int" />
+      <xs:element minOccurs="0" name="PlayerId" type="xs:int" />
+      <xs:element minOccurs="0" name="Tiles" nillable="true" type="tns:ArrayOfDominoTile" />
+      <xs:element minOccurs="0" name="Version" type="xs:long" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PlayerHand" nillable="true" type="tns:PlayerHand" />
+  <xs:complexType name="ArrayOfDominoTile">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="DominoTile" nillable="true" type="tns:DominoTile" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfDominoTile" nillable="true" type="tns:ArrayOfDominoTile" />
+  <xs:simpleType name="MatchIssue">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="MatchNotFound" />
+      <xs:enumeration value="MatchNotInProgress" />
+      <xs:enumeration value="StaleVersion" />
+      <xs:enumeration value="NotPlayersTurn" />
+      <xs:enumeration value="TileNotOwned" />
+      <xs:enumeration value="InvalidPlacement" />
+      <xs:enumeration value="PassNotAllowed" />
+      <xs:enumeration value="DrawNotAllowed" />
+      <xs:enumeration value="PlayerNotInMatch" />
+      <xs:enumeration value="OpeningTileRequired" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="MatchIssue" nillable="true" type="tns:MatchIssue" />
+  <xs:complexType name="MatchResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="MatchId" type="xs:int" />
+      <xs:element minOccurs="0" name="Scores" nillable="true" type="tns:ArrayOfPlayerScore" />
+      <xs:element minOccurs="0" name="WinnerIds" nillable="true" xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" type="q1:ArrayOfint" />
+      <xs:element minOccurs="0" name="Phase" type="tns:MatchPhase" />
+      <xs:element minOccurs="0" name="Version" type="xs:long" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="MatchResult" nillable="true" type="tns:MatchResult" />
+</xs:schema>

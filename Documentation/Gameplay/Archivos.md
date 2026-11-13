@@ -1,30 +1,41 @@
 # Archivos de la integración
 
-Rutas relativas a la raíz del repositorio. Los hashes identifican los archivos finales verificados.
+Rutas relativas a la raíz del repositorio. Hashes de la versión final con proxy generado.
 
 | Archivo | Acción | SHA-256 |
 |---|---|---|
-| DominoAllFives.Client/DominoAllFives.Client.Tests/BoardLayoutTests.cs | Creado | AA115F69735AA461CC849F878FA7A5F0CF669AB08F73E1901ADD6CCEF24C9012 |
-| DominoAllFives.Client/DominoAllFives.Client.Tests/DominoAllFives.Client.Tests.csproj | Integrado | AF670C40728322F217FAB0F45AFB1D5D4FCB315906FDC8918511B11A6E345886 |
-| DominoAllFives.Client/DominoAllFives.Client.Tests/MatchViewModelTests.cs | Creado | C5F17BCED2B85E83D2283289E3DD6CB0EDDD9EB96E439E3141B366E61F49B743 |
-| DominoAllFives.Client/DominoAllFives.Client.WPF/App.config | Integrado | B2D9EF12D425E41828F5C7EFAD3FD64D646C4C29788D19C00297909B7C3199B0 |
-| DominoAllFives.Client/DominoAllFives.Client.WPF/DominoAllFives.Client.WPF.csproj | Integrado | EA0FF2ABD77B3096E0E1B9CD17E4536E72FFB81D1352AFFF637975D6BD884F78 |
+| DominoAllFives.Client/DominoAllFives.Client.sln | Integrado | EDC4363E01414761CA9663FDC1CF096B46C9650DAA04E777ADD3019803B1CA90 |
+| DominoAllFives.Client/DominoAllFives.Client.Tests/BoardLayoutTests.cs | Creado | DE2AE8B49C0542630AA04B5F0FBFF91087714F529281F1217FF832D41909DFBB |
+| DominoAllFives.Client/DominoAllFives.Client.Tests/DominoAllFives.Client.Tests.csproj | Integrado | 703E5F91E740E40A6F7972823297BD19ED75DEE18D36402F24BB1643622EC016 |
+| DominoAllFives.Client/DominoAllFives.Client.Tests/MatchProxyTests.cs | Creado | 532385FB3B5BB7484AD387012C027A6B3E16C6DC196E154D932D115405949E00 |
+| DominoAllFives.Client/DominoAllFives.Client.Tests/MatchViewModelTests.cs | Creado | EFF1D0D4EADC756ACDAF082CF7CE4F6F7C51BD8908B13EA555FAA5DBD7D1FCB8 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/App.config | Integrado | 72D019E9C4E663F84D8185CF53058CFFE07D24C1C0534402AB0198C02699BCC9 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Connected Services/MatchService/Metadata/Match0.wsdl | Creado | 1A62DAA15AFBBCECF3F6A75C494556DE085109D48290E817569A8E2C2ED081F3 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Connected Services/MatchService/Metadata/Match0.xsd | Creado | 04779268D94E631FF18DFBE7FF891086C585B0ADAEF850DC239A961FBA8AF9A1 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Connected Services/MatchService/Metadata/Match1.wsdl | Creado | 75221CAC04EEB53AF3533B0BB67D1BF541C04E43BF3D800F8883D74ED6267190 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Connected Services/MatchService/Metadata/Match1.xsd | Creado | 12FA4978A16A3E757E300C126A94E1E9E317A17D8C903BB6B14457CD32CF5CC6 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Connected Services/MatchService/Metadata/Match2.xsd | Creado | C53C1C9CBE70EE6A93616F041CE3E6E78D22F47AB190B5E4E0BB28AB15745B03 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Connected Services/MatchService/Metadata/Match3.xsd | Creado | 58FF07EEBA848ABEBA5220CFADF9C231CF0945DFBF9E1A9F89784C4DB26D30A6 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Connected Services/MatchService/Metadata/Match4.xsd | Creado | 95DDB5A84E4F232C7733BA9A191A11D207D252F24AC61E8E26F1B60A2C68F60B |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Connected Services/MatchService/Reference.cs | Creado | 7733F8090613F91736B3171DECA102588E9A8C55E1C27640E28868D4E91AFD67 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Connected Services/MatchService/RegenerateProxy.ps1 | Creado | F74DB25FA2B7A15412DE5A46559AABE8A45FD61D2F2717FDE96AE8567F6B49BE |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/DominoAllFives.Client.WPF.csproj | Integrado | 44C09262652931D09337970661170F6CD308146135DBDF9990F678A475F9F777 |
 | DominoAllFives.Client/DominoAllFives.Client.WPF/Localization/Resources.Designer.cs | Integrado | C293B138E725AF1710BC27CA9B68A304E26A8182F73FEB900007447CAECA76A5 |
 | DominoAllFives.Client/DominoAllFives.Client.WPF/Localization/Resources.en-US.resx | Integrado | F3F968FFB7086058F17949B0F39C02F56917EE3DBC5AE79BAB36FC2F57DA510D |
 | DominoAllFives.Client/DominoAllFives.Client.WPF/Localization/Resources.pt-BR.resx | Integrado | 6FF90FBFF642AC5547082EFD8CC4C618C94D2BA902FFCADD08CBFB09B283113F |
 | DominoAllFives.Client/DominoAllFives.Client.WPF/Localization/Resources.resx | Integrado | 1C6CBF39A2878AF863D8E644C91FCE842091ABB71243E7E22099F422D7154876 |
-| DominoAllFives.Client/DominoAllFives.Client.WPF/Models/BoardLayout.cs | Creado | 80E5B57AE17D548B0B2E89C3E6D9C87B2846939E3DD22B936FDB9A689FFFD617 |
-| DominoAllFives.Client/DominoAllFives.Client.WPF/Models/Domain/EndOption.cs | Creado | A338BF18C383E61866CA95160C5D2CE29ED6FC736947BAE345ECACBD61620DD3 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Models/BoardLayout.cs | Creado | 17B40BBB2248288E10FDBD7CD20CD8A773BB1F6F4B85835580C918BFA083A7CB |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Models/Domain/EndOption.cs | Creado | 407628A4D84FA14D6BA5161FD24BEFDCE08BB88AC9CBB4F1780598876AFD694A |
 | DominoAllFives.Client/DominoAllFives.Client.WPF/Models/Domain/MatchNavigation.cs | Creado | 58689E975E5714301F7B61017A78BA406B077E77C81273DB5186FCE75221C604 |
-| DominoAllFives.Client/DominoAllFives.Client.WPF/Models/Domain/MatchPlayerRecord.cs | Creado | 8C8340204C3B266BA6802D4FE5B20F4B9CFAD2285BD649E6196DCECB221FC4B8 |
-| DominoAllFives.Client/DominoAllFives.Client.WPF/Models/Domain/TilePosition.cs | Creado | 2B833315DDCFA186483253BDBF99943A430357367775047232CFF5ACDF0FC917 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Models/Domain/MatchPlayerRecord.cs | Creado | CDA1AA755BB49644BAAED677F0A333409F3880A9F745207411B9E5EA42A9A96D |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Models/Domain/TilePosition.cs | Creado | 87978F8BBD32DCDBDF4C67D5724A2AD44A705A89283FBF1723646A9BF4A431F6 |
 | DominoAllFives.Client/DominoAllFives.Client.WPF/Models/Enum/DominoTileType.cs | Creado | BAA82FE105456ECEA993CB1E66D3247A5366642F197A124CFABD18A2E58F312E |
-| DominoAllFives.Client/DominoAllFives.Client.WPF/Models/MatchValueConverter.cs | Creado | D0DEF10267DE0CE54A49C2F63A53B7883E8B612A6B6261F2F34EEE05987FA173 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Models/MatchValueConverter.cs | Creado | 268079A05ED958297B0A04033F42BBD74D31B4FD236AE8B6A43A0459F1D7A731 |
 | DominoAllFives.Client/DominoAllFives.Client.WPF/Services/FrameNavigationService.cs | Integrado | 6EE6B13158C993668BD0DBFAF634E3DD50D3145FE6DF2499570F055688C2112C |
-| DominoAllFives.Client/DominoAllFives.Client.WPF/Services/Wcf/Interfaces/IMatchClient.cs | Creado | F4CE331C0EE19E5C1839F8C906A86EEF829B9BE5F8CDC57BF6DA6C6AF33A0BF8 |
-| DominoAllFives.Client/DominoAllFives.Client.WPF/Services/Wcf/Services/WcfMatchClient.cs | Creado | 21DF4FF406432DA0B97E6ECD33770C7E697263887C71863AC6FBC3301BFD7014 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Services/Wcf/Interfaces/IMatchClient.cs | Creado | 24C18B1A32DA750D42EFC811A2103C55983A8C35D9671FA26BFEBC849F0FF475 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/Services/Wcf/Services/WcfMatchClient.cs | Creado | C486D7F2DC9A35634BA8B1373B38681E4BD759DB0C325538F95F0B488C197B60 |
 | DominoAllFives.Client/DominoAllFives.Client.WPF/ViewModels/LobbyViewModel.cs | Integrado | 29E418A4A8BCF649F89BB18A700D8429B95175EF77F1131E10CFBCF947BCAC05 |
-| DominoAllFives.Client/DominoAllFives.Client.WPF/ViewModels/MatchViewModel.cs | Creado | 0E0748BBD36EC4A979E610D5332355ED9DE46558B90AC242BFA7188D5A47C328 |
+| DominoAllFives.Client/DominoAllFives.Client.WPF/ViewModels/MatchViewModel.cs | Creado | BB2F54FFB0A1310B82BEBB0B4D048B59AE96BC96D0901B40CCD49F5BFF581104 |
 | DominoAllFives.Client/DominoAllFives.Client.WPF/Views/Match.xaml | Creado | B7641A3BE0156B48687B71EFFDD7E9C124B9414147EC8DBC98FEC79D6C507087 |
 | DominoAllFives.Client/DominoAllFives.Client.WPF/Views/Match.xaml.cs | Creado | 712C69831FCDDB69857B4FEE6DA96BA0C824C1E7F02E3889B4013E238A3C1266 |
 | DominoAllFives.Server/DominoAllFives.BusinessLogic/Controllers/LobbyController.cs | Integrado | 7F1AE84B6A228A367D6E53D49F0F2BEB8FFF7D0DB2AA8DFD7D0A5C2D408AE965 |
@@ -65,10 +76,11 @@ Rutas relativas a la raíz del repositorio. Los hashes identifican los archivos 
 | DominoAllFives.Server/DominoAllFives.Contracts/Gameplay/Enum/SpecialPower.cs | Creado | 26BDEE747A0F426960BCBEB93F9C5D47250E630D4121CDF435D87932F2ACF77E |
 | DominoAllFives.Server/DominoAllFives.Contracts/Services/IMatchCallback.cs | Creado | 2DC727B5C118F7AF4CB7C68E31B73C7910B22BA45444DF922A69D807039206BF |
 | DominoAllFives.Server/DominoAllFives.Contracts/Services/IMatchService.cs | Creado | CC7C2791DCECA64C07B7E3F335E54CEA7C7EEF45DAC5C84A897A9F10813D673E |
-| DominoAllFives.Server/DominoAllFives.Server.Tests/DominoAllFives.Server.Tests.csproj | Integrado | AB1413E68317FB47D99BBF5DCF7714808EBBF1ABF8EA1CE1F9469DCE55D0FF87 |
+| DominoAllFives.Server/DominoAllFives.Server.Tests/DominoAllFives.Server.Tests.csproj | Integrado | C1AD9AC39069B523A8BD71B7C5D1BB0038FD2266BD4F81EBBC073D20554F4720 |
 | DominoAllFives.Server/DominoAllFives.Server.Tests/GameplayTests.cs | Creado | BAF59087733C90A2C04FFA22A79CD79531639CF5B401439875DF5B6F0E35A5B5 |
-| DominoAllFives.Server/DominoAllFives.Server.Tests/MatchServiceWcfTests.cs | Creado | 71D8DA84C49C4F8BC8FE66D31B98182003468A26217FD3D2BC6A201F6B0BD33F |
-| DominoAllFives.Server/DominoAllFives.Server/App.config | Integrado | 8E5668D6C22D27E4AFD8FE8D4FC3730845BB13752028BC1D0FA8D9CC8695805D |
+| DominoAllFives.Server/DominoAllFives.Server.Tests/MatchProxyCallback.cs | Creado | 941F4BCA915C1D5DB6EF18A536388FCA3D7BA3CFEFF10727DE2C3914CAC2B4FA |
+| DominoAllFives.Server/DominoAllFives.Server.Tests/MatchServiceWcfTests.cs | Creado | 208448171E8707DE367466D8A0C18284946B7A7CD0BF11C3DF3A9BC8FE64365E |
+| DominoAllFives.Server/DominoAllFives.Server/App.config | Integrado | 5D47F25D6565A6EF197CC1266D4526B1703F553B366C9BA6FCE8C0061FB7EA5F |
 | DominoAllFives.Server/DominoAllFives.Server/DominoAllFives.Server.csproj | Integrado | 8FE07559E83A1A7197132524A330C7FF7BE9FF2984BFF79C8F5697684090BE78 |
 | DominoAllFives.Server/DominoAllFives.Server/Infrastructure/GameRuntime.cs | Creado | 3852824A882DEB7102E23DB7DAF372E47B840E7EE56F6BCA302F263A407FA54E |
 | DominoAllFives.Server/DominoAllFives.Server/Infrastructure/MatchEventPublisher.cs | Creado | 510B5A7A9CD91C52F0A52F798D22C5D4574A84CAFD5BDDF7CDA8F29F5CDD9F12 |

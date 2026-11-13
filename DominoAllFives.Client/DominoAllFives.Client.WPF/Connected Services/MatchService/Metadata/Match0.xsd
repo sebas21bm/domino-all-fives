@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="urn:domino-all-fives:services" elementFormDefault="qualified" targetNamespace="urn:domino-all-fives:services" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" />
+  <xs:element name="OpenMatchSession">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="sessionKey" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="matchId" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OpenMatchSessionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="OpenMatchSessionResult" nillable="true" xmlns:q1="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" type="q1:MatchView" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetMatch">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="matchId" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetMatchResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetMatchResult" nillable="true" xmlns:q2="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" type="q2:MatchView" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetHand">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="matchId" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetHandResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetHandResult" nillable="true" xmlns:q3="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" type="q3:PlayerHand" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PlayTile">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="matchId" type="xs:int" />
+        <xs:element minOccurs="0" name="tile" nillable="true" xmlns:q4="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" type="q4:DominoTile" />
+        <xs:element minOccurs="0" name="end" xmlns:q5="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" type="q5:BoardEnd" />
+        <xs:element minOccurs="0" name="expectedVersion" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PlayTileResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="PlayTileResult" nillable="true" xmlns:q6="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" type="q6:MatchView" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DrawTiles">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="matchId" type="xs:int" />
+        <xs:element minOccurs="0" name="expectedVersion" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DrawTilesResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="DrawTilesResult" nillable="true" xmlns:q7="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" type="q7:MatchView" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PassTurn">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="matchId" type="xs:int" />
+        <xs:element minOccurs="0" name="expectedVersion" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PassTurnResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="PassTurnResult" nillable="true" xmlns:q8="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" type="q8:MatchView" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LeaveMatch">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="matchId" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LeaveMatchResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnMatchChanged">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="match" nillable="true" xmlns:q9="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" type="q9:MatchView" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnPrivateHandChanged">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="hand" nillable="true" xmlns:q10="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" type="q10:PlayerHand" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnRoundFinished">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="result" nillable="true" xmlns:q11="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" type="q11:RoundResult" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnMatchFinished">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="result" nillable="true" xmlns:q12="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" type="q12:MatchResult" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

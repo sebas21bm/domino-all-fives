@@ -11,7 +11,7 @@ using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.Services.Wcf.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.Gameplay;
+using MatchService;
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.ViewModels

@@ -1,8 +1,7 @@
 using System;
 using System.ServiceModel;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
-using DominoAllFives.Contracts.Gameplay;
-using DominoAllFives.Contracts.Services;
+using MatchService;
 
 namespace DominoAllFives.Client.WPF.Services.Wcf.Services
 {
@@ -11,10 +10,9 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
     /// </summary>
     [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode =
         ConcurrencyMode.Multiple)]
-    public sealed class WcfMatchClient : IMatchClient, IMatchCallback
+    public sealed class WcfMatchClient : IMatchClient, IMatchServiceCallback
     {
-        private DuplexChannelFactory<IMatchService> _factory;
-        private IMatchService _service;
+        private MatchServiceClient _service;
         private bool _disposed;
         public event Action<MatchView> MatchChanged;
         public event Action<PlayerHand> HandChanged;
@@ -36,11 +34,9 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
             }
 
             ResetConnection();
-            _factory = new DuplexChannelFactory<IMatchService>(new InstanceContext(this),
-                "MatchEndpoint");
             try
             {
-                _service = _factory.CreateChannel();
+                _service = new MatchServiceClient(new InstanceContext(this), "MatchEndpoint");
                 return _service.OpenMatchSession(sessionKey, matchId);
             }
             catch (CommunicationException)
@@ -188,10 +184,8 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
 
         private void ResetConnection()
         {
-            Close(_service as ICommunicationObject);
-            Close(_factory);
+            Close(_service);
             _service = null;
-            _factory = null;
         }
 
         private static void Close(ICommunicationObject channel)

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="urn:domino-all-fives:services" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="urn:domino-all-fives:services" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="urn:domino-all-fives:services/Imports">
+      <xsd:import namespace="urn:domino-all-fives:services" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IMatchService_OpenMatchSession_InputMessage">
+    <wsdl:part name="parameters" element="tns:OpenMatchSession" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_OpenMatchSession_OutputMessage">
+    <wsdl:part name="parameters" element="tns:OpenMatchSessionResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_OpenMatchSession_AccessIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q1="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" element="q1:AccessIssue" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_OpenMatchSession_MatchIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q2="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" element="q2:MatchIssue" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_GetMatch_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetMatch" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_GetMatch_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetMatchResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_GetMatch_AccessIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q3="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" element="q3:AccessIssue" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_GetMatch_MatchIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q4="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" element="q4:MatchIssue" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_GetHand_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetHand" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_GetHand_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetHandResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_GetHand_AccessIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q5="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" element="q5:AccessIssue" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_GetHand_MatchIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q6="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" element="q6:MatchIssue" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_PlayTile_InputMessage">
+    <wsdl:part name="parameters" element="tns:PlayTile" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_PlayTile_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PlayTileResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_PlayTile_AccessIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q7="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" element="q7:AccessIssue" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_PlayTile_MatchIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q8="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" element="q8:MatchIssue" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_DrawTiles_InputMessage">
+    <wsdl:part name="parameters" element="tns:DrawTiles" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_DrawTiles_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DrawTilesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_DrawTiles_AccessIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q9="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" element="q9:AccessIssue" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_DrawTiles_MatchIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q10="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" element="q10:MatchIssue" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_PassTurn_InputMessage">
+    <wsdl:part name="parameters" element="tns:PassTurn" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_PassTurn_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PassTurnResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_PassTurn_AccessIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q11="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" element="q11:AccessIssue" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_PassTurn_MatchIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q12="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" element="q12:MatchIssue" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_LeaveMatch_InputMessage">
+    <wsdl:part name="parameters" element="tns:LeaveMatch" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_LeaveMatch_OutputMessage">
+    <wsdl:part name="parameters" element="tns:LeaveMatchResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_LeaveMatch_AccessIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q13="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" element="q13:AccessIssue" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_LeaveMatch_MatchIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q14="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay" element="q14:MatchIssue" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_OnMatchChanged_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnMatchChanged" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_OnPrivateHandChanged_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnPrivateHandChanged" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_OnRoundFinished_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnRoundFinished" />
+  </wsdl:message>
+  <wsdl:message name="IMatchService_OnMatchFinished_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnMatchFinished" />
+  </wsdl:message>
+  <wsdl:portType msc:usingSession="true" name="IMatchService">
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OpenMatchSession">
+      <wsdl:input wsaw:Action="urn:domino-all-fives:services/IMatchService/OpenMatchSession" message="tns:IMatchService_OpenMatchSession_InputMessage" />
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IMatchService/OpenMatchSessionResponse" message="tns:IMatchService_OpenMatchSession_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IMatchService/OpenMatchSessionAccessIssueFault" name="AccessIssueFault" message="tns:IMatchService_OpenMatchSession_AccessIssueFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IMatchService/OpenMatchSessionMatchIssueFault" name="MatchIssueFault" message="tns:IMatchService_OpenMatchSession_MatchIssueFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="GetMatch">
+      <wsdl:input wsaw:Action="urn:domino-all-fives:services/IMatchService/GetMatch" message="tns:IMatchService_GetMatch_InputMessage" />
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IMatchService/GetMatchResponse" message="tns:IMatchService_GetMatch_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IMatchService/GetMatchAccessIssueFault" name="AccessIssueFault" message="tns:IMatchService_GetMatch_AccessIssueFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IMatchService/GetMatchMatchIssueFault" name="MatchIssueFault" message="tns:IMatchService_GetMatch_MatchIssueFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="GetHand">
+      <wsdl:input wsaw:Action="urn:domino-all-fives:services/IMatchService/GetHand" message="tns:IMatchService_GetHand_InputMessage" />
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IMatchService/GetHandResponse" message="tns:IMatchService_GetHand_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IMatchService/GetHandAccessIssueFault" name="AccessIssueFault" message="tns:IMatchService_GetHand_AccessIssueFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IMatchService/GetHandMatchIssueFault" name="MatchIssueFault" message="tns:IMatchService_GetHand_MatchIssueFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="PlayTile">
+      <wsdl:input wsaw:Action="urn:domino-all-fives:services/IMatchService/PlayTile" message="tns:IMatchService_PlayTile_InputMessage" />
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IMatchService/PlayTileResponse" message="tns:IMatchService_PlayTile_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IMatchService/PlayTileAccessIssueFault" name="AccessIssueFault" message="tns:IMatchService_PlayTile_AccessIssueFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IMatchService/PlayTileMatchIssueFault" name="MatchIssueFault" message="tns:IMatchService_PlayTile_MatchIssueFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="DrawTiles">
+      <wsdl:input wsaw:Action="urn:domino-all-fives:services/IMatchService/DrawTiles" message="tns:IMatchService_DrawTiles_InputMessage" />
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IMatchService/DrawTilesResponse" message="tns:IMatchService_DrawTiles_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IMatchService/DrawTilesAccessIssueFault" name="AccessIssueFault" message="tns:IMatchService_DrawTiles_AccessIssueFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IMatchService/DrawTilesMatchIssueFault" name="MatchIssueFault" message="tns:IMatchService_DrawTiles_MatchIssueFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="PassTurn">
+      <wsdl:input wsaw:Action="urn:domino-all-fives:services/IMatchService/PassTurn" message="tns:IMatchService_PassTurn_InputMessage" />
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IMatchService/PassTurnResponse" message="tns:IMatchService_PassTurn_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IMatchService/PassTurnAccessIssueFault" name="AccessIssueFault" message="tns:IMatchService_PassTurn_AccessIssueFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IMatchService/PassTurnMatchIssueFault" name="MatchIssueFault" message="tns:IMatchService_PassTurn_MatchIssueFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="false" msc:isTerminating="false" name="LeaveMatch">
+      <wsdl:input wsaw:Action="urn:domino-all-fives:services/IMatchService/LeaveMatch" message="tns:IMatchService_LeaveMatch_InputMessage" />
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IMatchService/LeaveMatchResponse" message="tns:IMatchService_LeaveMatch_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IMatchService/LeaveMatchAccessIssueFault" name="AccessIssueFault" message="tns:IMatchService_LeaveMatch_AccessIssueFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IMatchService/LeaveMatchMatchIssueFault" name="MatchIssueFault" message="tns:IMatchService_LeaveMatch_MatchIssueFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnMatchChanged">
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IMatchService/OnMatchChanged" message="tns:IMatchService_OnMatchChanged_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnPrivateHandChanged">
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IMatchService/OnPrivateHandChanged" message="tns:IMatchService_OnPrivateHandChanged_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnRoundFinished">
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IMatchService/OnRoundFinished" message="tns:IMatchService_OnRoundFinished_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnMatchFinished">
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IMatchService/OnMatchFinished" message="tns:IMatchService_OnMatchFinished_OutputCallbackMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

@@ -108,7 +108,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DominoAllFives.Server\DominoAllFives.Contracts\DominoAllFives.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Runtime.Serialization" />

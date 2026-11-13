@@ -7,7 +7,7 @@ using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFives.Contracts.Gameplay;
+using MatchService;
 using NUnit.Framework;
 
 namespace DominoAllFives.Client.Tests
