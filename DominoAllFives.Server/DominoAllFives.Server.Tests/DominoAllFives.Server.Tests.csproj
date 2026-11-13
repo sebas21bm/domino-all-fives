@@ -117,4 +117,7 @@
   <ItemGroup>
     <Compile Include="PlayScoreTests.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="LobbyMergeTests.cs" />
+  </ItemGroup>
 </Project>

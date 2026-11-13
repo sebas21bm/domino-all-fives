@@ -178,4 +178,7 @@
   <ItemGroup>
     <Compile Include="Gameplay\Domain\PlayScore.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Exceptions\ChatRuleException.cs" />
+  </ItemGroup>
 </Project>
