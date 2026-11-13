@@ -13,6 +13,7 @@
       <xs:element minOccurs="0" name="RoundNumber" type="xs:int" />
       <xs:element minOccurs="0" name="LastRound" nillable="true" type="tns:RoundResult" />
       <xs:element minOccurs="0" name="OpeningTileId" type="xs:int" />
+      <xs:element minOccurs="0" name="LastPlay" nillable="true" type="tns:PlayScore" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="MatchView" nillable="true" type="tns:MatchView" />
@@ -133,6 +134,29 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ArrayOfDominoTile" nillable="true" type="tns:ArrayOfDominoTile" />
+  <xs:complexType name="PlayScore">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="PlayerId" type="xs:int" />
+      <xs:element minOccurs="0" name="RoundNumber" type="xs:int" />
+      <xs:element minOccurs="0" name="Tile" nillable="true" type="tns:DominoTile" />
+      <xs:element minOccurs="0" name="PlayedEnd" type="tns:BoardEnd" />
+      <xs:element minOccurs="0" name="EndValues" nillable="true" xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" type="q1:ArrayOfint" />
+      <xs:element minOccurs="0" name="BlockedEnds" nillable="true" type="tns:ArrayOfBoardEnd" />
+      <xs:element minOccurs="0" name="IncludesOpeningDouble" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Total" type="xs:int" />
+      <xs:element minOccurs="0" name="BasePoints" type="xs:int" />
+      <xs:element minOccurs="0" name="Multiplier" type="xs:int" />
+      <xs:element minOccurs="0" name="Points" type="xs:int" />
+      <xs:element minOccurs="0" name="RoundPoints" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PlayScore" nillable="true" type="tns:PlayScore" />
+  <xs:complexType name="ArrayOfBoardEnd">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="BoardEnd" type="tns:BoardEnd" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfBoardEnd" nillable="true" type="tns:ArrayOfBoardEnd" />
   <xs:simpleType name="MatchIssue">
     <xs:restriction base="xs:string">
       <xs:enumeration value="MatchNotFound" />
@@ -152,7 +176,7 @@
     <xs:sequence>
       <xs:element minOccurs="0" name="MatchId" type="xs:int" />
       <xs:element minOccurs="0" name="Scores" nillable="true" type="tns:ArrayOfPlayerScore" />
-      <xs:element minOccurs="0" name="WinnerIds" nillable="true" xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" type="q1:ArrayOfint" />
+      <xs:element minOccurs="0" name="WinnerIds" nillable="true" xmlns:q2="http://schemas.microsoft.com/2003/10/Serialization/Arrays" type="q2:ArrayOfint" />
       <xs:element minOccurs="0" name="Phase" type="tns:MatchPhase" />
       <xs:element minOccurs="0" name="Version" type="xs:long" />
     </xs:sequence>

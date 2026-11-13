@@ -76,6 +76,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public string TurnText { get; private set; }
         public string RoundText { get; private set; }
+        public string ScoreBreakdown { get; private set; } = PlayScoreFormatter.Format(null, null);
 
         public DominoTile SelectedTile
         {
@@ -415,6 +416,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             _match = _pendingView;
+            UpdateScoreBreakdown();
             Hand = _pendingHand.Tiles;
             BoardTiles = BoardLayout.Arrange(_match.Board);
             FitBoard();
@@ -449,6 +451,13 @@ namespace DominoAllFives.Client.WPF.ViewModels
             OnPropertyChanged(nameof(RoundText));
             OnPropertyChanged(nameof(RevealedHands));
             RaiseCommands();
+        }
+
+        private void UpdateScoreBreakdown()
+        {
+            ScoreBreakdown = PlayScoreFormatter.Format(_match.LastPlay, _match.LastPlay == null
+                ? string.Empty : GetPlayerName(_match.LastPlay.PlayerId));
+            OnPropertyChanged(nameof(ScoreBreakdown));
         }
 
         private void FitBoard()

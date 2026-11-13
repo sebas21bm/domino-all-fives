@@ -82,29 +82,40 @@
 
             <Border Grid.Row="2" BorderBrush="#7B4A34" BorderThickness="16"
                     Background="{StaticResource GameBoardBackgroundBrush}">
-                <Viewbox Stretch="Uniform" StretchDirection="DownOnly" Margin="12">
-                    <ItemsControl ItemsSource="{Binding BoardTiles}"
-                                  Width="{Binding BoardWidth}" Height="{Binding BoardHeight}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate><Canvas/></ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemContainerStyle>
-                            <Style TargetType="ContentPresenter">
-                                <Setter Property="Canvas.Left" Value="{Binding X}"/>
-                                <Setter Property="Canvas.Top" Value="{Binding Y}"/>
-                            </Style>
-                        </ItemsControl.ItemContainerStyle>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Viewbox Width="48" Height="96" RenderTransformOrigin="0.5,0.5">
-                                    <Viewbox.RenderTransform><RotateTransform Angle="{Binding Angle}"/></Viewbox.RenderTransform>
-                                    <controls:DominoTile Width="56" Height="112" TopValue="{Binding TopValue}"
-                                                        BottomValue="{Binding BottomValue}" TileType="{Binding TileType}"/>
-                                </Viewbox>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Viewbox>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Background="{StaticResource DarkBgBrush}" Padding="12,8" Margin="12,10,12,0">
+                        <TextBlock x:Name="txbScoreBreakdown" Text="{Binding ScoreBreakdown}"
+                                   Style="{StaticResource BodyText}" FontSize="12"
+                                   LineHeight="20" LineStackingStrategy="BlockLineHeight"/>
+                    </Border>
+                    <Viewbox Grid.Row="1" Stretch="Uniform" StretchDirection="DownOnly" Margin="12">
+                        <ItemsControl ItemsSource="{Binding BoardTiles}"
+                                      Width="{Binding BoardWidth}" Height="{Binding BoardHeight}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><Canvas/></ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Viewbox Width="48" Height="96" RenderTransformOrigin="0.5,0.5">
+                                        <Viewbox.RenderTransform><RotateTransform Angle="{Binding Angle}"/></Viewbox.RenderTransform>
+                                        <controls:DominoTile Width="56" Height="112" TopValue="{Binding TopValue}"
+                                                            BottomValue="{Binding BottomValue}" TileType="{Binding TileType}"/>
+                                    </Viewbox>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Viewbox>
+                </Grid>
             </Border>
 
             <Grid Grid.Row="3" Margin="18,10">

@@ -35,5 +35,8 @@ namespace DominoAllFives.Contracts.Gameplay
 
         [DataMember(Order = 10)]
         public int OpeningTileId { get; set; }
+
+        [DataMember(Order = 11)]
+        public PlayScore LastPlay { get; set; }
     }
 }

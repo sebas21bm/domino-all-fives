@@ -16,6 +16,46 @@ namespace DominoAllFives.Client.Tests
     public sealed class MatchViewModelTests
     {
         [Test]
+        public void Callbacks_PlayScore_PublishesBreakdownWithCoherentSnapshot()
+        {
+            // Arrange
+            Client client = new Client();
+            using (MatchViewModel model = CreateModel(client))
+            {
+                MatchView view = View(1);
+                view.LastPlay = new PlayScore
+                {
+                    PlayerId = 2,
+                    RoundNumber = 1,
+                    Tile = new DominoTile
+                    {
+                        FirstValue = 4,
+                        SecondValue = 5,
+                        SpecialPower = SpecialPower.DoublePoints
+                    },
+                    EndValues = new List<int>
+                    {
+                        12,
+                        5,
+                        3
+                    },
+                    BlockedEnds = new List<BoardEnd>(),
+                    Total = 20,
+                    BasePoints = 20,
+                    Multiplier = 2,
+                    Points = 40
+                };
+                // Act
+                client.Emit(view, Hand(1));
+                Pump();
+                // Assert
+                Assert.That(model.ScoreBreakdown, Does.Contain("Bob"));
+                Assert.That(model.ScoreBreakdown, Does.Contain("12 + 5 + 3 = 20"));
+                Assert.That(model.ScoreBreakdown, Does.Contain("20 × 2 = 40"));
+            }
+        }
+
+        [Test]
         public void Callbacks_OtherMatchView_DoesNotPoisonSnapshotVersions()
         {
             // Arrange

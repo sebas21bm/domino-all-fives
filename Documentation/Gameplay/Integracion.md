@@ -101,6 +101,8 @@ aceptar su versión. Así, un snapshot de otra partida no impide aplicar los
 snapshots válidos posteriores. Los pasos de red se extrajeron a métodos para
 mantener simples las lambdas y conservar la intención capturada de la jugada.
 
+El [desglose de puntuación](DesglosePuntaje.md) explica la última colocación con datos del servidor, efectos de color y premios separados. Se regeneró el proxy y se añadieron diez casos de prueba para este cambio.
+
 ## Estándar y fuentes
 
 Se consultaron mediante el conector de Google Drive las versiones disponibles
@@ -109,7 +111,7 @@ y del [reglamento del Equipo 4](https://docs.google.com/document/d/19LjewYpM6IVi
 Las decisiones complementarias de apertura, poderes y abandono proceden de
 LEEME.md del ZIP, cuya implementación solicitó el usuario.
 
-El alcance revisado comprende 62 archivos C# relacionados, con las excepciones
+El alcance revisado comprende 67 archivos C# relacionados, con las excepciones
 documentadas del diseñador de recursos y del proxy generado, más proyectos, configuración,
 XAML y recursos afectados. La revisión sintáctica verificó nombres de campos y
 parámetros, llaves, correspondencia entre tipo y archivo, líneas de hasta 100
@@ -126,12 +128,12 @@ ni garantiza la ausencia de defectos no detectados.
 |---|---|
 | Solución Server, Debug, .NET Framework 4.8 | Compilación correcta |
 | Solución Client, Debug, net48 | Compilación correcta |
-| Suite Server | 80 aprobadas, 0 fallidas, 0 omitidas |
-| Suite Client | 53 aprobadas, 0 fallidas, 0 omitidas |
-| Total | 133 aprobadas |
+| Suite Server | 84 aprobadas, 0 fallidas, 0 omitidas |
+| Suite Client | 59 aprobadas, 0 fallidas, 0 omitidas |
+| Total | 143 aprobadas |
 | Análisis sintáctico del código integrado | Sin hallazgos pendientes |
-| Entradas Compile explícitas inspeccionadas | 123; sin ausencias ni duplicados |
-| Claves Match en tres idiomas | 22; traducciones y marcadores coherentes |
+| Entradas Compile explícitas inspeccionadas | 126; sin ausencias ni duplicados |
+| Claves Match en tres idiomas | 32; traducciones y marcadores coherentes |
 | Recursos anteriores de los tres idiomas | Conservados |
 | Presentación WPF a 1600 × 900 | Render inspeccionado con datos de muestra |
 
@@ -181,5 +183,5 @@ No se ejecutó aquí ese recorrido con cuentas reales y la base SQL del usuario.
 El chat solo conserva su espacio visual. No se integraron historial/ranking de
 resultados, persistencia de partidas ni recuperación tras reiniciar el proceso
 del servidor. Las partidas terminadas se conservan treinta minutos en memoria.
-Las 133 pruebas tampoco completan el requisito académico global de 300 pruebas.
+Las 143 pruebas tampoco completan el requisito académico global de 300 pruebas.
 No se realizaron commits, cambios de rama ni publicaciones.

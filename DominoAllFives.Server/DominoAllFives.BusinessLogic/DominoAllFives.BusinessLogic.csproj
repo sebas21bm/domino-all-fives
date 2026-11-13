@@ -175,4 +175,7 @@
   <ItemGroup>
     <Compile Include="Gameplay\Enum\SpecialPower.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\PlayScore.cs" />
+  </ItemGroup>
 </Project>

@@ -41,6 +41,8 @@ namespace MatchService
         
         private int OpeningTileIdField;
         
+        private MatchService.PlayScore LastPlayField;
+        
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData
         {
             get
@@ -180,6 +182,19 @@ namespace MatchService
             set
             {
                 this.OpeningTileIdField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=10)]
+        public MatchService.PlayScore LastPlay
+        {
+            get
+            {
+                return this.LastPlayField;
+            }
+            set
+            {
+                this.LastPlayField = value;
             }
         }
     }
@@ -327,6 +342,207 @@ namespace MatchService
             set
             {
                 this.RevealedHandsField = value;
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="PlayScore", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Gameplay")]
+    public partial class PlayScore : object, System.Runtime.Serialization.IExtensibleDataObject
+    {
+        
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private int PlayerIdField;
+        
+        private int RoundNumberField;
+        
+        private MatchService.DominoTile TileField;
+        
+        private MatchService.BoardEnd PlayedEndField;
+        
+        private System.Collections.Generic.List<int> EndValuesField;
+        
+        private System.Collections.Generic.List<MatchService.BoardEnd> BlockedEndsField;
+        
+        private bool IncludesOpeningDoubleField;
+        
+        private int TotalField;
+        
+        private int BasePointsField;
+        
+        private int MultiplierField;
+        
+        private int PointsField;
+        
+        private int RoundPointsField;
+        
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData
+        {
+            get
+            {
+                return this.extensionDataField;
+            }
+            set
+            {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int PlayerId
+        {
+            get
+            {
+                return this.PlayerIdField;
+            }
+            set
+            {
+                this.PlayerIdField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int RoundNumber
+        {
+            get
+            {
+                return this.RoundNumberField;
+            }
+            set
+            {
+                this.RoundNumberField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public MatchService.DominoTile Tile
+        {
+            get
+            {
+                return this.TileField;
+            }
+            set
+            {
+                this.TileField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        public MatchService.BoardEnd PlayedEnd
+        {
+            get
+            {
+                return this.PlayedEndField;
+            }
+            set
+            {
+                this.PlayedEndField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public System.Collections.Generic.List<int> EndValues
+        {
+            get
+            {
+                return this.EndValuesField;
+            }
+            set
+            {
+                this.EndValuesField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+        public System.Collections.Generic.List<MatchService.BoardEnd> BlockedEnds
+        {
+            get
+            {
+                return this.BlockedEndsField;
+            }
+            set
+            {
+                this.BlockedEndsField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=6)]
+        public bool IncludesOpeningDouble
+        {
+            get
+            {
+                return this.IncludesOpeningDoubleField;
+            }
+            set
+            {
+                this.IncludesOpeningDoubleField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=7)]
+        public int Total
+        {
+            get
+            {
+                return this.TotalField;
+            }
+            set
+            {
+                this.TotalField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=8)]
+        public int BasePoints
+        {
+            get
+            {
+                return this.BasePointsField;
+            }
+            set
+            {
+                this.BasePointsField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=9)]
+        public int Multiplier
+        {
+            get
+            {
+                return this.MultiplierField;
+            }
+            set
+            {
+                this.MultiplierField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=10)]
+        public int Points
+        {
+            get
+            {
+                return this.PointsField;
+            }
+            set
+            {
+                this.PointsField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=11)]
+        public int RoundPoints
+        {
+            get
+            {
+                return this.RoundPointsField;
+            }
+            set
+            {
+                this.RoundPointsField = value;
             }
         }
     }
