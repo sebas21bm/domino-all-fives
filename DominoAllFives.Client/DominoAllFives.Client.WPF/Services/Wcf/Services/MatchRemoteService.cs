@@ -10,7 +10,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
     /// </summary>
     [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode =
         ConcurrencyMode.Multiple)]
-    public sealed class WcfMatchClient : IMatchClient, IMatchServiceCallback
+    public sealed class MatchRemoteService : IMatchClient, IMatchServiceCallback
     {
         private MatchServiceClient _service;
         private bool _disposed;
@@ -30,7 +30,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
         {
             if (_disposed)
             {
-                throw new ObjectDisposedException(nameof(WcfMatchClient));
+                throw new ObjectDisposedException(nameof(MatchRemoteService));
             }
 
             ResetConnection();

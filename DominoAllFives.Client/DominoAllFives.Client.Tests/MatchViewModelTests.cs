@@ -15,6 +15,12 @@ namespace DominoAllFives.Client.Tests
     [TestFixture, Apartment(ApartmentState.STA)]
     public sealed class MatchViewModelTests
     {
+        [OneTimeSetUp]
+        public void StartDispatcher()
+        {
+            WpfTestHost.EnsureStarted();
+        }
+
         [TestCase(20, 1, "+20", "")]
         [TestCase(40, 2, "+40", "×2")]
         [TestCase(0, 2, "", "")]

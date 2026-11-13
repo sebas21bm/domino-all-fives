@@ -1141,4 +1141,7 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
   <data name="Match_lblChat">
     <value>CHAT</value>
   </data>
+  <data name="Match_msgOperationFailed" xml:space="preserve">
+    <value>No se pudo completar la operación. Actualiza el estado e inténtalo de nuevo.</value>
+  </data>
 </root>

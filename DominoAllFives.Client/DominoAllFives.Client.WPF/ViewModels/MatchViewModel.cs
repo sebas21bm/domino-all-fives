@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Threading;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
+using DominoAllFives.Client.WPF.Services.Threading;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.Services.Wcf.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
@@ -37,7 +36,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private bool _disposed;
         private bool _opened;
         private string _status;
-        private Task _operation = Task.CompletedTask;
+        private bool _isClientDisposalStarted;
         public List<DominoTile> Hand { get; private set; } = new List<DominoTile>();
         public List<TilePosition> BoardTiles { get; private set; } = new List<TilePosition>();
         public double BoardWidth { get; private set; } = InitialBoardWidth;
@@ -115,7 +114,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand LeaveCommand { get; }
 
         public MatchViewModel(IFrameNavigationService navigation,
-            MatchNavigation context) : this(navigation, context, new WcfMatchClient())
+            MatchNavigation context) : this(navigation, context, new MatchRemoteService())
         {
         }
 
@@ -134,15 +133,14 @@ namespace DominoAllFives.Client.WPF.ViewModels
             LeaveCommand = new RelayCommand(Leave, () => !_isBusy && !_disposed);
         }
 
-        public Task InitializeAsync()
+        public void Initialize()
         {
             if (_opened || _isBusy || _disposed)
             {
-                return Task.CompletedTask;
+                return;
             }
 
-            _operation = RunAsync(OpenAndSynchronize);
-            return _operation;
+            StartOperation(OpenAndSynchronize);
         }
 
         public void Dispose()
@@ -155,14 +153,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _disposed = true;
             _client.MatchChanged -= OnMatchChanged;
             _client.HandChanged -= OnHandChanged;
-            Task pending = _operation;
-            _ = DisposeClientAsync(pending);
-        }
-
-        private async Task DisposeClientAsync(Task pending)
-        {
-            await pending;
-            _client.Dispose();
+            RaiseCommands();
+            if (!_isBusy)
+            {
+                BeginClientDisposal();
+            }
         }
 
         private bool IsOwnTurn()
@@ -210,46 +205,62 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void Play()
         {
-            DominoTile tile = SelectedTile;
+            if (!CanPlay())
+            {
+                return;
+            }
+
+            DominoTile tile = new DominoTile
+            {
+                TileId = SelectedTile.TileId,
+                FirstValue = SelectedTile.FirstValue,
+                SecondValue = SelectedTile.SecondValue,
+                SpecialPower = SelectedTile.SpecialPower
+            };
             BoardEnd end = SelectedEnd;
             long version = _match.Version;
-            _operation = RunAsync(() => PlayAndSynchronize(tile, end, version));
+            StartOperation(() => PlayAndSynchronize(tile, end, version));
         }
 
         private void Draw()
         {
+            if (!CanDraw())
+            {
+                return;
+            }
+
             long version = _match.Version;
-            _operation = RunAsync(() => DrawAndSynchronize(version));
+            StartOperation(() => DrawAndSynchronize(version));
         }
 
         private void Pass()
         {
+            if (!CanPass())
+            {
+                return;
+            }
+
             long version = _match.Version;
-            _operation = RunAsync(() => PassAndSynchronize(version));
+            StartOperation(() => PassAndSynchronize(version));
         }
 
         private void Refresh()
         {
-            _operation = RunAsync(OpenAndSynchronize);
+            StartOperation(OpenAndSynchronize);
         }
 
         private void Leave()
         {
-            _operation = LeaveAsync();
+            StartOperation(LeaveMatch, NavigateToMenu);
         }
 
-        private async Task LeaveAsync()
+        private void NavigateToMenu()
         {
-            bool left = await RunAsync(LeaveMatch);
-            if (left && !_disposed)
-            {
-                _navigation.NavigateAsRoot<MainMenuViewModel>();
-            }
+            _navigation.NavigateAsRoot<MainMenuViewModel>();
         }
 
         private void Synchronize()
         {
-            // Never combine a hand from one revision with a board from another.
             for (int attempt = 0; attempt < SynchronizationAttempts; attempt++)
             {
                 MatchView view = _client.GetMatch(_context.MatchId);
@@ -263,61 +274,101 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
         }
 
-        private async Task<bool> RunAsync(Action action)
+        private void StartOperation(Action action, Action onCompleted = null)
         {
             if (_disposed || _isBusy)
             {
-                return false;
+                return;
             }
 
-            bool succeeded = false;
             _isBusy = true;
             RaiseCommands();
-            try
+            BackgroundJob<Action, bool> job = new BackgroundJob<Action, bool>(
+                ExecuteOperation, action,
+                (result, state) => OnOperationCompleted(onCompleted), OnOperationFailed);
+            BackgroundWork.Start(job);
+        }
+
+        private static bool ExecuteOperation(Action action)
+        {
+            action();
+            return true;
+        }
+
+        private void OnOperationCompleted(Action onCompleted)
+        {
+            _isBusy = false;
+            if (_disposed)
             {
-                await Task.Run(action);
-                succeeded = true;
+                BeginClientDisposal();
+                return;
             }
-            catch (FaultException<MatchIssue> ex)
+
+            RaiseCommands();
+            onCompleted?.Invoke();
+        }
+
+        private void OnOperationFailed(Exception ex, Action action)
+        {
+            _isBusy = false;
+            if (_disposed)
+            {
+                _logger.LogWarning(ex, "Match operation failed after the view was disposed.");
+                BeginClientDisposal();
+                return;
+            }
+
+            FaultException<MatchIssue> fault = ex as FaultException<MatchIssue>;
+            if (fault != null)
             {
                 Status = GetText("Match_msgRejected");
                 _logger.LogWarning(ex, "Match operation was rejected.");
-                if (ex.Detail == MatchIssue.StaleVersion)
+                if (fault.Detail == MatchIssue.StaleVersion && action != (Action)Synchronize)
                 {
-                    await RecoverStaleVersionAsync();
+                    StartOperation(Synchronize);
+                    return;
                 }
             }
-            catch (CommunicationException ex)
+            else if (ex is CommunicationException || ex is TimeoutException)
             {
                 ReportConnectionFailure(ex);
             }
-            catch (TimeoutException ex)
+            else
             {
-                ReportConnectionFailure(ex);
-            }
-            finally
-            {
-                _isBusy = false;
-                RaiseCommands();
+                Status = GetText("Match_msgOperationFailed");
+                _logger.LogError(ex, "Unexpected match operation failure.");
             }
 
-            return succeeded;
+            RaiseCommands();
         }
 
-        private async Task RecoverStaleVersionAsync()
+        private void BeginClientDisposal()
         {
-            try
+            if (_isClientDisposalStarted)
             {
-                await Task.Run(Synchronize);
+                return;
             }
-            catch (CommunicationException ex)
-            {
-                ReportConnectionFailure(ex);
-            }
-            catch (TimeoutException ex)
-            {
-                ReportConnectionFailure(ex);
-            }
+
+            _isClientDisposalStarted = true;
+            BackgroundJob<IMatchClient, bool> job = new BackgroundJob<IMatchClient, bool>(
+                DisposeClientOnWorker, _client, OnClientDisposed, OnClientDisposalFailed);
+            BackgroundWork.Start(job);
+        }
+
+        private static bool DisposeClientOnWorker(IMatchClient client)
+        {
+            client.Dispose();
+            return true;
+        }
+
+        private void OnClientDisposed(bool result, IMatchClient client)
+        {
+            // Disposal has no UI continuation because this view is no longer active.
+        }
+
+        private void OnClientDisposalFailed(Exception ex, IMatchClient client)
+        {
+            _logger.LogWarning(ex, "Match connection could not be closed cleanly.");
         }
 
         private void OpenAndSynchronize()

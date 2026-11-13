@@ -1142,4 +1142,7 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
   <data name="Match_lblChat">
     <value>CHAT</value>
   </data>
+  <data name="Match_msgOperationFailed" xml:space="preserve">
+    <value>Não foi possível concluir a operação. Atualize o estado e tente novamente.</value>
+  </data>
 </root>

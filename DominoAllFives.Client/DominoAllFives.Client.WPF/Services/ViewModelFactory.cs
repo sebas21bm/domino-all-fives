@@ -51,7 +51,7 @@ namespace DominoAllFives.Client.WPF.Services
                 ?? throw new ArgumentNullException(
                 nameof(
                 profilePictureImageService));
-            _lobbyService = new WcfLobbyService(_playerSession);
+            _lobbyService = new LobbyRemoteService(_playerSession);
         }
 
         public void Dispose()

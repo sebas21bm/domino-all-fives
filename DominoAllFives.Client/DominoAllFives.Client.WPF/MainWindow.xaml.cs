@@ -27,12 +27,12 @@ namespace DominoAllFives.Client.WPF
             ProfilePictureImageService profilePictureImageService =
                 new ProfilePictureImageService(
                 loggerFactory.CreateLogger<ProfilePictureImageService>());
-            IRankingClient rankingService = new WcfRankingService();
+            IRankingClient rankingService = new RankingRemoteService();
             ViewModelFactory viewModelFactory =
                 new ViewModelFactory(
                 navigationService,
                 mainWindowViewModel.DialogService,
-                new WcfLoginService(),
+                new LoginRemoteService(),
                 rankingService,
                 playerSession,
                 loggerFactory,
