@@ -43,7 +43,8 @@ namespace DominoAllFives.BusinessLogic.Controllers
         }
 
         public Lobby LeaveLobby(int playerId) => _lobbyManager.LeavePlayer(ValidateId(playerId));
-        public Lobby StartLobby(int playerId) => _lobbyManager.StartLobby(ValidateId(playerId));
+        public Lobby StartLobby(int playerId, Action<Lobby> initializeMatch = null)
+            => _lobbyManager.StartLobby(ValidateId(playerId), initializeMatch);
         public Lobby CloseLobby(int playerId) => _lobbyManager.CloseLobby(ValidateId(playerId));
         public Lobby GetLobby(string code)
         {

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -1046,14 +1046,100 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
   <data name="MessageLanguage_msgSaveFailed" xml:space="preserve">
     <value>Não foi possível salvar o idioma. Tente novamente ou selecione um idioma disponível.</value>
   </data>
-  <data name="Lobby_msgAlreadyJoined" xml:space="preserve"><value>Você já está em uma sala.</value></data>
-  <data name="Lobby_msgCannotStart" xml:space="preserve"><value>São necessários pelo menos dois participantes e uma sala que ainda não começou.</value></data>
-  <data name="Lobby_msgClosed" xml:space="preserve"><value>O anfitrião fechou a sala.</value></data>
-  <data name="Lobby_msgHostOnly" xml:space="preserve"><value>Somente o anfitrião pode realizar esta operação.</value></data>
-  <data name="Lobby_msgInvalidSettings" xml:space="preserve"><value>Configuração de sala inválida.</value></data>
-  <data name="Lobby_msgNotFound" xml:space="preserve"><value>Sala não encontrada.</value></data>
-  <data name="Lobby_msgOperationFailed" xml:space="preserve"><value>Não foi possível concluir a operação. Verifique a conexão e entre na sala novamente.</value></data>
-  <data name="Lobby_msgStarted" xml:space="preserve"><value>Sinal de início recebido. A partida ainda não está disponível.</value></data>
-  <data name="Lobby_msgStartRequested" xml:space="preserve"><value>Início solicitado.</value></data>
-  <data name="Lobby_msgUnavailable" xml:space="preserve"><value>A sala está cheia ou já começou.</value></data>
+  <data name="Lobby_msgAlreadyJoined" xml:space="preserve">
+    <value>Você já está em uma sala.</value>
+  </data>
+  <data name="Lobby_msgCannotStart" xml:space="preserve">
+    <value>São necessários pelo menos dois participantes e uma sala que ainda não começou.</value>
+  </data>
+  <data name="Lobby_msgClosed" xml:space="preserve">
+    <value>O anfitrião fechou a sala.</value>
+  </data>
+  <data name="Lobby_msgHostOnly" xml:space="preserve">
+    <value>Somente o anfitrião pode realizar esta operação.</value>
+  </data>
+  <data name="Lobby_msgInvalidSettings" xml:space="preserve">
+    <value>Configuração de sala inválida.</value>
+  </data>
+  <data name="Lobby_msgNotFound" xml:space="preserve">
+    <value>Sala não encontrada.</value>
+  </data>
+  <data name="Lobby_msgOperationFailed" xml:space="preserve">
+    <value>Não foi possível concluir a operação. Verifique a conexão e entre na sala novamente.</value>
+  </data>
+  <data name="Lobby_msgStarted" xml:space="preserve">
+    <value>Sinal de início recebido. A partida ainda não está disponível.</value>
+  </data>
+  <data name="Lobby_msgStartRequested" xml:space="preserve">
+    <value>Início solicitado.</value>
+  </data>
+  <data name="Lobby_msgUnavailable" xml:space="preserve">
+    <value>A sala está cheia ou já começou.</value>
+  </data>
+  <data name="Match_btnPass">
+    <value>Passar</value>
+  </data>
+  <data name="Match_msgRejected">
+    <value>A jogada foi rejeitada. Confira o estado atualizado.</value>
+  </data>
+  <data name="Match_btnLeave">
+    <value>Sair</value>
+  </data>
+  <data name="Match_lblPreviousRound">
+    <value>Peças reveladas ao terminar a rodada anterior</value>
+  </data>
+  <data name="Match_lblTurn">
+    <value>Vez do jogador {0}</value>
+  </data>
+  <data name="Match_lblRevealed">
+    <value>Jogador {0}: {1}</value>
+  </data>
+  <data name="Match_endLeft">
+    <value>Esquerda</value>
+  </data>
+  <data name="Match_endBottom">
+    <value>Abaixo</value>
+  </data>
+  <data name="Match_msgConnectionFailed">
+    <value>Não foi possível conectar ao servidor. Pressione Atualizar para tentar novamente.</value>
+  </data>
+  <data name="Match_lblScore">
+    <value>Jogador {0}: {1} pontos · {2} peças</value>
+  </data>
+  <data name="Match_msgCancelled">
+    <value>Partida cancelada, sem vencedor.</value>
+  </data>
+  <data name="Match_btnRefresh">
+    <value>Atualizar</value>
+  </data>
+  <data name="Match_endRight">
+    <value>Direita</value>
+  </data>
+  <data name="Match_endTop">
+    <value>Acima</value>
+  </data>
+  <data name="Match_btnPlay">
+    <value>Jogar</value>
+  </data>
+  <data name="Match_btnDraw">
+    <value>Comprar do monte</value>
+  </data>
+  <data name="Match_lblRound">
+    <value>Rodada {0} · Monte: {1}</value>
+  </data>
+  <data name="Match_msgCompleted">
+    <value>Partida encerrada. A maior pontuação identifica o vencedor.</value>
+  </data>
+  <data name="Match_lblScores">
+    <value>PONTUAÇÃO</value>
+  </data>
+  <data name="Match_lblTarget">
+    <value>META</value>
+  </data>
+  <data name="Match_btnStock">
+    <value>MONTE</value>
+  </data>
+  <data name="Match_lblChat">
+    <value>CHAT</value>
+  </data>
 </root>

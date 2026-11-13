@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.ServiceModel;
 using System.Windows;
 using DominoAllFives.Client.WPF.Commands;
@@ -106,8 +107,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public LobbyViewModel(PlayerSession playerSession)
         {
             _logger = LoggerFactoryProvider.CreateLogger<LobbyViewModel>();
-            _playerSession = playerSession ?? throw new ArgumentNullException(
-                nameof(
+            _playerSession = playerSession ?? throw new ArgumentNullException(nameof(
                 playerSession));
             GoBackCommand = new RelayCommand(Leave, CanLeave);
             InviteFriendsCommand = new RelayCommand(DoNothing, CannotExecute);
@@ -116,11 +116,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             KickPlayerCommand = new RelayCommand(DoNothing, CannotExecute);
         }
 
-        public void Initialize(
-            IFrameNavigationService navigation,
-            ILobbyClient lobbyService,
-            ProfilePictureImageService pictureService,
-            IDialogService dialogService)
+        public void Initialize(IFrameNavigationService navigation, ILobbyClient lobbyService,
+            ProfilePictureImageService pictureService, IDialogService dialogService)
         {
             if (_client != null)
             {
@@ -129,11 +126,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
             _client = lobbyService ?? throw new ArgumentNullException(nameof(lobbyService));
-            _pictureService = pictureService ?? throw new ArgumentNullException(
-                nameof(
+            _pictureService = pictureService ?? throw new ArgumentNullException(nameof(
                 pictureService));
-            _dialogService = dialogService ?? throw new ArgumentNullException(
-                nameof(
+            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(
                 dialogService));
             if (!_client.IsActive)
             {
@@ -206,7 +201,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OnMatchStarted(int matchId)
         {
-            Dispatch(HandleMatchStartedOnUi);
+            Dispatch(() => HandleMatchStartedOnUi(matchId));
         }
 
         private void ApplyLobbyUpdate(Lobby lobby)
@@ -227,29 +222,30 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             StatusMessage = string.Empty;
-            _dialogService.ShowDialog(
-                new DialogRequest {
-                    Type = DialogType.Information,
-                    TitleKey = "Global_msgDefaultErrorTitle",
-                    MessageKey = "Lobby_msgClosed" });
+            _dialogService.ShowDialog(new DialogRequest { Type = DialogType.Information,
+                TitleKey = "Global_msgDefaultErrorTitle", MessageKey = "Lobby_msgClosed" });
             _client.Reset();
             _navigation.GoBack();
         }
 
-        private void HandleMatchStartedOnUi()
+        private void HandleMatchStartedOnUi(int matchId)
         {
             if (_disposed)
             {
                 return;
             }
 
-            StatusMessage = string.Empty;
-            _dialogService.ShowDialog(
-                new DialogRequest {
-                    Type = DialogType.Information,
-                    TitleKey = "Global_msgDefaultErrorTitle",
-                    MessageKey = "Lobby_msgStarted" });
-            RaiseCommands();
+            MatchNavigation context = new MatchNavigation
+            {
+                MatchId = matchId,
+                PlayerSession = _playerSession,
+                TargetPoints = _client.CurrentLobby.Settings.TargetPoints,
+                PlayerNames = _client.CurrentLobby.Participants.ToDictionary(participant
+                    => participant.PlayerId, participant => participant.Username)
+            };
+            Dispose();
+            _client.Reset();
+            _navigation.NavigateTo<MatchViewModel>(context);
         }
 
         private void ApplyLobby(Lobby lobby)
@@ -265,13 +261,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             {
                 foreach (Player player in lobby.Participants)
                 {
-                    Players.Add(
-                        new LobbyPlayerRecord(
-                        player,
-                        _pictureService.GetProfilePicture(
-                        player.Picture?.ImageData),
-                        lobby.Host?.PlayerId,
-                        _playerSession.PlayerId));
+                    Players.Add(new LobbyPlayerRecord(player, _pictureService.GetProfilePicture(
+                        player.Picture?.ImageData), lobby.Host?.PlayerId, _playerSession.PlayerId));
                 }
             }
 
@@ -287,12 +278,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             SetBusy(true);
-            BackgroundJob<object, bool> job =
-                new BackgroundJob<object, bool>(
-                StartMatchOnWorker,
-                null,
-                OnStartMatchCompleted,
-                OnStartMatchFailed);
+            BackgroundJob<object, bool> job = new BackgroundJob<object, bool>(
+                StartMatchOnWorker, null, OnStartMatchCompleted, OnStartMatchFailed);
             BackgroundWork.Start(job);
         }
 
@@ -304,12 +291,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             SetBusy(true);
-            BackgroundJob<object, bool> job =
-                new BackgroundJob<object, bool>(
-                LeaveLobbyOnWorker,
-                null,
-                OnLeaveLobbyCompleted,
-                OnLeaveLobbyFailed);
+            BackgroundJob<object, bool> job = new BackgroundJob<object, bool>(
+                LeaveLobbyOnWorker, null, OnLeaveLobbyCompleted, OnLeaveLobbyFailed);
             BackgroundWork.Start(job);
         }
 
@@ -360,14 +343,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void HandleOperationFailure(Exception error)
         {
             _logger.LogError(error, "Lobby operation failed.");
-            string key =
-                error is FaultException<LobbyIssue>
+            string key = error is FaultException<LobbyIssue>
                 ? "Lobby_msgCannotStart" : "Lobby_msgOperationFailed";
-            _dialogService.ShowDialog(
-                new DialogRequest {
-                    Type = DialogType.Warning,
-                    TitleKey = "Global_msgDefaultErrorTitle",
-                    MessageKey = key });
+            _dialogService.ShowDialog(new DialogRequest { Type = DialogType.Warning, TitleKey =
+                "Global_msgDefaultErrorTitle", MessageKey = key });
         }
 
         private static void Dispatch(Action action)

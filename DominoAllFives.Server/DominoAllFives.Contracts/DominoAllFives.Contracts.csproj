@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -79,5 +79,50 @@
   <ItemGroup>
     <Compile Include="Services\ILobbyCallback.cs" />
     <Compile Include="Services\ILobbyService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\DominoTile.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\MatchResult.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\MatchView.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\PlacedTile.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\PlayerHand.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\PlayerScore.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\PublicBoard.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\PublicEnd.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\RoundResult.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Enum\BoardEnd.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Enum\MatchIssue.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Enum\MatchPhase.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Enum\SpecialPower.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Services\IMatchCallback.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Services\IMatchService.cs" />
   </ItemGroup>
 </Project>

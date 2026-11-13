@@ -14,11 +14,15 @@ namespace DominoAllFives.Server
             {
                 using (ServiceHost lobbyServiceHost = new ServiceHost(typeof(LobbyService)))
                 {
-                    dominoServiceHost.Open();
-                    lobbyServiceHost.Open();
-                    logger.LogInformation("Domino All Fives server is running.");
-                    Console.WriteLine("Press Enter to stop the server.");
-                    Console.ReadLine();
+                    using (ServiceHost matchServiceHost = new ServiceHost(typeof(MatchService)))
+                    {
+                        dominoServiceHost.Open();
+                        lobbyServiceHost.Open();
+                        matchServiceHost.Open();
+                        logger.LogInformation("Domino All Fives server is running.");
+                        Console.WriteLine("Press Enter to stop the server.");
+                        Console.ReadLine();
+                    }
                 }
             }
 

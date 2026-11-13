@@ -10,9 +10,8 @@ namespace DominoAllFives.BusinessLogic.Managers
     {
         private const int MinimumPlayersToStart = 2;
         private const int LobbyCodeLength = 6;
-        private readonly object _syncRoot = new object();
-        private readonly Dictionary<string, Lobby> _lobbies =
-            new Dictionary<string, Lobby>(
+        private readonly object _syncRoot = new object ();
+        private readonly Dictionary<string, Lobby> _lobbies = new Dictionary<string, Lobby>(
             StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, string> _playerLobbyCodes = new Dictionary<int, string>();
         private int _nextLobbyId = 1;
@@ -112,7 +111,7 @@ namespace DominoAllFives.BusinessLogic.Managers
             }
         }
 
-        public Lobby StartLobby(int playerId)
+        public Lobby StartLobby(int playerId, Action<Lobby> initializeMatch = null)
         {
             lock (_syncRoot)
             {
@@ -128,8 +127,30 @@ namespace DominoAllFives.BusinessLogic.Managers
                     throw new LobbyRuleException(LobbyIssue.InsufficientPlayers);
                 }
 
-                lobby.State = LobbyState.Starting;
+                initializeMatch?.Invoke(CreateSnapshot(lobby));
+                lobby.State = initializeMatch == null ? LobbyState.Starting : LobbyState.InProgress;
                 return CreateSnapshot(lobby);
+            }
+        }
+
+        public void ReleaseMatch(int lobbyId)
+        {
+            lock (_syncRoot)
+            {
+                Lobby lobby = null;
+                foreach (Lobby candidate in _lobbies.Values)
+                {
+                    if (candidate.LobbyId == lobbyId)
+                    {
+                        lobby = candidate;
+                        break;
+                    }
+                }
+
+                if (lobby != null)
+                {
+                    CloseLobbyInternal(lobby);
+                }
             }
         }
 
@@ -191,13 +212,8 @@ namespace DominoAllFives.BusinessLogic.Managers
             string code;
             do
             {
-                code = Guid.NewGuid()
-                    .ToString(
-                    "N")
-                    .Substring(
-                    0,
-                    LobbyCodeLength)
-                    .ToUpperInvariant();
+                code = Guid.NewGuid().ToString("N").Substring(0,
+                    LobbyCodeLength).ToUpperInvariant();
             }
             while (_lobbies.ContainsKey(code));
             return code;

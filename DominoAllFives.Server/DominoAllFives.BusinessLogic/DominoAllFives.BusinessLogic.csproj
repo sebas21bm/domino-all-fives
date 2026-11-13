@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\..\packages\EntityFramework.6.5.2\build\EntityFramework.props" Condition="Exists('..\..\packages\EntityFramework.6.5.2\build\EntityFramework.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -118,4 +118,61 @@
     <Error Condition="!Exists('..\..\packages\EntityFramework.6.5.2\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\EntityFramework.6.5.2\build\EntityFramework.targets'))" />
   </Target>
   <Import Project="..\..\packages\EntityFramework.6.5.2\build\EntityFramework.targets" Condition="Exists('..\..\packages\EntityFramework.6.5.2\build\EntityFramework.targets')" />
+  <ItemGroup>
+    <Compile Include="Gameplay\MatchProjection.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controllers\MatchController.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controllers\MatchUpdate.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controllers\Move.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\ActiveMatch.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Managers\MatchManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\Board.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\BoardEnd.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\Deck.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\Match.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\MatchPlayer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\MatchRuleException.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\Placement.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\RoundSummary.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Domain\Tile.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Enum\End.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Enum\MatchIssue.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Enum\MatchPhase.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\Enum\SpecialPower.cs" />
+  </ItemGroup>
 </Project>
