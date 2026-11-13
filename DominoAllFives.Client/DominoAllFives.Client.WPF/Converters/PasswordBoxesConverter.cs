@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Controls;
@@ -17,8 +17,8 @@ namespace DominoAllFives.Client.WPF.Converters
             object parameter,
             CultureInfo culture)
         {
-            return values.Select(
-                value => value as PasswordBox).ToArray();
+            return values.Select(value => value as PasswordBox)
+                .ToArray();
         }
 
         public object[] ConvertBack(
@@ -31,5 +31,3 @@ namespace DominoAllFives.Client.WPF.Converters
         }
     }
 }
-
-

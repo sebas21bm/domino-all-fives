@@ -1,5 +1,4 @@
 using System;
-
 using LobbyService;
 
 namespace DominoAllFives.Client.WPF.Services.Wcf.Callbacks
@@ -7,16 +6,11 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Callbacks
     internal sealed class LobbyCallbackHandler : ILobbyServiceCallback
     {
         public event Action<Lobby> LobbyChanged;
-
         public event Action LobbyClosed;
-
         public event Action<int> MatchStarted;
-
-        public void OnLobbyChanged(
-            Lobby lobby)
+        public void OnLobbyChanged(Lobby lobby)
         {
-            LobbyChanged?.Invoke(
-                lobby);
+            LobbyChanged?.Invoke(lobby);
         }
 
         public void OnLobbyClosed()
@@ -24,11 +18,9 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Callbacks
             LobbyClosed?.Invoke();
         }
 
-        public void OnMatchStarted(
-            int matchId)
+        public void OnMatchStarted(int matchId)
         {
-            MatchStarted?.Invoke(
-                matchId);
+            MatchStarted?.Invoke(matchId);
         }
     }
 }

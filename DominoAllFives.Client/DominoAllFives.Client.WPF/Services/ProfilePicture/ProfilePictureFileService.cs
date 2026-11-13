@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 using System;
 using System.IO;
+using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 
 namespace DominoAllFives.Client.WPF.Services
 {
@@ -12,12 +12,9 @@ namespace DominoAllFives.Client.WPF.Services
     public class ProfilePictureFileService
     {
         private readonly ILogger<ProfilePictureFileService> _logger;
-
-        public ProfilePictureFileService(
-            ILogger<ProfilePictureFileService> logger)
+        public ProfilePictureFileService(ILogger<ProfilePictureFileService> logger)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -28,13 +25,10 @@ namespace DominoAllFives.Client.WPF.Services
         {
             OpenFileDialog fileDialog = new OpenFileDialog
             {
-                Filter =
-                    "Image files (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png",
+                Filter = "Image files (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png",
                 Multiselect = false
             };
-
             bool? result = fileDialog.ShowDialog();
-
             if (result != true)
             {
                 return new ProfilePictureFileResult
@@ -56,18 +50,12 @@ namespace DominoAllFives.Client.WPF.Services
             }
             catch (IOException ex)
             {
-                _logger.LogError(
-                    ex,
-                    "Unable to read the selected profile picture file.");
-
+                _logger.LogError(ex, "Unable to read the selected profile picture file.");
                 return CreateFailureResult();
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.LogError(
-                    ex,
-                    "Access to the selected profile picture file was denied.");
-
+                _logger.LogError(ex, "Access to the selected profile picture file was denied.");
                 return CreateFailureResult();
             }
         }

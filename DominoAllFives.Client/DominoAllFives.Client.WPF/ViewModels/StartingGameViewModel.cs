@@ -1,4 +1,4 @@
-﻿using DominoAllFives.Client.WPF.ViewModels.Base;
+using DominoAllFives.Client.WPF.ViewModels.Base;
 
 namespace DominoAllFives.Client.WPF.ViewModels
 {

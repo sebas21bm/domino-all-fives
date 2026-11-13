@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Windows;
-
 using DominoAllFives.Client.WPF.Commands;
-using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Localization;
+using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 
@@ -15,23 +14,23 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private readonly PlayerSession _playerSession;
         public string Username => _playerSession.Username;
         public bool IsGuest => !_playerSession.IsAuthenticated;
-        public Visibility AccountFeaturesVisibility => IsGuest ? 
-            Visibility.Collapsed : Visibility.Visible;
-
+        public Visibility AccountFeaturesVisibility =>
+            IsGuest
+            ? Visibility.Collapsed : Visibility.Visible;
         public RelayCommand GoToProfileCommand { get; }
         public RelayCommand GoToFriendsCommand { get; }
         public RelayCommand GoToSettingsCommand { get; }
         public RelayCommand LogoutCommand { get; }
         public RelayCommand ShowHowToPlayCommand { get; }
         public RelayCommand ShowLeaderboardCommand { get; }
-        public RelayCommand GoToCreateGameCommand {  get; }
+        public RelayCommand GoToCreateGameCommand { get; }
         public RelayCommand GoToJoinRoomCommand { get; }
 
         public MainMenuViewModel(PlayerSession playerSession)
         {
-            _playerSession = playerSession ?? 
-                throw new ArgumentNullException(nameof(playerSession));
-
+            _playerSession = playerSession ?? throw new ArgumentNullException(
+                nameof(
+                playerSession));
             GoToProfileCommand = new RelayCommand(
                 _ => _navigationService.NavigateTo<ProfileViewModel>());
             GoToFriendsCommand = new RelayCommand(
@@ -49,8 +48,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             LogoutCommand = new RelayCommand(_ => ExecuteLogout());
         }
 
-        public void Initialize(
-            IFrameNavigationService navigationService)
+        public void Initialize(IFrameNavigationService navigationService)
         {
             if (_navigationService != null)
             {
@@ -59,7 +57,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             if (navigationService == null)
+            {
                 throw new ArgumentNullException(nameof(navigationService));
+            }
 
             _navigationService = navigationService;
         }

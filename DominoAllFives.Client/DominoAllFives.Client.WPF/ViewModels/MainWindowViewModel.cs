@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 
@@ -9,30 +9,22 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private IFrameNavigationService _navigationService;
         private bool _isDialogVisible;
         private CustomMessageViewModel _currentDialogViewModel;
-
         public IFrameNavigationService Navigation => _navigationService;
         public IDialogService DialogService { get; }
-
-        public bool IsDialogVisible
-        {
-            get => _isDialogVisible;
-            set => SetProperty(ref _isDialogVisible, value);
-        }
-
-        public CustomMessageViewModel CurrentDialogViewModel
-        {
-            get => _currentDialogViewModel;
-            set => SetProperty(ref _currentDialogViewModel, value);
-        }
-
+        public bool IsDialogVisible { get =>
+            _isDialogVisible; set =>
+            SetProperty(
+            ref _isDialogVisible,
+            value); }
+        public CustomMessageViewModel CurrentDialogViewModel { get =>
+            _currentDialogViewModel; set =>
+            SetProperty(
+            ref _currentDialogViewModel,
+            value); }
 
         public MainWindowViewModel()
         {
-            DialogService = new DialogService(dialogVm =>
-            {
-                CurrentDialogViewModel = dialogVm;
-                IsDialogVisible = dialogVm != null;
-            });
+            DialogService = new DialogService(ShowDialog);
         }
 
         public void Initialize(IFrameNavigationService navigationService)
@@ -43,8 +35,15 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     "MainWindowViewModel has already been initialized.");
             }
 
-            _navigationService = navigationService
-                ?? throw new ArgumentNullException(nameof(navigationService));
+            _navigationService = navigationService ?? throw new ArgumentNullException(
+                nameof(
+                navigationService));
+        }
+
+        private void ShowDialog(CustomMessageViewModel dialogViewModel)
+        {
+            CurrentDialogViewModel = dialogViewModel;
+            IsDialogVisible = dialogViewModel != null;
         }
     }
 }

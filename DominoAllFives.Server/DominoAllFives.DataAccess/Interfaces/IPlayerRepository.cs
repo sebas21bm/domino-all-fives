@@ -1,4 +1,4 @@
-﻿using DominoAllFives.DataAccess.Models;
+using DominoAllFives.DataAccess.Models;
 
 namespace DominoAllFives.DataAccess.Interfaces
 {
@@ -10,62 +10,57 @@ namespace DominoAllFives.DataAccess.Interfaces
         /// <summary>
         /// Retrieves a player by username or email.
         /// </summary>
-        /// <param name="identifier">
+        /// <param name = "identifier">
         /// The username or email used to identify the player.
         /// </param>
         /// <returns>
         /// The matching player, or null when no player is found.
         /// </returns>
         Player GetByUsernameOrEmail(string identifier);
-
         /// <summary>
         /// Retrieves a player by identifier.
         /// </summary>
-        /// <param name="playerId">
+        /// <param name = "playerId">
         /// The identifier of the player.
         /// </param>
         /// <returns>
         /// The matching player, or null when no player is found.
         /// </returns>
         Player GetById(int playerId);
-
         /// <summary>
         /// Determines whether a username is already registered.
         /// </summary>
-        /// <param name="username">
+        /// <param name = "username">
         /// The username to verify.
         /// </param>
         /// <returns>
         /// True when the username exists; otherwise, false.
         /// </returns>
         bool UsernameExists(string username);
-
         /// <summary>
         /// Determines whether an email address is already registered.
         /// </summary>
-        /// <param name="email">
+        /// <param name = "email">
         /// The email address to verify.
         /// </param>
         /// <returns>
         /// True when the email exists; otherwise, false.
         /// </returns>
         bool EmailExists(string email);
-
         /// <summary>
         /// Adds a player to the current persistence context.
         /// </summary>
-        /// <param name="playerToAdd">
+        /// <param name = "playerToAdd">
         /// The player to add.
         /// </param>
         void Add(Player playerToAdd);
-
         /// <summary>
         /// Updates the username assigned to a player.
         /// </summary>
-        /// <param name="playerId">
+        /// <param name = "playerId">
         /// The identifier of the player.
         /// </param>
-        /// <param name="username">
+        /// <param name = "username">
         /// The new username to assign.
         /// </param>
         /// <returns>
@@ -73,14 +68,13 @@ namespace DominoAllFives.DataAccess.Interfaces
         /// otherwise, false.
         /// </returns>
         bool UpdateUsername(int playerId, string username);
-
         /// <summary>
         /// Updates the profile picture assigned to a player.
         /// </summary>
-        /// <param name="playerId">
+        /// <param name = "playerId">
         /// The identifier of the player.
         /// </param>
-        /// <param name="profilePictureFileName">
+        /// <param name = "profilePictureFileName">
         /// The name of the stored profile picture file.
         /// </param>
         /// <returns>
@@ -88,11 +82,10 @@ namespace DominoAllFives.DataAccess.Interfaces
         /// was updated; otherwise, false.
         /// </returns>
         bool UpdateProfilePicture(int playerId, string profilePictureFileName);
-
         /// <summary>
         /// Marks a player account as logically deleted.
         /// </summary>
-        /// <param name="playerId">
+        /// <param name = "playerId">
         /// The identifier of the player account.
         /// </param>
         /// <returns>
@@ -100,15 +93,13 @@ namespace DominoAllFives.DataAccess.Interfaces
         /// otherwise, false.
         /// </returns>
         bool SoftDelete(int playerId);
-
-
         /// <summary>
         /// Updates the password hash assigned to a player.
         /// </summary>
-        /// <param name="playerId">
+        /// <param name = "playerId">
         /// The identifier of the player.
         /// </param>
-        /// <param name="passwordHash">
+        /// <param name = "passwordHash">
         /// The new hashed password to assign.
         /// </param>
         /// <returns>
@@ -116,6 +107,5 @@ namespace DominoAllFives.DataAccess.Interfaces
         /// was updated; otherwise, false.
         /// </returns>
         bool UpdatePassword(int playerId, string passwordHash);
-
     }
 }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using DominoAllFivesService;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
+using DominoAllFivesService;
 
 namespace DominoAllFives.Client.WPF.Services.Wcf.Services
 {
@@ -12,16 +12,18 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
         public List<RankingEntry> GetTopWinsRanking()
         {
             return WcfInvoker.Invoke<RankingRemoteServiceClient, List<RankingEntry>>(
-                () => new RankingRemoteServiceClient("RankingEndpoint"), 
+                () => new RankingRemoteServiceClient(
+                "RankingEndpoint"),
                 proxy => proxy.GetTopWinsRanking());
         }
 
         public int GetWinsRankingPositionById(int playerId)
         {
             return WcfInvoker.Invoke<RankingRemoteServiceClient, int>(
-                () => new RankingRemoteServiceClient("RankingEndpoint"),
-                proxy => proxy.GetWinsRankingPositionById(playerId));
+                () => new RankingRemoteServiceClient(
+                "RankingEndpoint"),
+                proxy => proxy.GetWinsRankingPositionById(
+                playerId));
         }
     }
 }
-

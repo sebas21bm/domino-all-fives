@@ -1,4 +1,4 @@
-﻿namespace DominoAllFives.Contracts.Domain
+namespace DominoAllFives.Contracts.Domain
 {
     /// <summary>
     /// Represents a read-only snapshot of the statistics maintained by the server.
@@ -16,12 +16,14 @@
         /// <summary>
         /// Preserves stored counters without introducing additional game rules.
         /// </summary>
-        /// <param name="gamesWon">The stored victory count.</param>
-        /// <param name="totalPointsScored">The stored points total.</param>
-        /// <param name="gamesPlayed">The stored match count.</param>
+        /// <param name = "gamesWon">The stored victory count.</param>
+        /// <param name = "totalPointsScored">The stored points total.</param>
+        /// <param name = "gamesPlayed">The stored match count.</param>
         /// <returns>An immutable statistics snapshot.</returns>
         public static PlayerStatistics FromStoredStatistics(
-            int gamesWon, int totalPointsScored, int gamesPlayed)
+            int gamesWon,
+            int totalPointsScored,
+            int gamesPlayed)
         {
             return new PlayerStatistics
             {

@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Linq;
-
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
 
@@ -12,11 +11,10 @@ namespace DominoAllFives.DataAccess.Repositories
     public class PlayerRepository : IPlayerRepository
     {
         private readonly DominoAllFivesEntities _context;
-
         /// <summary>
         /// Initializes a new instance of the repository with the specified database context.
         /// </summary>
-        /// <param name="databaseContext">
+        /// <param name = "databaseContext">
         /// The database context used by the repository.
         /// </param>
         public PlayerRepository(DominoAllFivesEntities databaseContext)
@@ -24,66 +22,61 @@ namespace DominoAllFives.DataAccess.Repositories
             _context = databaseContext;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public Player GetByUsernameOrEmail(string identifier)
         {
             return _context.Player.FirstOrDefault(
-                player =>
-                    player.Username == identifier ||
-                    player.Email == identifier);
+                player => player.Username == identifier
+                || player.Email == identifier);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public Player GetById(int playerId)
         {
-            return _context.Player.FirstOrDefault(
-                player => player.IdPlayer == playerId);
+            return _context.Player.FirstOrDefault(player => player.IdPlayer == playerId);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public bool UsernameExists(string username)
         {
-            return _context.Player.Any(
-                player => player.Username == username);
+            return _context.Player.Any(player => player.Username == username);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public bool EmailExists(string email)
         {
-            return _context.Player.Any(
-                player => player.Email == email);
+            return _context.Player.Any(player => player.Email == email);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public void Add(Player playerToAdd)
         {
             _context.Player.Add(playerToAdd);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public bool UpdateUsername(int playerId, string username)
         {
-            bool WasUpdated = false;
-
-            Player player = _context.Player.FirstOrDefault(
+            bool wasUpdated = false;
+            Player player =
+                _context.Player.FirstOrDefault(
                 currentPlayer => currentPlayer.IdPlayer == playerId);
-
             if (player != null && !player.IsDeleted)
             {
                 player.Username = username;
-                WasUpdated = true;
+                wasUpdated = true;
             }
 
-            return WasUpdated;
+            return wasUpdated;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public bool UpdateProfilePicture(int playerId, string profilePictureFileName)
         {
             bool wasUpdated = false;
-            Player player = _context.Player.FirstOrDefault(
+            Player player =
+                _context.Player.FirstOrDefault(
                 currentPlayer => currentPlayer.IdPlayer == playerId);
-
             if (player != null && !player.IsDeleted)
             {
                 player.ProfilePicture = profilePictureFileName;
@@ -93,14 +86,13 @@ namespace DominoAllFives.DataAccess.Repositories
             return wasUpdated;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public bool SoftDelete(int playerId)
         {
             bool wasDeleted = false;
-
-            Player player = _context.Player.FirstOrDefault(
+            Player player =
+                _context.Player.FirstOrDefault(
                 currentPlayer => currentPlayer.IdPlayer == playerId);
-
             if (player != null && !player.IsDeleted)
             {
                 player.IsDeleted = true;
@@ -111,14 +103,13 @@ namespace DominoAllFives.DataAccess.Repositories
             return wasDeleted;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public bool UpdatePassword(int playerId, string passwordHash)
         {
             bool wasUpdated = false;
-
-            Player player = _context.Player.FirstOrDefault(
+            Player player =
+                _context.Player.FirstOrDefault(
                 currentPlayer => currentPlayer.IdPlayer == playerId);
-
             if (player != null && !player.IsDeleted)
             {
                 player.PasswordHash = passwordHash;

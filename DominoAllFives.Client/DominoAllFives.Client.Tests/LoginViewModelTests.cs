@@ -29,7 +29,6 @@ namespace DominoAllFives.Client.Tests
         private TestLogger<LoginViewModel> _logger;
         private int _navigations;
         private int _savedPreferences;
-
         [SetUp]
         public void SetUp()
         {
@@ -73,6 +72,7 @@ namespace DominoAllFives.Client.Tests
         [Test]
         public void Login_Success_StartsSessionAndAppliesAccountLanguage()
         {
+            // Arrange
             _client.Account = new PlayerAccount
             {
                 PlayerId = 42,
@@ -80,7 +80,9 @@ namespace DominoAllFives.Client.Tests
                 PreferredLanguageId = "en-US",
                 SessionKey = "valid-session-key"
             };
+            // Act
             CreateViewModel().LoginCommand.Execute(null);
+            // Assert
             Assert.That(_session.PlayerId, Is.EqualTo(42));
             Assert.That(_session.Username, Is.EqualTo("player"));
             Assert.That(_session.PreferredLanguageId, Is.EqualTo("en-US"));
@@ -132,8 +134,11 @@ namespace DominoAllFives.Client.Tests
         [Test]
         public void Login_UnknownBusinessFault_ShowsTechnicalMessage()
         {
+            // Arrange
             _client.Error = new FaultException<AccountIssue>((AccountIssue)999);
+            // Act
             CreateViewModel().LoginCommand.Execute(null);
+            // Assert
             AssertFailure("Global_msgDefaultError", DialogType.Error);
         }
 
@@ -142,10 +147,13 @@ namespace DominoAllFives.Client.Tests
         [TestCase("  ", "  ")]
         public void Login_BlankInput_DoesNotCallService(string email, string password)
         {
+            // Arrange
             LoginViewModel viewModel = CreateViewModel();
             viewModel.Email = email;
             viewModel.Password = password;
+            // Act
             viewModel.LoginCommand.Execute(null);
+            // Assert
             Assert.That(viewModel.IsEmailRequiredVisible, Is.True);
             Assert.That(viewModel.IsPasswordRequiredVisible, Is.True);
             Assert.That(_client.CallCount, Is.Zero);
@@ -159,35 +167,58 @@ namespace DominoAllFives.Client.Tests
         [TestCase(42, " ")]
         public void Login_InvalidAccount_ShowsTechnicalMessage(int playerId, string username)
         {
-            _client.Account = new PlayerAccount { PlayerId = playerId, Username = username };
+            // Arrange
+            _client.Account = new PlayerAccount
+            {
+                PlayerId = playerId,
+                Username = username
+            };
+            // Act
             CreateViewModel().LoginCommand.Execute(null);
+            // Assert
             AssertFailure("Global_msgDefaultError", DialogType.Error);
         }
 
         [Test]
         public void Login_NullAccount_ShowsTechnicalMessage()
         {
+            // Arrange
+            // Act
             CreateViewModel().LoginCommand.Execute(null);
+            // Assert
             AssertFailure("Global_msgDefaultError", DialogType.Error);
         }
 
         [Test]
         public void Login_BeforeInitialization_DoesNotCallService()
         {
-            var viewModel = new LoginViewModel(_session,
-                () => _navigations++, () => { }, () => { }, () => { });
-
+            // Arrange
+            var viewModel = new LoginViewModel(_session, () => _navigations++, () =>
+            {
+            }, () =>
+            {
+            }, () =>
+            {
+            });
+            // Act
             Assert.Throws<InvalidOperationException>(() => viewModel.LoginCommand.Execute(null));
+            // Assert
             Assert.That(_client.CallCount, Is.Zero);
         }
 
         [Test]
         public void Initialize_Twice_RejectsSecondInitialization()
         {
+            // Arrange
             LoginViewModel viewModel = CreateViewModel();
-
-            Assert.Throws<InvalidOperationException>(() =>
-                viewModel.Initialize(_dialogs, _client, _logger, _languages));
+            // Act
+            Assert.Throws<InvalidOperationException>(
+                () => viewModel.Initialize(
+                _dialogs,
+                _client,
+                _logger,
+                _languages));
+            // Assert
             Assert.That(_client.CallCount, Is.Zero);
         }
 
@@ -200,9 +231,17 @@ namespace DominoAllFives.Client.Tests
 
         private LoginViewModel CreateViewModel()
         {
-            var viewModel = new LoginViewModel(_session,
-                () => _navigations++, () => { }, () => { }, () => { })
-            { Email = " player ", Password = "password" };
+            var viewModel = new LoginViewModel(_session, () => _navigations++, () =>
+            {
+            }, () =>
+            {
+            }, () =>
+            {
+            })
+            {
+                Email = " player ",
+                Password = "password"
+            };
             viewModel.Initialize(_dialogs, _client, _logger, _languages);
             return viewModel;
         }
@@ -225,11 +264,16 @@ namespace DominoAllFives.Client.Tests
             public PlayerAccount Account { get; set; }
             public Credentials Credentials { get; private set; }
             public int CallCount { get; private set; }
+
             public PlayerAccount LoginWithAccount(Credentials credentials)
             {
                 CallCount++;
                 Credentials = credentials;
-                if (Error != null) throw Error;
+                if (Error != null)
+                {
+                    throw Error;
+                }
+
                 return Account;
             }
         }
@@ -237,6 +281,7 @@ namespace DominoAllFives.Client.Tests
         private sealed class DialogService : IDialogService
         {
             public List<DialogRequest> Requests { get; } = new List<DialogRequest>();
+
             public void ShowDialog(DialogRequest request) => Requests.Add(request);
         }
     }

@@ -19,17 +19,18 @@ namespace DominoAllFives.BusinessLogic.Controllers
         private const string PortugueseLanguageId = "pt-BR";
         private readonly Func<ILanguagePreferenceStore> _storeFactory;
         private readonly ILogger<AccountLanguageController> _logger;
-
-        public AccountLanguageController(ILogger<AccountLanguageController> logger)
-            : this(() => new LanguagePreferenceStore(), logger)
+        public AccountLanguageController(
+            ILogger<AccountLanguageController> logger) : this(
+            () => new LanguagePreferenceStore(),
+            logger)
         {
         }
 
-        public AccountLanguageController(Func<ILanguagePreferenceStore> storeFactory,
+        public AccountLanguageController(
+            Func<ILanguagePreferenceStore> storeFactory,
             ILogger<AccountLanguageController> logger)
         {
-            _storeFactory = storeFactory
-                ?? throw new ArgumentNullException(nameof(storeFactory));
+            _storeFactory = storeFactory ?? throw new ArgumentNullException(nameof(storeFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -42,12 +43,14 @@ namespace DominoAllFives.BusinessLogic.Controllers
             {
                 throw new ArgumentOutOfRangeException(nameof(playerId));
             }
-            if (languageId != SpanishLanguageId &&
-                languageId != EnglishLanguageId &&
-                languageId != PortugueseLanguageId)
+
+            if (languageId != SpanishLanguageId
+                && languageId != EnglishLanguageId
+                && languageId != PortugueseLanguageId)
             {
                 throw new ArgumentException("The language is not supported.", nameof(languageId));
             }
+
             try
             {
                 using (ILanguagePreferenceStore store = _storeFactory())
@@ -55,8 +58,23 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     return PersistLanguage(store, playerId, languageId);
                 }
             }
-            catch (Exception ex) when (ex is SqlException ||
-                ex is EntityException || ex is DbUpdateException)
+            catch (SqlException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unable to persist preferred language for player {PlayerId}.",
+                    playerId);
+                throw;
+            }
+            catch (EntityException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unable to persist preferred language for player {PlayerId}.",
+                    playerId);
+                throw;
+            }
+            catch (DbUpdateException ex)
             {
                 _logger.LogError(
                     ex,
@@ -67,16 +85,21 @@ namespace DominoAllFives.BusinessLogic.Controllers
         }
 
         private static LanguagePreferenceStatus PersistLanguage(
-            ILanguagePreferenceStore store, int playerId, string languageId)
+            ILanguagePreferenceStore store,
+            int playerId,
+            string languageId)
         {
             if (!store.LanguageExists(languageId))
             {
-                throw new InvalidOperationException("The supported language is absent from the language catalog.");
+                throw new InvalidOperationException(
+                    "The supported language is absent from the language catalog.");
             }
+
             if (!store.UpdatePreferredLanguage(playerId, languageId))
             {
                 return LanguagePreferenceStatus.AccountNotFound;
             }
+
             store.SaveChanges();
             return LanguagePreferenceStatus.None;
         }

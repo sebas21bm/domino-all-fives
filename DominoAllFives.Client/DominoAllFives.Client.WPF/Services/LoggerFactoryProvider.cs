@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -10,37 +10,35 @@ namespace DominoAllFives.Client.WPF.Services
     /// </summary>
     public static class LoggerFactoryProvider
     {
-        private static readonly object _lockObject = new object();
-
-        private static ILoggerFactory _loggerFactory;
-
+        private static readonly object lockObject = new object();
+        private static ILoggerFactory loggerFactory;
         /// <summary>
-        /// Gets the singleton instance of <see cref="ILoggerFactory"/>.
+        /// Gets the singleton instance of <see cref = "ILoggerFactory"/>.
         /// </summary>
         public static ILoggerFactory Instance
         {
             get
             {
-                if (_loggerFactory == null)
+                if (loggerFactory == null)
                 {
-                    lock (_lockObject)
+                    lock (lockObject)
                     {
-                        if (_loggerFactory == null)
+                        if (loggerFactory == null)
                         {
-                            _loggerFactory = CreateLoggerFactory();
+                            loggerFactory = CreateLoggerFactory();
                         }
                     }
                 }
 
-                return _loggerFactory;
+                return loggerFactory;
             }
         }
 
         /// <summary>
         /// Creates a typed logger instance for a specific class type.
         /// </summary>
-        /// <typeparam name="T">The type of class requesting the logger.</typeparam>
-        /// <returns>An <see cref="ILogger{T}"/> instance configured for the 
+        /// <typeparam name = "T">The type of class requesting the logger.</typeparam>
+        /// <returns>An <see cref = "ILogger{T}"/> instance configured for the
         /// specified type.</returns>
         public static ILogger<T> CreateLogger<T>()
         {
@@ -51,40 +49,48 @@ namespace DominoAllFives.Client.WPF.Services
         {
             try
             {
-                string logDirectory = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                string logDirectory =
+                    Path.Combine(
+                    Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData),
                     "DominoAllFives",
                     "Logs");
-
                 if (!Directory.Exists(logDirectory))
                 {
                     Directory.CreateDirectory(logDirectory);
                 }
 
                 string logFilePath = Path.Combine(logDirectory, "client_log-.txt");
-
-                Serilog.Log.Logger = new LoggerConfiguration()
-                    .MinimumLevel.Debug()
-                    .WriteTo.File(
-                        path: logFilePath,
-                        rollingInterval: RollingInterval.Day,
-                        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} " +
-                        "[{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}")
+                Serilog.Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.File(
+                    path: logFilePath,
+                    rollingInterval: RollingInterval.Day,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} "
+                        + "[{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}")
                     .CreateLogger();
-
-                return LoggerFactory.Create(builder =>
-                {
-                    builder.AddSerilog(dispose: true);
-                    builder.AddDebug();
-                });
+                return LoggerFactory.Create(ConfigureLogging);
             }
-            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+            catch (IOException ex)
             {
-                return LoggerFactory.Create(builder =>
-                {
-                    builder.AddDebug();
-                });
+                return CreateFallbackLogger(ex);
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                return CreateFallbackLogger(ex);
+            }
+        }
+
+        private static void ConfigureLogging(ILoggingBuilder builder)
+        {
+            builder.AddSerilog(dispose: true);
+            builder.AddDebug();
+        }
+
+        private static ILoggerFactory CreateFallbackLogger(Exception ex)
+        {
+            ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddDebug());
+            factory.CreateLogger(typeof(LoggerFactoryProvider).FullName).LogWarning(
+                ex, "File logging is unavailable; using debug logging.");
+            return factory;
         }
     }
 }

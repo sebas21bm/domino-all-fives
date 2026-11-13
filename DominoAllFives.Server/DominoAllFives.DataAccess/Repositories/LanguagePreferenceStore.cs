@@ -10,7 +10,6 @@ namespace DominoAllFives.DataAccess.Repositories
     public sealed class LanguagePreferenceStore : ILanguagePreferenceStore
     {
         private readonly DominoAllFivesEntities _context = new DominoAllFivesEntities();
-
         /// <inheritdoc/>
         public bool LanguageExists(string languageId)
         {
@@ -20,12 +19,16 @@ namespace DominoAllFives.DataAccess.Repositories
         /// <inheritdoc/>
         public bool UpdatePreferredLanguage(int playerId, string languageId)
         {
-            Player player = _context.Player.FirstOrDefault(account =>
-                account.IdPlayer == playerId && !account.IsDeleted && !account.IsGuest);
+            Player player =
+                _context.Player.FirstOrDefault(
+                account => account.IdPlayer == playerId
+                && !account.IsDeleted
+                && !account.IsGuest);
             if (player == null)
             {
                 return false;
             }
+
             player.PreferredLanguageId = languageId;
             return true;
         }

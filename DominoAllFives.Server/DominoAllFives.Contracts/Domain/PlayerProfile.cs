@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace DominoAllFives.Contracts.Domain
 {
@@ -18,12 +18,14 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Composes a profile from server-reconstructed domain values.
         /// </summary>
-        /// <param name="username">The stored username.</param>
-        /// <param name="statistics">The stored statistics snapshot.</param>
-        /// <param name="picture">The picture snapshot, which may contain absent content.</param>
+        /// <param name = "username">The stored username.</param>
+        /// <param name = "statistics">The stored statistics snapshot.</param>
+        /// <param name = "picture">The picture snapshot, which may contain absent content.</param>
         /// <returns>A profile without operation failure flags.</returns>
-        public static PlayerProfile FromStoredProfile(string username,
-            PlayerStatistics statistics, ProfilePicture picture)
+        public static PlayerProfile FromStoredProfile(
+            string username,
+            PlayerStatistics statistics,
+            ProfilePicture picture)
         {
             return new PlayerProfile
             {

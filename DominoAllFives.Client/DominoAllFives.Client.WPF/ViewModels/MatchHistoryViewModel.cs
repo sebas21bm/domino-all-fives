@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Services;
@@ -11,15 +11,15 @@ namespace DominoAllFives.Client.WPF.ViewModels
     {
         private IFrameNavigationService _navigationService;
         public RelayCommand GoBackCommand { get; }
-        public ObservableCollection<object> MatchHistoryList { get; } = new ObservableCollection<object>();
+        public ObservableCollection<object> MatchHistoryList { get; } =
+            new ObservableCollection<object>();
 
         public MatchHistoryViewModel()
         {
             GoBackCommand = new RelayCommand(() => _navigationService.GoBack());
         }
 
-        public void Initialize(
-            IFrameNavigationService navigationService)
+        public void Initialize(IFrameNavigationService navigationService)
         {
             if (_navigationService != null)
             {
@@ -28,7 +28,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             if (navigationService == null)
+            {
                 throw new ArgumentNullException(nameof(navigationService));
+            }
 
             _navigationService = navigationService;
         }

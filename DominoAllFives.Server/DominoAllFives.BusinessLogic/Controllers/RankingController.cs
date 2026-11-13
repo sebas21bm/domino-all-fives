@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-
 using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.DataAccess.Interfaces;
@@ -15,15 +14,12 @@ namespace DominoAllFives.BusinessLogic.Controllers
     public class RankingController
     {
         private const int RankingLimit = 10;
-
         private readonly ProfilePictureStorage _profilePictureStorage;
-
-        public RankingController(
-            ProfilePictureStorage profilePictureStorage)
+        public RankingController(ProfilePictureStorage profilePictureStorage)
         {
-            _profilePictureStorage = profilePictureStorage
-                ?? throw new ArgumentNullException(
-                    nameof(profilePictureStorage));
+            _profilePictureStorage = profilePictureStorage ?? throw new ArgumentNullException(
+                nameof(
+                profilePictureStorage));
         }
 
         /// <summary>
@@ -34,29 +30,25 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// </returns>
         public List<RankingEntry> GetTopWinsRanking()
         {
-            using (DominoAllFivesEntities context =
-                new DominoAllFivesEntities())
+            using (DominoAllFivesEntities context = new DominoAllFivesEntities())
             {
-                IPlayerStatsRepository playerStatsRepository =
-                    new PlayerStatsRepository(context);
-
+                IPlayerStatsRepository playerStatsRepository = new PlayerStatsRepository(context);
                 IEnumerable<PlayerStats> topPlayerStats =
                     playerStatsRepository.GetTopByGamesWon(
-                        RankingLimit);
-
+                    RankingLimit);
                 List<RankingEntry> entries = new List<RankingEntry>();
-
                 int rank = 1;
-
                 foreach (PlayerStats playerStats in topPlayerStats)
                 {
-                    RankingEntry rankingEntry = RankingEntry.FromRankedPlayer(
-                        rank, playerStats.Player.Username, playerStats.GamesWon,
+                    RankingEntry rankingEntry =
+                        RankingEntry.FromRankedPlayer(
+                        rank,
+                        playerStats.Player.Username,
+                        playerStats.GamesWon,
                         ProfilePicture.FromStoredContent(
-                            _profilePictureStorage.GetProfilePictureData(
-                                playerStats.Player.ProfilePicture)));
+                        _profilePictureStorage.GetProfilePictureData(
+                        playerStats.Player.ProfilePicture)));
                     entries.Add(rankingEntry);
-
                     rank++;
                 }
 
@@ -74,11 +66,9 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 throw new ArgumentOutOfRangeException(nameof(playerId));
             }
 
-            
             using (DominoAllFivesEntities context = new DominoAllFivesEntities())
             {
-                IPlayerStatsRepository playerStatsRepository =
-                    new PlayerStatsRepository(context);
+                IPlayerStatsRepository playerStatsRepository = new PlayerStatsRepository(context);
                 return playerStatsRepository.GetRankByPlayerId(playerId);
             }
         }

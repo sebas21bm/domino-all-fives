@@ -16,14 +16,25 @@ namespace DominoAllFives.Client.WPF.Views
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            if (_navigation != null) return;
+            if (_navigation != null)
+            {
+                return;
+            }
+
             _navigation = NavigationService;
-            if (_navigation != null) _navigation.Navigated += OnNavigated;
+            if (_navigation != null)
+            {
+                _navigation.Navigated += OnNavigated;
+            }
         }
 
         private void OnNavigated(object sender, NavigationEventArgs e)
         {
-            if (ReferenceEquals(e.Content, this)) return;
+            if (ReferenceEquals(e.Content, this))
+            {
+                return;
+            }
+
             _navigation.Navigated -= OnNavigated;
             _navigation = null;
             (DataContext as LobbyViewModel)?.Dispose();

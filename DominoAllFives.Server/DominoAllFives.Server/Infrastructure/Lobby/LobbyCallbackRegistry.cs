@@ -9,18 +9,29 @@ namespace DominoAllFives.Server.Infrastructure.Lobby
     {
         private readonly ConcurrentDictionary<int, ILobbyCallback> _callbacks =
             new ConcurrentDictionary<int, ILobbyCallback>();
-
         public bool RegisterCallback(int playerId, ILobbyCallback callback)
         {
-            if (playerId <= 0) throw new ArgumentOutOfRangeException(nameof(playerId));
-            if (callback == null) throw new ArgumentNullException(nameof(callback));
+            if (playerId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(playerId));
+            }
+
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+
             return _callbacks.TryAdd(playerId, callback);
         }
 
         public ILobbyCallback GetCallback(int playerId)
         {
             ILobbyCallback callback;
-            if (!_callbacks.TryGetValue(playerId, out callback)) throw new KeyNotFoundException();
+            if (!_callbacks.TryGetValue(playerId, out callback))
+            {
+                throw new KeyNotFoundException();
+            }
+
             return callback;
         }
 

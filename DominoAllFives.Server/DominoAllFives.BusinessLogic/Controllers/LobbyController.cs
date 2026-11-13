@@ -9,14 +9,19 @@ namespace DominoAllFives.BusinessLogic.Controllers
 {
     public sealed class LobbyController
     {
-        private static readonly HashSet<int> ValidTargetPoints =
-            new HashSet<int> { 100, 150, 200, 250 };
+        private const int MinimumPlayers = 2;
+        private const int MaximumPlayers = 4;
+        private static readonly HashSet<int> validTargetPoints = new HashSet<int>
+        {
+            100,
+            150,
+            200,
+            250
+        };
         private readonly LobbyManager _lobbyManager;
-
         public LobbyController(LobbyManager lobbyManager)
         {
-            _lobbyManager = lobbyManager 
-                ?? throw new ArgumentNullException(nameof(lobbyManager));
+            _lobbyManager = lobbyManager ?? throw new ArgumentNullException(nameof(lobbyManager));
         }
 
         public Lobby CreateLobby(Player host, LobbySettings settings)
@@ -33,32 +38,36 @@ namespace DominoAllFives.BusinessLogic.Controllers
             {
                 throw new ArgumentException(null, nameof(code));
             }
+
             return _lobbyManager.JoinPlayer(player, code.Trim());
         }
 
         public Lobby LeaveLobby(int playerId) => _lobbyManager.LeavePlayer(ValidateId(playerId));
         public Lobby StartLobby(int playerId) => _lobbyManager.StartLobby(ValidateId(playerId));
         public Lobby CloseLobby(int playerId) => _lobbyManager.CloseLobby(ValidateId(playerId));
-
         public Lobby GetLobby(string code)
         {
-            if (string.IsNullOrWhiteSpace(code)){
+            if (string.IsNullOrWhiteSpace(code))
+            {
                 throw new ArgumentException(null, nameof(code));
             }
+
             return _lobbyManager.GetLobby(code.Trim());
         }
 
         private static void ValidateSettings(LobbySettings settings)
         {
-            if (settings == null){
+            if (settings == null)
+            {
                 throw new ArgumentNullException(nameof(settings));
             }
-            if (settings.MaxPlayers < 2 || settings.MaxPlayers > 4)
+
+            if (settings.MaxPlayers < MinimumPlayers || settings.MaxPlayers > MaximumPlayers)
             {
                 throw new LobbyRuleException(LobbyIssue.InvalidPlayerLimit);
             }
-                
-            if (!ValidTargetPoints.Contains(settings.TargetPoints))
+
+            if (!validTargetPoints.Contains(settings.TargetPoints))
             {
                 throw new LobbyRuleException(LobbyIssue.InvalidTargetPoints);
             }
@@ -68,8 +77,9 @@ namespace DominoAllFives.BusinessLogic.Controllers
         {
             if (player == null)
             {
-                new ArgumentNullException(nameof(player));
+                throw new ArgumentNullException(nameof(player));
             }
+
             ValidateId(player.PlayerId);
             if (string.IsNullOrWhiteSpace(player.Username))
             {
@@ -83,6 +93,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             {
                 throw new ArgumentOutOfRangeException(nameof(playerId));
             }
+
             return playerId;
         }
     }

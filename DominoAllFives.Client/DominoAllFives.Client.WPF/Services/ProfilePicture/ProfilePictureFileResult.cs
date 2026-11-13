@@ -1,4 +1,4 @@
-﻿namespace DominoAllFives.Client.WPF.Services
+namespace DominoAllFives.Client.WPF.Services
 {
     /// <summary>
     /// Represents the result of selecting and reading
@@ -7,11 +7,8 @@
     public class ProfilePictureFileResult
     {
         public bool IsSuccessful { get; set; }
-
         public bool WasCancelled { get; set; }
-
         public byte[] ImageData { get; set; }
-
         public string FileName { get; set; }
     }
 }

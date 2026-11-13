@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -9,19 +9,15 @@ namespace DominoAllFives.BusinessLogic.Validation
     /// </summary>
     public static class ProfilePictureValidator
     {
-        private const long MaximumFileSizeInBytes =
-            1024 * 1024;
-
-        private static readonly HashSet<string>
-            allowedExtensions = 
-                new HashSet<string>(
-                    StringComparer.OrdinalIgnoreCase)
-                {
-                    ".jpg",
-                    ".jpeg",
-                    ".png"
-                };
-
+        private const long MaximumFileSizeInBytes = 1024 * 1024;
+        private static readonly HashSet<string> allowedExtensions =
+            new HashSet<string>(
+            StringComparer.OrdinalIgnoreCase)
+        {
+            ".jpg",
+            ".jpeg",
+            ".png"
+        };
         /// <summary>
         /// Determines whether a profile picture has an allowed
         /// file extension.
@@ -33,9 +29,7 @@ namespace DominoAllFives.BusinessLogic.Validation
                 return false;
             }
 
-            string extension =
-                Path.GetExtension(fileName);
-
+            string extension = Path.GetExtension(fileName);
             return allowedExtensions.Contains(extension);
         }
 
@@ -45,9 +39,9 @@ namespace DominoAllFives.BusinessLogic.Validation
         /// </summary>
         public static bool HasValidFileSize(byte[] imageData)
         {
-            return imageData != null && 
-                   imageData.Length > 0 && 
-                   imageData.Length <= MaximumFileSizeInBytes;
+            return imageData != null
+                && imageData.Length > 0
+                && imageData.Length <= MaximumFileSizeInBytes;
         }
 
         /// <summary>
@@ -56,8 +50,7 @@ namespace DominoAllFives.BusinessLogic.Validation
         /// </summary>
         public static bool IsValid(string fileName, byte[] imageData)
         {
-            return HasValidExtension(fileName) &&
-                   HasValidFileSize(imageData);
+            return HasValidExtension(fileName) && HasValidFileSize(imageData);
         }
     }
 }

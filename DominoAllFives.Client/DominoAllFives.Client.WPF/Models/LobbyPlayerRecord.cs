@@ -11,17 +11,34 @@ namespace DominoAllFives.Client.WPF.Models
         public bool IsHost { get; }
         public bool IsCurrentPlayer { get; }
 
-        public LobbyPlayerRecord(int playerId, string username, BitmapImage avatarImage,
-            bool isHost, bool isCurrentPlayer)
+        public LobbyPlayerRecord(
+            LobbyService.Player player,
+            BitmapImage avatarImage,
+            int? hostPlayerId,
+            int? currentPlayerId)
         {
-            if (playerId <= 0) throw new ArgumentOutOfRangeException(nameof(playerId));
+            if (player == null)
+            {
+                throw new ArgumentNullException(nameof(player));
+            }
+
+            int playerId = player.PlayerId;
+            string username = player.Username;
+            if (playerId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(playerId));
+            }
+
             if (string.IsNullOrWhiteSpace(username))
+            {
                 throw new ArgumentException(null, nameof(username));
+            }
+
             PlayerId = playerId;
             Username = username;
             AvatarImage = avatarImage ?? throw new ArgumentNullException(nameof(avatarImage));
-            IsHost = isHost;
-            IsCurrentPlayer = isCurrentPlayer;
+            IsHost = playerId == hostPlayerId;
+            IsCurrentPlayer = playerId == currentPlayerId;
         }
     }
 }

@@ -2,15 +2,14 @@ using System;
 using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
-
 using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.BusinessLogic.Validation;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
-using DominoAllFives.DataAccess.Repositories;
 using Player = DominoAllFives.DataAccess.Models.Player;
+using DominoAllFives.DataAccess.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.BusinessLogic.Controllers
@@ -22,97 +21,57 @@ namespace DominoAllFives.BusinessLogic.Controllers
     {
         private readonly ProfilePictureStorage _profilePictureStorage;
         private readonly ILogger<ProfilePictureController> _logger;
-
         public ProfilePictureController(
             ProfilePictureStorage profilePictureStorage,
             ILogger<ProfilePictureController> logger)
         {
-            _profilePictureStorage = profilePictureStorage
-                ?? throw new ArgumentNullException(
-                    nameof(profilePictureStorage));
-
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
+            _profilePictureStorage = profilePictureStorage ?? throw new ArgumentNullException(
+                nameof(
+                profilePictureStorage));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
         /// Sets the profile picture of a player.
         /// </summary>
-        /// <param name="playerId">The account identifier.</param>
-        /// <param name="picture">The selected snapshot; null or absent content is invalid.</param>
+        /// <param name = "playerId">The account identifier.</param>
+        /// <param name = "picture">The selected snapshot; null or absent content is invalid.</param>
         public ProfilePictureStatus SetProfilePicture(int playerId, ProfilePicture picture)
         {
-            if (playerId <= 0)
+            ProfilePictureStatus validation = ValidatePictureSelection(playerId, picture);
+            if (validation != ProfilePictureStatus.None)
             {
-                throw new ArgumentOutOfRangeException(nameof(playerId));
+                return validation;
             }
-            if (picture == null)
-            {
-                throw new ArgumentNullException(nameof(picture));
-            }
+
             byte[] imageData = picture.ImageData;
-            string fileName = picture?.OriginalFileName;
-            if (imageData == null ||
-                imageData.Length == 0)
-            {
-                return ProfilePictureStatus.InvalidImage;
-            }
-
-            if (!ProfilePictureValidator.HasValidExtension(
-                    fileName))
-            {
-                return ProfilePictureStatus.InvalidFormat;
-            }
-
-            if (!ProfilePictureValidator.HasValidFileSize(
-                    imageData))
-            {
-                return ProfilePictureStatus.FileTooLarge;
-            }
-
+            string fileName = picture.OriginalFileName;
             string previousProfilePicture = string.Empty;
             string profilePictureFileName = string.Empty;
             bool changesCommitted = false;
-
             try
             {
-                using (DominoAllFivesEntities context =
-                    new DominoAllFivesEntities())
+                using (DominoAllFivesEntities context = new DominoAllFivesEntities())
                 {
-                    IPlayerRepository playerRepository =
-                        new PlayerRepository(context);
-
-                    Player player =
-                        playerRepository.GetById(
-                            playerId);
-
+                    IPlayerRepository playerRepository = new PlayerRepository(context);
+                    Player player = playerRepository.GetById(playerId);
                     if (player == null)
                     {
                         return ProfilePictureStatus.PlayerNotFound;
                     }
 
-                    profilePictureFileName =
-                    _profilePictureStorage.GenerateFileName(
+                    profilePictureFileName = _profilePictureStorage.GenerateFileName(
                         playerId,
                         fileName);
-
-                    _profilePictureStorage.SaveProfilePicture(
-                        profilePictureFileName,
-                        imageData);
-
-                    previousProfilePicture =
-                        player.ProfilePicture;
-
+                    _profilePictureStorage.SaveProfilePicture(profilePictureFileName, imageData);
+                    previousProfilePicture = player.ProfilePicture;
                     bool wasUpdated =
                         playerRepository.UpdateProfilePicture(
-                            playerId,
-                            profilePictureFileName);
-
+                        playerId,
+                        profilePictureFileName);
                     if (!wasUpdated)
                     {
-                        _profilePictureStorage.TryDeleteProfilePicture(
-                            profilePictureFileName);
-
+                        _profilePictureStorage.TryDeleteProfilePicture(profilePictureFileName);
                         return ProfilePictureStatus.PlayerNotFound;
                     }
 
@@ -120,36 +79,41 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     changesCommitted = true;
                 }
             }
-            catch (Exception ex)
+            catch (SqlException ex)
+            {
+                LogPictureFailure(ex, playerId);
+                throw;
+            }
+            catch (EntityException ex)
+            {
+                LogPictureFailure(ex, playerId);
+                throw;
+            }
+            catch (DbUpdateException ex)
+            {
+                LogPictureFailure(ex, playerId);
+                throw;
+            }
+            finally
             {
                 if (!changesCommitted)
                 {
                     _profilePictureStorage.TryDeleteProfilePicture(profilePictureFileName);
                 }
-
-                _logger.LogError(
-                    ex,
-                    "Unable to store profile picture for player {PlayerId}.",
-                    playerId);
-                throw;
             }
 
-            DeletePreviousProfilePicture(
-                previousProfilePicture,
-                profilePictureFileName);
-
+            DeletePreviousProfilePicture(previousProfilePicture, profilePictureFileName);
             return ProfilePictureStatus.None;
         }
 
         /// <summary>
         /// Removes the profile picture assigned to a player.
         /// </summary>
-        /// <param name="playerId">
+        /// <param name = "playerId">
         /// The identifier of the player whose profile picture
         /// will be removed.
         /// </param>
-        public ProfilePictureStatus RemoveProfilePicture(
-            int playerId)
+        public ProfilePictureStatus RemoveProfilePicture(int playerId)
         {
             if (playerId <= 0)
             {
@@ -157,37 +121,24 @@ namespace DominoAllFives.BusinessLogic.Controllers
             }
 
             string previousProfilePicture = string.Empty;
-
             try
             {
-                using (DominoAllFivesEntities context =
-                    new DominoAllFivesEntities())
+                using (DominoAllFivesEntities context = new DominoAllFivesEntities())
                 {
-                    IPlayerRepository playerRepository =
-                        new PlayerRepository(context);
-
-                    Player player =
-                        playerRepository.GetById(playerId);
-
+                    IPlayerRepository playerRepository = new PlayerRepository(context);
+                    Player player = playerRepository.GetById(playerId);
                     if (player == null)
                     {
                         return ProfilePictureStatus.PlayerNotFound;
                     }
 
-                    previousProfilePicture =
-                        player.ProfilePicture;
-
-                    if (string.IsNullOrWhiteSpace(
-                            previousProfilePicture))
+                    previousProfilePicture = player.ProfilePicture;
+                    if (string.IsNullOrWhiteSpace(previousProfilePicture))
                     {
                         return ProfilePictureStatus.None;
                     }
 
-                    bool wasUpdated =
-                        playerRepository.UpdateProfilePicture(
-                            playerId,
-                            null);
-
+                    bool wasUpdated = playerRepository.UpdateProfilePicture(playerId, null);
                     if (!wasUpdated)
                     {
                         return ProfilePictureStatus.PlayerNotFound;
@@ -196,22 +147,32 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     context.SaveChanges();
                 }
             }
-            catch (Exception ex) when (
-                ex is SqlException ||
-                ex is EntityException ||
-                ex is DbUpdateException)
+            catch (SqlException ex)
             {
                 _logger.LogError(
                     ex,
                     "Unable to remove profile picture for player {PlayerId}.",
                     playerId);
-
+                throw;
+            }
+            catch (EntityException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unable to remove profile picture for player {PlayerId}.",
+                    playerId);
+                throw;
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Unable to remove profile picture for player {PlayerId}.",
+                    playerId);
                 throw;
             }
 
-            _profilePictureStorage.TryDeleteProfilePicture(
-                previousProfilePicture);
-
+            _profilePictureStorage.TryDeleteProfilePicture(previousProfilePicture);
             return ProfilePictureStatus.None;
         }
 
@@ -223,18 +184,54 @@ namespace DominoAllFives.BusinessLogic.Controllers
             string currentProfilePicture)
         {
             if (string.IsNullOrWhiteSpace(
-                    previousProfilePicture) ||
-                string.Equals(
-                    previousProfilePicture,
-                    currentProfilePicture,
-                    StringComparison.OrdinalIgnoreCase))
+                previousProfilePicture)
+                || string.Equals(
+                previousProfilePicture,
+                currentProfilePicture,
+                StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }
 
-            _profilePictureStorage.TryDeleteProfilePicture(
-                previousProfilePicture);
+            _profilePictureStorage.TryDeleteProfilePicture(previousProfilePicture);
         }
 
+        private void LogPictureFailure(Exception ex, int playerId)
+        {
+            _logger.LogError(
+                ex,
+                "Unable to store profile picture for player {PlayerId}.",
+                playerId);
+        }
+
+        private static ProfilePictureStatus ValidatePictureSelection(
+            int playerId,
+            ProfilePicture picture)
+        {
+            if (playerId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(playerId));
+            }
+
+            if (picture == null)
+            {
+                throw new ArgumentNullException(nameof(picture));
+            }
+
+            byte[] imageData = picture.ImageData;
+            if (imageData == null || imageData.Length == 0)
+            {
+                return ProfilePictureStatus.InvalidImage;
+            }
+
+            if (!ProfilePictureValidator.HasValidExtension(picture.OriginalFileName))
+            {
+                return ProfilePictureStatus.InvalidFormat;
+            }
+
+            return ProfilePictureValidator.HasValidFileSize(
+                imageData)
+                ? ProfilePictureStatus.None : ProfilePictureStatus.FileTooLarge;
+        }
     }
 }

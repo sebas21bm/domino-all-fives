@@ -1,5 +1,5 @@
-using DominoAllFivesService;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
+using DominoAllFivesService;
 
 namespace DominoAllFives.Client.WPF.Services.Wcf.Services
 {
@@ -11,8 +11,10 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
         public PlayerAccount LoginWithAccount(Credentials credentials)
         {
             return WcfInvoker.Invoke<SessionAccountClient, PlayerAccount>(
-                () => new SessionAccountClient("AuthenticationEndpoint"),
-                proxy => proxy.LoginWithAccount(credentials));
+                () => new SessionAccountClient(
+                "AuthenticationEndpoint"),
+                proxy => proxy.LoginWithAccount(
+                credentials));
         }
     }
 }

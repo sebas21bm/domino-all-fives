@@ -11,16 +11,15 @@ namespace DominoAllFives.Contracts.Domain
     public sealed class PlayerAccount
     {
         private const int MaximumLanguageIdLength = 10;
-
         [DataMember(Order = 1, IsRequired = true)]
         public int PlayerId { get; private set; }
 
         [DataMember(Order = 2, IsRequired = true)]
         public string Username { get; private set; }
-        
+
         [DataMember(Order = 3, IsRequired = true)]
         public string PreferredLanguageId { get; private set; }
-        
+
         [DataMember(Order = 4, IsRequired = true)]
         public AccountAccessStatus AccessStatus { get; private set; }
 
@@ -34,13 +33,16 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Reconstructs an account without including credentials or persistence entities.
         /// </summary>
-        /// <param name="playerId">The account identifier.</param>
-        /// <param name="username">The stored or requested username.</param>
-        /// <param name="preferredLanguageId">The preferred language identifier associated with the account.</param>
-        /// <param name="accessStatus">The restrictions reconstructed by the server.</param>
+        /// <param name = "playerId">The account identifier.</param>
+        /// <param name = "username">The stored or requested username.</param>
+        /// <param name = "preferredLanguageId">The preferred language identifier associated with the account.</param>
+        /// <param name = "accessStatus">The restrictions reconstructed by the server.</param>
         /// <returns>The domain value produced by the operation.</returns>
-        public static PlayerAccount FromStoredAccount(int playerId, string username,
-            string preferredLanguageId, AccountAccessStatus accessStatus)
+        public static PlayerAccount FromStoredAccount(
+            int playerId,
+            string username,
+            string preferredLanguageId,
+            AccountAccessStatus accessStatus)
         {
             PlayerAccount account = new PlayerAccount
             {
@@ -55,42 +57,31 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Maps the preferred language stored with the account.
         /// </summary>
-        /// <param name="preferredLanguageId">The preferred language identifier associated with the account.</param>
+        /// <param name = "preferredLanguageId">The preferred language identifier associated with the account.</param>
         public void SetPreferredLanguage(string preferredLanguageId)
         {
             if (!IsPreferredLanguageValid(preferredLanguageId))
             {
-                throw new ArgumentException("Invalid stored language identifier.",
-                    nameof(preferredLanguageId));
+                throw new ArgumentException(
+                    "Invalid stored language identifier.",
+                    nameof(
+                    preferredLanguageId));
             }
+
             PreferredLanguageId = preferredLanguageId;
-        }
-
-        private static bool IsPreferredLanguageValid(string preferredLanguageId)
-        {
-            return preferredLanguageId != null &&
-                preferredLanguageId.Length <= MaximumLanguageIdLength;
-        }
-
-        [OnDeserialized]
-        private void OnDeserialized(StreamingContext context)
-        {
-            if (AccessStatus == null || !IsPreferredLanguageValid(PreferredLanguageId))
-            {
-                throw new SerializationException("Invalid stored account state.");
-            }
         }
 
         /// <summary>
         /// Checks server-reconstructed restrictions without authenticating a client session.
         /// </summary>
-        /// <param name="currentTime">The comparison time in the timestamp convention of the stored restrictions.</param>
+        /// <param name = "currentTime">The comparison time in the timestamp convention of the stored restrictions.</param>
         public LoginStatus EnsureCanLogin(DateTime currentTime)
         {
             if (AccessStatus == null)
             {
                 throw new InvalidOperationException("Account access restrictions are unavailable.");
             }
+
             return AccessStatus.EnsureCanLogin(currentTime);
         }
 
@@ -102,6 +93,21 @@ namespace DominoAllFives.Contracts.Domain
             }
 
             SessionKey = sessionKey;
+        }
+
+        private static bool IsPreferredLanguageValid(string preferredLanguageId)
+        {
+            return preferredLanguageId != null
+                && preferredLanguageId.Length <= MaximumLanguageIdLength;
+        }
+
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            if (AccessStatus == null || !IsPreferredLanguageValid(PreferredLanguageId))
+            {
+                throw new SerializationException("Invalid stored account state.");
+            }
         }
     }
 }

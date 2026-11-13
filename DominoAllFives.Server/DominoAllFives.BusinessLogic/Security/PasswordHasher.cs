@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Security.Cryptography;
 
 namespace DominoAllFives.BusinessLogic.Security
@@ -12,32 +12,31 @@ namespace DominoAllFives.BusinessLogic.Security
         private const int Iterations = 100000;
         private const int SaltSize = 16;
         private const int HashSize = 32;
-
+        private const int SerializedHashPartCount = 4;
+        private const int AlgorithmPartIndex = 0;
+        private const int IterationsPartIndex = 1;
+        private const int SaltPartIndex = 2;
+        private const int HashPartIndex = 3;
         public static string HashPassword(string password)
         {
             if (string.IsNullOrWhiteSpace(password))
             {
-                throw new ArgumentException(
-                    "Password cannot be null or empty.",
-                    nameof(password));
+                throw new ArgumentException("Password cannot be null or empty.", nameof(password));
             }
 
             byte[] salt = new byte[SaltSize];
-
-            using (RandomNumberGenerator randomNumberGenerator =
-                RandomNumberGenerator.Create())
+            using (RandomNumberGenerator randomNumberGenerator = RandomNumberGenerator.Create())
             {
                 randomNumberGenerator.GetBytes(salt);
             }
 
             byte[] hash;
-
             using (Rfc2898DeriveBytes deriveBytes =
                 new Rfc2898DeriveBytes(
-                    password,
-                    salt,
-                    Iterations,
-                    HashAlgorithmName.SHA256))
+                password,
+                salt,
+                Iterations,
+                HashAlgorithmName.SHA256))
             {
                 hash = deriveBytes.GetBytes(HashSize);
             }
@@ -46,42 +45,43 @@ namespace DominoAllFives.BusinessLogic.Security
                 "{0}${1}${2}${3}",
                 Algorithm,
                 Iterations,
-                Convert.ToBase64String(salt),
-                Convert.ToBase64String(hash));
+                Convert.ToBase64String(
+                salt),
+                Convert.ToBase64String(
+                hash));
         }
 
-        public static bool VerifyPassword(
-            string password,
-            string storedPasswordHash)
+        public static bool VerifyPassword(string password, string storedPasswordHash)
         {
-            if (string.IsNullOrWhiteSpace(password) ||
-                string.IsNullOrWhiteSpace(storedPasswordHash))
+            if (string.IsNullOrWhiteSpace(
+                password)
+                || string.IsNullOrWhiteSpace(
+                storedPasswordHash))
             {
                 return false;
             }
 
             string[] parts = storedPasswordHash.Split('$');
-
-            if (parts.Length != 4 ||
-                parts[0] != Algorithm ||
-                !int.TryParse(parts[1], out int iterations))
+            if (parts.Length != SerializedHashPartCount
+                || parts[AlgorithmPartIndex] != Algorithm
+                || !int.TryParse(
+                parts[IterationsPartIndex],
+                out int iterations))
             {
                 return false;
             }
 
             try
             {
-                byte[] salt = Convert.FromBase64String(parts[2]);
-                byte[] expectedHash = Convert.FromBase64String(parts[3]);
-
+                byte[] salt = Convert.FromBase64String(parts[SaltPartIndex]);
+                byte[] expectedHash = Convert.FromBase64String(parts[HashPartIndex]);
                 byte[] actualHash;
-
                 using (Rfc2898DeriveBytes deriveBytes =
                     new Rfc2898DeriveBytes(
-                        password,
-                        salt,
-                        iterations,
-                        HashAlgorithmName.SHA256))
+                    password,
+                    salt,
+                    iterations,
+                    HashAlgorithmName.SHA256))
                 {
                     actualHash = deriveBytes.GetBytes(expectedHash.Length);
                 }
@@ -98,9 +98,7 @@ namespace DominoAllFives.BusinessLogic.Security
             }
         }
 
-        private static bool SlowEquals(
-            byte[] firstHash,
-            byte[] secondHash)
+        private static bool SlowEquals(byte[] firstHash, byte[] secondHash)
         {
             if (firstHash.Length != secondHash.Length)
             {
@@ -108,7 +106,6 @@ namespace DominoAllFives.BusinessLogic.Security
             }
 
             int difference = 0;
-
             for (int index = 0; index < firstHash.Length; index++)
             {
                 difference |= firstHash[index] ^ secondHash[index];
