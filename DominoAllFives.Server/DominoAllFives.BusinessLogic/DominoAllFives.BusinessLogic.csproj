@@ -79,6 +79,7 @@
     <Compile Include="Controllers\AccountLanguageController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AuthenticationController.cs" />
+    <Compile Include="Controllers\ChatController.cs" />
     <Compile Include="Controllers\LobbyController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\ProfilePictureController.cs" />

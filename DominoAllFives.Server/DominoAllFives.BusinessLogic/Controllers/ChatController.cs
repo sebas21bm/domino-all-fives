@@ -33,11 +33,15 @@ namespace DominoAllFives.BusinessLogic.Controllers
             switch (message.Context.Scope)
             {
                 case ChatScope.Lobby:
-                    return _lobbyManager.RecordChatMessage(
+                    ChatMessage registeredMessage = _lobbyManager.AddChatMessage(
                         sender,
                         message.Context.ContextId,
-                        normalizedContent,
-                        out recipients);
+                        normalizedContent);
+
+                    recipients = _lobbyManager.GetChatRecipients(
+                        message.Context.ContextId);
+
+                    return registeredMessage;
                 case ChatScope.Match:
                     throw new ChatRuleException(ChatIssue.PlayerNotInChat);
                 default:
@@ -52,7 +56,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             switch (context.Scope)
             {
                 case ChatScope.Lobby:
-                    return _lobbyManager.GetChatMessages(playerId, context.ContextId);
+                    return _lobbyManager.GetChatMessages(context.ContextId,playerId);
                 case ChatScope.Match:
                     throw new ChatRuleException(ChatIssue.PlayerNotInChat);
                 default:
