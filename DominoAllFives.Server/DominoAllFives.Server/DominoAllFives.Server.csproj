@@ -47,6 +47,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChatService.cs" />
+	<Compile Include="Infrastructure\Chat\ChatCallbackRegistry.cs" />
+	<Compile Include="Infrastructure\Chat\ChatEventPublisher.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="DominoService.cs" />

@@ -43,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\IChatCallback.cs" />
+    <Compile Include="Services\IChatService.cs" />
     <Compile Include="Services\ISessionAccount.cs" />
     <Compile Include="Services\IRankingService.cs" />
     <Compile Include="Domain\RegistrationResult.cs" />
