@@ -13,7 +13,7 @@ namespace DominoAllFives.Client.Tests
         {
             // Arrange
             const string ServerContractsAssembly = "DominoAllFives.Contracts";
-            var application = typeof(MatchRemoteService).Assembly;
+            var application = typeof(MatchClient).Assembly;
             var tests = typeof(MatchProxyTests).Assembly;
             // Act
             bool applicationReferencesServer = application.GetReferencedAssemblies()

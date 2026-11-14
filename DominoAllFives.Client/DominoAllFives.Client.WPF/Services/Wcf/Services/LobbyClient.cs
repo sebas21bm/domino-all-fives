@@ -7,7 +7,7 @@ using LobbyService;
 
 namespace DominoAllFives.Client.WPF.Services.Wcf.Services
 {
-    public sealed class LobbyRemoteService : ILobbyClient
+    public sealed class LobbyClient : ILobbyClient
     {
         private readonly PlayerSession _playerSession;
         private readonly Func<LobbyCallbackHandler, LobbyServiceClient> _clientFactory;
@@ -39,7 +39,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
         public bool WasClosed { get; private set; }
         public int ProvisionalMatchId { get; private set; }
 
-        public LobbyRemoteService(
+        public LobbyClient(
             PlayerSession playerSession) : this(
             playerSession,
             callback => new LobbyServiceClient(
@@ -49,7 +49,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
         {
         }
 
-        internal LobbyRemoteService(
+        internal LobbyClient(
             PlayerSession playerSession,
             Func<LobbyCallbackHandler, LobbyServiceClient> clientFactory)
         {
@@ -299,7 +299,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
         {
             if (_disposed)
             {
-                throw new ObjectDisposedException(nameof(LobbyRemoteService));
+                throw new ObjectDisposedException(nameof(LobbyClient));
             }
         }
 

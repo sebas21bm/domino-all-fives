@@ -19,7 +19,7 @@ namespace DominoAllFives.Contracts.Gameplay
         public List<PlayerScore> Scores { get; set; }
 
         [DataMember(Order = 5)]
-        public MatchPhase Phase { get; set; }
+        public MatchStatus Phase { get; set; }
 
         [DataMember(Order = 6)]
         public long Version { get; set; }

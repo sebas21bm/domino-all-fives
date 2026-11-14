@@ -120,4 +120,7 @@
   <ItemGroup>
     <Compile Include="LobbyMergeTests.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Gameplay\TileTests.cs" />
+  </ItemGroup>
 </Project>

@@ -7,7 +7,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
     /// <summary>
     /// Retrieves ranking through the configured remote endpoint.
     /// </summary>
-    public sealed class RankingRemoteService : IRankingClient
+    public sealed class RankingClient : IRankingClient
     {
         public List<RankingEntry> GetTopWinsRanking()
         {

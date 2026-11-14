@@ -36,7 +36,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
         public int TurnNumber { get; private set; }
         public long Version { get; private set; }
         public Board Board { get; private set; }
-        public MatchPhase Phase { get; private set; }
+        public MatchState Phase { get; private set; }
         public RoundSummary LastRound { get; private set; }
         public PlayScore LastPlay { get; private set; }
 
@@ -60,7 +60,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
         {
             get
             {
-                return Phase == MatchPhase.InProgress ? (int
+                return Phase == MatchState.InProgress ? (int
                     ? )_players[_currentPlayerIndex].PlayerId : null;
             }
         }
@@ -135,7 +135,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             Version++;
             if (player.Points >= TargetPoints)
             {
-                Phase = MatchPhase.Completed;
+                Phase = MatchState.Completed;
                 return;
             }
 
@@ -191,19 +191,19 @@ namespace DominoAllFives.BusinessLogic.Gameplay
         public void Cancel(int playerId)
         {
             GetPlayer(playerId);
-            if (Phase != MatchPhase.InProgress)
+            if (Phase != MatchState.InProgress)
             {
                 return;
             }
 
-            Phase = MatchPhase.Cancelled;
+            Phase = MatchState.Cancelled;
             Version++;
         }
 
         private MatchPlayer ValidateTurn(int playerId, long expectedVersion)
         {
             MatchPlayer player = GetPlayer(playerId);
-            if (Phase != MatchPhase.InProgress)
+            if (Phase != MatchState.InProgress)
             {
                 throw new MatchRuleException(MatchIssue.MatchNotInProgress);
             }
@@ -272,7 +272,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             };
             if (_players.Any(player => player.Points >= TargetPoints))
             {
-                Phase = MatchPhase.Completed;
+                Phase = MatchState.Completed;
                 return;
             }
 

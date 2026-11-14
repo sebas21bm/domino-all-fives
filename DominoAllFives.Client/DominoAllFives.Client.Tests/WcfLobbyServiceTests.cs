@@ -23,7 +23,7 @@ namespace DominoAllFives.Client.Tests
             };
             using (TestLobbyHost host = new TestLobbyHost(remoteService))
             {
-                using (LobbyRemoteService service = host.CreateClient())
+                using (LobbyClient service = host.CreateClient())
                 {
                     // Act
                     Assert.Throws<FaultException>(() => service.CreateLobby(new LobbySettings()));
@@ -49,7 +49,7 @@ namespace DominoAllFives.Client.Tests
             };
             using (TestLobbyHost host = new TestLobbyHost(remoteService))
             {
-                using (LobbyRemoteService service = host.CreateClient())
+                using (LobbyClient service = host.CreateClient())
                 {
                     // Act
                     Assert.Throws<FaultException>(() => service.JoinLobby("MISSING"));
@@ -70,7 +70,7 @@ namespace DominoAllFives.Client.Tests
             };
             using (TestLobbyHost host = new TestLobbyHost(remoteService))
             {
-                using (LobbyRemoteService service = host.CreateClient())
+                using (LobbyClient service = host.CreateClient())
                 {
                     // Act
                     Lobby lobby = service.CreateLobby(new LobbySettings());
@@ -88,7 +88,7 @@ namespace DominoAllFives.Client.Tests
             TestLobbyService remoteService = new TestLobbyService();
             using (TestLobbyHost host = new TestLobbyHost(remoteService))
             {
-                using (LobbyRemoteService service = host.CreateClient())
+                using (LobbyClient service = host.CreateClient())
                 {
                     // Act
                     service.JoinLobby("ROOM");
@@ -112,7 +112,7 @@ namespace DominoAllFives.Client.Tests
             };
             using (TestLobbyHost host = new TestLobbyHost(remoteService))
             {
-                using (LobbyRemoteService service = host.CreateClient())
+                using (LobbyClient service = host.CreateClient())
                 {
                     service.JoinLobby("ROOM");
                     // Act
@@ -132,7 +132,7 @@ namespace DominoAllFives.Client.Tests
             TestLobbyService remoteService = new TestLobbyService();
             using (TestLobbyHost host = new TestLobbyHost(remoteService))
             {
-                using (LobbyRemoteService service = host.CreateClient())
+                using (LobbyClient service = host.CreateClient())
                 {
                     service.JoinLobby("ROOM");
                     LobbyCallbackHandler previousCallback = host.Callbacks[0];
@@ -155,7 +155,7 @@ namespace DominoAllFives.Client.Tests
             TestLobbyService remoteService = new TestLobbyService();
             using (TestLobbyHost host = new TestLobbyHost(remoteService))
             {
-                LobbyRemoteService service = host.CreateClient();
+                LobbyClient service = host.CreateClient();
                 service.JoinLobby("ROOM");
                 // Act
                 service.Dispose();
@@ -191,11 +191,11 @@ namespace DominoAllFives.Client.Tests
                 _host.Open();
             }
 
-            public LobbyRemoteService CreateClient()
+            public LobbyClient CreateClient()
             {
                 PlayerSession playerSession = new PlayerSession();
                 playerSession.Start(1, "Player", "en-US", "session-key");
-                return new LobbyRemoteService(playerSession, CreateProxy);
+                return new LobbyClient(playerSession, CreateProxy);
             }
 
             public void Dispose()

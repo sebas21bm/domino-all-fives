@@ -114,7 +114,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public RelayCommand LeaveCommand { get; }
 
         public MatchViewModel(IFrameNavigationService navigation,
-            MatchNavigation context) : this(navigation, context, new MatchRemoteService())
+            MatchNavigation context) : this(navigation, context, new MatchClient())
         {
         }
 

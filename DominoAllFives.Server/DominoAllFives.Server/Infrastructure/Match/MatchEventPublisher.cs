@@ -15,7 +15,7 @@ namespace DominoAllFives.Server.Infrastructure
 {
     public sealed class MatchEventPublisher
     {
-        private readonly object _syncRoot = new object ();
+        private readonly object _syncRoot = new object();
         private readonly Dictionary<Tuple<int, int>, IMatchCallback> _callbacks =
             new Dictionary<Tuple<int, int>, IMatchCallback>();
         private readonly ConcurrentDictionary<int, DeliveryQueue> _queues =

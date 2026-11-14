@@ -14,7 +14,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 OpeningTileId = match.OpeningTileId,
                 CurrentPlayerId = match.CurrentPlayerId,
                 Version = match.Version,
-                Phase = (Network.MatchPhase)match.Phase,
+                Phase = (Network.MatchStatus)match.Phase,
                 RoundNumber = match.RoundNumber,
                 StockCount = match.StockCount,
                 Scores = CreateScores(match),
@@ -55,8 +55,8 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 MatchId = match.MatchId,
                 Scores = CreateScores(match),
                 Version = match.Version,
-                Phase = (Network.MatchPhase)match.Phase,
-                WinnerIds = match.Phase == MatchPhase.Completed ? match.Players.Where(player
+                Phase = (Network.MatchStatus)match.Phase,
+                WinnerIds = match.Phase == MatchState.Completed ? match.Players.Where(player
                     => player.Points >= match.TargetPoints)
                     .Select(player => player.PlayerId)
                     .ToList() : new List<int>()

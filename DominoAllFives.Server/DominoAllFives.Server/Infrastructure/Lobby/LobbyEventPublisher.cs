@@ -20,24 +20,30 @@ namespace DominoAllFives.Server.Infrastructure.Lobby
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public void PublishLobbyChanged(
-            LobbyModel lobby) =>
-            Publish(
-            lobby,
-            callback => callback.OnLobbyChanged(
-            lobby));
-        public void PublishLobbyClosed(
-            LobbyModel lobby) =>
-            Publish(
-            lobby,
-            callback => callback.OnLobbyClosed());
-        public void PublishMatchStarted(
-            LobbyModel lobby,
-            int matchId) =>
-            Publish(
-            lobby,
-            callback => callback.OnMatchStarted(
-            matchId));
+        public void PublishLobbyChanged(LobbyModel lobby)
+        {
+            Publish(lobby, delegate (ILobbyCallback callback)
+            {
+                callback.OnLobbyChanged(lobby);
+            });
+        }
+
+        public void PublishLobbyClosed(LobbyModel lobby)
+        {
+            Publish(lobby, delegate (ILobbyCallback callback)
+            {
+                callback.OnLobbyClosed();
+            });
+        }
+
+        public void PublishMatchStarted(LobbyModel lobby, int matchId)
+        {
+            Publish(lobby, delegate (ILobbyCallback callback)
+            {
+                callback.OnMatchStarted(matchId);
+            });
+        }
+
         private void Publish(LobbyModel lobby, Action<ILobbyCallback> notification)
         {
             if (lobby == null)
