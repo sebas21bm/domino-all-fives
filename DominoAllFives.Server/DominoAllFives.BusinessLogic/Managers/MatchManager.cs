@@ -7,7 +7,6 @@ namespace DominoAllFives.BusinessLogic.Managers
 {
     public sealed class MatchManager
     {
-        private const int RetentionMinutes = 30;
         private readonly ConcurrentDictionary<int, ActiveMatch> _matches =
             new ConcurrentDictionary<int, ActiveMatch>();
         public ActiveMatch GetMatch(int matchId)

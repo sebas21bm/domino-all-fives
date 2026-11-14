@@ -38,8 +38,28 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 return end == End.Left;
             }
 
-            BoardEnd target = _ends.SingleOrDefault(candidate => candidate.End == end);
-            return target != null && target.BlockedTurn != turnNumber && tile.Matches(target.Value);
+            BoardEnd target = null;
+            foreach (BoardEnd candidate in _ends)
+            {
+                if (candidate.End == end)
+                {
+                    target = candidate;
+                    break;
+                }
+            }
+
+            if (target == null)
+            {
+                return false;
+            }
+
+            if (target.BlockedTurn == turnNumber)
+            {
+                return false;
+            }
+
+            return tile.Matches(target.Value);
+
         }
 
         public bool HasMove(IEnumerable<Tile> hand, int turnNumber)

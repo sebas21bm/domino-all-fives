@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace DominoAllFives.Contracts.Gameplay
 {
     [DataContract]
-    public enum MatchPhase
+    public enum MatchStatus
     {
         [EnumMember]
         InProgress = 0,
