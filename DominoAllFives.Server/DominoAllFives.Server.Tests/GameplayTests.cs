@@ -116,7 +116,7 @@ namespace DominoAllFives.Server.Tests
             Match match = new Match(1, new[] { 1, 2 }, 250, FixedDeck);
             int actions = 0;
             // Act
-            while (match.LastRound == null && match.Phase == MatchPhase.InProgress
+            while (match.LastRound == null && match.Phase == MatchState.InProgress
                 && actions++ < 1000)
             {
                 PlayNextLegalAction(match);
@@ -377,7 +377,7 @@ namespace DominoAllFives.Server.Tests
             // Act
             match.Cancel(playerId);
             // Assert
-            Assert.That(match.Phase, Is.EqualTo(MatchPhase.Cancelled));
+            Assert.That(match.Phase, Is.EqualTo(MatchState.Cancelled));
             Assert.That(MatchProjection.CreateResult(match).WinnerIds, Is.Empty);
             Assert.Throws<MatchRuleException>(() => match.Draw(playerId, match.Version));
         }
@@ -391,7 +391,7 @@ namespace DominoAllFives.Server.Tests
             Match match = new Match(1, Enumerable.Range(1, playerCount), 100, Deck.Create);
             int actionCount = 0;
             // Act
-            while (match.Phase == MatchPhase.InProgress && actionCount++ < 5000)
+            while (match.Phase == MatchState.InProgress && actionCount++ < 5000)
             {
                 PlayNextLegalAction(match);
                 Assert.That(match.Players.Sum(player => player.Tiles.Count) + match.StockCount
@@ -399,7 +399,7 @@ namespace DominoAllFives.Server.Tests
             }
 
             // Assert
-            Assert.That(match.Phase, Is.EqualTo(MatchPhase.Completed));
+            Assert.That(match.Phase, Is.EqualTo(MatchState.Completed));
             Assert.That(match.Players.Max(player => player.Points), Is.GreaterThanOrEqualTo(100));
         }
 

@@ -152,7 +152,7 @@
     <Compile Include="Gameplay\Domain\MatchPlayer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Gameplay\Domain\MatchRuleException.cs" />
+    <Compile Include="Gameplay\Exceptions\MatchRuleException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gameplay\Domain\Placement.cs" />
@@ -170,7 +170,7 @@
     <Compile Include="Gameplay\Enum\MatchIssue.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Gameplay\Enum\MatchPhase.cs" />
+    <Compile Include="Gameplay\Enum\MatchState.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gameplay\Enum\SpecialPower.cs" />

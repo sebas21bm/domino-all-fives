@@ -114,7 +114,7 @@
     <Compile Include="Gameplay\Enum\MatchIssue.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Gameplay\Enum\MatchPhase.cs" />
+    <Compile Include="Gameplay\Enum\MatchStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gameplay\Enum\SpecialPower.cs" />

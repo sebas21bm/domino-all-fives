@@ -84,6 +84,6 @@
     <Compile Include="Infrastructure\GameRuntime.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Infrastructure\MatchEventPublisher.cs" />
+    <Compile Include="Infrastructure\Match\MatchEventPublisher.cs" />
   </ItemGroup>
 </Project>

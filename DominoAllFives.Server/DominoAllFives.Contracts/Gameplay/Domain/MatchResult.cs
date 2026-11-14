@@ -16,7 +16,7 @@ namespace DominoAllFives.Contracts.Gameplay
         public List<int> WinnerIds { get; set; }
 
         [DataMember(Order = 4)]
-        public MatchPhase Phase { get; set; }
+        public MatchStatus Phase { get; set; }
 
         [DataMember(Order = 5)]
         public long Version { get; set; }

@@ -77,7 +77,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 RoundSummary previousRound = match.LastRound;
                 long previousVersion = match.Version;
                 change(match);
-                if (match.Phase != MatchPhase.InProgress && !active.FinishedAt.HasValue)
+                if (match.Phase != MatchState.InProgress && !active.FinishedAt.HasValue)
                 {
                     active.FinishedAt = DateTime.UtcNow;
                 }
@@ -92,7 +92,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 _enqueue(new MatchUpdate { View = view, Hands = match.Players.Select(player
                     => MatchProjection.CreateHand(match, player.PlayerId))
                     .ToList(), Round = ReferenceEquals(previousRound, match.LastRound)
-                        ? null : view.LastRound, Result = match.Phase == MatchPhase.InProgress
+                        ? null : view.LastRound, Result = match.Phase == MatchState.InProgress
                         ? null : MatchProjection.CreateResult(match) });
                 return view;
             }
