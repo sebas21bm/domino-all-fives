@@ -28,18 +28,18 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 throw new ArgumentNullException(nameof(message));
             }
 
-            ValidateContext(message.Context);
+            ValidateContext(message.ContextId);
             string normalizedContent = ValidateAndNormalizeContent(message.Content);
-            switch (message.Context.Scope)
+            switch (message.Scope)
             {
                 case ChatScope.Lobby:
                     ChatMessage registeredMessage = _lobbyManager.AddChatMessage(
                         sender,
-                        message.Context.ContextId,
+                        message.ContextId,
                         normalizedContent);
 
                     recipients = _lobbyManager.GetChatRecipients(
-                        message.Context.ContextId);
+                        message.ContextId);
 
                     return registeredMessage;
                 case ChatScope.Match:
@@ -49,20 +49,22 @@ namespace DominoAllFives.BusinessLogic.Controllers
             }
         }
 
+        /*
         public List<ChatMessage> GetMessages(int playerId, ChatContext context)
         {
             ValidateId(playerId, nameof(playerId));
-            ValidateContext(context);
+            //ValidateContext(context);
             switch (context.Scope)
             {
                 case ChatScope.Lobby:
-                    return _lobbyManager.GetChatMessages(context.ContextId,playerId);
+                    return _lobbyManager.GetChatMessages(context.ContextId, playerId);
                 case ChatScope.Match:
                     throw new ChatRuleException(ChatIssue.PlayerNotInChat);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(context));
             }
         }
+        */
 
         private static void ValidatePlayer(Player player)
         {
@@ -78,8 +80,10 @@ namespace DominoAllFives.BusinessLogic.Controllers
             }
         }
 
-        private static void ValidateContext(ChatContext context)
+        private static void ValidateContext(int contextId)
         {
+            /*
+             * TODO: Remove this method
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
@@ -91,6 +95,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             }
 
             ValidateId(context.ContextId, nameof(context));
+            */
         }
 
         private static void ValidateId(int value, string parameterName)

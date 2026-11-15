@@ -11,14 +11,14 @@ namespace DominoAllFives.BusinessLogic.Managers
         private const int MinimumPlayersToStart = 2;
         private const int LobbyCodeLength = 6;
         private static readonly LobbyManager instance = new LobbyManager();
-        private readonly object _syncRoot = new object ();
+        private readonly object _syncRoot = new object();
         private readonly Dictionary<string, Lobby> _lobbies = new Dictionary<string, Lobby>(
             StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, string> _playerLobbyCodes = new Dictionary<int, string>();
         private readonly Dictionary<int, List<ChatMessage>> _lobbyMessages = new Dictionary<int,
             List<ChatMessage>>();
         private int _nextLobbyId = 1;
-        private int _nextMessageId = 1;
+        //private int _nextMessageId = 1;
         public static LobbyManager Instance
         {
             get
@@ -193,16 +193,11 @@ namespace DominoAllFives.BusinessLogic.Managers
 
                 ChatMessage registeredMessage = new ChatMessage
                 {
-                    MessageId = _nextMessageId++,
-                    Context = new ChatContext
-                    {
-                        Scope = ChatScope.Lobby,
-                        ContextId = lobby.LobbyId
-                    },
+                    Scope = ChatScope.Lobby,
+                    ContextId = lobby.LobbyId,
                     SenderId = sender.PlayerId,
                     SenderUsername = sender.Username,
-                    Content = content,
-                    SentAtUtc = DateTime.UtcNow
+                    Content = content
                 };
                 messages.Add(registeredMessage);
                 return CopyChatMessage(registeredMessage);
@@ -422,16 +417,11 @@ namespace DominoAllFives.BusinessLogic.Managers
         {
             return new ChatMessage
             {
-                MessageId = message.MessageId,
-                Context = new ChatContext
-                {
-                    Scope = message.Context.Scope,
-                    ContextId = message.Context.ContextId
-                },
+                Scope = message.Scope,
+                ContextId = message.ContextId,
                 SenderId = message.SenderId,
                 SenderUsername = message.SenderUsername,
                 Content = message.Content,
-                SentAtUtc = message.SentAtUtc
             };
         }
     }
