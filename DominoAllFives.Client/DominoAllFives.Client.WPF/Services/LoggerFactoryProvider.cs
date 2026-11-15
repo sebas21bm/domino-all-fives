@@ -61,11 +61,21 @@ namespace DominoAllFives.Client.WPF.Services
                 }
 
                 string logFilePath = Path.Combine(logDirectory, "client_log-.txt");
-                Serilog.Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.File(
-                    path: logFilePath,
-                    rollingInterval: RollingInterval.Day,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} "
-                        + "[{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}")
+                Serilog.Log.Logger = new LoggerConfiguration()
+                    .MinimumLevel.Debug()
+                    .WriteTo.File(
+                        path: logFilePath,
+                        rollingInterval: RollingInterval.Day,
+                        rollOnFileSizeLimit: true,
+                        fileSizeLimitBytes: 10 * 1024 * 1024,
+                        retainedFileCountLimit: 14,
+                        outputTemplate:
+                            "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} "
+                            + "[{Level:u3}] "
+                            + "[{SourceContext}] "
+                            + "{Message:lj}"
+                            + "{NewLine}"
+                            + "{Exception}")
                     .CreateLogger();
                 return LoggerFactory.Create(ConfigureLogging);
             }

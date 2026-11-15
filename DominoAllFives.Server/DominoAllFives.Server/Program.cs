@@ -9,7 +9,7 @@ namespace DominoAllFives.Server
     {
         private static int Main()
         {
-            ILogger<DominoService> logger = new ConsoleLogger<DominoService>();
+            ILogger<DominoService> logger = LoggerFactoryProvider.CreateLogger<DominoService>();
             using (ServiceHost dominoServiceHost = new ServiceHost(typeof(DominoService)))
             {
                 using (ServiceHost lobbyServiceHost = new ServiceHost(typeof(LobbyService)))

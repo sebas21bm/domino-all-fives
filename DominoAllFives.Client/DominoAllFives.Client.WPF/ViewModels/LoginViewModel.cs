@@ -112,7 +112,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            _logger.LogInformation("Attempting login for user: {EmailOrUsername}", Email.Trim());
             PlayerAccount authenticatedAccount;
             try
             {
@@ -150,10 +149,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             if (authenticatedAccount == null
                 || authenticatedAccount.PlayerId <= 0
-                || string.IsNullOrWhiteSpace(
-                authenticatedAccount.Username)
-                || string.IsNullOrWhiteSpace(
-                authenticatedAccount.SessionKey))
+                || string.IsNullOrWhiteSpace(authenticatedAccount.Username)
+                || string.IsNullOrWhiteSpace(authenticatedAccount.SessionKey))
             {
                 _logger.LogError("Authentication service returned an invalid account.");
                 ShowMessageFailure();
@@ -165,7 +162,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             {
                 _logger.LogWarning(
                     "Unsupported stored account language "
-                        + "{PreferredLanguageId}; using fallback.",
+                    + "{PreferredLanguageId}; using fallback.",
                     authenticatedAccount.PreferredLanguageId);
             }
 
@@ -175,8 +172,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 authenticatedAccount.PreferredLanguageId,
                 authenticatedAccount.SessionKey);
             _logger.LogInformation(
-                "User {EmailOrUsername} logged in successfully with " + "PlayerId: {PlayerId}",
-                Email.Trim(),
+                "Player {PlayerId} logged in successfully.",
                 authenticatedAccount.PlayerId);
             _onLoginSuccess.Invoke();
         }

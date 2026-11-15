@@ -27,7 +27,7 @@ namespace DominoAllFives.Server
         private static readonly LobbyController controller;
         private static readonly LobbyCallbackRegistry callbacks;
         private static readonly LobbyEventPublisher publisher;
-        private static readonly ILogger<LobbyService> logger;
+        private static readonly ILogger<LobbyService> _logger;
         private Player _player;
         private ILobbyCallback _callback;
         private ICommunicationObject _callbackChannel;
@@ -38,8 +38,8 @@ namespace DominoAllFives.Server
             controller = new LobbyController(lobbyManager);
             callbacks = new LobbyCallbackRegistry();
             publisher = new LobbyEventPublisher(callbacks,
-                new ConsoleLogger<LobbyEventPublisher>());
-            logger = new ConsoleLogger<LobbyService>();
+                            LoggerFactoryProvider.CreateLogger<LobbyEventPublisher>());
+            _logger = LoggerFactoryProvider.CreateLogger<LobbyService>();
         }
 
         /// <summary>
@@ -74,17 +74,17 @@ namespace DominoAllFives.Server
             }
             catch (SqlException ex)
             {
-                logger.LogError(ex, "Lobby session could not resolve player.");
+                _logger.LogError(ex, "Lobby session could not resolve player.");
                 throw new FaultException("The service could not complete the operation.");
             }
             catch (EntityException ex)
             {
-                logger.LogError(ex, "Lobby session could not resolve player.");
+                _logger.LogError(ex, "Lobby session could not resolve player.");
                 throw new FaultException("The service could not complete the operation.");
             }
             catch (DbUpdateException ex)
             {
-                logger.LogError(ex, "Lobby session could not resolve player.");
+                _logger.LogError(ex, "Lobby session could not resolve player.");
                 throw new FaultException("The service could not complete the operation.");
             }
 
