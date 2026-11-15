@@ -8,9 +8,9 @@ Equipo 4:
 Sebastián Barrera Mora  
 Yarazareth Zacnite Ortiz Olmos
 
-Versión: 4.0
+Versión: 5.0
 
-Fecha de entrega: 30 de Agosto de 2026
+Fecha de entrega: 15 de Noviembre de 2026
 
 **Contenido**
 
@@ -44,13 +44,13 @@ Fecha de entrega: 30 de Agosto de 2026
 
 [2.6. Clases	9](#2.6.-clases)
 
-[2.7. Estructuras	9](#2.7.-estructuras)
+[2.7. Estructuras	10](#2.7.-estructuras)
 
 [2.8. Interfaces	10](#2.8.-interfaces)
 
 [2.9. Enumeraciones	10](#2.9.-enumeraciones)
 
-[2.10. Namespaces	10](#2.10.-namespaces)
+[2.10. Namespaces	11](#2.10.-namespaces)
 
 [2.11. Parámetros	12](#2.11.-parámetros)
 
@@ -58,23 +58,25 @@ Fecha de entrega: 30 de Agosto de 2026
 
 [2.13 Componentes gráficos de WPF	14](#2.13-componentes-gráficos-de-wpf)
 
-[2.14 Vistas y archivos XAML	18](#2.14-vistas-y-archivos-xaml)
+[2.14 Vistas y archivos XAML	17](#2.14-vistas-y-archivos-xaml)
 
-[2.15 Recursos para el proyecto	18](#2.15-recursos-para-el-proyecto)
+[2.15 Recursos para el proyecto	17](#2.15-recursos-para-el-proyecto)
 
-[2.16 Recursos de internacionalización y claves	18](#2.16-recursos-de-internacionalización-y-claves)
+[2.16 Recursos de internacionalización y claves	17](#2.16-recursos-de-internacionalización-y-claves)
 
-[2.17 Base de datos, tablas y columnas	19](#2.17-base-de-datos,-tablas-y-columnas)
+[2.17 Base de datos, tablas y columnas	18](#2.17-base-de-datos,-tablas-y-columnas)
 
-[2.18 Proyectos y soluciones	19](#2.18-proyectos-y-soluciones)
+[2.18 Proyectos y soluciones	18](#2.18-proyectos-y-soluciones)
 
-[2.19 Contratos y elementos de WCF	19](#2.19-contratos-y-elementos-de-wcf)
+[2.19 Contratos y elementos de WCF	18](#2.19-contratos-y-elementos-de-wcf)
 
-[**3\. Estilo de código	21**](#estilo-de-código)
+[2.20 Nombrado de excepciones personalizadas de reglas de negocio	20](#2.20-nombrado-de-excepciones-personalizadas-de-reglas-de-negocio)
 
-[3.1. Formato y estructura general	21](#3.1.-formato-y-estructura-general)
+[**3\. Estilo de código	20**](#estilo-de-código)
 
-[3.1.1. Indentación	21](#3.1.1.-indentación)
+[3.1. Formato y estructura general	20](#3.1.-formato-y-estructura-general)
+
+[3.1.1. Indentación	20](#3.1.1.-indentación)
 
 [3.1.2. Longitud de línea	22](#3.1.2.-longitud-de-línea)
 
@@ -96,85 +98,89 @@ Fecha de entrega: 30 de Agosto de 2026
 
 [4.4. Interfaces	37](#4.4.-interfaces)
 
-[4.5. Sobrescritura de métodos	38](#4.5.-sobrescritura-de-métodos)
+[4.5. Sobrescritura de métodos	39](#4.5.-sobrescritura-de-métodos)
 
 [4.6. Manejo de valores nulos	41](#4.6.-manejo-de-valores-nulos)
 
-[4.7. Manejo de excepciones	41](#4.7.-manejo-de-excepciones)
+[4.7. Manejo de excepciones	42](#4.7.-manejo-de-excepciones)
 
-[4.8. Expresiones lambda	43](#4.8.-expresiones-lambda)
+[4.8. Expresiones lambda y cuerpos de expresión	44](#4.8.-expresiones-lambda-y-cuerpos-de-expresión)
 
-[4.9. Números y cadenas mágicas	44](#4.9.-números-y-cadenas-mágicas)
+[4.9. Números y cadenas mágicas	45](#4.9.-números-y-cadenas-mágicas)
 
-[4.10. Complejidad de métodos	45](#4.10.-complejidad-de-métodos)
+[4.10. Complejidad de métodos	46](#4.10.-complejidad-de-métodos)
 
-[4.11. Complejidad ciclomática	46](#4.11.-complejidad-ciclomática)
+[4.11. Complejidad ciclomática	47](#4.11.-complejidad-ciclomática)
 
-[4.12. Número de parámetros	48](#4.12.-número-de-parámetros)
+[4.12. Número de parámetros	49](#4.12.-número-de-parámetros)
 
-[4.13. Expresiones lógicas	49](#4.13.-expresiones-lógicas)
+[4.13. Expresiones lógicas	50](#4.13.-expresiones-lógicas)
 
-[4.14. Registro de eventos y errores (Logs)	49](#4.14.-registro-de-eventos-y-errores-\(logs\))
+[4.14. Registro de eventos y errores (Logs)	51](#4.14.-registro-de-eventos-y-errores-\(logs\))
 
-[4.14.1 Categorización de errores	50](#4.14.1-categorización-de-errores)
+[4.14.1 Categorización de errores	52](#4.14.1-categorización-de-errores)
 
-[4.15 Inicialización y asignación	52](#4.15-inicialización-y-asignación)
+[4.15 Inicialización y asignación	54](#4.15-inicialización-y-asignación)
 
-[4.16 Composición de textos e Internacionalización	53](#4.16-composición-de-textos-e-internacionalización)
+[4.16 Composición de textos e Internacionalización	55](#4.16-composición-de-textos-e-internacionalización)
 
-[4.17 Uso de las variables de tipo local	54](#4.17-uso-de-las-variables-de-tipo-local)
+[4.17 Uso de las variables de tipo local	56](#4.17-uso-de-las-variables-de-tipo-local)
 
-[4.18 Consultas de datos con LINQ	54](#4.18-consultas-de-datos-con-linq)
+[4.18 Consultas de datos con LINQ	56](#4.18-consultas-de-datos-con-linq)
 
-[4.19 Uso de enumeraciones	55](#4.19-uso-de-enumeraciones)
+[4.19 Uso de enumeraciones	57](#4.19-uso-de-enumeraciones)
 
-[4.20 Enfoque orientado a objetos	55](#4.20-enfoque-orientado-a-objetos)
+[4.20 Enfoque orientado a objetos	57](#4.20-enfoque-orientado-a-objetos)
 
-[**5\. Comentarios y documentación	55**](#comentarios-y-documentación)
+[4.21 Manejo de concurrencia y sincronización	57](#4.21-manejo-de-concurrencia-y-sincronización)
 
-[5.1. Comentarios de implementación	55](#5.1.-comentarios-de-implementación)
+[4.22 Comunicación remota con WCF	59](#4.22-comunicación-remota-con-wcf)
 
-[5.2. Comentarios de una sola línea	56](#5.2.-comentarios-de-una-sola-línea)
+[**5\. Comentarios y documentación	61**](#comentarios-y-documentación)
 
-[5.3. Comentarios en bloque	57](#5.3.-comentarios-en-bloque)
+[5.1. Comentarios de implementación	61](#5.1.-comentarios-de-implementación)
 
-[5.4. Comentarios de documentación XML	57](#5.4.-comentarios-de-documentación-xml)
+[5.2. Comentarios de una sola línea	62](#5.2.-comentarios-de-una-sola-línea)
 
-[5.5. Comentarios TODO	59](#5.5.-comentarios-todo)
+[5.3. Comentarios en bloque	63](#5.3.-comentarios-en-bloque)
 
-[5.6. Comentarios FIXME	60](#5.6.-comentarios-fixme)
+[5.4. Comentarios de documentación XML	63](#5.4.-comentarios-de-documentación-xml)
 
-[5.7 Comentarios en archivos XAML	60](#5.7-comentarios-en-archivos-xaml)
+[5.5. Comentarios TODO	65](#5.5.-comentarios-todo)
 
-[5.8 Excepciones en archivos autogenerados	61](#5.8-excepciones-en-archivos-autogenerados)
+[5.6. Comentarios FIXME	65](#5.6.-comentarios-fixme)
 
-[**6\. Estructuras de control	62**](#estructuras-de-control)
+[5.7 Comentarios en archivos XAML	66](#5.7-comentarios-en-archivos-xaml)
 
-[6.1. Sentencias condicionales	62](#6.1.-sentencias-condicionales)
+[5.8 Excepciones en archivos autogenerados	67](#5.8-excepciones-en-archivos-autogenerados)
 
-[6.2. Bucles	63](#6.2.-bucles)
+[**6\. Estructuras de control	68**](#estructuras-de-control)
 
-[6.3. Sentencias switch	65](#6.3.-sentencias-switch)
+[6.1. Sentencias condicionales	68](#6.1.-sentencias-condicionales)
 
-[6.4. Operador ternario	66](#6.4.-operador-ternario)
+[6.2. Bucles	69](#6.2.-bucles)
 
-[6.5. Operador de coalescencia nula	67](#6.5.-operador-de-coalescencia-nula)
+[6.3. Sentencias switch	71](#6.3.-sentencias-switch)
 
-[6.6. Control de flujo	68](#6.6.-control-de-flujo)
+[6.4. Operador ternario	72](#6.4.-operador-ternario)
 
-[**7\. Pruebas	70**](#pruebas)
+[6.5. Operador de coalescencia nula	73](#6.5.-operador-de-coalescencia-nula)
 
-[7.1. Pruebas unitarias	70](#7.1.-pruebas-unitarias)
+[6.6. Control de flujo	73](#6.6.-control-de-flujo)
 
-[7.2. Ubicación de las pruebas	71](#7.2.-ubicación-de-las-pruebas)
+[**7\. Pruebas	76**](#pruebas)
 
-[7.3. Nomenclatura de las pruebas	71](#7.3.-nomenclatura-de-las-pruebas)
+[7.1. Pruebas unitarias	76](#7.1.-pruebas-unitarias)
 
-[7.4. Estructura de las pruebas	72](#7.4.-estructura-de-las-pruebas)
+[7.2. Ubicación de las pruebas	77](#7.2.-ubicación-de-las-pruebas)
 
-[**8\. Declaración de uso de IA	74**](#declaración-de-uso-de-ia)
+[7.3. Nomenclatura de las pruebas	77](#7.3.-nomenclatura-de-las-pruebas)
 
-[**9\. Referencias	75**](#referencias)
+[7.4. Estructura de las pruebas	78](#7.4.-estructura-de-las-pruebas)
+
+[**8\. Declaración de uso de IA	80**](#declaración-de-uso-de-ia)
+
+[**9\. Referencias	81**](#referencias)
 
 1. # Introducción {#introducción}
 
@@ -220,11 +226,9 @@ Se deberán utilizar palabras completas cuando sea posible y evitar abreviaturas
 
 Para valores booleanos se utilizarán nombres que expresan el estado o condición representada, procurando que puedan interpretarse como verdadero o falso.
 
-En caso de las variables `var`, la convención de nombrado será igual al resto de variables. 
-
 | Con estándar | Sin estándar |
 | ----- | ----- |
-| `int playerScore = 1500; string playerName = "Yara"; bool isGamePaused = false; float movementSpeed = 5.5f; var player = new Player();`  | `int PlayerScore = 1500; string player_name = "Sebastián"; bool flag = false; float spd = 5.5f; var PLAYER = new Player();` |
+| `int playerScore = 1500;` `string playerName = "Yara";` `bool isGamePaused = false;` `float movementSpeed = 5.5f;` `Player currentPlayer = new Player();` | `int PlayerScore = 1500;` `string player_name = "Sebastián";` `bool flag = false;` `float spd = 5.5f;` `Player PLAYER = new Player();` |
 
 ### 2.1.1 Variables de incremento  {#2.1.1-variables-de-incremento}
 
@@ -260,9 +264,9 @@ Las propiedades que representen colecciones deberán utilizar un nombre en plura
 
 | Con estándar |
 | ----- |
-| `public class Player {     public string PlayerName { get; set; }     public int CurrentHealth { get; private set; }     public int MaximumHealth { get; }     public bool IsAlive { get; private set; }     public bool CanAttack { get; set; }     public bool HasShield { get; private set; }     public IReadOnlyList<string> UnlockedAbilities { get; }      public float MovementSpeed     {         get => _movementSpeed;         set => _movementSpeed = Math.Max(0f, value);     }     private float _movementSpeed; }` |
+| `public class Player` `{`     `private float _movementSpeed;`     `public string PlayerName { get; set; }`     `public int CurrentHealth { get; private set; }`     `public int MaximumHealth { get; }`     `public bool IsAlive { get; private set; }`     `public bool CanAttack { get; set; }`     `public bool HasShield { get; private set; }`     `public IReadOnlyList<string> UnlockedAbilities { get; }`     `public float MovementSpeed`     `{`         `get`         `{`             `return _movementSpeed;`         `}`         `set`         `{`             `_movementSpeed = Math.Max(0f, value);`         `}`     `}` `}` |
 | **Sin estándar** |
-| `public class Player {     public string playerName { get; set; }     public int current_health { get; private set; }     public int maxHealth { get; }     public bool alive { get; private set; }     public bool can_attack { get; set; }     public bool shield { get; private set; }     public List<string> abilityList { get; }     public float movement_speed     {         get => _movementSpeed;         set => _movementSpeed = Math.Max(0f, value);     }     private float _movementSpeed; }` |
+| `public class Player` `{`     `public string playerName { get; set; }`     `public int current_health { get; private set; }`     `public int maxHealth { get; }`     `public bool alive { get; private set; }`     `public bool can_attack { get; set; }`     `public bool shield { get; private set; }`     `public List<string> abilityList { get; }`     `public float movement_speed`     `{`         `get => _movementSpeed;`         `set => _movementSpeed = Math.Max(0f, value);`     `}`     `private float _movementSpeed;` `}` |
 
 ## 2.4. Constantes {#2.4.-constantes}
 
@@ -354,9 +358,9 @@ Los nombres de los eventos deberán utilizar preferentemente verbos o frases ver
 
 | Con estándar |
 | ----- |
-| `public class Player {     public event EventHandler? Died;     public event EventHandler<CancelEventArgs>? OnGameEnding;  }` |
+| `public class Player` `{`     `public event EventHandler Died;`     `public event EventHandler<CancelEventArgs> OnGameEnding;` `}` |
 | **Sin estándar** |
-| `public class Player {     public event EventHandler player_died;     public event EventHandler<CancelEventArgs> game_ending_event; }` |
+| `public class Player` `{`     `public event EventHandler player_died;`     `public event EventHandler<CancelEventArgs> game_ending_event;` `}` |
 
 ## 
 
@@ -382,7 +386,7 @@ Los controles que no se mencionan explícitamente en esta sección pero que en d
 
 | Label | Con estándar |
 | :---: | ----- |
-|  | `<Label x:Name="txbRoomCode"/>`  |
+|  | `<Label x:Name="lblRoomCode"/>` |
 | lbl | **Sin estándar** |
 |  | `<Label x:Name="codigo_sala"/>`  |
 
@@ -470,7 +474,7 @@ Los archivos físicos de diccionarios de recursos deberán escribirse en **Pasca
 
 Las claves deberán utilizar la estructura ViewName\_ControlName (o Global\_ElementName para textos transversales). Está estrictamente prohibido el uso de puntos (.) en las claves para evitar errores en el generador de código de Visual Studio (Microsoft, 2024). 
 
-Para las reglas de nombrado de ControlName ver la [sección 2.13](#2.13-componentes-gráficos-de-wpf).
+Para las reglas de nombrado de ViewName ver la [sección 2.13](#2.13-componentes-gráficos-de-wpf).
 
 | Con estándar | Sin estándar |
 | ----- | ----- |
@@ -526,6 +530,21 @@ Los elementos que conforman la frontera de comunicación mediante *Windows Commu
 | ----- | ----- |
 | `[OperationContract(IsOneWay = true)] void OnMatchStarted(int matchId);` | `[OperationContract(IsOneWay = true)] void MatchStartNotification(int matchId);` |
 
+
+* **Implementaciones de Servicio:** Las clases que implementan un contrato de servicio WCF deberán conservar el mismo nombre de la interfaz sin el prefijo **I**, finalizando con el sufijo **Service**.
+
+| Con estándar | Sin estándar |
+| ----- | ----- |
+| `LobbyService` `ChatService` | `LobbyServiceImpl` `WcfChatManager` |
+
+## 2.20 Nombrado de excepciones personalizadas de reglas de negocio {#2.20-nombrado-de-excepciones-personalizadas-de-reglas-de-negocio}
+
+Las clases de excepción que representen rechazos esperados de reglas de negocio dentro del servidor deberán utilizar **PascalCase** con el nombre del dominio seguido obligatoriamente del sufijo **RuleException**.
+
+| Con estándar | Sin estándar |
+| ----- | ----- |
+| `AccountRuleException` `LobbyRuleException` `ChatRuleException` | `AccountBusinessException` `LobbyErrorException` `ChatValidationException` |
+
 3. # Estilo de código {#estilo-de-código}
 
 ## 3.1. Formato y estructura general {#3.1.-formato-y-estructura-general}
@@ -555,7 +574,8 @@ Las líneas de código deberán mantenerse en un máximo de **100 caracteres sie
 * Cuando una **declaración, llamada a método, expresión o inicialización** supere este límite, deberá dividirse en varias líneas en puntos que conserven claramente la relación entre sus elementos.   
 * En **llamadas o declaraciones de métodos** con varios argumentos, estos podrán distribuirse en líneas adicionales manteniendo una indentación consistente.(Google, s. f.).  
 * Para expresiones largas, los saltos deberán realizarse de forma que **no dificulten la comprensión de la operación**.   
-* Cuando sea necesario dividir una expresión que contiene **operadores binarios**, el salto de línea puede realizarse **antes del operador**.(Microsoft, 2025).
+* Cuando sea necesario dividir una expresión que contiene **operadores binarios**, el salto de línea puede realizarse **antes del operador**.(Microsoft, 2025).  
+* Las instrucciones, argumentos o expresiones cortas como `nameof(parametro)` que no superen el límite de 100 caracteres deberán mantenerse en una sola línea, evitando saltos de línea innecesarios.
 
 No se deberán **acortar nombres descriptivos** de clases, métodos o variables únicamente para cumplir con el límite de longitud.
 
@@ -657,14 +677,13 @@ Los archivos C\# del proyecto deberán organizarse, de forma general, en el sigu
 
 |  | Elemento | Descripción |
 | ----- | ----- | ----- |
-| **1** | **Directivas `global using`** | Deben aparecer antes de cualquier `using`, `namespace` o declaración de tipo. Se concentrarán preferentemente en un archivo independiente, como `GlobalUsings.cs`. |
-| **2** | **Directivas `using`** | Se colocarán al inicio del archivo y fuera del `namespace`. Se ordenarán alfabéticamente, colocando primero las directivas de `System`. |
-| **3** | **Declaración `namespace`** | Los namespaces deberán declararse utilizando **bloques de llaves tradicionales**  |
-| **4** | **Declaración del tipo principal** | Después del `namespace` se declarará la clase, estructura, interfaz, enumeración, registro o delegado principal del archivo.  |
+| **1** | **Directivas `using`** | Se colocarán al inicio del archivo y fuera del `namespace`. Se ordenarán alfabéticamente, colocando primero las directivas de `System`. |
+| **2** | **Declaración `namespace`** | Los namespaces deberán declararse utilizando **bloques de llaves tradicionales**. |
+| **3** | **Declaración del tipo principal** | Después del `namespace` se declarará la clase, estructura, interfaz, enumeración o delegado principal del archivo. |
 
 | Con estándar |
 | ----- |
-| `using System; using System.Collections.Generic; using Starfall.Audio; using Starfall.Gameplay.Entities namespace Starfall.Gameplay.Enemies {     public class EnemySpawner     {     } }`  |
+| `using System; using System.Collections.Generic; using Starfall.Audio; using Starfall.Gameplay.Entities;`  `namespace Starfall.Gameplay.Enemies {     public class EnemySpawner     {     } }`  |
 | **Sin estándar** |
 | `namespace Starfall.Gameplay.Enemies {     public class EnemySpawner     {     }     using Starfall.Gameplay.Entities;     using System.Collections.Generic;     using Starfall.Audio;     using System; } public class EnemyAudioManager { }` |
 
@@ -690,7 +709,7 @@ Los miembros que pertenezcan a la misma categoría deberán mantenerse juntos. L
 
 | Con estándar |
 | ----- |
-| `namespace Starfall.Gameplay.Enemies; {    public class EnemyController    {        private const int MaximumHealth = 100;        private static int activeEnemyCount;        private int _currentHealth;        public int CurrentHealth { get; set; }        public EnemyController(EnemyWeapon weapon)        {        }        public event EventHandler? Defeated;        public int GenerateAttackDamage()        {        }        protected virtual void OnCriticalHealth()        {        }        private void ApplyDamage(int damageAmount)        {        }    } }` |
+| `namespace Starfall.Gameplay.Enemies` `{    public class EnemyController    {        private const int MaximumHealth = 100;        private static int activeEnemyCount;        private int _currentHealth;        public int CurrentHealth { get; set; }        public EnemyController(EnemyWeapon weapon)        {        }        public event EventHandler Defeated;`         `public int GenerateAttackDamage()        {        }        protected virtual void OnCriticalHealth()        {        }        private void ApplyDamage(int damageAmount)        {        }    } }` |
 | **Sin estándar** |
 | `namespace Starfall.Gameplay.Enemies {     public class EnemyController     {         private void ApplyDamage(int damageAmount)         {         }              public int CurrentHealth => _currentHealth;                  private int _currentHealth;         public void TakeDamage(int damageAmount)         {         }         private const int MaximumHealth = 100;         protected virtual void OnCriticalHealth()         {         }         public EnemyController(EnemyWeapon weapon)         {         }         private static int activeEnemyCount;         public event EventHandler? Defeated;     } }` |
 
@@ -754,7 +773,7 @@ Se deberá procurar que toda interfaz creada para el proyecto tenga **al menos u
 
 | Con estándar |
 | ----- |
-| `namespace Starfall.Gameplay.Combat {     public interface IDamageable     {          bool IsAlive { get; }         void TakeDamage(int damageAmount);     }     public sealed class Player : IDamageable     {         public int CurrentHealth { get; private set; }         public bool IsAlive => CurrentHealth > 0;         public Player(int maximumHealth)         {             CurrentHealth = maximumHealth;         }         public void TakeDamage(int damageAmount)         {             if (damageAmount <= 0)             {                 return;             }             CurrentHealth = Math.Max(0, CurrentHealth - damageAmount);         }     } }` |
+| `namespace Starfall.Gameplay.Combat {     public interface IDamageable     {          bool IsAlive { get; }         void TakeDamage(int damageAmount);     }     public sealed class Player : IDamageable     {         public int CurrentHealth { get; private set; }         public bool IsAlive`         `{`             `get`             `{`                 `return CurrentHealth > 0;`             `}`         `}`          `public Player(int maximumHealth)         {             CurrentHealth = maximumHealth;         }         public void TakeDamage(int damageAmount)         {             if (damageAmount <= 0)             {                 return;             }             CurrentHealth = Math.Max(0, CurrentHealth - damageAmount);         }     } }` |
 | **Sin estándar** |
 | `namespace Starfall.Gameplay.Combat {     public interface Damageable     {     }     public interface IGameObject     {         void TakeDamage(int damageAmount);         void SaveGame();         void PlayMusic();         void OpenInventory();         void LoadLevel();     }     public sealed class DamageSystem     {          public void ApplyDamage(Player player, int damageAmount)          {             player.TakeDamage(damageAmount);          }     } }` |
 
@@ -788,29 +807,36 @@ Las consultas de colecciones sin resultados deberán devolver colecciones vacía
 
 ## 4.7. Manejo de excepciones {#4.7.-manejo-de-excepciones}
 
-Los bloques `catch` deberán capturar **el tipo de excepción específico que pueda manejarse preferentemente**. Se podrá utilizar `catch (Exception)` exclusivamente como último recurso, pero se seguirá prefiriendo capturas las excepciones específicas.
+Los errores deberán clasificarse y manejarse según su naturaleza y la capa donde exista contexto suficiente para resolverlos o transformarlos:
 
-Cuando se atrape una excepción que se va a lanzar, o se accederá a alguno de sus métodos, el nombre a usar para estas será `ex` independientemente del tipo de excepción que sea.
-
-* **Prohibición del enmascaramiento:** Queda estrictamente prohibido dejar bloques `catch` vacíos o capturar excepciones sin realizar una acción correctiva o su debido registro en la bitácora (`logger`). 
+* **Prohibición de captura genérica y de enmascaramiento:** Queda estrictamente prohibido capturar la clase base `Exception` en bloques `catch`, así como dejar bloques `catch` vacíos o capturar excepciones únicamente para volver a lanzarlas sin realizar una acción concreta o registro en bitácora. Cuando se capture una excepción específica, la variable deberá nombrarse `ex`.  
+* **Propagación:** Si una capa no cuenta con contexto para resolver una excepción, deberá permitir que se propague sin capturarla, o bien utilizar `throw;` (nunca `throw ex;`) para preservar el *stack trace* original.  
+* **Excepciones estándar de .NET:** Para violaciones de contrato en argumentos se deberá utilizar la excepción estándar más específica aplicable:  
+  * `ArgumentNullException(nameof(parametro))` cuando el valor sea nulo.  
+  * `ArgumentOutOfRangeException(nameof(parametro))` cuando esté fuera del rango permitido.  
+  * `ArgumentException` cuando el contenido sea inválido.   
+  * Para estados inválidos del ciclo de vida del objeto se utilizarán `InvalidOperationException`, `ObjectDisposedException` o `UnauthorizedAccessException`.  
+* **Excepciones de reglas de negocio (RuleException) y frontera WCF:** Las excepciones personalizadas se limitan a representar rechazos esperados de reglas de negocio en `BusinessLogic`. Deberán declararse como clases `sealed` que hereden de `Exception`, exponer únicamente una propiedad inmutable `Issue` del tipo enumerado `{Dominio}Issue` correspondiente y comprobar su validez en el constructor mediante `Enum.IsDefined`. Estas excepciones no deberán cruzar hacia el cliente; el servicio WCF deberá capturarlas y lanzar directamente `new FaultException<{Dominio}Issue>(ex.Issue)` sin métodos envoltorio intermedios.  
+* **Errores de infraestructura y presentación en el cliente:** Los fallos técnicos de persistencia (`SqlException`, `EntityException`, `DbUpdateException`) deberán capturarse en la frontera del servicio WCF, registrarse con `LogError` y transformarse en un `FaultException` genérico con un mensaje técnico seguro (`"The service could not complete the operation."`), manteniendo `IncludeExceptionDetailInFaults = false`. En el cliente, nunca se deberá mostrar `Exception.Message` ni `FaultException.Message` al usuario; el `ViewModel` deberá clasificar el error y centralizar en un método la traducción hacia claves de recursos `.resx`.
 
 | Con estándar |
 | :---- |
-| `public class DominoSaveSystem {     private readonly ILogger<DominoSaveSystem> _logger;     public DominoSaveSystem(ILogger<DominoSaveSystem> logger)     {         _logger = logger;     }     public GameStateData LoadGameSave(string filePath)     {         try         {             string jsonContent = File.ReadAllText(filePath);             return JsonSerializer.Deserialize<GameStateData>(jsonContent)!;         }         catch (FileNotFoundException ex)         {             _logger.LogWarning(ex, "Save file not found at path {FilePath}. Starting default state.", filePath);             return CreateDefaultGameState();         }         catch (JsonException ex)         {             _logger.LogError(ex, "Corrupted save file at path {FilePath}.", filePath);             throw new InvalidOperationException("The game save file is corrupted.", ex);         }         catch (Exception ex)         {             _logger.LogError(ex, "Unexpected error occurred while loading save file at {FilePath}.", filePath);             throw;         }     } }` |
+| `public sealed class ChatRuleException : Exception` `{`     `public ChatIssue Issue { get; }`     `public ChatRuleException(ChatIssue issue)`     `{`         `if (!Enum.IsDefined(typeof(ChatIssue), issue))`         `{`             `throw new ArgumentOutOfRangeException(nameof(issue));`         `}`         `Issue = issue;`     `}` `}` `public Lobby JoinLobby(string lobbyCode)` `{`     `try`     `{`         `Player player = GetAuthenticatedPlayer();`         `Lobby lobby = controller.JoinLobby(player, lobbyCode);`         `publisher.PublishLobbyChanged(lobby);`         `return lobby;`     `}`     `catch (LobbyRuleException ex)`     `{`         `throw new FaultException<LobbyIssue>(ex.Issue);`     `}`     `catch (SqlException ex)`     `{`         `logger.LogError(ex, "Lobby operation could not access persistence.");`         `throw new FaultException("The service could not complete the operation.");`     `}` `}` |
 | **Sin estándar** |
-| `public class DominoSaveSystem {     public GameStateData LoadGameSave(string filePath)     {         try         {             string jsonContent = File.ReadAllText(filePath);             return JsonSerializer.Deserialize<GameStateData>(jsonContent)!;         }         catch (Exception)         {         }     } }` |
+| `public class ChatRuleException : Exception` `{`     `public ChatIssue Issue { get; set; }` `}` `public Lobby JoinLobby(string lobbyCode)` `{`     `try`     `{`         `Player player = GetAuthenticatedPlayer();`         `return controller.JoinLobby(player, lobbyCode);`     `}`     `catch (LobbyRuleException ex)`     `{`         `throw LobbyFault(ex.Issue);`     `}`     `catch (Exception ex)`     `{`         `throw ex;`     `}` `}` `private static FaultException<LobbyIssue> LobbyFault(LobbyIssue issue)` `{`     `return new FaultException<LobbyIssue>(issue);` `}` |
 
-## 4.8. Expresiones lambda {#4.8.-expresiones-lambda}
+## 4.8. Expresiones lambda y cuerpos de expresión {#4.8.-expresiones-lambda-y-cuerpos-de-expresión}
 
-Las expresiones lambda deberán mantenerse **simples y enfocadas en una sola operación**. Para eso, se preferirá una sola expresión cuando sea suficiente.  
-   
-Los parámetros de las expresiones lambda deberán utilizar **nombres descriptivos** cuando su significado no sea evidente por el contexto. No deberán utilizarse nombres excesivamente abreviados cuando dificulten comprender la operación realizada.
+Se distingue entre miembros con cuerpo de expresión y expresiones lambda utilizadas como delegados:
+
+* **Prohibición de miembros con cuerpo de expresión (=\>):** Queda prohibido utilizar el operador `=>` para definir el cuerpo de métodos, constructores, propiedades calculadas o descriptores de acceso (`get`, `set`, `add`, `remove`). Todo miembro deberá implementar su cuerpo mediante bloques explícitos con llaves `{ }` siguiendo el estilo Allman (Sección 3.1.4).  
+* **Uso acotado de expresiones lambda:** Las expresiones lambda (`parametro => expresion`) deberán mantenerse simples y enfocadas en una sola expresión sin bloque de llaves, limitando su uso a argumentos de métodos que requieran delegados (`Action`, `Func`, `Predicate`), consultas de Entity Framework o inicialización de comandos y pruebas. Los parámetros deberán utilizar nombres descriptivos. Cuando la lógica requiera múltiples instrucciones, deberá extraerse a un método privado con nombre descriptivo o sustituirse por un bucle `foreach` explícito.
 
 | Con estándar |
 | ----- |
-| `public bool HasPoints => CurrentRoundPoints > MinimumPointsThreshold; var activePlayers = players     .Where(player => player.HasPoints)     .ToList();` |
+| `public bool HasPoints` `{`     `get`     `{`         `return CurrentRoundPoints > MinimumPointsThreshold;`     `}` `}` `List<Player> activePlayers = players`     `.Where(player => player.HasPoints)`     `.ToList();` |
 | **Sin estándar** |
-| `var activeEnemies = enemies     .Where(enemy =>     {         bool isAlive = enemy.Health > 0;         bool isEnabled = enemy.IsActive;         bool isInRange = enemy.DistanceToPlayer < 100;         bool canAttack = enemy.HasWeapon;         return isAlive && isEnabled && isInRange && canAttack;     })     .ToList();` |
+| `public bool HasPoints => CurrentRoundPoints > MinimumPointsThreshold;` `List<Enemy> activeEnemies = enemies`     `.Where(enemy =>`     `{`         `bool isAlive = enemy.Health > 0;`         `bool isEnabled = enemy.IsActive;`         `return isAlive && isEnabled;`     `})`     `.ToList();` |
 
 ## 4.9. Números y cadenas mágicas {#4.9.-números-y-cadenas-mágicas}
 
@@ -851,9 +877,9 @@ El número máximo de parámetros permitidos para un método es de 4\.
 
 | Con estándar |
 | ----- |
-| `public void SpawnEnemy(Vector3 position, EnemyType enemyType, int level) {     // Implementation }`  |
+| `public void SpawnEnemy(Vector3 position, EnemyType enemyType, int level) { }` |
 | **Sin estándar** |
-| `public void SpawnEnemy(int xPosition, int yPosition, EnemyType enemyType, int level, bool isActive, string name, ) {     // Implementation }` |
+| `public void SpawnEnemy(int xPosition, int yPosition, EnemyType enemyType, int level, bool isActive, string name)` `{`  `}` |
 
 ## 4.13. Expresiones lógicas {#4.13.-expresiones-lógicas}
 
@@ -869,37 +895,38 @@ Cuando se hagan expresiones con valores booleanos se permite que no se incluya l
 
 ## 4.14. Registro de eventos y errores (Logs) {#4.14.-registro-de-eventos-y-errores-(logs)}
 
-El proyecto deberá utilizar registros (*logs*) para conservar información relevante sobre la ejecución del videojuego, permitiendo identificar eventos importantes, diagnosticar errores y facilitar la depuración durante el desarrollo. Los registros deberán utilizarse de manera selectiva, evitando generar información innecesaria que dificulte localizar eventos relevantes. 
+El proyecto deberá utilizar la abstracción `ILogger<T>` de `Microsoft.Extensions.Logging` (donde `T` corresponde al tipo de la clase que registra el evento), obtenida de manera centralizada mediante `LoggerFactoryProvider.CreateLogger<T>()` sobre Serilog.
 
-Los mensajes de registro deberán escribirse en **inglés**, al igual que el resto del código y los elementos técnicos establecidos en este estándar. 
+* **Formato del mensaje y orientación al evento:** Los mensajes deberán escribirse en **inglés**, iniciar con letra mayúscula, finalizar con punto (**.**) y describir el evento o resultado ocurrido en el sistema, evitando escribir únicamente el nombre del método ejecutado.  
+* **Structured logging y nombrado de placeholders:** Queda prohibido concatenar (`+`) o interpolar (`$""`) valores variables dentro del mensaje. Se deberán utilizar plantillas constantes con marcadores de posición en **PascalCase** que conserven exactamente el mismo nombre de la propiedad, atributo o concepto representado (por ejemplo, `{PlayerId}`, `{LobbyId}`, `{AccountIssue}`, `{ChatIssue}`), evitando marcadores genéricos como `{Id}`, `{Issue}`, `{Data}` o `{Error}`.  
+* **Registro de excepciones y no duplicación:** Cuando exista una excepción capturada, la instancia `ex` deberá pasarse como primer argumento del método del logger (`_logger.LogWarning(ex, ...)` o `_logger.LogError(ex, ...)`). Cada excepción deberá registrarse únicamente en la capa donde sea manejada o transformada, evitando registrarla repetidamente en cada capa intermedia.  
+* **Protección de información sensible:** Nunca deberán registrarse contraseñas, `sessionKey`, códigos de verificación, contenido de mensajes de chat, datos binarios de imágenes (`byte[]`), correos electrónicos personales ni objetos de dominio completos.
 
 | Con estándar |
 | ----- |
-| `logger.LogInformation(     "Level {LevelName} started for player {PlayerId}",     levelName,     player.Id);` |
+| `private readonly ILogger<LobbyEventPublisher> _logger =`     `LoggerFactoryProvider.CreateLogger<LobbyEventPublisher>();` `_logger.LogInformation(`     `"Player {PlayerId} joined lobby {LobbyId}.",`     `player.PlayerId,`     `lobby.LobbyId);` |
 | **Sin estándar** |
-| `Console.WriteLine("Level started");` |
+| `private readonly ILogger<object> _logger = new ConsoleLogger<object>();` `_logger.LogInformation(`     `$"Player {player.PlayerId} joined lobby {lobby.LobbyId}");` |
 
 ### 4.14.1 Categorización de errores {#4.14.1-categorización-de-errores}
 
-Cada registro deberá utilizar uno de los niveles de severidad establecidos por `LogLevel`: **Trace, Debug, Information, Warning o Error**. 
+Cada registro deberá utilizar uno de los niveles de severidad establecidos por `LogLevel`: **Trace, Debug, Information, Warning, Error o Critical** (reflejado como `Fatal` / `FTL` en la salida de Serilog).
 
 | Trace | Información extremadamente detallada sobre la ejecución interna. Se utilizará únicamente cuando sea necesario investigar un comportamiento específico y no deberá mantenerse habilitado normalmente. |
 | :---: | :---- |
 
 | Con estándar |
 | ----- |
-| `_logger.LogTrace(     "Updating enemy {EnemyId} at position {Position}",     enemy.Id,     enemy.Position);` |
+| `_logger.LogTrace(     "Updating enemy {EnemyId} at position {Position}.",`     `enemy.Id,     enemy.Position);` |
 | **Sin estándar** |
 | `_logger.LogTrace(     "Level {LevelName} started successfully",     levelName);` |
 
-## 
-
-| Debug | Información destinada principalmente a la depuración durante el desarrollo, como estados internos o valores útiles para investigar un problema. |
+| Debug | Situaciones anómalas recuperables (como fallos de callback o cierre anómalo de un canal WCF) o rechazos esperados por reglas de negocio (`FaultException<TIssue>`) que no impiden que el sistema continúe funcionando. |
 | :---: | :---- |
 
 | Con estándar |
 | ----- |
-| `_logger.LogDebug(     "Player {PlayerId} selected tile [{LeftPip}|{RightPip}] from hand",      player.Id,      selectedTile.LeftPip,      selectedTile.RightPip);` |
+| `_logger.LogDebug(     "Player {PlayerId} selected tile [{LeftPip}|{RightPip}] from hand.",`     `player.Id,      selectedTile.LeftPip,      selectedTile.RightPip);` |
 | **Sin estándar** |
 | `_logger.LogDebug(     "Could not open save file for player {PlayerId}",      player.Id);` |
 
@@ -908,7 +935,7 @@ Cada registro deberá utilizar uno de los niveles de severidad establecidos por 
 
 | Con estándar |
 | ----- |
-| `_logger.LogInformation(     "Round {RoundNumber} started for room {RoomId} with {PlayerCount} players",      roundNumber,      roomId,      players.Count);` |
+| `_logger.LogInformation(     "Round {RoundNumber} started for room {RoomId} with {PlayerCount} players.",`     `roundNumber,      roomId,      players.Count);` |
 | **Sin estándar** |
 | `Console.WriteLine("Round started");` |
 
@@ -926,9 +953,18 @@ Cada registro deberá utilizar uno de los niveles de severidad establecidos por 
 
 | Con estándar |
 | ----- |
-| `_logger.LogError(     ex,      "Failed to send turn state to player {PlayerId} in room {RoomId}",      player.Id,      roomId);` |
+| `_logger.LogError(     ex,      "Failed to send turn state to player {PlayerId} in room {RoomId}.",`     `player.Id,      roomId);` |
 | **Sin estándar** |
 | `_logger.LogError(     "Failed to send turn state for player " + player.Id);` |
+
+| Critical | Fallos graves que impiden que un componente esencial o la aplicación completa continúe en ejecución. |
+| :---- | :---- |
+
+| Con estándar |
+| ----- |
+| `_logger.LogCritical(`     `ex,`     `"Server host could not start essential WCF services.");` |
+| **Sin estándar** |
+| `_logger.LogCritical(`     `ex,`     `"Player {PlayerId} could not join the lobby.",`     `playerId);` |
 
 ## 4.15 Inicialización y asignación {#4.15-inicialización-y-asignación}
 
@@ -938,9 +974,9 @@ Fuera de esas excepciones, la inicialización se **debe** realizar en el constru
 
 | Con estándar |
 | ----- |
-| `public class DominoPlayer {     private readonly List<Tile> _hand = new();     private readonly ILogger<DominoPlayer> _logger;     private int _currentRoundScore;     public DominoPlayer(string playerName, ILogger<DominoPlayer> logger)     {         ArgumentException.ThrowIfNullOrEmpty(playerName);         ArgumentNullException.ThrowIfNull(logger);         PlayerName = playerName;         _logger = logger;         _currentRoundScore = 0;     } }` |
+| `public class DominoPlayer` `{`     `private readonly List<Tile> _hand = new List<Tile>();`     `private readonly ILogger<DominoPlayer> _logger;`     `private int _currentRoundScore;`     `public string PlayerName { get; }`     `public DominoPlayer(string playerName, ILogger<DominoPlayer> logger)`     `{`         `if (string.IsNullOrWhiteSpace(playerName))`         `{`             `throw new ArgumentException("The player name cannot be empty.", nameof(playerName));`         `}`         `PlayerName = playerName;`         `_logger = logger ?? throw new ArgumentNullException(nameof(logger));`         `_currentRoundScore = 0;`     `}` `}` |
 | **Sin estándar** |
-| `public class DominoPlayer {     private List<Tile> _hand;      private string _playerName = "DefaultPlayer";      public DominoPlayer(string playerName)     {     }     public void StartHand()     {         _hand = new List<Tile>();     } }` |
+| `public class DominoPlayer` `{`     `private List<Tile> _hand;`     `private string _playerName = "DefaultPlayer";`     `public DominoPlayer(string playerName)`     `{`     `}`     `public void StartHand()`     `{`         `_hand = new List<Tile>();`     `}` `}` |
 
 ## 
 
@@ -956,13 +992,13 @@ Se debe evitar formar oraciones o mensajes en la interfaz concatenando fragmento
 
 ## 4.17 Uso de las variables de tipo local {#4.17-uso-de-las-variables-de-tipo-local}
 
-Se permite el uso de variables `var` cuando el tipo de datos se pueda inferir claramente en su asignación, contexto de la variable, así como cuando sea necesario trabajar con tipos anónimos. En caso de que el tipo al que se refiere no sea evidente, se deberá usar el tipo explícito para mejorar la legibilidad del código (Microsoft, 2026a). 
+Las variables locales deberán declararse especificando siempre su **tipo de dato explícito**, prohibiéndose el uso de la palabra clave `var`. Declarar el tipo explícitamente permite identificar de forma inmediata el contrato de cada variable al leer o revisar el código sin depender de las ayudas contextuales del entorno de desarrollo.
 
 | Con estándar |
 | ----- |
-| `var player = new Player();  int totalScore = CalculateAllFivesBonus(board);`   |
+| `Player player = new Player();` `int totalScore = CalculateAllFivesBonus(board);` |
 | **Sin estándar** |
-| `var totalScore = CalculateAllFivesBonus(board);` |
+| `var player = new Player();` `var totalScore = CalculateAllFivesBonus(board);` |
 
 ## 4.18 Consultas de datos con LINQ {#4.18-consultas-de-datos-con-linq}
 
@@ -972,7 +1008,7 @@ Cuando una consulta contenga múltiples operaciones encadenadas o su extensión 
 
 | Con estándar |
 | ----- |
-| `var ranking = players     .Where(player => player.GamesWon > 0)     .OrderByDescending(player => player.GamesWon)     .Take(10)     .ToList();` |
+| `List<Player> ranking = players`     `.Where(player => player.GamesWon > 0)     .OrderByDescending(player => player.GamesWon)     .Take(10)     .ToList();` |
 | **Sin estándar** |
 | `var ranking = (from p in players                where p.GamesWon > 0                orderby p.GamesWon descending select p).Take(10).ToList();` |
 
@@ -993,6 +1029,36 @@ Cada clase deberá representar una responsabilidad concreta y cohesiva. Su nombr
 | Con estándar | Sin estándar |
 | ----- | ----- |
 | `public class PlayerAccount { }` | `public class AccountResult { }` |
+
+## 4.21 Manejo de concurrencia y sincronización {#4.21-manejo-de-concurrencia-y-sincronización}
+
+El control de concurrencia deberá separar las responsabilidades del servidor y del cliente WPF sin mezclar mecanismos de sincronización:
+
+* **Concurrencia en servicios WCF dúplex:** Las clases de servicio dúplex deberán configurar `[ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Reentrant, IncludeExceptionDetailInFaults = false)]`. Queda prohibido utilizar la instrucción `lock` dentro de clases de servicio WCF, controladores (`Controllers`), repositorios (`Repositories`) y `ViewModels`.  
+* **Estado compartido en memoria (lock):** Cuando múltiples sesiones accedan a colecciones o estructuras relacionadas en un `Manager`, las operaciones compuestas de validación y modificación deberán protegerse mediante un único objeto `private readonly object _syncRoot = new object();` y bloques `lock (_syncRoot)`. Nunca deberán invocarse callbacks ni operaciones de red WCF mientras se mantenga adquirido el bloqueo. Para evitar modificaciones externas concurrentes sobre el estado interno sin degradar el desempeño, se deberá evaluar el retorno de vistas de solo lectura (`IReadOnlyList<T>`), proyecciones o copias defensivas (*snapshots*) según el tamaño de los datos y el contexto de la operación.  
+* **Colecciones concurrentes:** Cuando el estado compartido consista únicamente en asociaciones independientes por clave (como `*CallbackRegistry`), se utilizará `ConcurrentDictionary<TKey, TValue>` sin bloques `lock` adicionales.  
+* **Ejecución en segundo plano en el cliente WPF:** No se utilizarán `async`, `await` ni `Task.Run` para invocar operaciones remotas. Toda operación susceptible de bloquear el hilo de interfaz gráfica desde un `ViewModel` deberá ejecutarse mediante `BackgroundJob<TState, TResult>` y `BackgroundWork.Start(job)`, actualizando las propiedades de la vista únicamente en los delegados de finalización despachados a través del `Dispatcher`.
+
+| Con estándar |
+| ----- |
+| `public Lobby LeavePlayer(int playerId)` `{`     `lock (_syncRoot)`     `{`         `Lobby lobby = GetPlayerLobbyInternal(playerId);`         `lobby.Participants.Remove(FindPlayer(lobby.Participants, playerId));`         `_playerLobbyCodes.Remove(playerId);`         `return CreateSnapshot(lobby);`     `}` `}` `BackgroundJob<string, Lobby> job = new BackgroundJob<string, Lobby>(`     `code => _lobbyService.JoinLobby(code),`     `roomCode,`     `OnLobbyReady,`     `OnLobbyFailed);` `BackgroundWork.Start(job);` |
+| **Sin estándar** |
+| `public void LeavePlayerAndNotify(int playerId)` `{`     `lock (_syncRoot)`     `{`         `Lobby lobby = _lobbies[playerId];`         `lobby.Participants.RemoveAll(player => player.PlayerId == playerId);`         `_publisher.PublishLobbyChanged(lobby);`     `}` `}` `public async Task JoinRoomAsync(string roomCode)` `{`     `Lobby lobby = await Task.Run(() => _lobbyService.JoinLobby(roomCode));`     `ApplyLobby(lobby);` `}` |
+
+## 4.22 Comunicación remota con WCF {#4.22-comunicación-remota-con-wcf}
+
+La definición de contratos y el manejo de canales WCF deberán cumplir las siguientes reglas:
+
+* **Serialización explícita:** Toda clase de modelo transferida por WCF y toda enumeración de contrato deberá decorarse con `[DataContract]`, marcando las propiedades transferibles con `[DataMember]` simple (sin acoplamiento posicional `Order` ni `IsRequired` cuando la validación se realice en dominio) y cada miembro de enumeración con `[EnumMember]`.  
+* **Contratos dúplex y callbacks:** Todo `[ServiceContract]` que declare un `CallbackContract` deberá configurar `SessionMode = SessionMode.Required`. Las operaciones del `CallbackContract` deberán declararse con `[OperationContract(IsOneWay = true)]` y retornar `void`. Cuando una operación del servicio difunda su resultado a los participantes mediante un `EventPublisher`, dicha operación deberá retornar `void` para evitar duplicidad con la notificación del callback.  
+* **Ciclo de vida de proxies y separación en el cliente:** En operaciones *request/response*, el proxy deberá crearse, utilizarse y cerrarse por operación mediante `WcfInvoker`, sin conservarse como estado permanente. En comunicación dúplex deberán mantenerse separadas las responsabilidades de `*Client`, `*CallbackHandler`, `*CallbackRegistry` y `*EventPublisher`.  
+* **Cierre seguro de canales:** Al cerrar un canal WCF, si su estado es `CommunicationState.Faulted`, deberá invocarse `Abort()`. Si al invocar `Close()` se produce `CommunicationException` o `TimeoutException`, deberá capturarse la excepción específica, registrarse con `LogWarning` cuando aplique y abortarse el canal mediante `Abort()`.
+
+| Con estándar |
+| ----- |
+| `[DataContract]` `public sealed class ChatMessage` `{`     `[DataMember]`     `public int ContextId { get; set; }`     `[DataMember]`     `public ChatScope Scope { get; set; }`     `[DataMember]`     `public int SenderId { get; set; }`     `[DataMember]`     `public string SenderUsername { get; set; }`     `[DataMember]`     `public string Content { get; set; }` `}` `[ServiceContract(`     `CallbackContract = typeof(IChatCallback),`     `SessionMode = SessionMode.Required)]` `public interface IChatService` `{`     `[OperationContract]`     `[FaultContract(typeof(AccessIssue))]`     `void OpenChatSession(string sessionKey);`     `[OperationContract]`     `[FaultContract(typeof(AccessIssue))]`     `[FaultContract(typeof(ChatIssue))]`     `void SendMessage(ChatMessage message);` `}` |
+| **Sin estándar** |
+| `[DataContract]` `public class ChatMessage` `{`     `[DataMember(IsRequired = true, Order = 1)]`     `public int ContextId { get; set; }`     `public string Content { get; set; }` `}` `[ServiceContract(CallbackContract = typeof(IChatCallback))]` `public interface IChatService` `{`     `[OperationContract]`     `ChatMessage SendMessage(ChatMessage message);` `}` |
 
 5. # Comentarios y documentación {#comentarios-y-documentación}
 
@@ -1174,9 +1240,9 @@ Se utilizará `default` cuando exista la posibilidad de recibir un valor no cont
 
 | Con estándar |
 | :---- |
-| `switch (enemyState) {     case EnemyState.Idle:         StayIdle();         break;     case EnemyState.Patrol:         PatrolArea();         break;     case EnemyState.Attack:         AttackPlayer();         break;     default:         ReturnToSpawn();         break; } string healthStatus = healthPercentage switch {     > 0.75f => "Healthy",     > 0.25f => "Injured",     > 0.00f => "Critical",     _ => "Defeated" };` |
+| `switch (enemyState)` `{`     `case EnemyState.Idle:`         `StayIdle();`         `break;`     `case EnemyState.Patrol:`         `PatrolArea();`         `break;`     `case EnemyState.Attack:`         `AttackPlayer();`         `break;`     `default:`         `ReturnToSpawn();`         `break;` `}` |
 | **Sin estándar** |
-| `if (enemyState == EnemyState.Idle) {     StayIdle(); } if (enemyState == EnemyState.Patrol) {     PatrolArea(); } if (enemyState == EnemyState.Attack) {     AttackPlayer(); } string healthStatus; switch (healthPercentage) {     case > 0.75f:         healthStatus = "Healthy";         break;     case > 0.25f:         healthStatus = "Injured";         break;     default:         healthStatus = "Critical";         break; }` |
+| `if (enemyState == EnemyState.Idle)` `{`     `StayIdle();` `}` `if (enemyState == EnemyState.Patrol)` `{`     `PatrolArea();` `}` `if (enemyState == EnemyState.Attack)` `{`     `AttackPlayer();` `}` |
 
 ## 6.4. Operador ternario {#6.4.-operador-ternario}
 
@@ -1266,13 +1332,13 @@ Para este estándar se utilizará la siguiente estructura:
 
 Los nombres deberán utilizar **PascalCase** en cada una de las partes, separadas por guión bajo. Deberán ser descriptivos y evitar nombres genéricos.
 
-Nota: Para el ejemplo se utilizó el framework de pruebas **xUnit**, sin embargo, no significa que el framework de pruebas a utilizar en el proyecto será este, únicamente se usó para cuestiones de demostración.
+Nota: Para el ejemplo se utilizó el framework de pruebas **NUnit**, sin embargo, no significa que el framework de pruebas a utilizar en el proyecto será este, únicamente se usó para cuestiones de demostración.
 
 | Con estándar |
 | ----- |
-| `using Xunit; public class PlayerTests {     [Fact]     public void TakeDamage_ValidAmount_ReducesHealth()     {     }     [Fact]     public void TakeDamage_ZeroAmount_PreservesHealth()     {     } }` |
+| `using NUnit.Framework;` `[TestFixture]` `public class PlayerTests` `{`     `[Test]`     `public void TakeDamage_ValidAmount_ReducesHealth()`     `{`     `}`     `[Test]`     `public void TakeDamage_ZeroAmount_PreservesHealth()`     `{`     `}` `}` |
 | **Sin estándar** |
-| `using Xunit; public class PlayerTest {     [Fact]     public void Test1()     {     }     [Fact]     public void TestTakeDamage()     {     } }` |
+| `using NUnit.Framework;` `[TestFixture]` `public class PlayerTest` `{`     `[Test]`     `public void Test1()`     `{`     `}`     `[Test]`     `public void TestTakeDamage()`     `{`     `}` `}` |
 
 ## 7.4. Estructura de las pruebas {#7.4.-estructura-de-las-pruebas}
 
@@ -1283,13 +1349,13 @@ Cada prueba unitaria deberá seguir la estructura **Arrange, Act, Assert (AAA)**
 | **Act** | Deberá contener la ejecución del comportamiento que se desea comprobar. Cada prueba deberá procurar tener **una sola operación principal.** |
 | **Assert** | Deberá verificar que el resultado obtenido corresponde con el comportamiento esperado. Una prueba deberá contener **al menos una aserción**  |
 
-Nota: Para el ejemplo se utilizó el framework de pruebas **xUnit**, sin embargo, no significa que el framework de pruebas a utilizar en el proyecto será este, únicamente se usó para cuestiones de demostración.
+Nota: Para el ejemplo se utilizó el framework de pruebas **NUnit**, sin embargo, no significa que el framework de pruebas a utilizar en el proyecto será este, únicamente se usó para cuestiones de demostración.
 
 | Con estándar |
 | ----- |
-| `using Xunit; public class PlayerTests {     [Fact]     public void TakeDamage_ValidAmount_ReducesHealth()     {         // Arrange         var player = new Player(100);         int damageAmount = 25;         // Act         player.TakeDamage(damageAmount);         // Assert (En xUnit el orden es: Expected, Actual)         Assert.Equal(75, player.Health);     } }` |
+| `using NUnit.Framework;` `[TestFixture]` `public class PlayerTests` `{`     `[Test]`     `public void TakeDamage_ValidAmount_ReducesHealth()`     `{`         `// Arrange`         `Player player = new Player(100);`         `int damageAmount = 25;`         `// Act`         `player.TakeDamage(damageAmount);`         `// Assert`         `Assert.That(player.Health, Is.EqualTo(75));`     `}` `}` |
 | **Sin estándar** |
-| `using Xunit; public class PlayerTests {     [Fact]     public void TakeDamage_ValidAmount_ReducesHealth()     {         var player = new Player(100);         int damageAmount = 25;         player.TakeDamage(damageAmount);         Assert.Equal(75, player.Health);         player.TakeDamage(10);         Assert.Equal(65, player.Health);     } }` |
+| `using NUnit.Framework;` `[TestFixture]` `public class PlayerTests` `{`     `[Test]`     `public void TakeDamage_ValidAmount_ReducesHealth()`     `{`         `var player = new Player(100);`         `int damageAmount = 25;`         `player.TakeDamage(damageAmount);`         `Assert.That(player.Health, Is.EqualTo(75));`         `player.TakeDamage(10);`         `Assert.That(player.Health, Is.EqualTo(65));`     `}` `}` |
 
 8. # Declaración de uso de IA {#declaración-de-uso-de-ia}
 
