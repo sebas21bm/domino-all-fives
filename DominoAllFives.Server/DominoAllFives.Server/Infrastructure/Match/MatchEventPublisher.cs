@@ -23,7 +23,7 @@ namespace DominoAllFives.Server.Infrastructure
         private readonly Dictionary<IMatchCallback, string> _sessionKeys =
             new Dictionary<IMatchCallback, string>();
         private readonly ILogger<MatchEventPublisher> _logger =
-            new ConsoleLogger<MatchEventPublisher>();
+            LoggerFactoryProvider.CreateLogger<MatchEventPublisher>();
         public Action<int> MatchEnded { get; set; }
 
         public void Register(int matchId, int playerId, IMatchCallback callback, string sessionKey)
@@ -188,8 +188,7 @@ namespace DominoAllFives.Server.Infrastructure
             Exception ex)
         {
             Remove(recipient.Key.Item1, recipient.Key.Item2, recipient.Value);
-            _logger.LogWarning(ex, "Match callback failed for player {PlayerId}.",
-                recipient.Key.Item2);
+            _logger.LogWarning(ex, "Match callback failed for player {PlayerId}.",recipient.Key.Item2);
         }
 
         private sealed class DeliveryQueue

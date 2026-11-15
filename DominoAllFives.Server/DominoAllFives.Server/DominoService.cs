@@ -28,10 +28,12 @@ namespace DominoAllFives.Server
     public partial class DominoService : ISessionAccountService
     {
         private readonly Func<Credentials, PlayerAccount> _authenticate;
+        
         private readonly ILogger<DominoService> _logger;
+
         public DominoService() : this(
             new AuthenticationController().LoginWithAccount,
-            new ConsoleLogger<DominoService>())
+            LoggerFactoryProvider.CreateLogger<DominoService>())
         {
         }
 

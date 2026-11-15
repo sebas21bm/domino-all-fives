@@ -38,8 +38,10 @@ namespace DominoAllFives.Server
             callbacks = new ChatCallbackRegistry();
             publisher = new ChatEventPublisher(
                 callbacks,
-                new ConsoleLogger<ChatEventPublisher>());
-            logger = new ConsoleLogger<ChatService>();
+                LoggerFactoryProvider.CreateLogger<ChatEventPublisher>());
+
+            logger =
+                LoggerFactoryProvider.CreateLogger<ChatService>();
         }
 
         /// <summary>
@@ -131,8 +133,10 @@ namespace DominoAllFives.Server
 
             try
             {
-                ChatMessage registeredMessage = controller.SendMessage(player, message);
-                List<Player> recipients = controller.GetRecipients(registeredMessage.Context);
+                List<Player> recipients;
+                ChatMessage registeredMessage =
+                    controller.SendMessage(player, message, out recipients);
+
                 publisher.PublishMessageReceived(recipients, registeredMessage);
                 return registeredMessage;
             }
@@ -163,7 +167,7 @@ namespace DominoAllFives.Server
 
             try
             {
-                return controller.GetMessages(player, context);
+                return controller.GetMessages(player.PlayerId, context);
             }
             catch (ChatRuleException ex)
             {
