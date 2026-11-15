@@ -213,28 +213,17 @@ Ejemplo:
 ```csharp
 try
 {
-    Lobby lobby =
-        controller.JoinLobby(player, lobbyCode);
-
+    Lobby lobby = controller.JoinLobby(player, lobbyCode);
     publisher.PublishLobbyChanged(lobby);
-
     return lobby;
 }
 catch (LobbyRuleException ex)
 {
-    throw LobbyFault(ex.Issue);
+    throw new FaultException<LobbyIssue>(ex.Issue);
 }
 ```
 
-donde:
-
-```csharp
-private static FaultException<LobbyIssue>
-    LobbyFault(LobbyIssue issue)
-{
-    return new FaultException<LobbyIssue>(issue);
-}
-```
+Se debe instanciar y lanzar directamente `new FaultException<TIssue>(ex.Issue)` dentro del bloque **`catch`**. No se deben crear métodos privados envoltorio (como **LobbyFault**, **ChatFault** o **AccessFault**) cuya única responsabilidad sea retornar new `FaultException<TIssue>(issue)`.
 
 El flujo es:
 
@@ -315,8 +304,7 @@ Por ejemplo:
 ```csharp
 if (_player == null)
 {
-    throw AccessFault(
-        AccessIssue.SessionRequired);
+    throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
 }
 ```
 
