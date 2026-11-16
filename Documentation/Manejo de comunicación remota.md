@@ -18,6 +18,15 @@ Se utiliza `netTcpBinding` para la comunicación cliente-servidor.
 
 Las operaciones que no requieren notificaciones posteriores utilizan llamadas request/response. Las funcionalidades que necesitan actualizaciones iniciadas por el servidor utilizan contratos duplex con callbacks.
 
+## Organización de los servicios
+
+Los contratos request/response se implementan en `DominoService`, como
+`IRankingService`. No requieren un servicio independiente ni un archivo parcial
+por contrato. Durante la refactorización se conserva esta organización; cualquier
+separación debe tener una necesidad concreta y acordarse antes de aplicarla.
+Los contratos duplex conservan sus servicios y el estado de su sesión según el
+flujo documentado.
+
 ## Comunicación request/response
 Para cada operación:
 

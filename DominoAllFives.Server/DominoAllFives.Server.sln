@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -12,12 +12,24 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoAllFives.Server", "Do
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoAllFives.Server.Tests", "DominoAllFives.Server.Tests\DominoAllFives.Server.Tests.csproj", "{2C2FF1C8-616D-4B72-934F-727102B7E997}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{7C30A667-DA9F-4EE5-B8B3-BD98EA019754}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdditionalTest", "AdditionalTest\AdditionalTest.csproj", "{40932A18-75CD-4BD4-A619-EAB76F674055}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{40932A18-75CD-4BD4-A619-EAB76F674055}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40932A18-75CD-4BD4-A619-EAB76F674055}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40932A18-75CD-4BD4-A619-EAB76F674055}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40932A18-75CD-4BD4-A619-EAB76F674055}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C30A667-DA9F-4EE5-B8B3-BD98EA019754}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C30A667-DA9F-4EE5-B8B3-BD98EA019754}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C30A667-DA9F-4EE5-B8B3-BD98EA019754}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C30A667-DA9F-4EE5-B8B3-BD98EA019754}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2C2FF1C8-616D-4B72-934F-727102B7E997}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2C2FF1C8-616D-4B72-934F-727102B7E997}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C2FF1C8-616D-4B72-934F-727102B7E997}.Release|Any CPU.ActiveCfg = Release|Any CPU

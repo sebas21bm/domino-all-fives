@@ -11,10 +11,8 @@ using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Contracts.Services;
-using DominoAllFives.DataAccess.Models;
 using DominoAllFives.Server.Logging;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace DominoAllFives.Server
 {
@@ -95,24 +93,23 @@ namespace DominoAllFives.Server
         {
             try
             {
-                ProfilePictureStorage storage =
-                    new ProfilePictureStorage(
+                ProfilePictureStorage storage = new ProfilePictureStorage(
                     LoggerFactoryProvider.CreateLogger<ProfilePictureStorage>());
                 return new RankingController(storage).GetTopWinsRanking();
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "Ranking failed on server.");
+                _logger.LogError(ex, "Top wins ranking could not access persistence.");
                 throw new FaultException("The service could not complete the operation.");
             }
             catch (EntityException ex)
             {
-                _logger.LogError(ex, "Ranking failed on server.");
+                _logger.LogError(ex, "Top wins ranking could not access persistence.");
                 throw new FaultException("The service could not complete the operation.");
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Ranking failed on server.");
+                _logger.LogError(ex, "Top wins ranking could not access persistence.");
                 throw new FaultException("The service could not complete the operation.");
             }
         }
@@ -134,24 +131,23 @@ namespace DominoAllFives.Server
 
             try
             {
-                ProfilePictureStorage storage =
-                    new ProfilePictureStorage(
+                ProfilePictureStorage storage = new ProfilePictureStorage(
                     LoggerFactoryProvider.CreateLogger<ProfilePictureStorage>());
                 return new RankingController(storage).GetWinsRankingPositionById(playerId);
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "Ranking failed on server.");
+                _logger.LogError(ex, "Wins ranking position could not access persistence.");
                 throw new FaultException("The service could not complete the operation.");
             }
             catch (EntityException ex)
             {
-                _logger.LogError(ex, "Ranking failed on server.");
+                _logger.LogError(ex, "Wins ranking position could not access persistence.");
                 throw new FaultException("The service could not complete the operation.");
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Ranking failed on server.");
+                _logger.LogError(ex, "Wins ranking position could not access persistence.");
                 throw new FaultException("The service could not complete the operation.");
             }
         }
