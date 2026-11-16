@@ -27,22 +27,17 @@ namespace DominoAllFives.Server
         IncludeExceptionDetailInFaults = false)]
     public partial class DominoService : ISessionAccountService
     {
-        private readonly Func<Credentials, PlayerAccount> _authenticate;
-        
         private readonly ILogger<DominoService> _logger;
 
-        public DominoService() : this(
-            new AuthenticationController().LoginWithAccount,
-            LoggerFactoryProvider.CreateLogger<DominoService>())
+        public DominoService()
+            : this(LoggerFactoryProvider.CreateLogger<DominoService>())
         {
         }
 
-        internal DominoService(
-            Func<Credentials, PlayerAccount> authenticate,
-            ILogger<DominoService> logger)
+        internal DominoService(ILogger<DominoService> logger)
         {
-            _authenticate = authenticate ?? throw new ArgumentNullException(nameof(authenticate));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger
+                ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -62,7 +57,7 @@ namespace DominoAllFives.Server
         {
             try
             {
-                PlayerAccount authenticatedAccount = _authenticate(credentials);
+                PlayerAccount authenticatedAccount = new AuthenticationController().LoginWithAccount(credentials);
                 string sessionKey = SessionManager.CreateSession(authenticatedAccount.PlayerId);
                 authenticatedAccount.SetSessionKey(sessionKey);
                 return authenticatedAccount;
