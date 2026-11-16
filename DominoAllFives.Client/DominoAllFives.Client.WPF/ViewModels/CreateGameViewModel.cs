@@ -175,13 +175,19 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 TargetPoints = GetTargetPoints()
             };
             SetBusy(true);
-            BackgroundJob<LobbySettings, Lobby> job =
-                new BackgroundJob<LobbySettings, Lobby>(
-                value => _lobbyService.CreateLobby(value),
+            BackgroundJob<LobbySettings, bool> job =
+                new BackgroundJob<LobbySettings, bool>(
+                CreateLobbyOnWorker,
                 settings,
                 OnLobbyReady,
                 OnLobbyFailed);
             BackgroundWork.Start(job);
+        }
+
+        private bool CreateLobbyOnWorker(LobbySettings settings)
+        {
+            _lobbyService.CreateLobby(settings);
+            return true;
         }
 
         private void HandleFailure(Exception error)
@@ -231,7 +237,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             CreateGameCommand.RaiseCanExecuteChanged();
         }
 
-        private void OnLobbyReady(Lobby lobby, LobbySettings state)
+        private void OnLobbyReady(bool wasCreated, LobbySettings state)
         {
             SetBusy(false);
             _navigation.NavigateTo<LobbyViewModel>();

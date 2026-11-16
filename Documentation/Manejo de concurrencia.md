@@ -235,9 +235,9 @@ Ejemplo:
 ```csharp
 lock (_syncRoot)
 {
-    EnsurePlayerIsAvailable(player.PlayerId);
+    ValidatePlayerCanEnterLobby(player.PlayerId);
 
-    Lobby lobby = GetLobbyInternal(lobbyCode);
+    Lobby lobby = GetRegisteredLobby(lobbyCode);
 
     if (lobby.Participants.Count >= lobby.Settings.MaxPlayers)
     {
@@ -270,10 +270,10 @@ deben permanecer protegidas por el mismo `lock`.
 Los métodos auxiliares de `LobbyManager`, como:
 
 ```text
-GetLobbyInternal
-GetPlayerLobbyInternal
-CloseLobbyInternal
-EnsurePlayerIsAvailable
+GetRegisteredLobby
+GetPlayerLobby
+CloseLobby
+ValidatePlayerCanEnterLobby
 GenerateLobbyCode
 ```
 

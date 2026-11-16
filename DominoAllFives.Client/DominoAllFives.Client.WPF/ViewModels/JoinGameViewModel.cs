@@ -153,13 +153,19 @@ namespace DominoAllFives.Client.WPF.ViewModels
             string code = RoomCode.Trim().ToUpperInvariant();
             ErrorMessage = string.Empty;
             SetBusy(true);
-            BackgroundJob<string, Lobby> job =
-                new BackgroundJob<string, Lobby>(
-                value => _lobbyService.JoinLobby(value),
+            BackgroundJob<string, bool> job =
+                new BackgroundJob<string, bool>(
+                JoinLobbyOnWorker,
                 code,
                 OnLobbyReady,
                 OnLobbyFailed);
             BackgroundWork.Start(job);
+        }
+
+        private bool JoinLobbyOnWorker(string lobbyCode)
+        {
+            _lobbyService.JoinLobby(lobbyCode);
+            return true;
         }
 
         private void HandleFailure(Exception error)
@@ -207,7 +213,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             JoinRoomCommand.RaiseCanExecuteChanged();
         }
 
-        private void OnLobbyReady(Lobby lobby, string state)
+        private void OnLobbyReady(bool wasJoined, string state)
         {
             SetBusy(false);
             _navigation.NavigateTo<LobbyViewModel>();

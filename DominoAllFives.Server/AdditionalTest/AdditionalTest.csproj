@@ -56,6 +56,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LobbyIntegrationTests.cs" />
+    <Compile Include="LobbyServiceWcfTests.cs" />
     <Compile Include="RankingServiceTests.cs" />
     <Compile Include="SessionServiceTests.cs" />
   </ItemGroup>

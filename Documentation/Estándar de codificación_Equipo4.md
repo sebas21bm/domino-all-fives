@@ -1041,7 +1041,7 @@ El control de concurrencia deberá separar las responsabilidades del servidor y 
 
 | Con estándar |
 | ----- |
-| `public Lobby LeavePlayer(int playerId)` `{`     `lock (_syncRoot)`     `{`         `Lobby lobby = GetPlayerLobbyInternal(playerId);`         `lobby.Participants.Remove(FindPlayer(lobby.Participants, playerId));`         `_playerLobbyCodes.Remove(playerId);`         `return CreateSnapshot(lobby);`     `}` `}` `BackgroundJob<string, Lobby> job = new BackgroundJob<string, Lobby>(`     `code => _lobbyService.JoinLobby(code),`     `roomCode,`     `OnLobbyReady,`     `OnLobbyFailed);` `BackgroundWork.Start(job);` |
+| `public Lobby LeavePlayer(int playerId)` `{`     `lock (_syncRoot)`     `{`         `Lobby lobby = GetPlayerLobby(playerId);`         `lobby.Participants.Remove(FindPlayer(lobby.Participants, playerId));`         `_playerLobbyCodes.Remove(playerId);`         `return CreateSnapshot(lobby);`     `}` `}` `BackgroundJob<string, Lobby> job = new BackgroundJob<string, Lobby>(`     `code => _lobbyService.JoinLobby(code),`     `roomCode,`     `OnLobbyReady,`     `OnLobbyFailed);` `BackgroundWork.Start(job);` |
 | **Sin estándar** |
 | `public void LeavePlayerAndNotify(int playerId)` `{`     `lock (_syncRoot)`     `{`         `Lobby lobby = _lobbies[playerId];`         `lobby.Participants.RemoveAll(player => player.PlayerId == playerId);`         `_publisher.PublishLobbyChanged(lobby);`     `}` `}` `public async Task JoinRoomAsync(string roomCode)` `{`     `Lobby lobby = await Task.Run(() => _lobbyService.JoinLobby(roomCode));`     `ApplyLobby(lobby);` `}` |
 

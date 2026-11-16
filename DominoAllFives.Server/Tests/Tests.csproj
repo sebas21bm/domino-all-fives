@@ -61,6 +61,10 @@
     <Compile Include="AccountRuleExceptionTests.cs" />
     <Compile Include="AuthenticationControllerTests.cs" />
     <Compile Include="CredentialsTests.cs" />
+    <Compile Include="LobbyContractTests.cs" />
+    <Compile Include="LobbyControllerTests.cs" />
+    <Compile Include="LobbyManagerTests.cs" />
+    <Compile Include="LobbyRuleExceptionTests.cs" />
     <Compile Include="PasswordHasherTests.cs" />
     <Compile Include="PlayerAccountTests.cs" />
     <Compile Include="PlayerRepositoryTests.cs" />

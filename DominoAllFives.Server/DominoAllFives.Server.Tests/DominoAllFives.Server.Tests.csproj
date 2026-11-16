@@ -92,10 +92,6 @@
     <ProjectReference Include="..\DominoAllFives.BusinessLogic\DominoAllFives.BusinessLogic.csproj" />
     <ProjectReference Include="..\DominoAllFives.Contracts\DominoAllFives.Contracts.csproj" />
     <ProjectReference Include="..\DominoAllFives.DataAccess\DominoAllFives.DataAccess.csproj" />
-    <Compile Include="TestLogger.cs" />
-    <Compile Include="LobbyContractTests.cs" />
-    <Compile Include="LobbyManagerTests.cs" />
-    <Compile Include="LobbyServiceWcfTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -115,9 +111,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PlayScoreTests.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="LobbyMergeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gameplay\TileTests.cs" />

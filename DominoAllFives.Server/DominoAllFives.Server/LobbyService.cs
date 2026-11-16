@@ -21,8 +21,10 @@ namespace DominoAllFives.Server
     /// <summary>
     /// Coordinates authenticated lobby operations and publishes participant callbacks.
     /// </summary>
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode =
-        ConcurrencyMode.Reentrant, IncludeExceptionDetailInFaults = false)]
+    [ServiceBehavior(
+        InstanceContextMode = InstanceContextMode.PerSession,
+        ConcurrencyMode = ConcurrencyMode.Reentrant,
+        IncludeExceptionDetailInFaults = false)]
     public sealed class LobbyService : ILobbyService
     {
         private static readonly LobbyController controller;
@@ -36,12 +38,13 @@ namespace DominoAllFives.Server
         private ICommunicationObject _callbackChannel;
         static LobbyService()
         {
-            LobbyManager lobbyManager = new LobbyManager();
+            LobbyManager lobbyManager = LobbyManager.Instance;
             Infrastructure.GameRuntime.Publisher.MatchEnded = lobbyManager.ReleaseMatch;
             controller = new LobbyController(lobbyManager);
             callbacks = new LobbyCallbackRegistry();
-            publisher = new LobbyEventPublisher(callbacks,
-                            LoggerFactoryProvider.CreateLogger<LobbyEventPublisher>());
+            publisher = new LobbyEventPublisher(
+                callbacks,
+                LoggerFactoryProvider.CreateLogger<LobbyEventPublisher>());
             logger = LoggerFactoryProvider.CreateLogger<LobbyService>();
         }
 
@@ -69,7 +72,9 @@ namespace DominoAllFives.Server
 
             try
             {
-                _player = SessionManager.GetPlayer(sessionKey, pictureStorage);
+                _player = controller.GetAuthenticatedPlayer(
+                    sessionKey,
+                    pictureStorage);
             }
             catch (KeyNotFoundException)
             {
@@ -112,21 +117,19 @@ namespace DominoAllFives.Server
         /// Creates a lobby owned by the authenticated player.
         /// </summary>
         /// <param name = "settings">The requested lobby configuration.</param>
-        /// <returns>The created lobby snapshot.</returns>
         /// <exception cref = "FaultException{AccessIssue}">
         /// The connection has no authenticated session or the player lacks permission.
         /// </exception>
         /// <exception cref = "FaultException{LobbyIssue}">
         /// The requested operation violates a lobby rule or the lobby is unavailable.
         /// </exception>
-        public Lobby CreateLobby(LobbySettings settings)
+        public void CreateLobby(LobbySettings settings)
         {
             try
             {
                 Player player = GetPlayer();
                 Lobby lobby = controller.CreateLobby(player, settings);
                 publisher.PublishLobbyChanged(lobby);
-                return lobby;
             }
             catch (LobbyRuleException ex)
             {
@@ -138,21 +141,19 @@ namespace DominoAllFives.Server
         /// Adds the authenticated player to an existing lobby.
         /// </summary>
         /// <param name = "lobbyCode">The code identifying the target lobby.</param>
-        /// <returns>The lobby snapshot after the player joins.</returns>
         /// <exception cref = "FaultException{AccessIssue}">
         /// The connection has no authenticated session or the player lacks permission.
         /// </exception>
         /// <exception cref = "FaultException{LobbyIssue}">
         /// The requested operation violates a lobby rule or the lobby is unavailable.
         /// </exception>
-        public Lobby JoinLobby(string lobbyCode)
+        public void JoinLobby(string lobbyCode)
         {
             try
             {
                 Player player = GetPlayer();
                 Lobby lobby = controller.JoinLobby(player, lobbyCode);
                 publisher.PublishLobbyChanged(lobby);
-                return lobby;
             }
             catch (LobbyRuleException ex)
             {
@@ -225,13 +226,19 @@ namespace DominoAllFives.Server
         /// </exception>
         public void StartMatch()
         {
+            Player player = GetPlayer();
+            Lobby startingLobby = null;
+            bool matchCreated = false;
             try
             {
-                Player player = GetPlayer();
-                Lobby lobby = controller.StartLobby(player.PlayerId, starting
-                    => Infrastructure.GameRuntime.Controller.Create(starting.LobbyId,
-                    starting.Participants.Select(participant => participant.PlayerId),
-                    starting.Settings.TargetPoints));
+                startingLobby = controller.PrepareLobbyForMatch(player.PlayerId);
+                Infrastructure.GameRuntime.Controller.Create(
+                    startingLobby.LobbyId,
+                    startingLobby.Participants.Select(participant => participant.PlayerId),
+                    startingLobby.Settings.TargetPoints);
+                matchCreated = true;
+
+                Lobby lobby = controller.ConfirmMatchStarted(player.PlayerId);
                 publisher.PublishLobbyChanged(lobby);
                 publisher.PublishMatchStarted(lobby, lobby.LobbyId);
             }
@@ -242,6 +249,14 @@ namespace DominoAllFives.Server
             catch (UnauthorizedAccessException)
             {
                 throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
+            }
+            finally
+            {
+                if (startingLobby != null
+                    && !matchCreated)
+                {
+                    controller.RestoreLobbyAfterMatchStartFailure(player.PlayerId);
+                }
             }
         }
 

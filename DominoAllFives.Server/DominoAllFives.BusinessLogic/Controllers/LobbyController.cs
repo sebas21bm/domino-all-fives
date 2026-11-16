@@ -2,8 +2,14 @@ using System;
 using System.Collections.Generic;
 using DominoAllFives.BusinessLogic.Exceptions;
 using DominoAllFives.BusinessLogic.Managers;
+using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
+using DominoAllFives.DataAccess.Interfaces;
+using DominoAllFives.DataAccess.Models;
+using DominoAllFives.DataAccess.Repositories;
+using Player = DominoAllFives.Contracts.Domain.Player;
+using StoredPlayer = DominoAllFives.DataAccess.Models.Player;
 
 namespace DominoAllFives.BusinessLogic.Controllers
 {
@@ -19,9 +25,36 @@ namespace DominoAllFives.BusinessLogic.Controllers
             250
         };
         private readonly LobbyManager _lobbyManager;
+
         public LobbyController(LobbyManager lobbyManager)
         {
-            _lobbyManager = lobbyManager ?? throw new ArgumentNullException(nameof(lobbyManager));
+            _lobbyManager = lobbyManager
+                ?? throw new ArgumentNullException(nameof(lobbyManager));
+        }
+
+        public Player GetAuthenticatedPlayer(
+            string sessionKey,
+            ProfilePictureStorage pictureStorage)
+        {
+            if (pictureStorage == null)
+            {
+                throw new ArgumentNullException(nameof(pictureStorage));
+            }
+
+            int playerId = SessionManager.GetPlayerId(sessionKey);
+            using (DominoAllFivesEntities context = new DominoAllFivesEntities())
+            {
+                IPlayerRepository playerRepository = new PlayerRepository(context);
+                StoredPlayer storedPlayer = playerRepository.GetById(playerId);
+                if (storedPlayer == null
+                    || storedPlayer.IsDeleted)
+                {
+                    SessionManager.RemoveSession(sessionKey);
+                    throw new KeyNotFoundException();
+                }
+
+                return CreatePlayer(storedPlayer, pictureStorage);
+            }
         }
 
         public Lobby CreateLobby(Player host, LobbySettings settings)
@@ -49,16 +82,34 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
         public Lobby LeaveLobby(int playerId)
         {
-            return _lobbyManager.LeavePlayer(ValidateId(playerId));
+            ValidatePlayerId(playerId);
+            return _lobbyManager.LeavePlayer(playerId);
         }
-        public Lobby StartLobby(int playerId, Action<Lobby> initializeMatch = null)
+
+        public Lobby PrepareLobbyForMatch(int playerId)
         {
-            return _lobbyManager.StartLobby(ValidateId(playerId), initializeMatch);
+            ValidatePlayerId(playerId);
+            return _lobbyManager.PrepareLobbyForMatch(playerId);
         }
+
+        public Lobby ConfirmMatchStarted(int playerId)
+        {
+            ValidatePlayerId(playerId);
+            return _lobbyManager.ConfirmMatchStarted(playerId);
+        }
+
+        public void RestoreLobbyAfterMatchStartFailure(int playerId)
+        {
+            ValidatePlayerId(playerId);
+            _lobbyManager.RestoreLobbyAfterMatchStartFailure(playerId);
+        }
+
         public Lobby CloseLobby(int playerId)
         {
-            return _lobbyManager.CloseLobby(ValidateId(playerId));
+            ValidatePlayerId(playerId);
+            return _lobbyManager.CloseLobby(playerId);
         }
+
         public Lobby GetLobby(string code)
         {
             if (code == null)
@@ -81,7 +132,8 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 throw new ArgumentNullException(nameof(settings));
             }
 
-            if (settings.MaxPlayers < MinimumPlayers || settings.MaxPlayers > MaximumPlayers)
+            if (settings.MaxPlayers < MinimumPlayers
+                || settings.MaxPlayers > MaximumPlayers)
             {
                 throw new LobbyRuleException(LobbyIssue.InvalidPlayerLimit);
             }
@@ -99,21 +151,36 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 throw new ArgumentNullException(nameof(player));
             }
 
-            ValidateId(player.PlayerId);
+            ValidatePlayerId(player.PlayerId);
             if (string.IsNullOrWhiteSpace(player.Username))
             {
                 throw new ArgumentException(null, nameof(player));
             }
         }
 
-        private static int ValidateId(int playerId)
+        private static void ValidatePlayerId(int playerId)
         {
             if (playerId <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(playerId));
             }
+        }
 
-            return playerId;
+        private static Player CreatePlayer(
+            StoredPlayer storedPlayer,
+            ProfilePictureStorage pictureStorage)
+        {
+            byte[] pictureData = pictureStorage.GetProfilePictureData(
+                storedPlayer.ProfilePicture);
+
+            return new Player
+            {
+                PlayerId = storedPlayer.IdPlayer,
+                Username = storedPlayer.Username,
+                Picture = ProfilePicture.FromStoredContent(pictureData),
+                Presence = PlayerPresence.Online,
+                IsGuest = storedPlayer.IsGuest
+            };
         }
     }
 }
