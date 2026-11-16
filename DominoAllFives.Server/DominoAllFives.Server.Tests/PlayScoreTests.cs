@@ -90,8 +90,8 @@ namespace DominoAllFives.Server.Tests
         private static List<Tile> CreateDrawDeck()
         {
             return Deck.Create()
-                .OrderByDescending(tile => tile.IsDouble && tile.FirstValue == 6).ThenBy(tile
-                    => tile.Matches(6))
+                .OrderByDescending(tile => tile.IsDouble && tile.FirstValue == 6)
+                .ThenBy(tile => tile.Matches(6))
                 .ToList();
         }
 
@@ -114,8 +114,7 @@ namespace DominoAllFives.Server.Tests
                 14,
                 15
             };
-            List<Tile> all = Deck.Create()
-                .Select(CreateTile)
+            List<Tile> all = Deck.Create().Select(CreateTile)
                 .ToList();
             List<Tile> ordered = values.Select(value => all.Single(tile => tile.FirstValue * 10
                 + tile.SecondValue == value))
@@ -132,7 +131,7 @@ namespace DominoAllFives.Server.Tests
                 power = SpecialPower.Block;
             }
 
-            if (tile.FirstValue == 4 && tile.SecondValue == 5)
+            else if (tile.FirstValue == 4 && tile.SecondValue == 5)
             {
                 power = SpecialPower.DoublePoints;
             }

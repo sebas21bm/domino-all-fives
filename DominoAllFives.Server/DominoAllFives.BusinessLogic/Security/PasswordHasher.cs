@@ -19,6 +19,11 @@ namespace DominoAllFives.BusinessLogic.Security
         private const int HashPartIndex = 3;
         public static string HashPassword(string password)
         {
+            if (password == null)
+            {
+                throw new ArgumentNullException(nameof(password));
+            }
+
             if (string.IsNullOrWhiteSpace(password))
             {
                 throw new ArgumentException("Password cannot be null or empty.", nameof(password));
@@ -32,11 +37,7 @@ namespace DominoAllFives.BusinessLogic.Security
 
             byte[] hash;
             using (Rfc2898DeriveBytes deriveBytes =
-                new Rfc2898DeriveBytes(
-                password,
-                salt,
-                Iterations,
-                HashAlgorithmName.SHA256))
+                new Rfc2898DeriveBytes(password, salt, Iterations, HashAlgorithmName.SHA256))
             {
                 hash = deriveBytes.GetBytes(HashSize);
             }
@@ -45,18 +46,14 @@ namespace DominoAllFives.BusinessLogic.Security
                 "{0}${1}${2}${3}",
                 Algorithm,
                 Iterations,
-                Convert.ToBase64String(
-                salt),
-                Convert.ToBase64String(
-                hash));
+                Convert.ToBase64String(salt),
+                Convert.ToBase64String(hash));
         }
 
         public static bool VerifyPassword(string password, string storedPasswordHash)
         {
-            if (string.IsNullOrWhiteSpace(
-                password)
-                || string.IsNullOrWhiteSpace(
-                storedPasswordHash))
+            if (string.IsNullOrWhiteSpace(password)
+                || string.IsNullOrWhiteSpace(storedPasswordHash))
             {
                 return false;
             }
@@ -64,9 +61,7 @@ namespace DominoAllFives.BusinessLogic.Security
             string[] parts = storedPasswordHash.Split('$');
             if (parts.Length != SerializedHashPartCount
                 || parts[AlgorithmPartIndex] != Algorithm
-                || !int.TryParse(
-                parts[IterationsPartIndex],
-                out int iterations))
+                || !int.TryParse(parts[IterationsPartIndex], out int iterations))
             {
                 return false;
             }
@@ -77,11 +72,7 @@ namespace DominoAllFives.BusinessLogic.Security
                 byte[] expectedHash = Convert.FromBase64String(parts[HashPartIndex]);
                 byte[] actualHash;
                 using (Rfc2898DeriveBytes deriveBytes =
-                    new Rfc2898DeriveBytes(
-                    password,
-                    salt,
-                    iterations,
-                    HashAlgorithmName.SHA256))
+                    new Rfc2898DeriveBytes(password, salt, iterations, HashAlgorithmName.SHA256))
                 {
                     actualHash = deriveBytes.GetBytes(expectedHash.Length);
                 }

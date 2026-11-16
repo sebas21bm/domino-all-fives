@@ -13,11 +13,11 @@ namespace DominoAllFives.Server.Tests
         public void OpenLobbySession_InvalidKey_ReturnsTypedAccessFaultOverNetTcp()
         {
             // Arrange
-            const string address = "net.tcp://localhost:18735/LobbyTest";
+            const string Address = "net.tcp://localhost:18735/LobbyTest";
             NetTcpBinding binding = new NetTcpBinding(SecurityMode.None);
             using (ServiceHost host = new ServiceHost(typeof(LobbyService)))
             {
-                host.AddServiceEndpoint(typeof(ILobbyService), binding, address);
+                host.AddServiceEndpoint(typeof(ILobbyService), binding, Address);
                 host.Open();
                 DuplexChannelFactory<ILobbyService> factory =
                     new DuplexChannelFactory<ILobbyService>(
@@ -25,15 +25,14 @@ namespace DominoAllFives.Server.Tests
                     new Callback()),
                     binding,
                     new EndpointAddress(
-                    address));
+                    Address));
                 ILobbyService channel = factory.CreateChannel();
                 try
                 {
                     // Act
                     FaultException<AccessIssue> error =
                         Assert.Throws<FaultException<AccessIssue>>(
-                        () => channel.OpenLobbySession(
-                        "invalid-session-key"));
+                        () => channel.OpenLobbySession("invalid-session-key"));
                     // Assert
                     Assert.That(error.Detail, Is.EqualTo(AccessIssue.SessionRequired));
                 }

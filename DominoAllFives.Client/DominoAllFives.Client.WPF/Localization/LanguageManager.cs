@@ -24,9 +24,27 @@ namespace DominoAllFives.Client.WPF.Localization
         private string _currentLanguageCode;
         private readonly Func<string> _readDeviceLanguage;
         private readonly Action<string> _saveDeviceLanguage;
-        public static LanguageManager Instance => instance.Value;
-        public string CurrentLanguageCode => _currentLanguageCode;
-        public CultureInfo CurrentCulture => Thread.CurrentThread.CurrentUICulture;
+        public static LanguageManager Instance
+        {
+            get
+            {
+                return instance.Value;
+            }
+        }
+        public string CurrentLanguageCode
+        {
+            get
+            {
+                return _currentLanguageCode;
+            }
+        }
+        public CultureInfo CurrentCulture
+        {
+            get
+            {
+                return Thread.CurrentThread.CurrentUICulture;
+            }
+        }
 
         public string this[string key]
         {
@@ -55,11 +73,9 @@ namespace DominoAllFives.Client.WPF.Localization
         public LanguageManager(Func<string> readDeviceLanguage, Action<string> saveDeviceLanguage)
         {
             _readDeviceLanguage = readDeviceLanguage ?? throw new ArgumentNullException(
-                nameof(
-                readDeviceLanguage));
+                nameof(readDeviceLanguage));
             _saveDeviceLanguage = saveDeviceLanguage ?? throw new ArgumentNullException(
-                nameof(
-                saveDeviceLanguage));
+                nameof(saveDeviceLanguage));
             _resourceManager = new ResourceManager(
                 "DominoAllFives.Client.WPF.Localization.Resources",
                 typeof(Resources).Assembly);
@@ -134,7 +150,7 @@ namespace DominoAllFives.Client.WPF.Localization
             {
                 Settings.Default.Save();
             }
-            catch (ConfigurationErrorsException)
+            catch (ConfigurationErrorsException ex)
             {
                 Settings.Default.LanguageCode = previousLanguage;
                 throw;

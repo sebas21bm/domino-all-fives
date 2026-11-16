@@ -10,6 +10,8 @@ namespace DominoAllFives.Client.WPF.Services
     /// </summary>
     public static class LoggerFactoryProvider
     {
+        private const long MaximumLogFileSizeBytes = 10 * 1024 * 1024;
+        private const int RetainedLogFileCount = 14;
         private static readonly object lockObject = new object();
         private static ILoggerFactory loggerFactory;
         /// <summary>
@@ -51,8 +53,7 @@ namespace DominoAllFives.Client.WPF.Services
             {
                 string logDirectory =
                     Path.Combine(
-                    Environment.GetFolderPath(
-                    Environment.SpecialFolder.LocalApplicationData),
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     "DominoAllFives",
                     "Logs");
                 if (!Directory.Exists(logDirectory))
@@ -67,8 +68,8 @@ namespace DominoAllFives.Client.WPF.Services
                         path: logFilePath,
                         rollingInterval: RollingInterval.Day,
                         rollOnFileSizeLimit: true,
-                        fileSizeLimitBytes: 10 * 1024 * 1024,
-                        retainedFileCountLimit: 14,
+                        fileSizeLimitBytes: MaximumLogFileSizeBytes,
+                        retainedFileCountLimit: RetainedLogFileCount,
                         outputTemplate:
                             "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} "
                             + "[{Level:u3}] "

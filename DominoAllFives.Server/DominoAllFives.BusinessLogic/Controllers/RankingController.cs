@@ -18,8 +18,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
         public RankingController(ProfilePictureStorage profilePictureStorage)
         {
             _profilePictureStorage = profilePictureStorage ?? throw new ArgumentNullException(
-                nameof(
-                profilePictureStorage));
+                nameof(profilePictureStorage));
         }
 
         /// <summary>
@@ -34,8 +33,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             {
                 IPlayerStatsRepository playerStatsRepository = new PlayerStatsRepository(context);
                 IEnumerable<PlayerStats> topPlayerStats =
-                    playerStatsRepository.GetTopByGamesWon(
-                    RankingLimit);
+                    playerStatsRepository.GetTopByGamesWon(RankingLimit);
                 List<RankingEntry> entries = new List<RankingEntry>();
                 int rank = 1;
                 foreach (PlayerStats playerStats in topPlayerStats)

@@ -14,8 +14,7 @@ namespace DominoAllFives.Client.WPF.ViewModels.Base
         protected virtual bool SetProperty<T>(
             ref T field,
             T value,
-            [CallerMemberName] string propertyName =
-            null)
+            [CallerMemberName] string propertyName = null)
         {
             if (Equals(field, value))
             {

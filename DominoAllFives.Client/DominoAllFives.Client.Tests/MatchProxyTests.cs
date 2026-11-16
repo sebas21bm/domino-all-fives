@@ -13,13 +13,13 @@ namespace DominoAllFives.Client.Tests
         {
             // Arrange
             const string ServerContractsAssembly = "DominoAllFives.Contracts";
-            var application = typeof(MatchClient).Assembly;
-            var tests = typeof(MatchProxyTests).Assembly;
+            System.Reflection.Assembly application = typeof(MatchClient).Assembly;
+            System.Reflection.Assembly tests = typeof(MatchProxyTests).Assembly;
             // Act
-            bool applicationReferencesServer = application.GetReferencedAssemblies()
-                .Any(assembly => assembly.Name == ServerContractsAssembly);
-            bool testsReferenceServer = tests.GetReferencedAssemblies()
-                .Any(assembly => assembly.Name == ServerContractsAssembly);
+            bool applicationReferencesServer = application.GetReferencedAssemblies().Any(
+                assembly => assembly.Name == ServerContractsAssembly);
+            bool testsReferenceServer = tests.GetReferencedAssemblies().Any(
+                assembly => assembly.Name == ServerContractsAssembly);
             // Assert
             Assert.That(typeof(MatchServiceClient).Assembly, Is.EqualTo(application));
             Assert.That(typeof(DominoTile).Assembly, Is.EqualTo(application));

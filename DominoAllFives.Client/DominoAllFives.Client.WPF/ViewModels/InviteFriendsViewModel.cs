@@ -20,9 +20,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public InviteFriendsViewModel(Action onCancel = null)
         {
             CloseInviteModalCommand = new RelayCommand(() => onCancel?.Invoke());
-            SendInviteCommand = new RelayCommand(() =>
-            {
-            }, () => false);
+            SendInviteCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
+        }
+        private static void IgnoreUnavailableCommand()
+        {
         }
     }
 }

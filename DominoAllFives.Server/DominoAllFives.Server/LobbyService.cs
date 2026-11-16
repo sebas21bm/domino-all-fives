@@ -8,6 +8,7 @@ using System.ServiceModel;
 using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Exceptions;
 using DominoAllFives.BusinessLogic.Managers;
+using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Contracts.Services;
@@ -27,7 +28,9 @@ namespace DominoAllFives.Server
         private static readonly LobbyController controller;
         private static readonly LobbyCallbackRegistry callbacks;
         private static readonly LobbyEventPublisher publisher;
-        private static readonly ILogger<LobbyService> _logger;
+        private static readonly ILogger<LobbyService> logger;
+        private static readonly ProfilePictureStorage pictureStorage =
+            new ProfilePictureStorage(LoggerFactoryProvider.CreateLogger<ProfilePictureStorage>());
         private Player _player;
         private ILobbyCallback _callback;
         private ICommunicationObject _callbackChannel;
@@ -39,7 +42,7 @@ namespace DominoAllFives.Server
             callbacks = new LobbyCallbackRegistry();
             publisher = new LobbyEventPublisher(callbacks,
                             LoggerFactoryProvider.CreateLogger<LobbyEventPublisher>());
-            _logger = LoggerFactoryProvider.CreateLogger<LobbyService>();
+            logger = LoggerFactoryProvider.CreateLogger<LobbyService>();
         }
 
         /// <summary>
@@ -56,35 +59,35 @@ namespace DominoAllFives.Server
         {
             if (_player != null)
             {
-                throw AccessFault(AccessIssue.PermissionDenied);
+                throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
             }
 
             if (string.IsNullOrWhiteSpace(sessionKey))
             {
-                throw AccessFault(AccessIssue.SessionRequired);
+                throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
             }
 
             try
             {
-                _player = SessionManager.GetPlayer(sessionKey);
+                _player = SessionManager.GetPlayer(sessionKey, pictureStorage);
             }
             catch (KeyNotFoundException)
             {
-                throw AccessFault(AccessIssue.SessionRequired);
+                throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "Lobby session could not resolve player.");
+                logger.LogError(ex, "Lobby session could not resolve player.");
                 throw new FaultException("The service could not complete the operation.");
             }
             catch (EntityException ex)
             {
-                _logger.LogError(ex, "Lobby session could not resolve player.");
+                logger.LogError(ex, "Lobby session could not resolve player.");
                 throw new FaultException("The service could not complete the operation.");
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Lobby session could not resolve player.");
+                logger.LogError(ex, "Lobby session could not resolve player.");
                 throw new FaultException("The service could not complete the operation.");
             }
 
@@ -93,7 +96,7 @@ namespace DominoAllFives.Server
             if (!callbackRegistered)
             {
                 _player = null;
-                throw AccessFault(AccessIssue.PermissionDenied);
+                throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
             }
 
             _callback = callback;
@@ -127,7 +130,7 @@ namespace DominoAllFives.Server
             }
             catch (LobbyRuleException ex)
             {
-                throw LobbyFault(ex.Issue);
+                throw new FaultException<LobbyIssue>(ex.Issue);
             }
         }
 
@@ -153,7 +156,7 @@ namespace DominoAllFives.Server
             }
             catch (LobbyRuleException ex)
             {
-                throw LobbyFault(ex.Issue);
+                throw new FaultException<LobbyIssue>(ex.Issue);
             }
         }
 
@@ -183,7 +186,7 @@ namespace DominoAllFives.Server
             }
             catch (LobbyRuleException ex)
             {
-                throw LobbyFault(ex.Issue);
+                throw new FaultException<LobbyIssue>(ex.Issue);
             }
         }
 
@@ -207,7 +210,7 @@ namespace DominoAllFives.Server
             }
             catch (LobbyRuleException ex)
             {
-                throw LobbyFault(ex.Issue);
+                throw new FaultException<LobbyIssue>(ex.Issue);
             }
         }
 
@@ -234,11 +237,11 @@ namespace DominoAllFives.Server
             }
             catch (LobbyRuleException ex)
             {
-                throw LobbyFault(ex.Issue);
+                throw new FaultException<LobbyIssue>(ex.Issue);
             }
             catch (UnauthorizedAccessException)
             {
-                throw AccessFault(AccessIssue.PermissionDenied);
+                throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
             }
         }
 
@@ -261,11 +264,11 @@ namespace DominoAllFives.Server
             }
             catch (LobbyRuleException ex)
             {
-                throw LobbyFault(ex.Issue);
+                throw new FaultException<LobbyIssue>(ex.Issue);
             }
             catch (UnauthorizedAccessException)
             {
-                throw AccessFault(AccessIssue.PermissionDenied);
+                throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
             }
         }
 
@@ -273,20 +276,10 @@ namespace DominoAllFives.Server
         {
             if (_player == null)
             {
-                throw AccessFault(AccessIssue.SessionRequired);
+                throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
             }
 
             return _player;
-        }
-
-        private static FaultException<LobbyIssue> LobbyFault(LobbyIssue issue)
-        {
-            return new FaultException<LobbyIssue>(issue);
-        }
-
-        private static FaultException<AccessIssue> AccessFault(AccessIssue issue)
-        {
-            return new FaultException<AccessIssue>(issue);
         }
 
         private void OnCallbackEnded(object sender, EventArgs eventArgs)

@@ -19,24 +19,34 @@ namespace DominoAllFives.Client.WPF.Models
         /// <exception cref = "ArgumentNullException">Thrown when value
         /// is null or empty.
         /// </exception>
-        public string TitleKey { get =>
-            _titleKey; set =>
-            _titleKey = ValidateNotNullOrEmpty(
-            value,
-            nameof(
-            TitleKey)); }
+        public string TitleKey
+        {
+            get
+            {
+                return _titleKey;
+            }
+            set
+            {
+                _titleKey = ValidateNotNullOrEmpty(value, nameof(TitleKey));
+            }
+        }
         /// <summary>
         /// Gets or sets the localization resource key for the main message.
         /// </summary>
         /// <exception cref = "ArgumentNullException">Thrown when value
         /// is null or empty.
         /// </exception>
-        public string MessageKey { get =>
-            _messageKey; set =>
-            _messageKey = ValidateNotNullOrEmpty(
-            value,
-            nameof(
-            MessageKey)); }
+        public string MessageKey
+        {
+            get
+            {
+                return _messageKey;
+            }
+            set
+            {
+                _messageKey = ValidateNotNullOrEmpty(value, nameof(MessageKey));
+            }
+        }
         /// <summary>
         /// Gets or sets the callback action executed when the user
         /// confirms or accepts the dialog.

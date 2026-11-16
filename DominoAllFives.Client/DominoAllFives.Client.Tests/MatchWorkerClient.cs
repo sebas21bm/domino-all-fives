@@ -32,17 +32,65 @@ namespace DominoAllFives.Client.Tests
         public long PlayedVersion { get; private set; }
         public int WorkerThreadId { get; private set; }
         public int DisposeThreadId { get; private set; }
-        public int OpenCalls => _openCalls;
-        public int PlayCalls => _playCalls;
-        public int DrawCalls => _drawCalls;
-        public int PassCalls => _passCalls;
-        public int GetMatchCalls => _getMatchCalls;
-        public int LeaveCalls => _leaveCalls;
-        public int DisposeCalls => _disposeCalls;
+
+        public int OpenCalls
+        {
+            get
+            {
+                return _openCalls;
+            }
+        }
+
+        public int PlayCalls
+        {
+            get
+            {
+                return _playCalls;
+            }
+        }
+
+        public int DrawCalls
+        {
+            get
+            {
+                return _drawCalls;
+            }
+        }
+
+        public int PassCalls
+        {
+            get
+            {
+                return _passCalls;
+            }
+        }
+
+        public int GetMatchCalls
+        {
+            get
+            {
+                return _getMatchCalls;
+            }
+        }
+
+        public int LeaveCalls
+        {
+            get
+            {
+                return _leaveCalls;
+            }
+        }
+
+        public int DisposeCalls
+        {
+            get
+            {
+                return _disposeCalls;
+            }
+        }
 
         public event Action<MatchView> MatchChanged;
         public event Action<PlayerHand> HandChanged;
-
         public MatchView Open(string sessionKey, int matchId)
         {
             Interlocked.Increment(ref _openCalls);
@@ -139,7 +187,8 @@ namespace DominoAllFives.Client.Tests
                 Phase = MatchPhase.InProgress,
                 Board = new PublicBoard
                 {
-                    Tiles = new List<PlacedTile>(), Ends = new List<PublicEnd>()
+                    Tiles = new List<PlacedTile>(),
+                    Ends = new List<PublicEnd>()
                 },
                 Scores = new List<PlayerScore>()
             };
@@ -149,10 +198,17 @@ namespace DominoAllFives.Client.Tests
         {
             return new PlayerHand
             {
-                MatchId = 1, PlayerId = 1, Version = version,
+                MatchId = 1,
+                PlayerId = 1,
+                Version = version,
                 Tiles = new List<DominoTile>
                 {
-                    new DominoTile { TileId = 1, FirstValue = 2, SecondValue = 3 }
+                    new DominoTile
+                    {
+                        TileId = 1,
+                        FirstValue = 2,
+                        SecondValue = 3
+                    }
                 }
             };
         }

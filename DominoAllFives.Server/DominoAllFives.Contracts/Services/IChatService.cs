@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ServiceModel;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
@@ -24,8 +24,12 @@ namespace DominoAllFives.Contracts.Services
         /// <summary>
         /// Registers and broadcasts a chat message to the authorized participants of its context.
         /// </summary>
-        /// <param name = "message">The message containing the target context and text content.</param>
-        /// <returns>The registered message with server-assigned identifier, sender, and timestamp.</returns>
+        /// <param name = "message">
+        /// The message containing the target context and text content.
+        /// </param>
+        /// <returns>
+        /// The registered message with server-assigned identifier, sender, and timestamp.
+        /// </returns>
         [OperationContract]
         [FaultContract(typeof(AccessIssue))]
         [FaultContract(typeof(ChatIssue))]
@@ -35,7 +39,9 @@ namespace DominoAllFives.Contracts.Services
         /// Retrieves the ordered message history for a chat context accessible to the player.
         /// </summary>
         /// <param name = "context">The lobby or match chat context to query.</param>
-        /// <returns>The list of messages registered in the specified context ordered by date.</returns>
+        /// <returns>
+        /// The list of messages registered in the specified context ordered by date.
+        /// </returns>
         [OperationContract]
         [FaultContract(typeof(AccessIssue))]
         [FaultContract(typeof(ChatIssue))]

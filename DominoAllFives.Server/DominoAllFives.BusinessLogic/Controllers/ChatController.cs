@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using DominoAllFives.BusinessLogic.Exceptions;
 using DominoAllFives.BusinessLogic.Managers;
@@ -38,8 +38,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                         message.Context.ContextId,
                         normalizedContent);
 
-                    recipients = _lobbyManager.GetChatRecipients(
-                        message.Context.ContextId);
+                    recipients = _lobbyManager.GetChatRecipients(message.Context.ContextId);
 
                     return registeredMessage;
                 case ChatScope.Match:

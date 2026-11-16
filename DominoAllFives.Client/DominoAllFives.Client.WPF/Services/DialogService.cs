@@ -23,8 +23,7 @@ namespace DominoAllFives.Client.WPF.Services
         public DialogService(Action<CustomMessageViewModel> showDialogCallback)
         {
             _showDialogCallback = showDialogCallback ?? throw new ArgumentNullException(
-                nameof(
-                showDialogCallback));
+                nameof(showDialogCallback));
         }
 
         /// <summary>
@@ -51,7 +50,7 @@ namespace DominoAllFives.Client.WPF.Services
                 resolvedCancelAction = () => CompleteDialog(request.OnCancel);
             }
 
-            var dialogVm = new CustomMessageViewModel
+            CustomMessageViewModel dialogVm = new CustomMessageViewModel
             {
                 Title = title,
                 Message = message,

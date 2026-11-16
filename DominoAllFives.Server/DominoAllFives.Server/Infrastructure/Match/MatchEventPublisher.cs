@@ -15,86 +15,44 @@ namespace DominoAllFives.Server.Infrastructure
 {
     public sealed class MatchEventPublisher
     {
-        private readonly object _syncRoot = new object();
-        private readonly Dictionary<Tuple<int, int>, IMatchCallback> _callbacks =
-            new Dictionary<Tuple<int, int>, IMatchCallback>();
-        private readonly ConcurrentDictionary<int, DeliveryQueue> _queues =
-            new ConcurrentDictionary<int, DeliveryQueue>();
-        private readonly Dictionary<IMatchCallback, string> _sessionKeys =
-            new Dictionary<IMatchCallback, string>();
+        private readonly MatchCallbackRegistry _callbacks = new MatchCallbackRegistry();
+        private readonly ConcurrentDictionary<int, MatchDeliveryManager> _queues =
+            new ConcurrentDictionary<int, MatchDeliveryManager>();
         private readonly ILogger<MatchEventPublisher> _logger =
             LoggerFactoryProvider.CreateLogger<MatchEventPublisher>();
         public Action<int> MatchEnded { get; set; }
 
         public void Register(int matchId, int playerId, IMatchCallback callback, string sessionKey)
         {
-            lock (_syncRoot)
-            {
-                Tuple<int, int> key = Tuple.Create(matchId, playerId);
-                IMatchCallback previous;
-                if (_callbacks.TryGetValue(key, out previous))
-                {
-                    _sessionKeys.Remove(previous);
-                }
-
-                _callbacks[key] = callback;
-                _sessionKeys[callback] = sessionKey;
-            }
+            _callbacks.Register(matchId, playerId, callback, sessionKey);
         }
 
         public void Remove(int matchId, int playerId, IMatchCallback callback)
         {
-            Tuple<int, int> key = Tuple.Create(matchId, playerId);
-            lock (_syncRoot)
-            {
-                IMatchCallback current;
-                if (_callbacks.TryGetValue(key, out current) && ReferenceEquals(current, callback))
-                {
-                    _callbacks.Remove(key);
-                    _sessionKeys.Remove(callback);
-                }
-            }
+            _callbacks.Remove(matchId, playerId, callback);
         }
 
         public void Enqueue(MatchUpdate notification)
         {
-            DeliveryQueue queue = _queues.GetOrAdd(notification.View.MatchId, id
-                => new DeliveryQueue());
-            lock (queue)
+            MatchDeliveryManager queue = _queues.GetOrAdd(notification.View.MatchId,
+                matchId => new MatchDeliveryManager());
+            if (queue.Enqueue(notification))
             {
-                queue.Items.Enqueue(notification);
-                if (queue.IsRunning)
-                {
-                    return;
-                }
-
-                queue.IsRunning = true;
                 ThreadPool.QueueUserWorkItem(unused => Drain(queue));
             }
         }
 
-        private void Drain(DeliveryQueue queue)
+        private void Drain(MatchDeliveryManager queue)
         {
-            while (true)
+            MatchUpdate notification;
+            while (queue.TryDequeue(out notification))
             {
-                MatchUpdate notification;
-                lock (queue)
-                {
-                    if (queue.Items.Count == 0)
-                    {
-                        queue.IsRunning = false;
-                        return;
-                    }
-
-                    notification = queue.Items.Dequeue();
-                }
-
                 Deliver(notification);
                 if (notification.Result != null)
                 {
                     MatchEnded?.Invoke(notification.View.MatchId);
                     Release(notification.View.MatchId);
-                    DeliveryQueue removed;
+                    MatchDeliveryManager removed;
                     _queues.TryRemove(notification.View.MatchId, out removed);
                 }
             }
@@ -102,27 +60,23 @@ namespace DominoAllFives.Server.Infrastructure
 
         private void Deliver(MatchUpdate notification)
         {
-            List<KeyValuePair<Tuple<int, int>, IMatchCallback>> recipients;
-            lock (_syncRoot)
-            {
-                recipients = _callbacks.Where(entry => entry.Key.Item1 == notification.View.MatchId)
-                    .ToList();
-            }
+            List<MatchCallbackRegistration> recipients =
+                _callbacks.GetCallbacks(notification.View.MatchId);
 
-            foreach (KeyValuePair<Tuple<int, int>, IMatchCallback> recipient in recipients)
+            foreach (MatchCallbackRegistration recipient in recipients)
             {
-                if (!IsAuthenticated(recipient.Value, recipient.Key.Item2))
+                if (!IsAuthenticated(recipient, recipient.PlayerId))
                 {
-                    Remove(recipient.Key.Item1, recipient.Key.Item2, recipient.Value);
+                    Remove(recipient.MatchId, recipient.PlayerId, recipient.Callback);
                     continue;
                 }
 
                 try
                 {
-                    IMatchCallback callback = recipient.Value;
+                    IMatchCallback callback = recipient.Callback;
                     callback.OnMatchChanged(notification.View);
                     callback.OnPrivateHandChanged(notification.Hands.Single(hand
-                        => hand.PlayerId == recipient.Key.Item2));
+                        => hand.PlayerId == recipient.PlayerId));
                     if (notification.Round != null)
                     {
                         callback.OnRoundFinished(notification.Round);
@@ -148,20 +102,11 @@ namespace DominoAllFives.Server.Infrastructure
             }
         }
 
-        private bool IsAuthenticated(IMatchCallback callback, int playerId)
+        private bool IsAuthenticated(MatchCallbackRegistration registration, int playerId)
         {
-            string key;
-            lock (_syncRoot)
-            {
-                if (!_sessionKeys.TryGetValue(callback, out key))
-                {
-                    return false;
-                }
-            }
-
             try
             {
-                return SessionManager.GetPlayerId(key) == playerId;
+                return SessionManager.GetPlayerId(registration.SessionKey) == playerId;
             }
             catch (KeyNotFoundException)
             {
@@ -171,30 +116,58 @@ namespace DominoAllFives.Server.Infrastructure
 
         private void Release(int matchId)
         {
-            List<KeyValuePair<Tuple<int, int>, IMatchCallback>> callbacks;
-            lock (_syncRoot)
-            {
-                callbacks = _callbacks.Where(entry => entry.Key.Item1 == matchId)
-                    .ToList();
-            }
+            List<MatchCallbackRegistration> callbacks =
+                _callbacks.GetCallbacks(matchId);
 
-            foreach (KeyValuePair<Tuple<int, int>, IMatchCallback> callback in callbacks)
+            foreach (MatchCallbackRegistration callback in callbacks)
             {
-                Remove(matchId, callback.Key.Item2, callback.Value);
+                Remove(matchId, callback.PlayerId, callback.Callback);
             }
         }
 
-        private void RemoveFailed(KeyValuePair<Tuple<int, int>, IMatchCallback> recipient,
-            Exception ex)
+        private void RemoveFailed(MatchCallbackRegistration recipient, Exception ex)
         {
-            Remove(recipient.Key.Item1, recipient.Key.Item2, recipient.Value);
-            _logger.LogWarning(ex, "Match callback failed for player {PlayerId}.",recipient.Key.Item2);
+            Remove(recipient.MatchId, recipient.PlayerId, recipient.Callback);
+            _logger.LogDebug(
+                ex, "Match callback failed for player {PlayerId}.", recipient.PlayerId);
         }
 
-        private sealed class DeliveryQueue
+        private sealed class MatchDeliveryManager
         {
-            public Queue<MatchUpdate> Items { get; } = new Queue<MatchUpdate>();
-            public bool IsRunning { get; set; }
+            private readonly object _syncRoot = new object();
+            private readonly Queue<MatchUpdate> _items = new Queue<MatchUpdate>();
+            private bool _isRunning;
+
+            public bool Enqueue(MatchUpdate notification)
+            {
+                lock (_syncRoot)
+                {
+                    _items.Enqueue(notification);
+                    if (_isRunning)
+                    {
+                        return false;
+                    }
+
+                    _isRunning = true;
+                    return true;
+                }
+            }
+
+            public bool TryDequeue(out MatchUpdate notification)
+            {
+                lock (_syncRoot)
+                {
+                    if (_items.Count == 0)
+                    {
+                        notification = null;
+                        _isRunning = false;
+                        return false;
+                    }
+
+                    notification = _items.Dequeue();
+                    return true;
+                }
+            }
         }
     }
 }

@@ -57,18 +57,16 @@ namespace DominoAllFives.Server
         {
             try
             {
-                PlayerAccount authenticatedAccount = new AuthenticationController().LoginWithAccount(credentials);
+                PlayerAccount authenticatedAccount =
+                    new AuthenticationController().LoginWithAccount(credentials);
                 string sessionKey = SessionManager.CreateSession(authenticatedAccount.PlayerId);
                 authenticatedAccount.SetSessionKey(sessionKey);
                 return authenticatedAccount;
             }
             catch (AccountRuleException ex)
             {
-                _logger.LogWarning(ex, "Login rejected. Account issue: {AccountIssue}.", ex.Issue);
-                throw new FaultException<AccountIssue>(
-                    ex.Issue,
-                    new FaultReason(
-                    "The account cannot sign in."));
+                _logger.LogDebug(ex, "Login rejected. Account issue: {AccountIssue}.", ex.Issue);
+                throw new FaultException<AccountIssue>(ex.Issue);
             }
             catch (SqlException ex)
             {
@@ -99,7 +97,7 @@ namespace DominoAllFives.Server
             {
                 ProfilePictureStorage storage =
                     new ProfilePictureStorage(
-                    NullLogger<ProfilePictureStorage>.Instance);
+                    LoggerFactoryProvider.CreateLogger<ProfilePictureStorage>());
                 return new RankingController(storage).GetTopWinsRanking();
             }
             catch (SqlException ex)
@@ -122,7 +120,9 @@ namespace DominoAllFives.Server
         /// <summary>Gets the wins ranking position for a player.</summary>
         /// <param name = "playerId">The target player identifier.</param>
         /// <returns>The player ranking position.</returns>
-        /// <exception cref = "FaultException">The request is invalid or persistence failed.</exception>
+        /// <exception cref = "FaultException">
+        /// The request is invalid or persistence failed.
+        /// </exception>
         public int GetWinsRankingPositionById(int playerId)
         {
             if (playerId <= 0)
@@ -136,7 +136,7 @@ namespace DominoAllFives.Server
             {
                 ProfilePictureStorage storage =
                     new ProfilePictureStorage(
-                    NullLogger<ProfilePictureStorage>.Instance);
+                    LoggerFactoryProvider.CreateLogger<ProfilePictureStorage>());
                 return new RankingController(storage).GetWinsRankingPositionById(playerId);
             }
             catch (SqlException ex)

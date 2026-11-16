@@ -33,9 +33,7 @@ namespace DominoAllFives.Server.Tests
             DominoService service = new DominoService();
             // Act
             FaultException fault =
-                Assert.Throws<FaultException>(
-                () => service.GetWinsRankingPositionById(
-                playerId));
+                Assert.Throws<FaultException>(() => service.GetWinsRankingPositionById(playerId));
             // Assert
             Assert.That(fault.Message, Is.EqualTo("Invalid request."));
         }

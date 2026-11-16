@@ -26,7 +26,7 @@ namespace DominoAllFives.Client.WPF
             ILoggerFactory loggerFactory = LoggerFactoryProvider.Instance;
             ProfilePictureImageService profilePictureImageService =
                 new ProfilePictureImageService(
-                loggerFactory.CreateLogger<ProfilePictureImageService>());
+                LoggerFactoryProvider.CreateLogger<ProfilePictureImageService>());
             IRankingClient rankingService = new RankingClient();
             ViewModelFactory viewModelFactory =
                 new ViewModelFactory(

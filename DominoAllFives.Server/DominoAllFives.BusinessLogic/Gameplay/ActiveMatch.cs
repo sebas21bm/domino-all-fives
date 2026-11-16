@@ -6,13 +6,12 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 {
     public sealed class ActiveMatch
     {
-        public object SyncRoot { get; } = new object ();
-        public Match Match { get; private set; }
-        public DateTime? FinishedAt { get; set; }
+        public Match Match { get; }
+        public DateTime? FinishedAt { get; internal set; }
 
         public ActiveMatch(Match match)
         {
-            Match = match;
+            Match = match ?? throw new ArgumentNullException(nameof(match));
         }
     }
 }

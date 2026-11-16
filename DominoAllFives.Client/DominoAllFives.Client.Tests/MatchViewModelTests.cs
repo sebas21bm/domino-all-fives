@@ -203,7 +203,7 @@ namespace DominoAllFives.Client.Tests
             session.Start(1, "Alice", "es-MX", "test-session");
             return new MatchViewModel(new Navigation(), new MatchNavigation { MatchId = 1,
                 PlayerSession = session, TargetPoints = 150, PlayerNames = new Dictionary<int,
-                string> { { 1, "Alice" }, { 2, "Bob" } } }, client);
+                    string> { { 1, "Alice" }, { 2, "Bob" } } }, client);
         }
 
         private static MatchView View(long version)
@@ -245,9 +245,8 @@ namespace DominoAllFives.Client.Tests
 
         private static void Pump()
         {
-            Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-            {
-            }));
+            Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Background, new Action(
+                NoOperation));
         }
 
         private sealed class Client : IMatchClient
@@ -333,6 +332,10 @@ namespace DominoAllFives.Client.Tests
             public void GoBack()
             {
             }
+        }
+
+        private static void NoOperation()
+        {
         }
     }
 }

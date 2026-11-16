@@ -13,7 +13,7 @@ namespace DominoAllFives.Server.Tests
 
         public void OnMatchChanged(Proxy.MatchView match)
         {
-        // This probe observes private delivery; public state is checked through responses.
+            // This probe observes private delivery; public state is checked through responses.
         }
 
         public void OnPrivateHandChanged(Proxy.PlayerHand hand)
@@ -23,12 +23,12 @@ namespace DominoAllFives.Server.Tests
 
         public void OnRoundFinished(Proxy.RoundResult result)
         {
-        // The single opening move in this probe cannot finish a round.
+            // The single opening move in this probe cannot finish a round.
         }
 
         public void OnMatchFinished(Proxy.MatchResult result)
         {
-        // The single opening move in this probe cannot reach the target score.
+            // The single opening move in this probe cannot reach the target score.
         }
     }
 }

@@ -1,19 +1,26 @@
 using System;
 using System.ServiceModel;
+using DominoAllFives.Client.WPF.Services.Wcf.Callbacks;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using MatchService;
+using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.Services.Wcf.Services
 {
     /// <summary>
     /// Owns the duplex channel and forwards match snapshots to the UI process.
     /// </summary>
-    [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode =
-        ConcurrencyMode.Multiple)]
-    public sealed class MatchClient : IMatchClient, IMatchServiceCallback
+    public sealed class MatchClient : IMatchClient
     {
+        private readonly MatchCallbackHandler _callback;
         private MatchServiceClient _service;
         private bool _disposed;
+        public MatchClient()
+        {
+            _callback = new MatchCallbackHandler(
+                OnMatchChanged, OnPrivateHandChanged, OnRoundFinished, OnMatchFinished);
+        }
+
         public event Action<MatchView> MatchChanged;
         public event Action<PlayerHand> HandChanged;
         /// <summary>
@@ -36,15 +43,15 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
             ResetConnection();
             try
             {
-                _service = new MatchServiceClient(new InstanceContext(this), "MatchEndpoint");
+                _service = new MatchServiceClient(new InstanceContext(_callback), "MatchEndpoint");
                 return _service.OpenMatchSession(sessionKey, matchId);
             }
-            catch (CommunicationException)
+            catch (CommunicationException ex)
             {
                 ResetConnection();
                 throw;
             }
-            catch (TimeoutException)
+            catch (TimeoutException ex)
             {
                 ResetConnection();
                 throw;
@@ -206,12 +213,16 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
                     channel.Close();
                 }
             }
-            catch (CommunicationException)
+            catch (CommunicationException ex)
             {
+                LoggerFactoryProvider.CreateLogger<MatchClient>().LogWarning(
+                    ex, "The WCF channel could not be closed cleanly.");
                 channel.Abort();
             }
-            catch (TimeoutException)
+            catch (TimeoutException ex)
             {
+                LoggerFactoryProvider.CreateLogger<MatchClient>().LogWarning(
+                    ex, "The WCF channel could not be closed cleanly.");
                 channel.Abort();
             }
         }

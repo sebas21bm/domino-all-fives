@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -10,6 +10,8 @@ namespace DominoAllFives.Server.Logging
     /// </summary>
     public static class LoggerFactoryProvider
     {
+        private const long MaximumLogFileSizeBytes = 10 * 1024 * 1024;
+        private const int RetainedLogFileCount = 14;
         private static readonly object lockObject = new object();
         private static ILoggerFactory loggerFactory;
 
@@ -83,13 +85,12 @@ namespace DominoAllFives.Server.Logging
                             path: logFilePath,
                             rollingInterval: RollingInterval.Day,
                             rollOnFileSizeLimit: true,
-                            fileSizeLimitBytes: 10 * 1024 * 1024,
-                            retainedFileCountLimit: 14,
+                            fileSizeLimitBytes: MaximumLogFileSizeBytes,
+                            retainedFileCountLimit: RetainedLogFileCount,
                             outputTemplate: outputTemplate)
                         .CreateLogger();
 
-                return LoggerFactory.Create(
-                    builder => builder.AddSerilog(dispose: true));
+                return LoggerFactory.Create(builder => builder.AddSerilog(dispose: true));
             }
             catch (IOException ex)
             {
@@ -113,12 +114,9 @@ namespace DominoAllFives.Server.Logging
                     .CreateLogger();
 
             ILoggerFactory factory =
-                LoggerFactory.Create(
-                    builder => builder.AddSerilog(dispose: true));
+                LoggerFactory.Create(builder => builder.AddSerilog(dispose: true));
 
-            factory
-                .CreateLogger(
-                    typeof(LoggerFactoryProvider).FullName)
+            factory.CreateLogger(typeof(LoggerFactoryProvider).FullName)
                 .LogWarning(
                     ex,
                     "File logging is unavailable; using console logging.");

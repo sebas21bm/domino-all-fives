@@ -40,46 +40,28 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 return DeleteStatus.PasswordNotMatch;
             }
 
-            try
+            using (DominoAllFivesEntities context = new DominoAllFivesEntities())
             {
-                using (DominoAllFivesEntities context = new DominoAllFivesEntities())
+                IPlayerRepository playerRepository = new PlayerRepository(context);
+                Player player = playerRepository.GetById(playerId);
+                if (player == null || player.IsDeleted)
                 {
-                    IPlayerRepository playerRepository = new PlayerRepository(context);
-                    Player player = playerRepository.GetById(playerId);
-                    if (player == null || player.IsDeleted)
-                    {
-                        return DeleteStatus.AccountNotFound;
-                    }
-
-                    if (!PasswordHasher.VerifyPassword(password, player.PasswordHash))
-                    {
-                        return DeleteStatus.PasswordNotMatch;
-                    }
-
-                    bool wasDeleted = playerRepository.SoftDelete(playerId);
-                    if (!wasDeleted)
-                    {
-                        return DeleteStatus.AccountNotFound;
-                    }
-
-                    context.SaveChanges();
-                    return DeleteStatus.None;
+                    return DeleteStatus.AccountNotFound;
                 }
-            }
-            catch (SqlException ex)
-            {
-                _logger.LogError(ex, "Unable to delete account for player {PlayerId}.", playerId);
-                throw;
-            }
-            catch (EntityException ex)
-            {
-                _logger.LogError(ex, "Unable to delete account for player {PlayerId}.", playerId);
-                throw;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Unable to delete account for player {PlayerId}.", playerId);
-                throw;
+
+                if (!PasswordHasher.VerifyPassword(password, player.PasswordHash))
+                {
+                    return DeleteStatus.PasswordNotMatch;
+                }
+
+                bool wasDeleted = playerRepository.SoftDelete(playerId);
+                if (!wasDeleted)
+                {
+                    return DeleteStatus.AccountNotFound;
+                }
+
+                context.SaveChanges();
+                return DeleteStatus.None;
             }
         }
 
@@ -101,52 +83,34 @@ namespace DominoAllFives.BusinessLogic.Controllers
             {
                 return validation;
             }
-            try
+            using (DominoAllFivesEntities context = new DominoAllFivesEntities())
             {
-                using (DominoAllFivesEntities context = new DominoAllFivesEntities())
+                IPlayerRepository playerRepository = new PlayerRepository(context);
+                Player player = playerRepository.GetById(playerId);
+                if (player == null || player.IsDeleted)
                 {
-                    IPlayerRepository playerRepository = new PlayerRepository(context);
-                    Player player = playerRepository.GetById(playerId);
-                    if (player == null || player.IsDeleted)
-                    {
-                        return ChangePasswordStatus.AccountNotFound;
-                    }
-
-                    if (!PasswordHasher.VerifyPassword(currentPassword, player.PasswordHash))
-                    {
-                        return ChangePasswordStatus.IncorrectCurrentPassword;
-                    }
-
-                    if (PasswordHasher.VerifyPassword(newPassword, player.PasswordHash))
-                    {
-                        return ChangePasswordStatus.SameAsCurrentPassword;
-                    }
-
-                    string newPasswordHash = PasswordHasher.HashPassword(newPassword);
-                    bool wasUpdated = playerRepository.UpdatePassword(playerId, newPasswordHash);
-                    if (!wasUpdated)
-                    {
-                        return ChangePasswordStatus.AccountNotFound;
-                    }
-
-                    context.SaveChanges();
-                    return ChangePasswordStatus.None;
+                    return ChangePasswordStatus.AccountNotFound;
                 }
-            }
-            catch (SqlException ex)
-            {
-                _logger.LogError(ex, "Unable to change password for player {PlayerId}.", playerId);
-                throw;
-            }
-            catch (EntityException ex)
-            {
-                _logger.LogError(ex, "Unable to change password for player {PlayerId}.", playerId);
-                throw;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Unable to change password for player {PlayerId}.", playerId);
-                throw;
+
+                if (!PasswordHasher.VerifyPassword(currentPassword, player.PasswordHash))
+                {
+                    return ChangePasswordStatus.IncorrectCurrentPassword;
+                }
+
+                if (PasswordHasher.VerifyPassword(newPassword, player.PasswordHash))
+                {
+                    return ChangePasswordStatus.SameAsCurrentPassword;
+                }
+
+                string newPasswordHash = PasswordHasher.HashPassword(newPassword);
+                bool wasUpdated = playerRepository.UpdatePassword(playerId, newPasswordHash);
+                if (!wasUpdated)
+                {
+                    return ChangePasswordStatus.AccountNotFound;
+                }
+
+                context.SaveChanges();
+                return ChangePasswordStatus.None;
             }
         }
         private static ChangePasswordStatus ValidatePasswordChange(

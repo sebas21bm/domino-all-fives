@@ -31,8 +31,7 @@ namespace DominoAllFives.Server.Tests
             LobbyRuleException error =
                 Assert.Throws<LobbyRuleException>(
                 () => CreateController().CreateLobby(
-                Player(
-                1),
+                Player(1),
                 Settings(
                 5,
                 100)));
@@ -51,8 +50,7 @@ namespace DominoAllFives.Server.Tests
             LobbyRuleException error =
                 Assert.Throws<LobbyRuleException>(
                 () => controller.JoinLobby(
-                Player(
-                3),
+                Player(3),
                 lobby.LobbyCode));
             // Assert
             Assert.That(error.Issue, Is.EqualTo(LobbyIssue.Full));
@@ -66,9 +64,7 @@ namespace DominoAllFives.Server.Tests
             controller.CreateLobby(Player(1), Settings(4, 150));
             // Act
             LobbyRuleException error =
-                Assert.Throws<LobbyRuleException>(
-                () => controller.StartLobby(
-                1));
+                Assert.Throws<LobbyRuleException>(() => controller.StartLobby(1));
             // Assert
             Assert.That(error.Issue, Is.EqualTo(LobbyIssue.InsufficientPlayers));
         }
@@ -100,20 +96,27 @@ namespace DominoAllFives.Server.Tests
             Assert.DoesNotThrow(() => controller.CreateLobby(Player(2), Settings(2, 100)));
         }
 
-        private static LobbyController CreateController() =>
-            new LobbyController(
-            new LobbyManager());
-        private static Player Player(int id) => new Player
+        private static LobbyController CreateController()
         {
-            PlayerId = id,
-            Username = "Player" + id,
-            Picture = ProfilePicture.FromStoredContent(new byte[0]),
-            Presence = PlayerPresence.Online
-        };
-        private static LobbySettings Settings(int players, int points) => new LobbySettings
+            return new LobbyController(new LobbyManager());
+        }
+        private static Player Player(int id)
         {
-            MaxPlayers = players,
-            TargetPoints = points
-        };
+            return new Player
+            {
+                PlayerId = id,
+                Username = "Player" + id,
+                Picture = ProfilePicture.FromStoredContent(new byte[0]),
+                Presence = PlayerPresence.Online
+            };
+        }
+        private static LobbySettings Settings(int players, int points)
+        {
+            return new LobbySettings
+            {
+                MaxPlayers = players,
+                TargetPoints = points
+            };
+        }
     }
 }

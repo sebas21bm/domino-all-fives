@@ -99,8 +99,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 
         public int CalculatePoints(int turnNumber)
         {
-            int sum = GetScoringValues(turnNumber)
-                .Sum();
+            int sum = GetScoringValues(turnNumber).Sum();
             return sum % ScoringMultiple == 0 ? sum : 0;
         }
 

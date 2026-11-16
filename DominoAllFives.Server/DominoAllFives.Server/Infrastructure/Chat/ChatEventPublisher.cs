@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using DominoAllFives.Contracts.Domain;
@@ -21,12 +21,10 @@ namespace DominoAllFives.Server.Infrastructure.Chat
 
         public void PublishMessageReceived(
             IEnumerable<Player> recipients,
-            ChatMessage message) =>
-            Publish(
-            recipients,
-            message,
-            callback => callback.OnMessageReceived(
-            message));
+            ChatMessage message)
+        {
+            Publish(recipients, message, callback => callback.OnMessageReceived(message));
+        }
         private void Publish(
             IEnumerable<Player> recipients,
             ChatMessage message,
@@ -61,7 +59,7 @@ namespace DominoAllFives.Server.Infrastructure.Chat
                 catch (CommunicationException ex)
                 {
                     _callbacks.RemoveCallback(player.PlayerId, callback);
-                    _logger.LogWarning(
+                    _logger.LogDebug(
                         ex,
                         "Chat callback failed for player {PlayerId}.",
                         player.PlayerId);
@@ -69,7 +67,7 @@ namespace DominoAllFives.Server.Infrastructure.Chat
                 catch (TimeoutException ex)
                 {
                     _callbacks.RemoveCallback(player.PlayerId, callback);
-                    _logger.LogWarning(
+                    _logger.LogDebug(
                         ex,
                         "Chat callback failed for player {PlayerId}.",
                         player.PlayerId);
@@ -77,7 +75,7 @@ namespace DominoAllFives.Server.Infrastructure.Chat
                 catch (ObjectDisposedException ex)
                 {
                     _callbacks.RemoveCallback(player.PlayerId, callback);
-                    _logger.LogWarning(
+                    _logger.LogDebug(
                         ex,
                         "Chat callback failed for player {PlayerId}.",
                         player.PlayerId);

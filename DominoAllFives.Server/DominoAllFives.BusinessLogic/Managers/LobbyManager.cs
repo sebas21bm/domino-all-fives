@@ -70,6 +70,11 @@ namespace DominoAllFives.BusinessLogic.Managers
                 throw new ArgumentNullException(nameof(player));
             }
 
+            if (lobbyCode == null)
+            {
+                throw new ArgumentNullException(nameof(lobbyCode));
+            }
+
             if (string.IsNullOrWhiteSpace(lobbyCode))
             {
                 throw new ArgumentException(null, nameof(lobbyCode));
@@ -174,6 +179,11 @@ namespace DominoAllFives.BusinessLogic.Managers
             if (sender == null)
             {
                 throw new ArgumentNullException(nameof(sender));
+            }
+
+            if (content == null)
+            {
+                throw new ArgumentNullException(nameof(content));
             }
 
             if (string.IsNullOrWhiteSpace(content))

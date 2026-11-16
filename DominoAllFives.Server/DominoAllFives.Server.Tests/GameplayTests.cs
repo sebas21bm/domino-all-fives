@@ -321,9 +321,8 @@ namespace DominoAllFives.Server.Tests
         public void GetHand_NonParticipant_IsRejected()
         {
             // Arrange
-            MatchController coordinator = new MatchController(new MatchManager(), unused =>
-            {
-            });
+            MatchController coordinator = new MatchController(
+                new MatchManager(), IgnoreMatchRelease);
             coordinator.Create(1, new[] { 1, 2 }, 100);
             // Act
             MatchRuleException ex = Assert.Throws<MatchRuleException>(() => coordinator.GetHand(
@@ -337,9 +336,7 @@ namespace DominoAllFives.Server.Tests
         {
             // Arrange
             MatchManager store = new MatchManager();
-            MatchController coordinator = new MatchController(store, unused =>
-            {
-            });
+            MatchController coordinator = new MatchController(store, IgnoreMatchRelease);
             coordinator.Create(1, new[] { 1, 2 }, 100);
             Match match = store.GetMatch(1).Match;
             int playerId = match.CurrentPlayerId.Value;
@@ -473,5 +470,9 @@ namespace DominoAllFives.Server.Tests
                 .OrderBy(tile => tile.TileId))
                 .ToList();
         }
+        private static void IgnoreMatchRelease(MatchUpdate notification)
+        {
+        }
+
     }
 }

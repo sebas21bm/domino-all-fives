@@ -187,15 +187,16 @@ namespace DominoAllFives.Server.Tests
             using (ServiceHost host = CreateHost())
             {
                 host.Open();
-                var factory = new DuplexChannelFactory<IMatchService>(new InstanceContext(
-                    new Callback()), new NetTcpBinding(SecurityMode.None),
+                DuplexChannelFactory<IMatchService> factory =
+                    new DuplexChannelFactory<IMatchService>(
+                    new InstanceContext(new Callback()), new NetTcpBinding(SecurityMode.None),
                     host.Description.Endpoints[0].Address);
                 IMatchService channel = factory.CreateChannel();
                 try
                 {
                     // Act
-                    FaultException<MatchIssue> ex = Assert.Throws<FaultException<MatchIssue>>((
-                        ) => channel.OpenMatchSession(key, matchId));
+                    FaultException<MatchIssue> ex = Assert.Throws<FaultException<MatchIssue>>(
+                        () => channel.OpenMatchSession(key, matchId));
                     // Assert
                     Assert.That(ex.Detail, Is.EqualTo(MatchIssue.PlayerNotInMatch));
                 }

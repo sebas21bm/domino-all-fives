@@ -38,8 +38,7 @@ namespace DominoAllFives.Contracts.Domain
             if (!IsRejection(reason))
             {
                 throw new ArgumentOutOfRangeException(
-                    nameof(
-                    reason),
+                    nameof(reason),
                     "Only expected business rejection reasons are allowed.");
             }
 

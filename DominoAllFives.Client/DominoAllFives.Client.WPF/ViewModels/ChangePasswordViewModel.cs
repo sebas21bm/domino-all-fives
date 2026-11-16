@@ -17,10 +17,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public ChangePasswordViewModel(Action onCancel = null)
         {
-            ChangePasswordCommand = new RelayCommand(() =>
-            {
-            }, () => false);
+            ChangePasswordCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
             CancelCommand = new RelayCommand(() => onCancel?.Invoke());
+        }
+        private static void IgnoreUnavailableCommand()
+        {
         }
     }
 }

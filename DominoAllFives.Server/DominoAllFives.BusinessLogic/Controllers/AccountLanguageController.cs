@@ -19,8 +19,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
         private const string PortugueseLanguageId = "pt-BR";
         private readonly Func<ILanguagePreferenceStore> _storeFactory;
         private readonly ILogger<AccountLanguageController> _logger;
-        public AccountLanguageController(
-            ILogger<AccountLanguageController> logger) : this(
+        public AccountLanguageController(ILogger<AccountLanguageController> logger) : this(
             () => new LanguagePreferenceStore(),
             logger)
         {
@@ -51,36 +50,9 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 throw new ArgumentException("The language is not supported.", nameof(languageId));
             }
 
-            try
+            using (ILanguagePreferenceStore store = _storeFactory())
             {
-                using (ILanguagePreferenceStore store = _storeFactory())
-                {
-                    return PersistLanguage(store, playerId, languageId);
-                }
-            }
-            catch (SqlException ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Unable to persist preferred language for player {PlayerId}.",
-                    playerId);
-                throw;
-            }
-            catch (EntityException ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Unable to persist preferred language for player {PlayerId}.",
-                    playerId);
-                throw;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Unable to persist preferred language for player {PlayerId}.",
-                    playerId);
-                throw;
+                return PersistLanguage(store, playerId, languageId);
             }
         }
 

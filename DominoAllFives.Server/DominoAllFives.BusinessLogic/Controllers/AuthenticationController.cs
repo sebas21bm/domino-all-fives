@@ -27,10 +27,8 @@ namespace DominoAllFives.BusinessLogic.Controllers
         public PlayerAccount LoginWithAccount(Credentials credentials)
         {
             if (credentials == null
-                || string.IsNullOrWhiteSpace(
-                credentials.EmailOrUsername)
-                || string.IsNullOrWhiteSpace(
-                credentials.Password))
+                || string.IsNullOrWhiteSpace(credentials.EmailOrUsername)
+                || string.IsNullOrWhiteSpace(credentials.Password))
             {
                 throw new AccountRuleException(AccountIssue.InvalidCredentials);
             }
@@ -38,9 +36,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             Player player = _findPlayer(credentials.EmailOrUsername);
             if (player == null
                 || player.IsDeleted
-                || !PasswordHasher.VerifyPassword(
-                credentials.Password,
-                player.PasswordHash))
+                || !PasswordHasher.VerifyPassword(credentials.Password, player.PasswordHash))
             {
                 throw new AccountRuleException(AccountIssue.InvalidCredentials);
             }

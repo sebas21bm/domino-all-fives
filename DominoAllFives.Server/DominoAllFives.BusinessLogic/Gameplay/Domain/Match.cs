@@ -29,8 +29,8 @@ namespace DominoAllFives.BusinessLogic.Gameplay
         private Queue<Tile> _stock;
         private int _currentPlayerIndex;
         private int _consecutivePasses;
-        public int MatchId { get; private set; }
-        public int TargetPoints { get; private set; }
+        public int MatchId { get; }
+        public int TargetPoints { get; }
         public int RoundNumber { get; private set; }
         public int OpeningTileId { get; private set; }
         public int TurnNumber { get; private set; }
@@ -60,8 +60,8 @@ namespace DominoAllFives.BusinessLogic.Gameplay
         {
             get
             {
-                return Phase == MatchState.InProgress ? (int
-                    ? )_players[_currentPlayerIndex].PlayerId : null;
+                return Phase == MatchState.InProgress
+                    ? (int?)_players[_currentPlayerIndex].PlayerId : null;
             }
         }
 
@@ -184,7 +184,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 List<MatchPlayer> winners = _players.Where(candidate => candidate.Hand.Sum(tile
                     => tile.TotalPips) == minimum)
                     .ToList();
-                FinishRound(winners.Count == 1 ? (int? )winners[0].PlayerId : null);
+                FinishRound(winners.Count == 1 ? (int?)winners[0].PlayerId : null);
             }
         }
 
@@ -241,7 +241,8 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 EndValues = Array.AsReadOnly(values),
                 BlockedEnds = Board.Ends.Where(target => target.BlockedTurn == TurnNumber)
                     .Select(target => target.End)
-                    .ToList().AsReadOnly(),
+                    .ToList()
+                    .AsReadOnly(),
                 IncludesOpeningDouble = Board.Ends.Any(target => target.IsOpeningEnd
                     && target.BlockedTurn != TurnNumber),
                 Total = values.Sum(),

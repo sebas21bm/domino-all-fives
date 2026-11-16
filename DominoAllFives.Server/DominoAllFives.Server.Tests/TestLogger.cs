@@ -10,8 +10,14 @@ namespace DominoAllFives.Server.Tests
         public List<Exception> Exceptions { get; } = new List<Exception>();
         public List<string> Messages { get; } = new List<string>();
 
-        public IDisposable BeginScope<TState>(TState state) => null;
-        public bool IsEnabled(LogLevel logLevel) => true;
+        public IDisposable BeginScope<TState>(TState state)
+        {
+            return null;
+        }
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return true;
+        }
         public void Log<TState>(
             LogLevel logLevel,
             EventId eventId,

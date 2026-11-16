@@ -35,7 +35,9 @@ namespace DominoAllFives.Contracts.Domain
         /// </summary>
         /// <param name = "playerId">The account identifier.</param>
         /// <param name = "username">The stored or requested username.</param>
-        /// <param name = "preferredLanguageId">The preferred language identifier associated with the account.</param>
+        /// <param name = "preferredLanguageId">
+        /// The preferred language identifier associated with the account.
+        /// </param>
         /// <param name = "accessStatus">The restrictions reconstructed by the server.</param>
         /// <returns>The domain value produced by the operation.</returns>
         public static PlayerAccount FromStoredAccount(
@@ -57,15 +59,16 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Maps the preferred language stored with the account.
         /// </summary>
-        /// <param name = "preferredLanguageId">The preferred language identifier associated with the account.</param>
+        /// <param name = "preferredLanguageId">
+        /// The preferred language identifier associated with the account.
+        /// </param>
         public void SetPreferredLanguage(string preferredLanguageId)
         {
             if (!IsPreferredLanguageValid(preferredLanguageId))
             {
                 throw new ArgumentException(
                     "Invalid stored language identifier.",
-                    nameof(
-                    preferredLanguageId));
+                    nameof(preferredLanguageId));
             }
 
             PreferredLanguageId = preferredLanguageId;
@@ -74,7 +77,9 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Checks server-reconstructed restrictions without authenticating a client session.
         /// </summary>
-        /// <param name = "currentTime">The comparison time in the timestamp convention of the stored restrictions.</param>
+        /// <param name = "currentTime">
+        /// The comparison time in the timestamp convention of the stored restrictions.
+        /// </param>
         public LoginStatus EnsureCanLogin(DateTime currentTime)
         {
             if (AccessStatus == null)

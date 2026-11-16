@@ -43,8 +43,7 @@ namespace DominoAllFives.Contracts.Domain
         /// <returns>The domain value produced by the operation.</returns>
         public static bool IsEmailValid(string email)
         {
-            if (string.IsNullOrWhiteSpace(
-                email)
+            if (string.IsNullOrWhiteSpace(email)
                 || !Regex.IsMatch(
                 email,
                 EmailPattern,
@@ -72,8 +71,7 @@ namespace DominoAllFives.Contracts.Domain
         /// <returns>The domain value produced by the operation.</returns>
         public static bool IsPasswordValid(string password)
         {
-            return !string.IsNullOrWhiteSpace(
-                password)
+            return !string.IsNullOrWhiteSpace(password)
                 && Regex.IsMatch(
                 password,
                 PasswordPattern,

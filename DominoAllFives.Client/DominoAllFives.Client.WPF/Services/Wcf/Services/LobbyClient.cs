@@ -4,6 +4,7 @@ using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services.Wcf.Callbacks;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using LobbyService;
+using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.Services.Wcf.Services
 {
@@ -54,11 +55,9 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
             Func<LobbyCallbackHandler, LobbyServiceClient> clientFactory)
         {
             _playerSession = playerSession ?? throw new ArgumentNullException(
-                nameof(
-                playerSession));
+                nameof(playerSession));
             _clientFactory = clientFactory ?? throw new ArgumentNullException(
-                nameof(
-                clientFactory));
+                nameof(clientFactory));
         }
 
         public event Action<Lobby> LobbyChanged;
@@ -272,12 +271,16 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
                     _client.Close();
                 }
             }
-            catch (CommunicationException)
+            catch (CommunicationException ex)
             {
+                LoggerFactoryProvider.CreateLogger<LobbyClient>().LogWarning(
+                    ex, "The WCF channel could not be closed cleanly.");
                 _client.Abort();
             }
-            catch (TimeoutException)
+            catch (TimeoutException ex)
             {
+                LoggerFactoryProvider.CreateLogger<LobbyClient>().LogWarning(
+                    ex, "The WCF channel could not be closed cleanly.");
                 _client.Abort();
             }
             finally

@@ -70,7 +70,7 @@ namespace DominoAllFives.Server.Infrastructure.Lobby
                 catch (CommunicationException ex)
                 {
                     _callbacks.RemoveCallback(player.PlayerId, callback);
-                    _logger.LogWarning(
+                    _logger.LogDebug(
                         ex,
                         "Lobby callback failed for player {PlayerId}.",
                         player.PlayerId);
@@ -78,7 +78,7 @@ namespace DominoAllFives.Server.Infrastructure.Lobby
                 catch (TimeoutException ex)
                 {
                     _callbacks.RemoveCallback(player.PlayerId, callback);
-                    _logger.LogWarning(
+                    _logger.LogDebug(
                         ex,
                         "Lobby callback failed for player {PlayerId}.",
                         player.PlayerId);
@@ -86,7 +86,7 @@ namespace DominoAllFives.Server.Infrastructure.Lobby
                 catch (ObjectDisposedException ex)
                 {
                     _callbacks.RemoveCallback(player.PlayerId, callback);
-                    _logger.LogWarning(
+                    _logger.LogDebug(
                         ex,
                         "Lobby callback failed for player {PlayerId}.",
                         player.PlayerId);

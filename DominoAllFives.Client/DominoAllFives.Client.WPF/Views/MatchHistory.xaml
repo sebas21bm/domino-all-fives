@@ -74,7 +74,7 @@
                     </Border>
 
                     <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                        <ItemsControl x:Name="itmMatchHistory" ItemsSource="{Binding MatchHistoryList}">
+                        <ItemsControl x:Name="itmMatchHistory" ItemsSource="{Binding MatchHistoryEntries}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border BorderBrush="{StaticResource CreamLightBrush}" BorderThickness="0,0,0,1" Padding="0,22,0,22" Opacity="0.9">

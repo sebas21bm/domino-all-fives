@@ -26,8 +26,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             ILogger<ProfileController> logger)
         {
             _profilePictureStorage = profilePictureStorage ?? throw new ArgumentNullException(
-                nameof(
-                profilePictureStorage));
+                nameof(profilePictureStorage));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -43,48 +42,28 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 throw new ArgumentOutOfRangeException(nameof(playerId));
             }
 
-            try
+            using (DominoAllFivesEntities context = new DominoAllFivesEntities())
             {
-                using (DominoAllFivesEntities context = new DominoAllFivesEntities())
+                IPlayerRepository playerRepository = new PlayerRepository(context);
+                Player player = playerRepository.GetById(playerId);
+                if (player == null)
                 {
-                    IPlayerRepository playerRepository = new PlayerRepository(context);
-                    Player player = playerRepository.GetById(playerId);
-                    if (player == null)
-                    {
-                        return null;
-                    }
-
-                    if (player.PlayerStats == null)
-                    {
-                        throw new InvalidOperationException(
-                            "The player has no required statistics.");
-                    }
-
-                    return PlayerProfile.FromStoredProfile(
-                        player.Username,
-                        PlayerStatistics.FromStoredStatistics(
-                        player.PlayerStats.GamesWon,
-                        player.PlayerStats.TotalPointsScored,
-                        player.PlayerStats.GamesPlayed),
-                        ProfilePicture.FromStoredContent(
-                        _profilePictureStorage.GetProfilePictureData(
-                        player.ProfilePicture)));
+                    return null;
                 }
-            }
-            catch (SqlException ex)
-            {
-                _logger.LogError(ex, "Unable to retrieve profile for player {PlayerId}.", playerId);
-                throw;
-            }
-            catch (EntityException ex)
-            {
-                _logger.LogError(ex, "Unable to retrieve profile for player {PlayerId}.", playerId);
-                throw;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Unable to retrieve profile for player {PlayerId}.", playerId);
-                throw;
+
+                if (player.PlayerStats == null)
+                {
+                    throw new InvalidOperationException("The player has no required statistics.");
+                }
+
+                return PlayerProfile.FromStoredProfile(
+                    player.Username,
+                    PlayerStatistics.FromStoredStatistics(
+                    player.PlayerStats.GamesWon,
+                    player.PlayerStats.TotalPointsScored,
+                    player.PlayerStats.GamesPlayed),
+                    ProfilePicture.FromStoredContent(
+                    _profilePictureStorage.GetProfilePictureData(player.ProfilePicture)));
             }
         }
 
@@ -135,21 +114,6 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 {
                     return UpdateStoredProfile(context, update);
                 }
-            }
-            catch (SqlException ex)
-            {
-                LogUpdateFailure(ex, playerId);
-                throw;
-            }
-            catch (EntityException ex)
-            {
-                LogUpdateFailure(ex, playerId);
-                throw;
-            }
-            catch (DbUpdateException ex)
-            {
-                LogUpdateFailure(ex, playerId);
-                throw;
             }
             finally
             {
@@ -224,8 +188,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             }
 
             return update.ReplacePicture
-                ? ValidateProfilePicture(
-                update.Picture) : UpdateProfileStatus.None;
+                ? ValidateProfilePicture(update.Picture) : UpdateProfileStatus.None;
         }
 
         private static bool ApplyStoredValues(
@@ -234,17 +197,13 @@ namespace DominoAllFives.BusinessLogic.Controllers
             ProfileUpdate update)
         {
             if (player.Username != update.Username
-                && !repository.UpdateUsername(
-                update.PlayerId,
-                update.Username))
+                && !repository.UpdateUsername(update.PlayerId, update.Username))
             {
                 return false;
             }
 
             if (update.ReplacePicture
-                && !repository.UpdateProfilePicture(
-                update.PlayerId,
-                update.NewPictureFileName))
+                && !repository.UpdateProfilePicture(update.PlayerId, update.NewPictureFileName))
             {
                 return false;
             }
@@ -334,8 +293,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             }
 
             bool wasDeleted =
-                _profilePictureStorage.TryDeleteProfilePicture(
-                profilePictureFileName);
+                _profilePictureStorage.TryDeleteProfilePicture(profilePictureFileName);
             if (!wasDeleted)
             {
                 _logger.LogWarning(

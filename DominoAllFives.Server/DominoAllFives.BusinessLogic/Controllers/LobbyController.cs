@@ -34,6 +34,11 @@ namespace DominoAllFives.BusinessLogic.Controllers
         public Lobby JoinLobby(Player player, string code)
         {
             ValidatePlayer(player);
+            if (code == null)
+            {
+                throw new ArgumentNullException(nameof(code));
+            }
+
             if (string.IsNullOrWhiteSpace(code))
             {
                 throw new ArgumentException(null, nameof(code));
@@ -42,12 +47,25 @@ namespace DominoAllFives.BusinessLogic.Controllers
             return _lobbyManager.JoinPlayer(player, code.Trim());
         }
 
-        public Lobby LeaveLobby(int playerId) => _lobbyManager.LeavePlayer(ValidateId(playerId));
+        public Lobby LeaveLobby(int playerId)
+        {
+            return _lobbyManager.LeavePlayer(ValidateId(playerId));
+        }
         public Lobby StartLobby(int playerId, Action<Lobby> initializeMatch = null)
-            => _lobbyManager.StartLobby(ValidateId(playerId), initializeMatch);
-        public Lobby CloseLobby(int playerId) => _lobbyManager.CloseLobby(ValidateId(playerId));
+        {
+            return _lobbyManager.StartLobby(ValidateId(playerId), initializeMatch);
+        }
+        public Lobby CloseLobby(int playerId)
+        {
+            return _lobbyManager.CloseLobby(ValidateId(playerId));
+        }
         public Lobby GetLobby(string code)
         {
+            if (code == null)
+            {
+                throw new ArgumentNullException(nameof(code));
+            }
+
             if (string.IsNullOrWhiteSpace(code))
             {
                 throw new ArgumentException(null, nameof(code));
