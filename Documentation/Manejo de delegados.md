@@ -126,21 +126,25 @@ BackgroundJob<string, PlayerAccount> job =
         OnLoginFailed);
 ```
 
-Un controlador recibe un repositorio explícito porque la búsqueda de jugadores corresponde a un colaborador estable:
+Un controller del servidor crea el repositorio con nombre dentro de la operación
+en vez de ocultar su comportamiento detrás de un delegado:
 
 ```csharp
-private readonly IPlayerRepository _playerRepository;
-
-public AuthenticationController(IPlayerRepository playerRepository)
+public PlayerAccount GetAccount(int playerId)
 {
-    _playerRepository = playerRepository
-        ?? throw new ArgumentNullException(nameof(playerRepository));
+    using (DominoAllFivesEntities context = new DominoAllFivesEntities())
+    {
+        IPlayerRepository playerRepository = new PlayerRepository(context);
+        Player player = playerRepository.GetById(playerId);
+        return CreatePlayerAccount(player);
+    }
 }
 ```
 
-```csharp
-Player player = _playerRepository.GetByUsernameOrEmail(identifier);
-```
+En Domino All Fives, los controllers crean y liberan el contexto de Entity
+Framework y componen sus repositorios por operación. No reciben el repositorio
+desde la frontera WCF ni agregan una ruta de inyección únicamente para pruebas.
+Esta responsabilidad se especifica en `Manejo de comunicación remota.md`.
 
 ### Mal ejemplo
 

@@ -11,6 +11,7 @@ namespace DominoAllFives.DataAccess.Repositories
     public class PlayerRepository : IPlayerRepository
     {
         private readonly DominoAllFivesEntities _context;
+
         /// <summary>
         /// Initializes a new instance of the repository with the specified database context.
         /// </summary>
@@ -19,7 +20,8 @@ namespace DominoAllFives.DataAccess.Repositories
         /// </param>
         public PlayerRepository(DominoAllFivesEntities databaseContext)
         {
-            _context = databaseContext;
+            _context = databaseContext
+                ?? throw new ArgumentNullException(nameof(databaseContext));
         }
 
         /// <inheritdoc/>

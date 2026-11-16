@@ -93,7 +93,7 @@
     <ProjectReference Include="..\DominoAllFives.Contracts\DominoAllFives.Contracts.csproj" />
     <ProjectReference Include="..\DominoAllFives.DataAccess\DominoAllFives.DataAccess.csproj" />
     <Compile Include="TestLogger.cs" />
-    <Compile Include="CredentialsTests.cs" />
+    <Compile Include="LobbyContractTests.cs" />
     <Compile Include="LobbyManagerTests.cs" />
     <Compile Include="LobbyServiceWcfTests.cs" />
   </ItemGroup>

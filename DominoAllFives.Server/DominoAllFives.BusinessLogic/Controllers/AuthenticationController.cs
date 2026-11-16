@@ -3,75 +3,94 @@ using DominoAllFives.BusinessLogic.Exceptions;
 using DominoAllFives.BusinessLogic.Security;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
+using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
-using Player = DominoAllFives.DataAccess.Models.Player;
 using DominoAllFives.DataAccess.Repositories;
+using Player = DominoAllFives.DataAccess.Models.Player;
 
 namespace DominoAllFives.BusinessLogic.Controllers
 {
     /// <summary>Authenticates accounts and enforces their access restrictions.</summary>
     public class AuthenticationController
     {
-        private readonly Func<string, Player> _findPlayer;
-        private readonly Func<DateTime> _utcNow;
-        public AuthenticationController() : this(FindStoredPlayer, () => DateTime.UtcNow)
-        {
-        }
-
-        public AuthenticationController(Func<string, Player> findPlayer, Func<DateTime> utcNow)
-        {
-            _findPlayer = findPlayer ?? throw new ArgumentNullException(nameof(findPlayer));
-            _utcNow = utcNow ?? throw new ArgumentNullException(nameof(utcNow));
-        }
-
+        /// <summary>
+        /// Authenticates credentials and reconstructs the stored account.
+        /// </summary>
+        /// <param name = "credentials">The credentials supplied by the player.</param>
+        /// <returns>The authenticated account without a session key.</returns>
+        /// <exception cref = "AccountRuleException">The account cannot sign in.</exception>
         public PlayerAccount LoginWithAccount(Credentials credentials)
         {
-            if (credentials == null
-                || string.IsNullOrWhiteSpace(credentials.EmailOrUsername)
-                || string.IsNullOrWhiteSpace(credentials.Password))
-            {
-                throw new AccountRuleException(AccountIssue.InvalidCredentials);
-            }
+            ValidateCredentials(credentials);
 
-            Player player = _findPlayer(credentials.EmailOrUsername);
-            if (player == null
-                || player.IsDeleted
-                || !PasswordHasher.VerifyPassword(credentials.Password, player.PasswordHash))
+            using (DominoAllFivesEntities context = new DominoAllFivesEntities())
             {
-                throw new AccountRuleException(AccountIssue.InvalidCredentials);
+                IPlayerRepository playerRepository = new PlayerRepository(context);
+                Player player = FindAuthenticatedPlayer(credentials, playerRepository);
+                ValidateAccountCanLogin(player);
+                return CreatePlayerAccount(player);
             }
+        }
 
-            if (player.IsBanned)
-            {
-                throw new AccountRuleException(AccountIssue.Banned);
-            }
 
-            DateTime utcNow = _utcNow();
-            DateTime evaluationTime =
-                player.SuspensionUntil.HasValue
-                && player.SuspensionUntil.Value.Kind != DateTimeKind.Utc
-                ? utcNow.ToLocalTime() : utcNow;
-            if (player.SuspensionUntil.HasValue && player.SuspensionUntil.Value > evaluationTime)
-            {
-                throw new AccountRuleException(AccountIssue.Suspended);
-            }
+        private static PlayerAccount CreatePlayerAccount(Player player)
+        {
+            AccountAccessStatus accessStatus = AccountAccessStatus.FromStoredState(
+                player.IsDeleted,
+                player.IsBanned,
+                player.SuspensionUntil);
 
             return PlayerAccount.FromStoredAccount(
                 player.IdPlayer,
                 player.Username,
                 player.PreferredLanguageId,
-                AccountAccessStatus.FromStoredState(
-                player.IsDeleted,
-                player.IsBanned,
-                player.SuspensionUntil));
+                accessStatus);
         }
 
-        private static Player FindStoredPlayer(string identifier)
+        private static void ValidateAccountCanLogin(Player player)
         {
-            using (DominoAllFivesEntities context = new DominoAllFivesEntities())
+            if (player.IsBanned)
             {
-                return new PlayerRepository(context).GetByUsernameOrEmail(identifier);
+                throw new AccountRuleException(AccountIssue.Banned);
             }
+
+            DateTime utcNow = DateTime.UtcNow;
+            DateTime evaluationTime =
+                player.SuspensionUntil.HasValue
+                && player.SuspensionUntil.Value.Kind != DateTimeKind.Utc
+                ? utcNow.ToLocalTime() : utcNow;
+
+            if (player.SuspensionUntil.HasValue
+                && player.SuspensionUntil.Value > evaluationTime)
+            {
+                throw new AccountRuleException(AccountIssue.Suspended);
+            }
+        }
+
+        private static void ValidateCredentials(Credentials credentials)
+        {
+            if (credentials == null
+                || credentials.Validate()
+                != LoginStatus.None)
+            {
+                throw new AccountRuleException(AccountIssue.InvalidCredentials);
+            }
+        }
+
+        private static Player FindAuthenticatedPlayer(
+            Credentials credentials,
+            IPlayerRepository playerRepository)
+        {
+            Player player = playerRepository.GetByUsernameOrEmail(
+                credentials.EmailOrUsername);
+            if (player == null
+                || player.IsDeleted
+                || !PasswordHasher.VerifyPassword(credentials.Password,player.PasswordHash))
+            {
+                throw new AccountRuleException(AccountIssue.InvalidCredentials);
+            }
+
+            return player;
         }
     }
 }

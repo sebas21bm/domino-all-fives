@@ -83,13 +83,90 @@ No ejecutados ni considerados cobertura unitaria. No se modifican datos reales.
   dominio; su eventual retirada requiere revisar el contrato y consumidores.
   No se declara conformidad total del contrato con esa recomendación.
 
+## Bloque 2: ISessionAccountService (2026-11-16)
+
+### Alcance y decisiones
+
+Flujo revisado: ISessionAccountService → DominoService → AuthenticationController
+→ IPlayerRepository / PlayerRepository → Entity Framework, seguido por la creación
+de sesión en SessionManager.
+
+AuthenticationController crea IPlayerRepository como colaborador con nombre y
+administra el contexto de Entity Framework mediante `using` por operación.
+DominoService conserva únicamente la responsabilidad de frontera WCF y creación
+de la sesión posterior a la autenticación. Se eliminaron los delegados Func que
+ocultaban el repositorio y sustituían el reloj únicamente durante pruebas. Se
+preservan el recorte del identificador, los espacios de la contraseña, el orden
+de validación, la comparación temporal existente y una sola sesión activa por
+jugador.
+
+Los rechazos esperados continúan como AccountRuleException dentro del servidor y
+se transforman directamente en FaultException<AccountIssue> en la frontera. Los
+errores SqlException, EntityException y DbUpdateException se registran una vez y
+se convierten en el fault seguro existente. No se registran credenciales, hashes
+ni claves de sesión.
+
+No se retiraron Order ni IsRequired de los DataMember publicados. Ese cambio
+afectaría los metadatos WCF y requiere una revisión específica de compatibilidad.
+Tampoco se modificaron las firmas de ISessionAccountService.
+
+### Organización de pruebas
+
+- Tests: credenciales, contrato serializado, reglas de acceso, validación previa
+  a persistencia, cuenta, hashing, repositorio y concurrencia de sesiones.
+- AdditionalTest: traducción directa de credenciales inválidas en DominoService.
+- La prueba de LobbyIssue se separó como LobbyContractTests y permanece en el
+  proyecto heredado para el bloque de lobby.
+
+Todas las pruebas nuevas siguen AAA y contienen una sola aserción. Las pruebas de
+AuthenticationController cubren los rechazos que ocurren antes de crear el
+contexto. No se agregó una ruta alternativa para sustituir el repositorio; los
+escenarios que dependen de datos persistidos requieren una base de pruebas
+aislada. SessionManager se prueba sin paralelizar su fixture y limpia las claves
+creadas.
+
+### Casos implementados
+
+| Caso a probar | Precondiciones | Postcondiciones | Resultado esperado | Resultado obtenido |
+| --- | --- | --- | --- | --- |
+| Identificador con espacios | Credenciales creadas para login | Credencial normalizada | Identificador recortado y contraseña intacta | Aprobado |
+| Credenciales incompletas | Controller con null o password ausente | No se crea contexto ni sesión | AccountIssue.InvalidCredentials | Aprobado |
+| Estado eliminado o baneado reconstruido | Banderas persistidas representadas en dominio | Estado evaluado sin SQL | InvalidCredentials, Banned o None | Aprobado |
+| Suspensión futura, vencida o en el límite | Fecha controlada representada en dominio | Estado evaluado sin SQL | Suspended o None según el límite | Aprobado |
+| Hash almacenado inválido | Formatos, algoritmo, iteraciones o Base64 inválidos | Sin excepción técnica expuesta | Verificación false | Aprobado |
+| Sustitución de sesión | Dos sesiones para el mismo jugador | Solo la segunda permanece | Primera clave inválida | Aprobado |
+| Sesiones concurrentes | Doce jugadores distintos | Mapeos limpiados al terminar | Todos los IDs se resuelven correctamente | Aprobado |
+| Contexto o colaboradores nulos | Dependencia obligatoria nula | Objeto no construido | ArgumentNullException | Aprobado |
+| Frontera con credenciales inválidas | DominoService con null o password ausente | Sin consulta SQL ni sesión | FaultException<AccountIssue> tipado | Aprobado |
+
+### Casos diseñados que requieren infraestructura aislada
+
+No ejecutados ni considerados cobertura unitaria. No se modifican datos reales.
+
+| Caso a probar | Precondiciones | Postcondiciones | Resultado esperado | Resultado obtenido |
+| --- | --- | --- | --- | --- |
+| Login válido | SQL de pruebas con cuenta controlada | Sesión creada y luego limpiada | Cuenta con clave resoluble | No ejecutado |
+| Rechazos persistidos | SQL con cuenta inexistente, eliminada, baneada o suspendida | Sin escrituras ajenas | Fault tipado correspondiente | No ejecutado |
+| Fallos SQL y Entity Framework | Infraestructura que provoque cada excepción específica | Contexto liberado | LogError y fault seguro | No ejecutado |
+| Transporte WCF real | Host y proxy de pruebas | Canal cerrado o abortado | Fault tipado serializado | No ejecutado |
+| Login repetido con SQL | La misma cuenta inicia sesión dos veces | Segunda sesión limpiada | Primera clave deja de ser válida | No ejecutado |
+
+### Verificación
+
+- Compilación Debug de DominoAllFives.Server.sln con MSBuild: aprobada.
+- Se conservaron las advertencias preexistentes MSB3277 y MSB3836 por versiones
+  y redirecciones de ensamblados; no se cambiaron dependencias en este bloque.
+- VSTest 18.10 con NUnit3TestAdapter 4.5: 68/68 aprobadas en Tests y
+  AdditionalTest. De ellas, 57 casos corresponden al bloque de sesión y 11 son la
+  regresión de ranking.
+- Las consultas SQL y el transporte WCF alojado permanecen no ejecutados.
+
 ## Continuidad de la refactorización
 
 Se inventariaron los proyectos, contratos y clases de Server para delimitar los
-flujos. Esta entrega revisa en detalle únicamente ranking; no constituye una
-certificación de toda la solución. Los siguientes bloques pendientes son
-ISessionAccountService, ILobbyService, IMatchService e IChatService, con sus
-colaboradores y pruebas. Cada contrato se cierra con validación y pausa para commit.
-Los componentes compartidos se revisarán en el contexto de cada flujo, sin cambios
-ajenos al bloque. El archivo preexistente no rastreado Manejo de delegados.md no se
-modificó y no pertenece a este bloque.
+flujos. Los bloques terminados son IRankingService e ISessionAccountService; esto
+no constituye una certificación de toda la solución. Los siguientes bloques
+pendientes son ILobbyService, IMatchService e IChatService, con sus colaboradores
+y pruebas. Cada contrato se cierra con validación y pausa para commit. Los
+componentes compartidos se revisarán en el contexto de cada flujo, sin cambios
+ajenos al bloque.

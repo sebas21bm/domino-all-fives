@@ -55,10 +55,12 @@ namespace DominoAllFives.Server
         {
             try
             {
-                PlayerAccount authenticatedAccount =
-                    new AuthenticationController().LoginWithAccount(credentials);
+                AuthenticationController controller = new AuthenticationController();
+                PlayerAccount authenticatedAccount = controller.LoginWithAccount(credentials);
+
                 string sessionKey = SessionManager.CreateSession(authenticatedAccount.PlayerId);
                 authenticatedAccount.SetSessionKey(sessionKey);
+
                 return authenticatedAccount;
             }
             catch (AccountRuleException ex)
@@ -68,17 +70,17 @@ namespace DominoAllFives.Server
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "Login failed on server.");
+                _logger.LogError(ex, "Account login could not access persistence.");
                 throw new FaultException("The service could not complete the operation.");
             }
             catch (EntityException ex)
             {
-                _logger.LogError(ex, "Login failed on server.");
+                _logger.LogError(ex, "Account login could not access persistence.");
                 throw new FaultException("The service could not complete the operation.");
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Login failed on server.");
+                _logger.LogError(ex, "Account login could not access persistence.");
                 throw new FaultException("The service could not complete the operation.");
             }
         }

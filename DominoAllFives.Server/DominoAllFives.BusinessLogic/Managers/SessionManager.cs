@@ -4,11 +4,11 @@ using System.Linq;
 using System.Security.Cryptography;
 using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Contracts.Domain;
-using Player = DominoAllFives.Contracts.Domain.Player;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Models;
-using StoredPlayer = DominoAllFives.DataAccess.Models.Player;
 using DominoAllFives.DataAccess.Repositories;
+using Player = DominoAllFives.Contracts.Domain.Player;
+using StoredPlayer = DominoAllFives.DataAccess.Models.Player;
 
 namespace DominoAllFives.BusinessLogic.Managers
 {
@@ -18,6 +18,7 @@ namespace DominoAllFives.BusinessLogic.Managers
         private static readonly object sessionLock = new object();
         private static readonly Dictionary<string, int> sessions =
             new Dictionary<string, int>(StringComparer.Ordinal);
+
         public static string CreateSession(int playerId)
         {
             if (playerId <= 0)

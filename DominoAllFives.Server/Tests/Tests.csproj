@@ -46,6 +46,7 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Extensions.Logging.Abstractions">
@@ -56,7 +57,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountAccessStatusTests.cs" />
+    <Compile Include="AccountRuleExceptionTests.cs" />
+    <Compile Include="AuthenticationControllerTests.cs" />
+    <Compile Include="CredentialsTests.cs" />
+    <Compile Include="PasswordHasherTests.cs" />
+    <Compile Include="PlayerAccountTests.cs" />
+    <Compile Include="PlayerRepositoryTests.cs" />
     <Compile Include="RankingControllerTests.cs" />
+    <Compile Include="SessionContractTests.cs" />
+    <Compile Include="SessionManagerTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

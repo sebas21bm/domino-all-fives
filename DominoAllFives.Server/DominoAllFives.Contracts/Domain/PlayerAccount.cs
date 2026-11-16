@@ -11,6 +11,7 @@ namespace DominoAllFives.Contracts.Domain
     public sealed class PlayerAccount
     {
         private const int MaximumLanguageIdLength = 10;
+
         [DataMember(Order = 1, IsRequired = true)]
         public int PlayerId { get; private set; }
 
@@ -50,7 +51,8 @@ namespace DominoAllFives.Contracts.Domain
             {
                 PlayerId = playerId,
                 Username = username,
-                AccessStatus = accessStatus ?? throw new ArgumentNullException(nameof(accessStatus))
+                AccessStatus = accessStatus
+                    ?? throw new ArgumentNullException(nameof(accessStatus))
             };
             account.SetPreferredLanguage(preferredLanguageId);
             return account;
@@ -64,6 +66,11 @@ namespace DominoAllFives.Contracts.Domain
         /// </param>
         public void SetPreferredLanguage(string preferredLanguageId)
         {
+            if (preferredLanguageId == null)
+            {
+                throw new ArgumentNullException(nameof(preferredLanguageId));
+            }
+
             if (!IsPreferredLanguageValid(preferredLanguageId))
             {
                 throw new ArgumentException(
@@ -84,7 +91,8 @@ namespace DominoAllFives.Contracts.Domain
         {
             if (AccessStatus == null)
             {
-                throw new InvalidOperationException("Account access restrictions are unavailable.");
+                throw new InvalidOperationException(
+                    "Account access restrictions are unavailable.");
             }
 
             return AccessStatus.EnsureCanLogin(currentTime);
@@ -92,6 +100,11 @@ namespace DominoAllFives.Contracts.Domain
 
         public void SetSessionKey(string sessionKey)
         {
+            if (sessionKey == null)
+            {
+                throw new ArgumentNullException(nameof(sessionKey));
+            }
+
             if (string.IsNullOrWhiteSpace(sessionKey))
             {
                 throw new ArgumentException(null, nameof(sessionKey));
