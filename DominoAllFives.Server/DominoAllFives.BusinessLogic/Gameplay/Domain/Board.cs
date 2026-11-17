@@ -5,10 +5,38 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 {
     public sealed class Board
     {
-        private const int ScoringMultiple = 5;
         private const int UnblockedTurn = -1;
         private readonly List<Placement> _tiles = new List<Placement>();
         private readonly List<BoardEndState> _ends = new List<BoardEndState>();
+
+        internal Board Copy()
+        {
+            Board copy = new Board();
+            foreach (Placement placement in _tiles)
+            {
+                copy._tiles.Add(new Placement
+                {
+                    Tile = placement.Tile,
+                    End = placement.End,
+                    ConnectingValue = placement.ConnectingValue,
+                    ExposedValue = placement.ExposedValue
+                });
+            }
+
+            foreach (BoardEndState end in _ends)
+            {
+                copy._ends.Add(new BoardEndState
+                {
+                    End = end.End,
+                    Value = end.Value,
+                    ScoreValue = end.ScoreValue,
+                    BlockedTurn = end.BlockedTurn,
+                    IsOpeningEnd = end.IsOpeningEnd
+                });
+            }
+
+            return copy;
+        }
 
         public IReadOnlyList<Placement> Tiles
         {
@@ -110,23 +138,6 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 ExposedValue = target.Value
             };
             _tiles.Add(placement);
-        }
-
-        public int CalculatePoints(int turnNumber)
-        {
-            int[] scoringValues = GetScoringValues(turnNumber);
-            int total = 0;
-            foreach (int scoringValue in scoringValues)
-            {
-                total += scoringValue;
-            }
-
-            if (total % ScoringMultiple == 0)
-            {
-                return total;
-            }
-
-            return 0;
         }
 
         public int[] GetScoringValues(int turnNumber)

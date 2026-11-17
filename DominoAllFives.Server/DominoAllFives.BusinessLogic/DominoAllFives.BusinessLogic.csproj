@@ -148,7 +148,14 @@
     <Compile Include="Gameplay\Domain\BoardEndState.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Gameplay\Domain\Deck.cs" />
+    <Compile Include="Gameplay\DeckGenerator.cs" />
+    <Compile Include="Gameplay\RoundSetup.cs" />
+    <Compile Include="Gameplay\PlayScoring.cs" />
+    <Compile Include="Gameplay\RoundResolution.cs" />
+    <Compile Include="Gameplay\MatchUpdateQueue.cs" />
+    <Compile Include="Gameplay\Domain\PreparedRound.cs" />
+    <Compile Include="Gameplay\Domain\PreparedPlay.cs" />
+    <Compile Include="Gameplay\Domain\PreparedRoundEnd.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gameplay\Domain\Match.cs" />

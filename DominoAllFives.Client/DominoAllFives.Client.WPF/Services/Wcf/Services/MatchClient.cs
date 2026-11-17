@@ -93,10 +93,10 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
         /// <param name = "version">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
-        public MatchView Play(int matchId, DominoTile tile, BoardEnd end, long version)
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
+        public void Play(int matchId, DominoTile tile, BoardEnd end, long version)
         {
-            return _service.PlayTile(matchId, tile, end, version);
+            _service.PlayTile(matchId, tile, end, version);
         }
 
         /// <summary>
@@ -108,10 +108,10 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
         /// <param name = "version">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
-        public MatchView Draw(int matchId, long version)
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
+        public void Draw(int matchId, long version)
         {
-            return _service.DrawTiles(matchId, version);
+            _service.DrawTiles(matchId, version);
         }
 
         /// <summary>
@@ -123,10 +123,10 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
         /// <param name = "version">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
-        public MatchView Pass(int matchId, long version)
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
+        public void Pass(int matchId, long version)
         {
-            return _service.PassTurn(matchId, version);
+            _service.PassTurn(matchId, version);
         }
 
         /// <summary>

@@ -163,7 +163,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 
             List<GameplayContracts.PlayerHand> revealedHands =
                 new List<GameplayContracts.PlayerHand>();
-            foreach (KeyValuePair<int, Tile[]> hand in round.RemainingHands)
+            foreach (KeyValuePair<int, IReadOnlyList<Tile>> hand in round.RemainingHands)
             {
                 GameplayContracts.PlayerHand revealedHand = CreateRevealedPlayerHand(
                     hand,
@@ -224,12 +224,12 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             {
                 PlayerId = score.Key,
                 Points = score.Value,
-                TileCount = round.RemainingHands[score.Key].Length
+                TileCount = round.RemainingHands[score.Key].Count
             };
         }
 
         private static GameplayContracts.PlayerHand CreateRevealedPlayerHand(
-            KeyValuePair<int, Tile[]> hand,
+            KeyValuePair<int, IReadOnlyList<Tile>> hand,
             Match match)
         {
             List<GameplayContracts.DominoTile> dominoTiles =

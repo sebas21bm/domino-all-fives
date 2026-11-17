@@ -6,10 +6,10 @@ namespace DominoAllFives.Contracts.Gameplay
     [DataContract]
     public sealed class PublicBoard
     {
-        [DataMember(Order = 1)]
+        [DataMember]
         public List<PlacedTile> Tiles { get; set; }
 
-        [DataMember(Order = 2)]
+        [DataMember]
         public List<PublicEnd> Ends { get; set; }
     }
 }

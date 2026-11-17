@@ -9,6 +9,76 @@ namespace DominoAllFives.Server.Tests
     [TestFixture]
     public sealed class PlayScoreTests
     {
+        [TestCase(SpecialPower.None, 1, 10)]
+        [TestCase(SpecialPower.DoublePoints, 2, 20)]
+        [TestCase(SpecialPower.Block, 1, 10)]
+        public void Play_OpeningScore_AccreditsExactlyExplainedPoints(
+            SpecialPower power,
+            int multiplier,
+            int awardedPoints)
+        {
+            // Arrange
+            List<Tile> deck = MatchTestDeck.Ordered(55);
+            Tile opening = deck[0];
+            deck[0] = new Tile(opening.TileId, 5, 5, power);
+            Match match = new Match(1, new[] { 1, 2 }, 250, deck);
+            int playerId = match.CurrentPlayerId.Value;
+            // Act
+            match.Play(playerId, match.OpeningTileId, BoardEndPosition.Left, match.Version);
+            // Assert
+            Assert.That(
+                new object[]
+                {
+                    match.GetPlayer(playerId).Points,
+                    match.GetPlayer(2).Points,
+                    match.LastPlay.PlayerId,
+                    match.LastPlay.RoundNumber,
+                    match.LastPlay.BasePoints,
+                    match.LastPlay.Multiplier,
+                    match.LastPlay.Points,
+                    match.LastPlay.RoundPoints,
+                    match.LastPlay.Tile.TileId,
+                    match.LastPlay.PlayedEnd
+                },
+                Is.EqualTo(new object[]
+                {
+                    awardedPoints, 0, playerId, 1, 10, multiplier, awardedPoints, 0,
+                    opening.TileId, BoardEndPosition.Left
+                }));
+        }
+
+        [Test]
+        public void Play_RedLastTile_DoublesPlayWithoutDoublingRoundAward()
+        {
+            // Arrange
+            List<Tile> deck = MatchTestDeck.Ordered(
+                5, 34, 4, 23, 14, 24, 56, 0, 33, 44, 45, 11, 26, 3,
+                2, 22, 12, 25, 46, 55, 36, 35, 13, 6, 66, 1, 16, 15);
+            Tile lastTile = deck[6];
+            deck[6] = new Tile(lastTile.TileId, 5, 6, SpecialPower.DoublePoints);
+            Match match = new Match(1, new[] { 1, 2 }, 250, deck);
+            for (int action = 0; action < 14; action++)
+            {
+                GameplayTests.PlayNextLegalAction(match);
+            }
+            // Act
+            GameplayTests.PlayNextLegalAction(match);
+            // Assert
+            Assert.That(
+                new object[]
+                {
+                    match.LastPlay.BasePoints,
+                    match.LastPlay.Multiplier,
+                    match.LastPlay.Points,
+                    match.LastPlay.RoundPoints,
+                    match.LastRound.AwardedPoints,
+                    match.LastRound.Scores[1],
+                    match.GetPlayer(1).Points,
+                    match.RoundNumber
+                },
+                Is.EqualTo(new object[] { 15, 2, 30, 5, 5, 50, 50, 2 }));
+        }
+
         [Test]
         public void Play_RedWithOpeningDouble_ReportsExactAwardAndSurvivesContractMapping()
         {
@@ -100,7 +170,8 @@ namespace DominoAllFives.Server.Tests
         public void Draw_AfterPlacement_PreservesLastPlayExplanation()
         {
             // Arrange
-            Match match = new Match(1, new[] { 1, 2 }, 100, CreateDrawDeck);
+            List<Tile> initialDeck = CreateDrawDeck();
+            Match match = new Match(1, new[] { 1, 2 }, 100, initialDeck);
             PlayTile(match, 6, 6, BoardEndPosition.Left);
             PlayScore score = match.LastPlay;
             // Act
@@ -111,7 +182,8 @@ namespace DominoAllFives.Server.Tests
 
         private static Match CreateMatch()
         {
-            return new Match(1, new[] { 1, 2 }, 100, CreateDeck);
+            List<Tile> initialDeck = CreateDeck();
+            return new Match(1, new[] { 1, 2 }, 100, initialDeck);
         }
 
         private static List<Tile> CreateDrawDeck()
@@ -119,7 +191,7 @@ namespace DominoAllFives.Server.Tests
             List<Tile> openingDoubles = new List<Tile>();
             List<Tile> tilesWithoutSix = new List<Tile>();
             List<Tile> remainingTilesWithSix = new List<Tile>();
-            foreach (Tile tile in Deck.Create())
+            foreach (Tile tile in new DeckGenerator().Generate())
             {
                 bool isOpeningDouble = tile.IsDouble
                     && tile.FirstValue == 6;
@@ -165,7 +237,7 @@ namespace DominoAllFives.Server.Tests
                 15
             };
             List<Tile> allTiles = new List<Tile>();
-            foreach (Tile tile in Deck.Create())
+            foreach (Tile tile in new DeckGenerator().Generate())
             {
                 allTiles.Add(CreateTile(tile));
             }

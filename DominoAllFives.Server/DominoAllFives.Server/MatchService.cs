@@ -81,7 +81,13 @@ namespace DominoAllFives.Server
             }
 
             // The second snapshot recovers a mutation that raced callback registration.
-            return GetMatchView(matchId, playerId);
+            MatchView current = GetMatchView(matchId, playerId);
+            if (current.Phase != MatchStatus.InProgress)
+            {
+                publisher.Remove(matchId, playerId, _callback);
+            }
+
+            return current;
         }
 
         /// <summary>
@@ -133,14 +139,14 @@ namespace DominoAllFives.Server
         /// <param name = "expectedVersion">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
         /// <exception cref = "FaultException{AccessIssue}">
         /// The session is missing, revoked or bound to another match.
         /// </exception>
         /// <exception cref = "FaultException{MatchIssue}">
         /// Membership, version or a gameplay rule rejects the request.
         /// </exception>
-        public MatchView PlayTile(int matchId, DominoTile tile, BoardEnd end, long expectedVersion)
+        public void PlayTile(int matchId, DominoTile tile, BoardEnd end, long expectedVersion)
         {
             ValidateSessionCanAccessMatch(matchId);
             if (tile == null)
@@ -161,11 +167,11 @@ namespace DominoAllFives.Server
                     matchId,
                     _playerId,
                     move);
-                return PublishMatchUpdate(update);
+                publisher.PublishPending(update);
             }
             catch (Domain.MatchRuleException ex)
             {
-                throw CreateMatchFault(ex);
+                throw new FaultException<MatchIssue>((MatchIssue)ex.Issue);
             }
         }
 
@@ -178,14 +184,14 @@ namespace DominoAllFives.Server
         /// <param name = "expectedVersion">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
         /// <exception cref = "FaultException{AccessIssue}">
         /// The session is missing, revoked or bound to another match.
         /// </exception>
         /// <exception cref = "FaultException{MatchIssue}">
         /// Membership, version or a gameplay rule rejects the request.
         /// </exception>
-        public MatchView DrawTiles(int matchId, long expectedVersion)
+        public void DrawTiles(int matchId, long expectedVersion)
         {
             ValidateSessionCanAccessMatch(matchId);
             try
@@ -194,11 +200,11 @@ namespace DominoAllFives.Server
                     matchId,
                     _playerId,
                     expectedVersion);
-                return PublishMatchUpdate(update);
+                publisher.PublishPending(update);
             }
             catch (Domain.MatchRuleException ex)
             {
-                throw CreateMatchFault(ex);
+                throw new FaultException<MatchIssue>((MatchIssue)ex.Issue);
             }
         }
 
@@ -211,14 +217,14 @@ namespace DominoAllFives.Server
         /// <param name = "expectedVersion">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
         /// <exception cref = "FaultException{AccessIssue}">
         /// The session is missing, revoked or bound to another match.
         /// </exception>
         /// <exception cref = "FaultException{MatchIssue}">
         /// Membership, version or a gameplay rule rejects the request.
         /// </exception>
-        public MatchView PassTurn(int matchId, long expectedVersion)
+        public void PassTurn(int matchId, long expectedVersion)
         {
             ValidateSessionCanAccessMatch(matchId);
             try
@@ -227,11 +233,11 @@ namespace DominoAllFives.Server
                     matchId,
                     _playerId,
                     expectedVersion);
-                return PublishMatchUpdate(update);
+                publisher.PublishPending(update);
             }
             catch (Domain.MatchRuleException ex)
             {
-                throw CreateMatchFault(ex);
+                throw new FaultException<MatchIssue>((MatchIssue)ex.Issue);
             }
         }
 
@@ -253,11 +259,11 @@ namespace DominoAllFives.Server
             try
             {
                 MatchUpdate update = controller.LeaveMatch(matchId, _playerId);
-                PublishMatchUpdate(update);
+                publisher.PublishPending(update);
             }
             catch (Domain.MatchRuleException ex)
             {
-                throw CreateMatchFault(ex);
+                throw new FaultException<MatchIssue>((MatchIssue)ex.Issue);
             }
         }
 
@@ -295,7 +301,7 @@ namespace DominoAllFives.Server
             }
             catch (Domain.MatchRuleException ex)
             {
-                throw CreateMatchFault(ex);
+                throw new FaultException<MatchIssue>((MatchIssue)ex.Issue);
             }
         }
 
@@ -307,24 +313,8 @@ namespace DominoAllFives.Server
             }
             catch (Domain.MatchRuleException ex)
             {
-                throw CreateMatchFault(ex);
+                throw new FaultException<MatchIssue>((MatchIssue)ex.Issue);
             }
-        }
-
-        private static MatchView PublishMatchUpdate(MatchUpdate update)
-        {
-            if (update.HasStateChange)
-            {
-                publisher.Enqueue(update);
-            }
-
-            return update.View;
-        }
-
-        private static FaultException<MatchIssue> CreateMatchFault(
-            Domain.MatchRuleException ex)
-        {
-            return new FaultException<MatchIssue>((MatchIssue)ex.Issue);
         }
 
         private void OnChannelEnded(object sender, EventArgs eventArgs)

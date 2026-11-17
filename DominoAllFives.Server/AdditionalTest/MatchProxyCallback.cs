@@ -10,10 +10,14 @@ namespace DominoAllFives.Server.AdditionalTest
     {
         public ConcurrentQueue<Proxy.PlayerHand> Hands { get; } =
             new ConcurrentQueue<Proxy.PlayerHand>();
+        public ConcurrentQueue<Proxy.MatchView> Views { get; } =
+            new ConcurrentQueue<Proxy.MatchView>();
+        public ConcurrentQueue<Proxy.MatchResult> Results { get; } =
+            new ConcurrentQueue<Proxy.MatchResult>();
 
         public void OnMatchChanged(Proxy.MatchView match)
         {
-            // This probe observes private delivery; public state is checked through responses.
+            Views.Enqueue(match);
         }
 
         public void OnPrivateHandChanged(Proxy.PlayerHand hand)
@@ -28,7 +32,7 @@ namespace DominoAllFives.Server.AdditionalTest
 
         public void OnMatchFinished(Proxy.MatchResult result)
         {
-            // The single opening move in this probe cannot reach the target score.
+            Results.Enqueue(result);
         }
     }
 }

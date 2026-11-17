@@ -8,15 +8,6 @@ namespace DominoAllFives.BusinessLogic.Gameplay
     {
         private const int MinimumPlayers = 2;
         private const int MaximumPlayers = 4;
-        private const int TwoPlayerHandSize = 7;
-        private const int MultiplayerHandSize = 5;
-        private const int DeckSize = 28;
-        private const int MaximumSpecialTiles = 5;
-        private const int DoublePointsMultiplier = 2;
-        private const int ScoringMultiple = 5;
-        private const int RoundingOffset = 2;
-        private const int DoubleRankOffset = 100;
-        private const int PipValueRadix = Tile.MaximumPips + 1;
         private static readonly int[] allowedTargets =
         {
             100,
@@ -24,8 +15,9 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             200,
             250
         };
-        private readonly List<MatchPlayer> _players;
-        private readonly Func<List<Tile>> _createDeck;
+        private List<MatchPlayer> _players;
+        private readonly DeckGenerator _deckGenerator = new DeckGenerator();
+        private readonly RoundSetup _roundSetup = new RoundSetup();
         private Queue<Tile> _stock;
         private int _currentPlayerIndex;
         private int _consecutivePasses;
@@ -75,7 +67,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             int matchId,
             IEnumerable<int> playerIds,
             int targetPoints,
-            Func<List<Tile>> createDeck)
+            List<Tile> initialDeck)
         {
             if (matchId <= 0)
             {
@@ -97,9 +89,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             MatchId = matchId;
             TargetPoints = targetPoints;
             _players = CreatePlayers(ids);
-            _createDeck = createDeck
-                ?? throw new ArgumentNullException(nameof(createDeck));
-            BeginRound();
+            BeginRound(initialDeck);
         }
 
         public MatchPlayer GetPlayer(int playerId)
@@ -134,35 +124,68 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 throw new MatchRuleException(MatchIssue.OpeningTileRequired);
             }
 
-            Board.Place(tile, end, TurnNumber);
-            player.Hand.Remove(tile);
+            PreparedPlay play = PreparePlay(player, tile, end);
+            ApplyPlay(play);
+        }
 
-            int basePoints = Board.CalculatePoints(TurnNumber);
-            int awardedPoints = CalculateAwardedPlayPoints(tile, basePoints);
-            player.Points += awardedPoints;
+        private PreparedPlay PreparePlay(MatchPlayer player, Tile tile, BoardEndPosition end)
+        {
+            Board board = Board.Copy();
+            board.Place(tile, end, TurnNumber);
+            MatchPlayer projectedPlayer = new MatchPlayer
+            {
+                PlayerId = player.PlayerId,
+                Points = player.Points,
+                Hand = new List<Tile>(player.Hand)
+            };
+            projectedPlayer.Hand.Remove(tile);
 
-            LastPlay = CreatePlayScore(
-                playerId,
-                tile,
-                end,
-                basePoints);
+            PlayScore score = PlayScoring.Evaluate(board, TurnNumber);
+            score.PlayerId = player.PlayerId;
+            score.RoundNumber = RoundNumber;
+            projectedPlayer.Points += score.Points;
+            PreparedPlay play = new PreparedPlay(board, projectedPlayer, score);
+
+            if (projectedPlayer.Points >= TargetPoints)
+            {
+                play.Phase = MatchState.Completed;
+                return play;
+            }
+
+            if (projectedPlayer.Hand.Count == 0)
+            {
+                List<MatchPlayer> projectedPlayers = new List<MatchPlayer>(_players);
+                projectedPlayers[_currentPlayerIndex] = projectedPlayer;
+                RoundSummary round = RoundResolution.ResolvePlayedOut(
+                    projectedPlayers,
+                    RoundNumber,
+                    player.PlayerId);
+                play.RoundEnd = PrepareRoundEnd(round);
+                score.RoundPoints = round.AwardedPoints;
+            }
+
+            return play;
+        }
+
+        private void ApplyPlay(PreparedPlay play)
+        {
+            MatchPlayer player = _players[_currentPlayerIndex];
+            player.Hand = play.Player.Hand;
+            player.Points = play.Player.Points;
+            Board = play.Board;
+            LastPlay = play.Score;
+            Phase = play.Phase;
             _consecutivePasses = 0;
+            if (play.RoundEnd != null)
+            {
+                ApplyRoundEnd(play.RoundEnd);
+            }
+            else if (Phase == MatchState.InProgress)
+            {
+                AdvanceTurn();
+            }
+
             Version++;
-
-            if (player.Points >= TargetPoints)
-            {
-                Phase = MatchState.Completed;
-                return;
-            }
-
-            if (player.Hand.Count == 0)
-            {
-                FinishRound(player.PlayerId);
-                LastPlay.RoundPoints = LastRound.AwardedPoints;
-                return;
-            }
-
-            AdvanceTurn();
         }
 
         public void Draw(int playerId, long expectedVersion)
@@ -197,20 +220,23 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 throw new MatchRuleException(MatchIssue.PassNotAllowed);
             }
 
-            _consecutivePasses++;
-            Version++;
-            AdvanceTurn();
-
-            bool everyPlayerPassed = _consecutivePasses >= _players.Count;
-            bool anyPlayerHasMove = AnyPlayerHasMove();
-            if (everyPlayerPassed && !anyPlayerHasMove)
+            int nextPassCount = _consecutivePasses + 1;
+            int nextTurnNumber = TurnNumber + 1;
+            PreparedRoundEnd roundEnd = null;
+            if (nextPassCount >= _players.Count && !AnyPlayerHasMove(nextTurnNumber))
             {
-                int minimumRemainingPips = FindMinimumRemainingPips();
-                List<MatchPlayer> roundWinners = FindPlayersWithRemainingPips(
-                    minimumRemainingPips);
-                int? winnerId = GetSingleWinnerId(roundWinners);
-                FinishRound(winnerId);
+                RoundSummary round = RoundResolution.ResolveBlocked(_players, RoundNumber);
+                roundEnd = PrepareRoundEnd(round);
             }
+
+            _consecutivePasses = nextPassCount;
+            AdvanceTurn();
+            if (roundEnd != null)
+            {
+                ApplyRoundEnd(roundEnd);
+            }
+
+            Version++;
         }
 
         public void Cancel(int playerId)
@@ -294,73 +320,11 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             TurnNumber++;
         }
 
-        private static int CalculateAwardedPlayPoints(Tile tile, int basePoints)
-        {
-            int awardedPoints = basePoints;
-            if (tile.SpecialPower == SpecialPower.DoublePoints)
-            {
-                awardedPoints = basePoints * DoublePointsMultiplier;
-            }
-
-            return awardedPoints;
-        }
-
-        private PlayScore CreatePlayScore(
-            int playerId,
-            Tile tile,
-            BoardEndPosition end,
-            int basePoints)
-        {
-            int multiplier = 1;
-            if (tile.SpecialPower == SpecialPower.DoublePoints)
-            {
-                multiplier = DoublePointsMultiplier;
-            }
-
-            int[] scoringValues = Board.GetScoringValues(TurnNumber);
-            List<BoardEndPosition> blockedEnds = new List<BoardEndPosition>();
-            bool includesOpeningDouble = false;
-            foreach (BoardEndState boardEnd in Board.Ends)
-            {
-                if (boardEnd.BlockedTurn == TurnNumber)
-                {
-                    blockedEnds.Add(boardEnd.End);
-                }
-
-                if (boardEnd.IsOpeningEnd
-                    && boardEnd.BlockedTurn != TurnNumber)
-                {
-                    includesOpeningDouble = true;
-                }
-            }
-
-            int total = 0;
-            foreach (int scoringValue in scoringValues)
-            {
-                total += scoringValue;
-            }
-
-            return new PlayScore
-            {
-                PlayerId = playerId,
-                RoundNumber = RoundNumber,
-                Tile = tile,
-                PlayedEnd = end,
-                EndValues = Array.AsReadOnly(scoringValues),
-                BlockedEnds = blockedEnds.AsReadOnly(),
-                IncludesOpeningDouble = includesOpeningDouble,
-                Total = total,
-                BasePoints = basePoints,
-                Multiplier = multiplier,
-                Points = basePoints * multiplier
-            };
-        }
-
-        private bool AnyPlayerHasMove()
+        private bool AnyPlayerHasMove(int turnNumber)
         {
             foreach (MatchPlayer player in _players)
             {
-                if (Board.HasMove(player.Hand, TurnNumber))
+                if (Board.HasMove(player.Hand, turnNumber))
                 {
                     return true;
                 }
@@ -369,236 +333,89 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             return false;
         }
 
-        private int FindMinimumRemainingPips()
+        private PreparedRoundEnd PrepareRoundEnd(RoundSummary round)
         {
-            int minimumRemainingPips = int.MaxValue;
-            foreach (MatchPlayer player in _players)
+            MatchPlayer winner = null;
+            if (round.WinnerId.HasValue)
             {
-                int remainingPips = CalculateRemainingPips(player);
-                if (remainingPips < minimumRemainingPips)
+                winner = GetPlayer(round.WinnerId.Value);
+            }
+
+            foreach (int score in round.Scores.Values)
+            {
+                if (score >= TargetPoints)
                 {
-                    minimumRemainingPips = remainingPips;
+                    return new PreparedRoundEnd(round, winner, null, null);
                 }
             }
 
-            return minimumRemainingPips;
+            List<Tile> deck = _deckGenerator.Generate();
+            PreparedRound nextRound = _roundSetup.Prepare(GetPlayerIds(), deck);
+            List<MatchPlayer> orderedPlayers = OrderPlayers(nextRound);
+            return new PreparedRoundEnd(round, winner, nextRound, orderedPlayers);
         }
 
-        private List<MatchPlayer> FindPlayersWithRemainingPips(int remainingPips)
+        private void ApplyRoundEnd(PreparedRoundEnd roundEnd)
         {
-            List<MatchPlayer> players = new List<MatchPlayer>();
-            foreach (MatchPlayer player in _players)
+            if (roundEnd.Winner != null)
             {
-                int playerRemainingPips = CalculateRemainingPips(player);
-                if (playerRemainingPips == remainingPips)
-                {
-                    players.Add(player);
-                }
+                roundEnd.Winner.Points += roundEnd.Summary.AwardedPoints;
             }
 
-            return players;
-        }
-
-        private static int? GetSingleWinnerId(List<MatchPlayer> winners)
-        {
-            int? winnerId = null;
-            if (winners.Count == 1)
-            {
-                MatchPlayer winner = winners[0];
-                winnerId = winner.PlayerId;
-            }
-
-            return winnerId;
-        }
-
-        private static int CalculateRemainingPips(MatchPlayer player)
-        {
-            int remainingPips = 0;
-            foreach (Tile tile in player.Hand)
-            {
-                remainingPips += tile.TotalPips;
-            }
-
-            return remainingPips;
-        }
-
-        private void FinishRound(int? winnerId)
-        {
-            int totalRemainingPips = 0;
-            Dictionary<int, int> scores = new Dictionary<int, int>();
-            Dictionary<int, Tile[]> remainingHands = new Dictionary<int, Tile[]>();
-
-            foreach (MatchPlayer player in _players)
-            {
-                totalRemainingPips += CalculateRemainingPips(player);
-                scores.Add(player.PlayerId, player.Points);
-                remainingHands.Add(player.PlayerId, player.Hand.ToArray());
-            }
-
-            int awardedPoints = 0;
-            if (winnerId.HasValue)
-            {
-                awardedPoints = CalculateRoundedRoundPoints(totalRemainingPips);
-                MatchPlayer winner = GetPlayer(winnerId.Value);
-                winner.Points += awardedPoints;
-                scores[winner.PlayerId] = winner.Points;
-            }
-
-            LastRound = new RoundSummary
-            {
-                RoundNumber = RoundNumber,
-                WinnerId = winnerId,
-                AwardedPoints = awardedPoints,
-                Scores = scores,
-                RemainingHands = remainingHands
-            };
-
-            if (HasPlayerReachedTarget())
+            LastRound = roundEnd.Summary;
+            if (roundEnd.NextRound == null)
             {
                 Phase = MatchState.Completed;
                 return;
             }
 
-            BeginRound();
+            ApplyPreparedRound(roundEnd.NextRound, roundEnd.OrderedPlayers);
         }
 
-        private static int CalculateRoundedRoundPoints(int totalRemainingPips)
+        private void BeginRound(List<Tile> deck)
         {
-            return ((totalRemainingPips + RoundingOffset) / ScoringMultiple)
-                * ScoringMultiple;
+            PreparedRound round = _roundSetup.Prepare(GetPlayerIds(), deck);
+            List<MatchPlayer> orderedPlayers = OrderPlayers(round);
+            ApplyPreparedRound(round, orderedPlayers);
         }
 
-        private bool HasPlayerReachedTarget()
+        private List<int> GetPlayerIds()
         {
+            List<int> playerIds = new List<int>();
             foreach (MatchPlayer player in _players)
             {
-                if (player.Points >= TargetPoints)
-                {
-                    return true;
-                }
+                playerIds.Add(player.PlayerId);
             }
 
-            return false;
+            return playerIds;
         }
 
-        private void BeginRound()
+        private List<MatchPlayer> OrderPlayers(PreparedRound round)
         {
-            List<Tile> deck = _createDeck();
-            ValidateDeck(deck);
-            _stock = new Queue<Tile>(deck);
-
-            int handSize = MultiplayerHandSize;
-            if (_players.Count == MinimumPlayers)
+            List<MatchPlayer> orderedPlayers = new List<MatchPlayer>();
+            foreach (MatchPlayer player in round.Players)
             {
-                handSize = TwoPlayerHandSize;
+                orderedPlayers.Add(GetPlayer(player.PlayerId));
             }
 
-            foreach (MatchPlayer player in _players)
+            return orderedPlayers;
+        }
+
+        private void ApplyPreparedRound(PreparedRound round, List<MatchPlayer> orderedPlayers)
+        {
+            for (int index = 0; index < orderedPlayers.Count; index++)
             {
-                player.Hand.Clear();
-                for (int tileIndex = 0; tileIndex < handSize; tileIndex++)
-                {
-                    Tile tile = _stock.Dequeue();
-                    player.Hand.Add(tile);
-                }
+                orderedPlayers[index].Hand = round.Players[index].Hand;
             }
 
-            _players.Sort(ComparePlayersByOpeningTile);
-            MatchPlayer openingPlayer = _players[0];
-            Tile openingTile = FindHighestRankedTile(openingPlayer);
-            OpeningTileId = openingTile.TileId;
-            Board = new Board();
+            _players = orderedPlayers;
+            _stock = round.Stock;
+            OpeningTileId = round.OpeningTileId;
+            Board = round.Board;
             RoundNumber++;
             TurnNumber = 0;
             _currentPlayerIndex = 0;
             _consecutivePasses = 0;
-        }
-
-        private static Tile FindHighestRankedTile(MatchPlayer player)
-        {
-            Tile highestRankedTile = null;
-            int highestRank = int.MinValue;
-            foreach (Tile tile in player.Hand)
-            {
-                int tileRank = GetTileRank(tile);
-                if (tileRank > highestRank)
-                {
-                    highestRank = tileRank;
-                    highestRankedTile = tile;
-                }
-            }
-
-            return highestRankedTile;
-        }
-
-        private static int GetHandRank(MatchPlayer player)
-        {
-            Tile highestRankedTile = FindHighestRankedTile(player);
-            return GetTileRank(highestRankedTile);
-        }
-
-        private static int ComparePlayersByOpeningTile(
-            MatchPlayer left,
-            MatchPlayer right)
-        {
-            int leftRank = GetHandRank(left);
-            int rightRank = GetHandRank(right);
-            return rightRank.CompareTo(leftRank);
-        }
-
-        private static int GetTileRank(Tile tile)
-        {
-            if (tile.IsDouble)
-            {
-                return DoubleRankOffset + tile.FirstValue;
-            }
-
-            int highestValue = Math.Max(tile.FirstValue, tile.SecondValue);
-            return tile.TotalPips * PipValueRadix + highestValue;
-        }
-
-        private static void ValidateDeck(List<Tile> deck)
-        {
-            if (deck == null
-                || deck.Count != DeckSize)
-            {
-                throw new ArgumentException("A complete double-six deck is required.");
-            }
-
-            HashSet<int> tileIds = new HashSet<int>();
-            HashSet<int> tileValues = new HashSet<int>();
-            int specialTileCount = 0;
-            foreach (Tile tile in deck)
-            {
-                if (tile == null)
-                {
-                    throw new ArgumentException("A complete double-six deck is required.");
-                }
-
-                tileIds.Add(tile.TileId);
-                tileValues.Add(GetTileValueIdentity(tile));
-                if (tile.SpecialPower != SpecialPower.None)
-                {
-                    specialTileCount++;
-                }
-            }
-
-            bool hasUniqueIds = tileIds.Count == DeckSize;
-            bool hasUniqueValues = tileValues.Count == DeckSize;
-            bool hasValidSpecialTileCount = specialTileCount <= MaximumSpecialTiles;
-            if (!hasUniqueIds
-                || !hasUniqueValues
-                || !hasValidSpecialTileCount)
-            {
-                throw new ArgumentException("Invalid deck.");
-            }
-        }
-
-        private static int GetTileValueIdentity(Tile tile)
-        {
-            int firstValue = Math.Min(tile.FirstValue, tile.SecondValue);
-            int secondValue = Math.Max(tile.FirstValue, tile.SecondValue);
-            return firstValue * PipValueRadix + secondValue;
         }
     }
 }

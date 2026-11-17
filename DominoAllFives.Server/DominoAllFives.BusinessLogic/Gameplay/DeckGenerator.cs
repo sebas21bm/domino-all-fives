@@ -4,12 +4,12 @@ using System.Security.Cryptography;
 
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
-    public static class Deck
+    public sealed class DeckGenerator
     {
         private const int PowerOptions = 2;
         private const int SpecialTileCount = 5;
 
-        public static List<Tile> Create()
+        public List<Tile> Generate()
         {
             List<Tile> tiles = new List<Tile>();
             for (int firstValue = 0; firstValue <= Tile.MaximumPips; firstValue++)

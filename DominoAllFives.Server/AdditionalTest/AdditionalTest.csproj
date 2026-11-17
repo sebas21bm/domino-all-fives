@@ -60,6 +60,7 @@
     <Compile Include="LobbyServiceWcfTests.cs" />
     <Compile Include="MatchProxyCallback.cs" />
     <Compile Include="MatchServiceWcfTests.cs" />
+    <Compile Include="MatchPublicationWcfTests.cs" />
     <Compile Include="RankingServiceTests.cs" />
     <Compile Include="SessionServiceTests.cs" />
   </ItemGroup>

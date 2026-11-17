@@ -164,7 +164,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private bool IsOwnTurn()
         {
             return !_disposed && !_isBusy && _match != null
-                && _match.Phase == MatchPhase.InProgress
+                && _match.Phase == MatchStatus.InProgress
                 && _match.CurrentPlayerId == _context.PlayerSession.PlayerId;
         }
 
@@ -381,19 +381,19 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void PlayAndSynchronize(DominoTile tile, BoardEnd end, long version)
         {
-            OnMatchChanged(_client.Play(_context.MatchId, tile, end, version));
+            _client.Play(_context.MatchId, tile, end, version);
             Synchronize();
         }
 
         private void DrawAndSynchronize(long version)
         {
-            OnMatchChanged(_client.Draw(_context.MatchId, version));
+            _client.Draw(_context.MatchId, version);
             Synchronize();
         }
 
         private void PassAndSynchronize(long version)
         {
-            OnMatchChanged(_client.Pass(_context.MatchId, version));
+            _client.Pass(_context.MatchId, version);
             Synchronize();
         }
 
@@ -486,7 +486,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 ? GetPlayerName(_match.CurrentPlayerId.Value) : string.Empty);
             RoundText = string.Format(GetText("Match_lblRound"), _match.RoundNumber,
                 _match.StockCount);
-            Status = _match.Phase == MatchPhase.InProgress ? string.Empty : GetText("Match_msg"
+            Status = _match.Phase == MatchStatus.InProgress ? string.Empty : GetText("Match_msg"
                 + _match.Phase);
             RevealedHands = _match.LastRound == null
                 ? new List<string>()

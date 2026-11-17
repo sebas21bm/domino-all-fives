@@ -120,7 +120,7 @@ namespace DominoAllFives.Client.Tests
             return Hand;
         }
 
-        public MatchView Play(int matchId, DominoTile tile, BoardEnd end, long version)
+        public void Play(int matchId, DominoTile tile, BoardEnd end, long version)
         {
             Interlocked.Increment(ref _playCalls);
             WaitForRelease(MatchWorkerOperation.Play);
@@ -131,22 +131,18 @@ namespace DominoAllFives.Client.Tests
             {
                 throw PlayError;
             }
-
-            return View;
         }
 
-        public MatchView Draw(int matchId, long version)
+        public void Draw(int matchId, long version)
         {
             Interlocked.Increment(ref _drawCalls);
             WaitForRelease(MatchWorkerOperation.Draw);
-            return View;
         }
 
-        public MatchView Pass(int matchId, long version)
+        public void Pass(int matchId, long version)
         {
             Interlocked.Increment(ref _passCalls);
             WaitForRelease(MatchWorkerOperation.Pass);
-            return View;
         }
 
         public void Leave(int matchId)
@@ -184,7 +180,7 @@ namespace DominoAllFives.Client.Tests
                 Version = version,
                 OpeningTileId = 1,
                 CurrentPlayerId = 1,
-                Phase = MatchPhase.InProgress,
+                Phase = MatchStatus.InProgress,
                 Board = new PublicBoard
                 {
                     Tiles = new List<PlacedTile>(),

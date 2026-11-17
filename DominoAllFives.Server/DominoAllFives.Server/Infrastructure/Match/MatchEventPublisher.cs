@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -15,8 +14,6 @@ namespace DominoAllFives.Server.Infrastructure
     internal sealed class MatchEventPublisher
     {
         private readonly MatchCallbackRegistry _callbacks;
-        private readonly ConcurrentDictionary<int, MatchUpdateQueue> _queues =
-            new ConcurrentDictionary<int, MatchUpdateQueue>();
         private readonly ILogger<MatchEventPublisher> _logger;
 
         public event Action<int> MatchEnded;
@@ -41,30 +38,23 @@ namespace DominoAllFives.Server.Infrastructure
             _callbacks.Remove(matchId, playerId, callback);
         }
 
-        public void Enqueue(MatchUpdate notification)
+        public void PublishPending(MatchUpdate notification)
         {
             if (notification == null)
             {
                 throw new ArgumentNullException(nameof(notification));
             }
 
-            MatchUpdateQueue queue = _queues.GetOrAdd(
-                notification.View.MatchId,
-                CreateUpdateQueue);
-            if (queue.Enqueue(notification))
+            MatchUpdateQueue queue = notification.PendingUpdates;
+            if (queue == null)
+            {
+                throw new ArgumentException("The update has no committed publication queue.");
+            }
+
+            if (queue.TryStartPublishing())
             {
                 ThreadPool.QueueUserWorkItem(DrainQueue, queue);
             }
-        }
-
-        private static MatchUpdateQueue CreateUpdateQueue(int matchId)
-        {
-            if (matchId <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(matchId));
-            }
-
-            return new MatchUpdateQueue();
         }
 
         private void DrainQueue(object state)
@@ -73,13 +63,21 @@ namespace DominoAllFives.Server.Infrastructure
             MatchUpdate notification;
             while (queue.TryDequeue(out notification))
             {
-                Deliver(notification);
                 if (notification.Result != null)
                 {
                     MatchEnded?.Invoke(notification.View.MatchId);
-                    Release(notification.View.MatchId);
-                    MatchUpdateQueue removed;
-                    _queues.TryRemove(notification.View.MatchId, out removed);
+                }
+
+                try
+                {
+                    Deliver(notification);
+                }
+                finally
+                {
+                    if (notification.Result != null)
+                    {
+                        Release(notification.View.MatchId);
+                    }
                 }
             }
         }
@@ -157,44 +155,6 @@ namespace DominoAllFives.Server.Infrastructure
             Remove(recipient.MatchId, recipient.PlayerId, recipient.Callback);
             _logger.LogDebug(
                 ex, "Match callback failed for player {PlayerId}.", recipient.PlayerId);
-        }
-
-        private sealed class MatchUpdateQueue
-        {
-            private readonly object _syncRoot = new object();
-            private readonly Queue<MatchUpdate> _items = new Queue<MatchUpdate>();
-            private bool _isRunning;
-
-            public bool Enqueue(MatchUpdate notification)
-            {
-                lock (_syncRoot)
-                {
-                    _items.Enqueue(notification);
-                    if (_isRunning)
-                    {
-                        return false;
-                    }
-
-                    _isRunning = true;
-                    return true;
-                }
-            }
-
-            public bool TryDequeue(out MatchUpdate notification)
-            {
-                lock (_syncRoot)
-                {
-                    if (_items.Count == 0)
-                    {
-                        notification = null;
-                        _isRunning = false;
-                        return false;
-                    }
-
-                    notification = _items.Dequeue();
-                    return true;
-                }
-            }
         }
     }
 }

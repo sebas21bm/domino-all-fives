@@ -18,6 +18,213 @@ namespace DominoAllFives.Server.AdditionalTest
     public sealed class MatchServiceWcfTests
     {
         private static int nextMatchId = 20000;
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void LeaveMatch_GeneratedProxy_PublishesSingleTerminalSnapshot(bool repeat)
+        {
+            // Arrange
+            using (CommandSession session = new CommandSession(false))
+            {
+                // Act
+                session.Client.LeaveMatch(session.MatchId);
+                if (repeat)
+                {
+                    session.Client.LeaveMatch(session.MatchId);
+                }
+
+                bool received = SpinWait.SpinUntil(session.HasResult, 5000);
+                Proxy.MatchView after = session.Client.GetMatch(session.MatchId);
+                Proxy.MatchResult result;
+                session.Callback.Results.TryPeek(out result);
+                // Assert
+                Assert.That(new object[]
+                {
+                    received, after.Version, after.Phase, result?.Phase,
+                    session.Callback.Views.Count, session.Callback.Hands.Count,
+                    session.Callback.Results.Count
+                }, Is.EqualTo(new object[]
+                {
+                    true, 1L, Proxy.MatchStatus.Cancelled, Proxy.MatchStatus.Cancelled, 1, 1, 1
+                }));
+            }
+        }
+
+        [TestCase("PlayTile", "stale", Proxy.MatchIssue.StaleVersion)]
+        [TestCase("DrawTiles", "stale", Proxy.MatchIssue.StaleVersion)]
+        [TestCase("PassTurn", "stale", Proxy.MatchIssue.StaleVersion)]
+        [TestCase("PlayTile", "turn", Proxy.MatchIssue.NotPlayersTurn)]
+        [TestCase("DrawTiles", "turn", Proxy.MatchIssue.NotPlayersTurn)]
+        [TestCase("PassTurn", "turn", Proxy.MatchIssue.NotPlayersTurn)]
+        [TestCase("DrawTiles", "legal", Proxy.MatchIssue.DrawNotAllowed)]
+        [TestCase("PassTurn", "legal", Proxy.MatchIssue.PassNotAllowed)]
+        [TestCase("PlayTile", "missing", Proxy.MatchIssue.TileNotOwned)]
+        public void Command_GeneratedProxy_ReturnsTypedRuleFaultWithoutMutation(
+            string operation,
+            string scenario,
+            Proxy.MatchIssue expectedIssue)
+        {
+            // Arrange
+            using (CommandSession session = new CommandSession(scenario == "turn"))
+            {
+                Proxy.MatchView request = session.Client.GetMatch(session.MatchId);
+                if (scenario == "stale")
+                {
+                    request.Version = -1;
+                }
+
+                if (scenario == "missing")
+                {
+                    request.OpeningTileId = -1;
+                }
+
+                Proxy.MatchIssue? issue = null;
+                // Act
+                try
+                {
+                    InvokeCommand(session.Client, operation, request);
+                }
+                catch (FaultException<Proxy.MatchIssue> ex)
+                {
+                    issue = ex.Detail;
+                }
+
+                Proxy.MatchView after = session.Client.GetMatch(session.MatchId);
+                // Assert
+                Assert.That(new object[] { issue, after.Version, after.Phase }, Is.EqualTo(
+                    new object[] { expectedIssue, 0L, Proxy.MatchStatus.InProgress }));
+            }
+        }
+
+        [TestCase("PlayTile", false)]
+        [TestCase("DrawTiles", false)]
+        [TestCase("PassTurn", false)]
+        [TestCase("LeaveMatch", false)]
+        [TestCase("PlayTile", true)]
+        [TestCase("DrawTiles", true)]
+        [TestCase("PassTurn", true)]
+        [TestCase("LeaveMatch", true)]
+        public void Command_GeneratedProxy_ReturnsTypedAccessFault(
+            string operation,
+            bool revoked)
+        {
+            // Arrange
+            using (CommandSession session = new CommandSession(false))
+            {
+                Proxy.MatchView request = session.Client.GetMatch(session.MatchId);
+                Proxy.AccessIssue expectedIssue = Proxy.AccessIssue.PermissionDenied;
+                if (revoked)
+                {
+                    SessionManager.RemoveSession(session.Key);
+                    expectedIssue = Proxy.AccessIssue.SessionRequired;
+                }
+                else
+                {
+                    request.MatchId++;
+                }
+
+                Proxy.AccessIssue? issue = null;
+                // Act
+                try
+                {
+                    InvokeCommand(session.Client, operation, request);
+                }
+                catch (FaultException<Proxy.AccessIssue> ex)
+                {
+                    issue = ex.Detail;
+                }
+
+                MatchView after = MatchManager.Instance.GetMatchView(
+                    session.MatchId,
+                    session.PlayerId);
+                // Assert
+                Assert.That(new object[] { issue, after.Version, after.Phase }, Is.EqualTo(
+                    new object[] { expectedIssue, 0L, MatchStatus.InProgress }));
+            }
+        }
+
+        private static void InvokeCommand(
+            Proxy.MatchServiceClient client,
+            string operation,
+            Proxy.MatchView request)
+        {
+            switch (operation)
+            {
+                case "PlayTile":
+                    Proxy.DominoTile tile = null;
+                    if (request.OpeningTileId >= 0)
+                    {
+                        tile = new Proxy.DominoTile { TileId = request.OpeningTileId };
+                    }
+
+                    client.PlayTile(request.MatchId, tile, Proxy.BoardEnd.Left, request.Version);
+                    break;
+                case "DrawTiles":
+                    client.DrawTiles(request.MatchId, request.Version);
+                    break;
+                case "PassTurn":
+                    client.PassTurn(request.MatchId, request.Version);
+                    break;
+                case "LeaveMatch":
+                    client.LeaveMatch(request.MatchId);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(operation));
+            }
+        }
+
+        private sealed class CommandSession : IDisposable
+        {
+            private readonly ServiceHost _host;
+            public int MatchId { get; }
+            public int PlayerId { get; }
+            public string Key { get; }
+            public Proxy.MatchServiceClient Client { get; }
+            public MatchProxyCallback Callback { get; } = new MatchProxyCallback();
+
+            public CommandSession(bool otherPlayer)
+            {
+                MatchId = Interlocked.Increment(ref nextMatchId);
+                int first = MatchId * 2;
+                int second = first + 1;
+                CreateMatch(MatchId, new[] { first, second }, 100);
+                MatchView initial = MatchManager.Instance.GetMatchView(MatchId, first);
+                PlayerId = initial.CurrentPlayerId.Value;
+                if (otherPlayer)
+                {
+                    PlayerId = first;
+                    if (initial.CurrentPlayerId == first)
+                    {
+                        PlayerId = second;
+                    }
+                }
+
+                Key = SessionManager.CreateSession(PlayerId);
+                _host = CreateHost();
+                _host.Open();
+                Client = new Proxy.MatchServiceClient(
+                    new InstanceContext(Callback),
+                    CreateBinding(),
+                    _host.Description.Endpoints[0].Address);
+                Client.OpenMatchSession(Key, MatchId);
+            }
+
+            public bool HasResult()
+            {
+                return !Callback.Results.IsEmpty
+                    && !Callback.Views.IsEmpty
+                    && !Callback.Hands.IsEmpty;
+            }
+
+            public void Dispose()
+            {
+                Client.Abort();
+                _host.Abort();
+                SessionManager.RemoveSession(Key);
+                MatchManager.Instance.RemoveMatch(MatchId);
+            }
+        }
+
         [Test]
         public void PlayTile_GeneratedProxy_PreservesWireContractsAndPrivateCallbacks()
         {
@@ -66,8 +273,9 @@ namespace DominoAllFives.Server.AdditionalTest
                     int originalValue = tile.FirstValue;
                     tile.FirstValue = 99;
                     // Act
-                    Proxy.MatchView after = clients[activeIndex].PlayTile(matchId, tile,
+                    clients[activeIndex].PlayTile(matchId, tile,
                         Proxy.BoardEnd.Left, view.Version);
+                    Proxy.MatchView after = clients[activeIndex].GetMatch(matchId);
                     bool received = WaitForProxyHands(
                         callbacks,
                         CallbackTimeoutMilliseconds);
@@ -81,6 +289,8 @@ namespace DominoAllFives.Server.AdditionalTest
                     Assert.That(after.LastPlay.Points, Is.EqualTo(
                         after.LastPlay.BasePoints * after.LastPlay.Multiplier));
                     Assert.That(received, Is.True);
+                    Assert.That(callbacks[activeIndex].Views.Single().Version,
+                        Is.EqualTo(after.Version));
                     Assert.That(callbacks[0].Hands.All(hand => hand.PlayerId == FirstPlayerId),
                         Is.True);
                     Assert.That(callbacks[1].Hands.All(hand => hand.PlayerId == SecondPlayerId),
@@ -177,8 +387,9 @@ namespace DominoAllFives.Server.AdditionalTest
                         SpecialPower = SpecialPower.DoublePoints
                     };
                     // Act
-                    MatchView after = channels[activeIndex].PlayTile(matchId, forged,
+                    channels[activeIndex].PlayTile(matchId, forged,
                         BoardEnd.Left, view.Version);
+                    MatchView after = channels[activeIndex].GetMatch(matchId);
                     bool received = WaitForHands(callbacks, 5000);
                     // Assert
                     Assert.That(after.Board.Tiles[0].Tile.FirstValue, Is.EqualTo(owned.FirstValue));

@@ -38,8 +38,10 @@ namespace DominoAllFives.BusinessLogic.Managers
                 ActiveMatch active;
                 if (!_matches.TryGetValue(matchId, out active))
                 {
-                    active = new ActiveMatch(
-                        new Match(matchId, players, targetPoints, Deck.Create));
+                    DeckGenerator deckGenerator = new DeckGenerator();
+                    List<Tile> initialDeck = deckGenerator.Generate();
+                    Match match = new Match(matchId, players, targetPoints, initialDeck);
+                    active = new ActiveMatch(match);
                     _matches.Add(matchId, active);
                 }
             }
@@ -168,7 +170,8 @@ namespace DominoAllFives.BusinessLogic.Managers
             MatchUpdate update = new MatchUpdate
             {
                 View = view,
-                HasStateChange = hasStateChange
+                HasStateChange = hasStateChange,
+                PendingUpdates = activeMatch.PendingUpdates
             };
 
             if (!hasStateChange)
@@ -195,6 +198,7 @@ namespace DominoAllFives.BusinessLogic.Managers
                 update.Result = MatchContractMapper.CreateMatchResult(match);
             }
 
+            activeMatch.PendingUpdates.Enqueue(update);
             return update;
         }
 

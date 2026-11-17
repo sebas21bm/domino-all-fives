@@ -47,11 +47,12 @@ namespace DominoAllFives.Server.Tests
                 1,
                 2
             };
+            List<Tile> initialDeck = FixedDeck();
             // Act
             ArgumentOutOfRangeException exception = null;
             try
             {
-                new Match(1, players, targetPoints, FixedDeck);
+                new Match(1, players, targetPoints, initialDeck);
             }
             catch (ArgumentOutOfRangeException ex)
             {
@@ -155,7 +156,8 @@ namespace DominoAllFives.Server.Tests
         public void Match_RoundFinishes_RevealsPreviousHandsAndDealsNewRound()
         {
             // Arrange
-            Match match = new Match(1, new[] { 1, 2 }, 250, FixedDeck);
+            List<Tile> initialDeck = FixedDeck();
+            Match match = new Match(1, new[] { 1, 2 }, 250, initialDeck);
             int actions = 0;
             // Act
             while (match.LastRound == null && match.Phase == MatchState.InProgress
@@ -165,7 +167,7 @@ namespace DominoAllFives.Server.Tests
             }
 
             // Assert
-            bool openingPlayerHasDoubleSix = HasOpeningDouble(match);
+            bool openingPlayerOwnsRequiredTile = OwnsOpeningTile(match);
             Assert.That(
                 new object[]
                 {
@@ -173,7 +175,7 @@ namespace DominoAllFives.Server.Tests
                     match.LastRound?.RemainingHands.Count,
                     match.RoundNumber,
                     match.Players.All(player => player.Tiles.Count == 7),
-                    openingPlayerHasDoubleSix
+                    openingPlayerOwnsRequiredTile
                 },
                 Is.EqualTo(new object[] { 1, 2, 2, true, true }));
         }
@@ -187,7 +189,7 @@ namespace DominoAllFives.Server.Tests
             int[] players = Enumerable.Range(1, count)
                 .ToArray();
             // Act
-            Match match = new Match(1, players, 100, Deck.Create);
+            Match match = new Match(1, players, 100, new DeckGenerator().Generate());
             // Assert
             Assert.That(
                 new object[]
@@ -204,7 +206,7 @@ namespace DominoAllFives.Server.Tests
             // Arrange
             List<Tile> deck;
             // Act
-            deck = Deck.Create();
+            deck = new DeckGenerator().Generate();
             // Assert
             Assert.That(
                 new object[]
@@ -224,7 +226,7 @@ namespace DominoAllFives.Server.Tests
             board.Place(new Tile(1, 5, 5, SpecialPower.None), BoardEndPosition.Left, 0);
             // Assert
             Assert.That(
-                new object[] { board.Ends.Count, board.CalculatePoints(0) },
+                new object[] { board.Ends.Count, PlayScoring.Evaluate(board, 0).BasePoints },
                 Is.EqualTo(new object[] { 4, 10 }));
         }
 
@@ -237,7 +239,7 @@ namespace DominoAllFives.Server.Tests
             board.Place(new Tile(1, 2, 3, SpecialPower.None), BoardEndPosition.Left, 0);
             // Assert
             Assert.That(
-                new object[] { board.Ends.Count, board.CalculatePoints(0) },
+                new object[] { board.Ends.Count, PlayScoring.Evaluate(board, 0).BasePoints },
                 Is.EqualTo(new object[] { 2, 5 }));
         }
 
@@ -272,7 +274,7 @@ namespace DominoAllFives.Server.Tests
             // Act
             board.Place(new Tile(2, 5, 5, SpecialPower.None), BoardEndPosition.Left, 1);
             // Assert
-            Assert.That(board.CalculatePoints(1), Is.EqualTo(10));
+            Assert.That(PlayScoring.Evaluate(board, 1).BasePoints, Is.EqualTo(10));
         }
 
         [Test]
@@ -298,17 +300,17 @@ namespace DominoAllFives.Server.Tests
         }
 
         [Test]
-        public void CalculatePoints_PurpleEnd_IsExcludedDuringNextTurn()
+        public void Evaluate_PurpleEnd_IsExcludedDuringNextTurn()
         {
             // Arrange
             Board board = new Board();
             board.Place(new Tile(1, 5, 3, SpecialPower.None), BoardEndPosition.Left, 0);
             board.Place(new Tile(2, 3, 5, SpecialPower.Block), BoardEndPosition.Right, 1);
             // Act
-            int nextTurnPoints = board.CalculatePoints(2);
+            int nextTurnPoints = PlayScoring.Evaluate(board, 2).BasePoints;
             // Assert
             Assert.That(
-                new object[] { nextTurnPoints, board.CalculatePoints(3) },
+                new object[] { nextTurnPoints, PlayScoring.Evaluate(board, 3).BasePoints },
                 Is.EqualTo(new object[] { 5, 10 }));
         }
 
@@ -367,8 +369,8 @@ namespace DominoAllFives.Server.Tests
             Tile opening = FindTileByValues(deck, 5, 5);
             deck.Remove(opening);
             deck.Insert(0, new Tile(opening.TileId, 5, 5, SpecialPower.DoublePoints));
-            FixedDeckProvider deckProvider = new FixedDeckProvider(deck);
-            Match match = new Match(1, new[] { 1, 2 }, 100, deckProvider.CreateDeck);
+            List<Tile> initialDeck = deck;
+            Match match = new Match(1, new[] { 1, 2 }, 100, initialDeck);
             // Act
             match.Play(1, opening.TileId, BoardEndPosition.Left, 0);
             // Assert
@@ -383,8 +385,8 @@ namespace DominoAllFives.Server.Tests
             // Arrange
             List<Tile> deck = OrderedDeck(new[] { 66, 0, 1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 22,
                 23 });
-            FixedDeckProvider deckProvider = new FixedDeckProvider(deck);
-            Match match = new Match(1, new[] { 1, 2 }, 100, deckProvider.CreateDeck);
+            List<Tile> initialDeck = deck;
+            Match match = new Match(1, new[] { 1, 2 }, 100, initialDeck);
             match.Play(1, deck[0].TileId, BoardEndPosition.Left, 0);
             // Act
             match.Draw(2, 1);
@@ -526,7 +528,10 @@ namespace DominoAllFives.Server.Tests
         public void Match_LegalAutomatedPlay_CompletesAndConservesTiles(int playerCount)
         {
             // Arrange
-            Match match = new Match(1, Enumerable.Range(1, playerCount), 100, Deck.Create);
+            DeckGenerator generator = new DeckGenerator();
+            List<Tile> initialDeck = generator.Generate();
+            IEnumerable<int> playerIds = Enumerable.Range(1, playerCount);
+            Match match = new Match(1, playerIds, 100, initialDeck);
             int actionCount = 0;
             bool tileCountWasPreserved = true;
             // Act
@@ -605,18 +610,16 @@ namespace DominoAllFives.Server.Tests
 
         private static Match NewMatch()
         {
-            return new Match(1, new[] { 1, 2 }, 100, FixedDeck);
+            List<Tile> initialDeck = FixedDeck();
+            return new Match(1, new[] { 1, 2 }, 100, initialDeck);
         }
 
-        private static bool HasOpeningDouble(Match match)
+        private static bool OwnsOpeningTile(Match match)
         {
             MatchPlayer openingPlayer = match.GetPlayer(match.CurrentPlayerId.Value);
             foreach (Tile tile in openingPlayer.Tiles)
             {
-                bool isOpeningTile = tile.TileId == match.OpeningTileId;
-                bool isDoubleSix = tile.FirstValue == 6
-                    && tile.SecondValue == 6;
-                if (isOpeningTile && isDoubleSix)
+                if (tile.TileId == match.OpeningTileId)
                 {
                     return true;
                 }
@@ -650,7 +653,7 @@ namespace DominoAllFives.Server.Tests
         private static List<Tile> OrderedDeck(int[] values)
         {
             List<Tile> allTiles = new List<Tile>();
-            foreach (Tile tile in Deck.Create())
+            foreach (Tile tile in new DeckGenerator().Generate())
             {
                 Tile tileWithoutPower = new Tile(
                     tile.TileId,
@@ -689,22 +692,6 @@ namespace DominoAllFives.Server.Tests
         private static int CompareTilesById(Tile left, Tile right)
         {
             return left.TileId.CompareTo(right.TileId);
-        }
-
-        private sealed class FixedDeckProvider
-        {
-            private readonly List<Tile> _deck;
-
-            public FixedDeckProvider(List<Tile> deck)
-            {
-                _deck = deck
-                    ?? throw new ArgumentNullException(nameof(deck));
-            }
-
-            public List<Tile> CreateDeck()
-            {
-                return _deck;
-            }
         }
 
         private sealed class ConcurrentPlayAttempt

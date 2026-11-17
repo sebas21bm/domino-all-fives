@@ -380,8 +380,10 @@ Esto es importante porque un callback puede:
 El estado principal no debe permanecer bloqueado mientras se espera una operación de red.
 
 En Jugabilidad se aplica la misma frontera. `MatchManager` valida la versión,
-modifica el dominio y construye `MatchUpdate` dentro de `_syncRoot`, pero no
-encola ni publica callbacks mientras conserva el bloqueo:
+modifica el dominio, construye `MatchUpdate` y registra el snapshot en la cola
+en memoria de `ActiveMatch` dentro de `_syncRoot`. Ese registro conserva el orden
+de las versiones aceptadas. No programa trabajadores ni ejecuta callbacks bajo
+ese bloqueo:
 
 ```text
 MatchManager
@@ -390,7 +392,7 @@ MatchManager
 valida jugador y versión
     │
     ▼
-modifica Match y crea snapshots
+modifica Match, crea snapshots y los registra en PendingUpdates
     │
     ▼
 libera lock y devuelve MatchUpdate
@@ -399,16 +401,26 @@ libera lock y devuelve MatchUpdate
 MatchService
     │
     ▼
-MatchEventPublisher.Enqueue
+MatchEventPublisher.PublishPending
     │
     ▼
-callbacks WCF desde la cola del partido
+un consumidor drena la cola del partido y ejecuta callbacks WCF
 ```
 
 No se debe entregar un `Action<MatchUpdate>` al controller o al manager para
 ocultar el publicador. La actualización producida por la transición se devuelve
-como dato; la frontera del servidor decide si debe encolarla después de liberar
-el estado compartido.
+como dato; después de liberar el estado compartido, el servicio activa la
+publicación pendiente. Incluso una salida repetida sin cambios puede activar
+snapshots ya registrados; no vuelve a agregarlos.
+
+`MatchUpdateQueue` permite un solo consumidor y protege únicamente operaciones
+cortas sobre datos. Libera su bloqueo antes de entregar cada snapshot al
+publicador; no llama al manager, al lobby ni a la red bajo ese bloqueo. El
+consumidor libera el lobby antes de emitir los callbacks del snapshot terminal
+y retira sus registros de callbacks al finalizar la entrega. La cola pertenece
+a `ActiveMatch`, se cierra al registrar el resultado final y no se recrea por
+una activación tardía. El transporte sigue siendo en memoria y no ofrece
+persistencia ni confirmación de recepción del cliente.
 
 
 ## Concurrencia en `CallbackRegistry`
