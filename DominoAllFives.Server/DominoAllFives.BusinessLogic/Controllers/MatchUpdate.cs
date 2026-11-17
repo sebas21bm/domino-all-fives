@@ -1,13 +1,16 @@
 using System.Collections.Generic;
-using Network = DominoAllFives.Contracts.Gameplay;
+using DominoAllFives.BusinessLogic.Gameplay;
+using GameplayContracts = DominoAllFives.Contracts.Gameplay;
 
 namespace DominoAllFives.BusinessLogic.Controllers
 {
     public sealed class MatchUpdate
     {
-        public Network.MatchView View { get; internal set; }
-        public List<Network.PlayerHand> Hands { get; internal set; }
-        public Network.RoundResult Round { get; internal set; }
-        public Network.MatchResult Result { get; internal set; }
+        public GameplayContracts.MatchView View { get; internal set; }
+        public List<GameplayContracts.PlayerHand> Hands { get; internal set; }
+        public GameplayContracts.RoundResult Round { get; internal set; }
+        public GameplayContracts.MatchResult Result { get; internal set; }
+        public bool HasStateChange { get; internal set; }
+        public MatchUpdateQueue PendingUpdates { get; internal set; }
     }
 }

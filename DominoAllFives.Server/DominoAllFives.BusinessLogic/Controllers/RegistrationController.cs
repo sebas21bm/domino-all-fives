@@ -42,74 +42,54 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 return RegistrationResult.Rejected(validationResult);
             }
 
-            try
+            using (DominoAllFivesEntities context = new DominoAllFivesEntities())
             {
-                using (DominoAllFivesEntities context = new DominoAllFivesEntities())
+                IPlayerRepository playerRepository = new PlayerRepository(context);
+                IPlayerStatsRepository playerStatsRepository =
+                    new PlayerStatsRepository(context);
+                if (playerRepository.UsernameExists(registrationData.Username))
                 {
-                    IPlayerRepository playerRepository = new PlayerRepository(context);
-                    IPlayerStatsRepository playerStatsRepository =
-                        new PlayerStatsRepository(
-                        context);
-                    if (playerRepository.UsernameExists(registrationData.Username))
-                    {
-                        return RegistrationResult.Rejected(
-                            RegistrationStatus.UsernameAlreadyExists);
-                    }
-
-                    if (playerRepository.EmailExists(registrationData.Email))
-                    {
-                        return RegistrationResult.Rejected(RegistrationStatus.EmailAlreadyExists);
-                    }
-
-                    Player player = new Player
-                    {
-                        Username = registrationData.Username,
-                        Email = registrationData.Email,
-                        PasswordHash = PasswordHasher.HashPassword(registrationData.Password),
-                        ProfilePicture = null,
-                        IsGuest = false,
-                        SuspensionUntil = null,
-                        IsBanned = false,
-                        PreferredLanguageId = registrationData.PreferredLanguageId,
-                        IsDeleted = false,
-                        DeletedAt = null,
-                    };
-                    PlayerStats playerStats = new PlayerStats
-                    {
-                        GamesWon = 0,
-                        GamesPlayed = 0,
-                        TotalPointsScored = 0,
-                        LastVictoryDate = null,
-                        Player = player
-                    };
-                    playerRepository.Add(player);
-                    playerStatsRepository.Add(playerStats);
-                    context.SaveChanges();
-                    return RegistrationResult.Success(
-                        PlayerAccount.FromStoredAccount(
-                        player.IdPlayer,
-                        player.Username,
-                        player.PreferredLanguageId,
-                        AccountAccessStatus.FromStoredState(
-                        player.IsDeleted,
-                        player.IsBanned,
-                        player.SuspensionUntil)));
+                    return RegistrationResult.Rejected(RegistrationStatus.UsernameAlreadyExists);
                 }
-            }
-            catch (SqlException ex)
-            {
-                _logger.LogError(ex, "An error occurred while registering a new player account.");
-                throw;
-            }
-            catch (EntityException ex)
-            {
-                _logger.LogError(ex, "An error occurred while registering a new player account.");
-                throw;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "An error occurred while registering a new player account.");
-                throw;
+
+                if (playerRepository.EmailExists(registrationData.Email))
+                {
+                    return RegistrationResult.Rejected(RegistrationStatus.EmailAlreadyExists);
+                }
+
+                Player player = new Player
+                {
+                    Username = registrationData.Username,
+                    Email = registrationData.Email,
+                    PasswordHash = PasswordHasher.HashPassword(registrationData.Password),
+                    ProfilePicture = null,
+                    IsGuest = false,
+                    SuspensionUntil = null,
+                    IsBanned = false,
+                    PreferredLanguageId = registrationData.PreferredLanguageId,
+                    IsDeleted = false,
+                    DeletedAt = null,
+                };
+                PlayerStats playerStats = new PlayerStats
+                {
+                    GamesWon = 0,
+                    GamesPlayed = 0,
+                    TotalPointsScored = 0,
+                    LastVictoryDate = null,
+                    Player = player
+                };
+                playerRepository.Add(player);
+                playerStatsRepository.Add(playerStats);
+                context.SaveChanges();
+                return RegistrationResult.Success(
+                    PlayerAccount.FromStoredAccount(
+                    player.IdPlayer,
+                    player.Username,
+                    player.PreferredLanguageId,
+                    AccountAccessStatus.FromStoredState(
+                    player.IsDeleted,
+                    player.IsBanned,
+                    player.SuspensionUntil)));
             }
         }
     }

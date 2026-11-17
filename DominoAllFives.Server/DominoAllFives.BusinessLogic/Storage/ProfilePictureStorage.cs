@@ -35,8 +35,7 @@ namespace DominoAllFives.BusinessLogic.Storage
             return string.Format(
                 "player_{0}_{1}{2}",
                 playerId,
-                Guid.NewGuid().ToString(
-                "N"),
+                Guid.NewGuid().ToString("N"),
                 extension);
         }
 
@@ -203,8 +202,7 @@ namespace DominoAllFives.BusinessLogic.Storage
         private string GetProfilePicturesDirectory()
         {
             string localApplicationData =
-                Environment.GetFolderPath(
-                Environment.SpecialFolder.LocalApplicationData);
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             return Path.Combine(
                 localApplicationData,
                 ApplicationFolderName,

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
-using System.Linq;
 using System.ServiceModel;
 using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Exceptions;
 using DominoAllFives.BusinessLogic.Managers;
+using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Contracts.Services;
@@ -20,26 +20,32 @@ namespace DominoAllFives.Server
     /// <summary>
     /// Coordinates authenticated lobby operations and publishes participant callbacks.
     /// </summary>
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode =
-        ConcurrencyMode.Reentrant, IncludeExceptionDetailInFaults = false)]
+    [ServiceBehavior(
+        InstanceContextMode = InstanceContextMode.PerSession,
+        ConcurrencyMode = ConcurrencyMode.Reentrant,
+        IncludeExceptionDetailInFaults = false)]
     public sealed class LobbyService : ILobbyService
     {
         private static readonly LobbyController controller;
+        private static readonly MatchController matchController;
         private static readonly LobbyCallbackRegistry callbacks;
         private static readonly LobbyEventPublisher publisher;
         private static readonly ILogger<LobbyService> logger;
+        private static readonly ProfilePictureStorage pictureStorage =
+            new ProfilePictureStorage(LoggerFactoryProvider.CreateLogger<ProfilePictureStorage>());
         private Player _player;
         private ILobbyCallback _callback;
         private ICommunicationObject _callbackChannel;
         static LobbyService()
         {
-            LobbyManager lobbyManager = new LobbyManager();
-            Infrastructure.GameRuntime.Publisher.MatchEnded = lobbyManager.ReleaseMatch;
+            LobbyManager lobbyManager = LobbyManager.Instance;
             controller = new LobbyController(lobbyManager);
+            matchController = new MatchController(MatchManager.Instance);
             callbacks = new LobbyCallbackRegistry();
-            publisher = new LobbyEventPublisher(callbacks,
-                new ConsoleLogger<LobbyEventPublisher>());
-            logger = new ConsoleLogger<LobbyService>();
+            publisher = new LobbyEventPublisher(
+                callbacks,
+                LoggerFactoryProvider.CreateLogger<LobbyEventPublisher>());
+            logger = LoggerFactoryProvider.CreateLogger<LobbyService>();
         }
 
         /// <summary>
@@ -56,21 +62,23 @@ namespace DominoAllFives.Server
         {
             if (_player != null)
             {
-                throw AccessFault(AccessIssue.PermissionDenied);
+                throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
             }
 
             if (string.IsNullOrWhiteSpace(sessionKey))
             {
-                throw AccessFault(AccessIssue.SessionRequired);
+                throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
             }
 
             try
             {
-                _player = SessionManager.GetPlayer(sessionKey);
+                _player = controller.GetAuthenticatedPlayer(
+                    sessionKey,
+                    pictureStorage);
             }
             catch (KeyNotFoundException)
             {
-                throw AccessFault(AccessIssue.SessionRequired);
+                throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
             }
             catch (SqlException ex)
             {
@@ -93,7 +101,7 @@ namespace DominoAllFives.Server
             if (!callbackRegistered)
             {
                 _player = null;
-                throw AccessFault(AccessIssue.PermissionDenied);
+                throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
             }
 
             _callback = callback;
@@ -109,25 +117,23 @@ namespace DominoAllFives.Server
         /// Creates a lobby owned by the authenticated player.
         /// </summary>
         /// <param name = "settings">The requested lobby configuration.</param>
-        /// <returns>The created lobby snapshot.</returns>
         /// <exception cref = "FaultException{AccessIssue}">
         /// The connection has no authenticated session or the player lacks permission.
         /// </exception>
         /// <exception cref = "FaultException{LobbyIssue}">
         /// The requested operation violates a lobby rule or the lobby is unavailable.
         /// </exception>
-        public Lobby CreateLobby(LobbySettings settings)
+        public void CreateLobby(LobbySettings settings)
         {
             try
             {
                 Player player = GetPlayer();
                 Lobby lobby = controller.CreateLobby(player, settings);
                 publisher.PublishLobbyChanged(lobby);
-                return lobby;
             }
             catch (LobbyRuleException ex)
             {
-                throw LobbyFault(ex.Issue);
+                throw new FaultException<LobbyIssue>(ex.Issue);
             }
         }
 
@@ -135,25 +141,23 @@ namespace DominoAllFives.Server
         /// Adds the authenticated player to an existing lobby.
         /// </summary>
         /// <param name = "lobbyCode">The code identifying the target lobby.</param>
-        /// <returns>The lobby snapshot after the player joins.</returns>
         /// <exception cref = "FaultException{AccessIssue}">
         /// The connection has no authenticated session or the player lacks permission.
         /// </exception>
         /// <exception cref = "FaultException{LobbyIssue}">
         /// The requested operation violates a lobby rule or the lobby is unavailable.
         /// </exception>
-        public Lobby JoinLobby(string lobbyCode)
+        public void JoinLobby(string lobbyCode)
         {
             try
             {
                 Player player = GetPlayer();
                 Lobby lobby = controller.JoinLobby(player, lobbyCode);
                 publisher.PublishLobbyChanged(lobby);
-                return lobby;
             }
             catch (LobbyRuleException ex)
             {
-                throw LobbyFault(ex.Issue);
+                throw new FaultException<LobbyIssue>(ex.Issue);
             }
         }
 
@@ -183,7 +187,7 @@ namespace DominoAllFives.Server
             }
             catch (LobbyRuleException ex)
             {
-                throw LobbyFault(ex.Issue);
+                throw new FaultException<LobbyIssue>(ex.Issue);
             }
         }
 
@@ -207,7 +211,7 @@ namespace DominoAllFives.Server
             }
             catch (LobbyRuleException ex)
             {
-                throw LobbyFault(ex.Issue);
+                throw new FaultException<LobbyIssue>(ex.Issue);
             }
         }
 
@@ -222,23 +226,43 @@ namespace DominoAllFives.Server
         /// </exception>
         public void StartMatch()
         {
+            Player player = GetPlayer();
+            Lobby startingLobby = null;
+            bool matchCreated = false;
             try
             {
-                Player player = GetPlayer();
-                Lobby lobby = controller.StartLobby(player.PlayerId, starting
-                    => Infrastructure.GameRuntime.Controller.Create(starting.LobbyId,
-                    starting.Participants.Select(participant => participant.PlayerId),
-                    starting.Settings.TargetPoints));
+                startingLobby = controller.PrepareLobbyForMatch(player.PlayerId);
+                List<int> playerIds = new List<int>();
+                foreach (Player participant in startingLobby.Participants)
+                {
+                    playerIds.Add(participant.PlayerId);
+                }
+
+                matchController.CreateMatch(
+                    startingLobby.LobbyId,
+                    playerIds,
+                    startingLobby.Settings.TargetPoints);
+                matchCreated = true;
+
+                Lobby lobby = controller.ConfirmMatchStarted(player.PlayerId);
                 publisher.PublishLobbyChanged(lobby);
                 publisher.PublishMatchStarted(lobby, lobby.LobbyId);
             }
             catch (LobbyRuleException ex)
             {
-                throw LobbyFault(ex.Issue);
+                throw new FaultException<LobbyIssue>(ex.Issue);
             }
             catch (UnauthorizedAccessException)
             {
-                throw AccessFault(AccessIssue.PermissionDenied);
+                throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
+            }
+            finally
+            {
+                if (startingLobby != null
+                    && !matchCreated)
+                {
+                    controller.RestoreLobbyAfterMatchStartFailure(player.PlayerId);
+                }
             }
         }
 
@@ -261,11 +285,11 @@ namespace DominoAllFives.Server
             }
             catch (LobbyRuleException ex)
             {
-                throw LobbyFault(ex.Issue);
+                throw new FaultException<LobbyIssue>(ex.Issue);
             }
             catch (UnauthorizedAccessException)
             {
-                throw AccessFault(AccessIssue.PermissionDenied);
+                throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
             }
         }
 
@@ -273,20 +297,10 @@ namespace DominoAllFives.Server
         {
             if (_player == null)
             {
-                throw AccessFault(AccessIssue.SessionRequired);
+                throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
             }
 
             return _player;
-        }
-
-        private static FaultException<LobbyIssue> LobbyFault(LobbyIssue issue)
-        {
-            return new FaultException<LobbyIssue>(issue);
-        }
-
-        private static FaultException<AccessIssue> AccessFault(AccessIssue issue)
-        {
-            return new FaultException<AccessIssue>(issue);
         }
 
         private void OnCallbackEnded(object sender, EventArgs eventArgs)

@@ -18,7 +18,8 @@ namespace DominoAllFives.Client.WPF.Commands
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref = "RelayCommand"/> class with parameterized delegates.
+        /// Initializes a new instance of the <see cref = "RelayCommand"/> class with
+        /// parameterized delegates.
         /// </summary>
         /// <param name = "execute">The execution logic delegate.</param>
         /// <param name = "canExecute">The execution status evaluation delegate.</param>
@@ -29,14 +30,14 @@ namespace DominoAllFives.Client.WPF.Commands
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref = "RelayCommand"/> class with parameterless delegates.
+        /// Initializes a new instance of the <see cref = "RelayCommand"/> class with
+        /// parameterless delegates.
         /// </summary>
         /// <param name = "execute">The execution logic delegate.</param>
         /// <param name = "canExecute">The execution status evaluation delegate.</param>
         public RelayCommand(
             Action execute,
-            Func<bool> canExecute =
-            null) : this(
+            Func<bool> canExecute = null) : this(
             execute != null
             ? new Action<object>(
             unusedParameter => execute()) : null,
@@ -49,9 +50,17 @@ namespace DominoAllFives.Client.WPF.Commands
         /// <summary>
         /// Occurs when changes occur that affect whether or not the command should execute.
         /// </summary>
-        public event EventHandler CanExecuteChanged { add =>
-            CommandManager.RequerySuggested += value; remove =>
-            CommandManager.RequerySuggested -= value; }
+        public event EventHandler CanExecuteChanged
+        {
+            add
+            {
+                CommandManager.RequerySuggested += value;
+            }
+            remove
+            {
+                CommandManager.RequerySuggested -= value;
+            }
+        }
 
         /// <summary>
         /// Determines whether the command can execute in its current state.
@@ -73,7 +82,8 @@ namespace DominoAllFives.Client.WPF.Commands
         }
 
         /// <summary>
-        /// Raises the <see cref = "CanExecuteChanged"/> event to force UI re-evaluation of the command status.
+        /// Raises the <see cref = "CanExecuteChanged"/> event to force UI re-evaluation of
+        /// the command status.
         /// </summary>
         public void RaiseCanExecuteChanged()
         {

@@ -13,10 +13,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public DeleteAccountViewModel(Action onCancel = null)
         {
-            ConfirmDeleteCommand = new RelayCommand(() =>
-            {
-            }, () => false);
+            ConfirmDeleteCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
             CancelCommand = new RelayCommand(() => onCancel?.Invoke());
+        }
+        private static void IgnoreUnavailableCommand()
+        {
         }
     }
 }

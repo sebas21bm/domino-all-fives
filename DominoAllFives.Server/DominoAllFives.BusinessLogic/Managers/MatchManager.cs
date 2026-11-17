@@ -1,15 +1,208 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Gameplay;
+using GameplayContracts = DominoAllFives.Contracts.Gameplay;
 
 namespace DominoAllFives.BusinessLogic.Managers
 {
     public sealed class MatchManager
     {
-        private readonly ConcurrentDictionary<int, ActiveMatch> _matches =
-            new ConcurrentDictionary<int, ActiveMatch>();
-        public ActiveMatch GetMatch(int matchId)
+        private const int MatchRetentionMinutes = 30;
+        private static readonly MatchManager instance = new MatchManager();
+        private readonly object _syncRoot = new object();
+        private readonly Dictionary<int, ActiveMatch> _matches =
+            new Dictionary<int, ActiveMatch>();
+
+        public static MatchManager Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+
+        public void CreateMatch(int matchId, IEnumerable<int> players, int targetPoints)
+        {
+            lock (_syncRoot)
+            {
+                foreach (KeyValuePair<int, ActiveMatch> entry in _matches.ToArray())
+                {
+                    if (HasExpired(entry.Value))
+                    {
+                        _matches.Remove(entry.Key);
+                    }
+                }
+
+                ActiveMatch active;
+                if (!_matches.TryGetValue(matchId, out active))
+                {
+                    DeckGenerator deckGenerator = new DeckGenerator();
+                    List<Tile> initialDeck = deckGenerator.Generate();
+                    Match match = new Match(matchId, players, targetPoints, initialDeck);
+                    active = new ActiveMatch(match);
+                    _matches.Add(matchId, active);
+                }
+            }
+        }
+
+        public void RemoveMatch(int matchId)
+        {
+            lock (_syncRoot)
+            {
+                _matches.Remove(matchId);
+            }
+        }
+
+        public GameplayContracts.MatchView GetMatchView(int matchId, int playerId)
+        {
+            lock (_syncRoot)
+            {
+                Match match = GetActiveMatch(matchId).Match;
+                match.GetPlayer(playerId);
+                return MatchContractMapper.CreateMatchView(match);
+            }
+        }
+
+        public GameplayContracts.PlayerHand GetPlayerHand(int matchId, int playerId)
+        {
+            lock (_syncRoot)
+            {
+                Match match = GetActiveMatch(matchId).Match;
+                return MatchContractMapper.CreatePlayerHand(match, playerId);
+            }
+        }
+
+        public MatchUpdate PlayTile(
+            int matchId,
+            int playerId,
+            Move move)
+        {
+            lock (_syncRoot)
+            {
+                ActiveMatch activeMatch = GetActiveMatch(matchId);
+                Match match = activeMatch.Match;
+                match.GetPlayer(playerId);
+                RoundSummary previousRound = match.LastRound;
+                long previousVersion = match.Version;
+
+                match.Play(
+                    playerId,
+                    move.TileId,
+                    move.End,
+                    move.ExpectedVersion);
+                return CreateUpdate(
+                    activeMatch,
+                    previousRound,
+                    previousVersion);
+            }
+        }
+
+        public MatchUpdate DrawTiles(int matchId, int playerId, long expectedVersion)
+        {
+            lock (_syncRoot)
+            {
+                ActiveMatch activeMatch = GetActiveMatch(matchId);
+                Match match = activeMatch.Match;
+                match.GetPlayer(playerId);
+                RoundSummary previousRound = match.LastRound;
+                long previousVersion = match.Version;
+
+                match.Draw(playerId, expectedVersion);
+                return CreateUpdate(
+                    activeMatch,
+                    previousRound,
+                    previousVersion);
+            }
+        }
+
+        public MatchUpdate PassTurn(int matchId, int playerId, long expectedVersion)
+        {
+            lock (_syncRoot)
+            {
+                ActiveMatch activeMatch = GetActiveMatch(matchId);
+                Match match = activeMatch.Match;
+                match.GetPlayer(playerId);
+                RoundSummary previousRound = match.LastRound;
+                long previousVersion = match.Version;
+
+                match.Pass(playerId, expectedVersion);
+                return CreateUpdate(
+                    activeMatch,
+                    previousRound,
+                    previousVersion);
+            }
+        }
+
+        public MatchUpdate LeaveMatch(int matchId, int playerId)
+        {
+            lock (_syncRoot)
+            {
+                ActiveMatch activeMatch = GetActiveMatch(matchId);
+                Match match = activeMatch.Match;
+                match.GetPlayer(playerId);
+                RoundSummary previousRound = match.LastRound;
+                long previousVersion = match.Version;
+
+                match.Cancel(playerId);
+                return CreateUpdate(
+                    activeMatch,
+                    previousRound,
+                    previousVersion);
+            }
+        }
+
+        private static MatchUpdate CreateUpdate(
+            ActiveMatch activeMatch,
+            RoundSummary previousRound,
+            long previousVersion)
+        {
+            Match match = activeMatch.Match;
+            if (match.Phase != MatchState.InProgress
+                && !activeMatch.FinishedAt.HasValue)
+            {
+                activeMatch.FinishedAt = DateTime.UtcNow;
+            }
+
+            GameplayContracts.MatchView view = MatchContractMapper.CreateMatchView(match);
+            bool hasStateChange = previousVersion != match.Version;
+            MatchUpdate update = new MatchUpdate
+            {
+                View = view,
+                HasStateChange = hasStateChange,
+                PendingUpdates = activeMatch.PendingUpdates
+            };
+
+            if (!hasStateChange)
+            {
+                return update;
+            }
+
+            update.Hands = new List<GameplayContracts.PlayerHand>();
+            foreach (MatchPlayer player in match.Players)
+            {
+                GameplayContracts.PlayerHand hand = MatchContractMapper.CreatePlayerHand(
+                    match,
+                    player.PlayerId);
+                update.Hands.Add(hand);
+            }
+
+            if (!ReferenceEquals(previousRound, match.LastRound))
+            {
+                update.Round = view.LastRound;
+            }
+
+            if (match.Phase != MatchState.InProgress)
+            {
+                update.Result = MatchContractMapper.CreateMatchResult(match);
+            }
+
+            activeMatch.PendingUpdates.Enqueue(update);
+            return update;
+        }
+
+        private ActiveMatch GetActiveMatch(int matchId)
         {
             ActiveMatch active;
             if (!_matches.TryGetValue(matchId, out active))
@@ -17,45 +210,20 @@ namespace DominoAllFives.BusinessLogic.Managers
                 throw new MatchRuleException(MatchIssue.MatchNotFound);
             }
 
-            lock (active.SyncRoot)
+            if (HasExpired(active))
             {
-                if (HasExpired(active))
-                {
-                    RemoveMatch(matchId);
-                    throw new MatchRuleException(MatchIssue.MatchNotFound);
-                }
+                _matches.Remove(matchId);
+                throw new MatchRuleException(MatchIssue.MatchNotFound);
             }
 
             return active;
         }
 
-        public ActiveMatch CreateMatch(int matchId, IEnumerable<int> players, int targetPoints)
-        {
-            foreach (KeyValuePair<int, ActiveMatch> entry in _matches)
-            {
-                lock (entry.Value.SyncRoot)
-                {
-                    if (HasExpired(entry.Value))
-                    {
-                        RemoveMatch(entry.Key);
-                    }
-                }
-            }
-
-            return _matches.GetOrAdd(matchId, id => new ActiveMatch(new Match(id, players,
-                targetPoints, Deck.Create)));
-        }
-
-        public void RemoveMatch(int matchId)
-        {
-            ActiveMatch removed;
-            _matches.TryRemove(matchId, out removed);
-        }
-
         private static bool HasExpired(ActiveMatch active)
         {
             return active.FinishedAt.HasValue
-                && DateTime.UtcNow - active.FinishedAt.Value > TimeSpan.FromMinutes(30);
+                && DateTime.UtcNow - active.FinishedAt.Value
+                    > TimeSpan.FromMinutes(MatchRetentionMinutes);
         }
     }
 }

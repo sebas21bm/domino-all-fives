@@ -22,12 +22,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public ProfileViewModel()
         {
             GoBackCommand = new RelayCommand(() => _navigationService.GoBack());
-            GoToEditProfileCommand = new RelayCommand(() =>
-            {
-            }, () => false);
-            GoToMatchHistoryCommand = new RelayCommand(() =>
-            {
-            }, () => false);
+            GoToEditProfileCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
+            GoToMatchHistoryCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
         }
 
         public void Initialize(IFrameNavigationService navigationService)
@@ -44,6 +40,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             _navigationService = navigationService;
+        }
+        private static void IgnoreUnavailableCommand()
+        {
         }
     }
 }

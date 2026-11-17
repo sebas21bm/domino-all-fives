@@ -12,7 +12,13 @@ namespace DominoAllFives.Contracts.Domain
         private readonly byte[] _imageData;
         [DataMember(Order = 1, IsRequired = true)]
         public string OriginalFileName { get; private set; }
-        public byte[] ImageData => _imageData == null ? null : (byte[])_imageData.Clone();
+        public byte[] ImageData
+        {
+            get
+            {
+                return _imageData == null ? null : (byte[])_imageData.Clone();
+            }
+        }
 
         private ProfilePicture(string originalFileName, byte[] imageData)
         {
@@ -33,7 +39,9 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Captures selection metadata while leaving ordered upload validation to the operation.
         /// </summary>
-        /// <param name = "originalFileName">The selected name, never a trusted storage path.</param>
+        /// <param name = "originalFileName">
+        /// The selected name, never a trusted storage path.
+        /// </param>
         /// <param name = "imageData">The selected content to copy.</param>
         /// <returns>An independent selection snapshot.</returns>
         public static ProfilePicture FromSelectedContent(string originalFileName, byte[] imageData)

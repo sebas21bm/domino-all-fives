@@ -6,16 +6,16 @@ namespace DominoAllFives.Contracts.Gameplay
     [DataContract]
     public sealed class DominoTile
     {
-        [DataMember(Order = 1)]
+        [DataMember]
         public int TileId { get; set; }
 
-        [DataMember(Order = 2)]
+        [DataMember]
         public int FirstValue { get; set; }
 
-        [DataMember(Order = 3)]
+        [DataMember]
         public int SecondValue { get; set; }
 
-        [DataMember(Order = 4)]
+        [DataMember]
         public SpecialPower SpecialPower { get; set; }
     }
 }

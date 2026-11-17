@@ -30,15 +30,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public FriendsViewModel()
         {
-            ShowFriendsListCommand = new RelayCommand(() =>
-            {
-            }, () => false);
-            ShowAddFriendsCommand = new RelayCommand(() =>
-            {
-            }, () => false);
-            ShowFriendRequestsCommand = new RelayCommand(() =>
-            {
-            }, () => false);
+            ShowFriendsListCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
+            ShowAddFriendsCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
+            ShowFriendRequestsCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
             GoBackCommand = new RelayCommand(() => _navigationService.GoBack());
         }
 
@@ -56,6 +50,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             _navigationService = navigationService;
+        }
+        private static void IgnoreUnavailableCommand()
+        {
         }
     }
 }

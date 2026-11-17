@@ -32,25 +32,19 @@ namespace DominoAllFives.Client.WPF.Services
             ProfilePictureImageService profilePictureImageService)
         {
             _navigationService = navigationService ?? throw new ArgumentNullException(
-                nameof(
-                navigationService));
+                nameof(navigationService));
             _dialogService = dialogService ?? throw new ArgumentNullException(
-                nameof(
-                dialogService));
+                nameof(dialogService));
             _loginClient = loginClient ?? throw new ArgumentNullException(nameof(loginClient));
             _rankingClient = rankingClient ?? throw new ArgumentNullException(
-                nameof(
-                rankingClient));
+                nameof(rankingClient));
             _playerSession = playerSession ?? throw new ArgumentNullException(
-                nameof(
-                playerSession));
+                nameof(playerSession));
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(
-                nameof(
-                loggerFactory));
+                nameof(loggerFactory));
             _profilePictureImageService = profilePictureImageService
                 ?? throw new ArgumentNullException(
-                nameof(
-                profilePictureImageService));
+                nameof(profilePictureImageService));
             _lobbyService = new LobbyClient(_playerSession);
         }
 
@@ -65,7 +59,7 @@ namespace DominoAllFives.Client.WPF.Services
             Action onGoToRegister,
             Action onGoToRecover)
         {
-            var viewModel =
+            LoginViewModel viewModel =
                 new LoginViewModel(
                 _playerSession,
                 onLoginSuccess,
@@ -75,7 +69,7 @@ namespace DominoAllFives.Client.WPF.Services
             viewModel.Initialize(
                 _dialogService,
                 _loginClient,
-                _loggerFactory.CreateLogger<LoginViewModel>());
+                LoggerFactoryProvider.CreateLogger<LoginViewModel>());
             return viewModel;
         }
 
@@ -96,17 +90,17 @@ namespace DominoAllFives.Client.WPF.Services
             switch (typeof(TViewModel).Name)
             {
                 case nameof(HomePageViewModel):
-                    var homePage = new HomePageViewModel(_playerSession);
+                    HomePageViewModel homePage = new HomePageViewModel(_playerSession);
                     homePage.Initialize(_navigationService, this);
                     viewModel = homePage;
                     break;
                 case nameof(MainMenuViewModel):
-                    var mainMenu = new MainMenuViewModel(_playerSession);
+                    MainMenuViewModel mainMenu = new MainMenuViewModel(_playerSession);
                     mainMenu.Initialize(_navigationService);
                     viewModel = mainMenu;
                     break;
                 case nameof(RankingsViewModel):
-                    var rankings = new RankingsViewModel(_playerSession);
+                    RankingsViewModel rankings = new RankingsViewModel(_playerSession);
                     rankings.Initialize(
                         _navigationService,
                         _rankingClient,
@@ -115,26 +109,26 @@ namespace DominoAllFives.Client.WPF.Services
                     viewModel = rankings;
                     break;
                 case nameof(CreateGameViewModel):
-                    var createGame = new CreateGameViewModel(_playerSession);
+                    CreateGameViewModel createGame = new CreateGameViewModel(_playerSession);
                     createGame.Initialize(
                         _navigationService,
                         _lobbyService,
                         _dialogService,
-                        _loggerFactory.CreateLogger<CreateGameViewModel>());
+                        LoggerFactoryProvider.CreateLogger<CreateGameViewModel>());
                     viewModel = createGame;
                     break;
                 case nameof(JoinGameViewModel):
-                    var joinGame = new JoinGameViewModel(_playerSession);
+                    JoinGameViewModel joinGame = new JoinGameViewModel(_playerSession);
                     joinGame.Initialize(
                         _navigationService,
                         _lobbyService,
                         _dialogService,
-                        _loggerFactory.CreateLogger<JoinGameViewModel>());
+                        LoggerFactoryProvider.CreateLogger<JoinGameViewModel>());
                     viewModel = joinGame;
                     break;
                 case nameof(LobbyViewModel):
-                    var lobby = new LobbyViewModel(_playerSession);
-                    lobby.ConfigureLogger(_loggerFactory.CreateLogger<LobbyViewModel>());
+                    LobbyViewModel lobby = new LobbyViewModel(_playerSession);
+                    lobby.ConfigureLogger(LoggerFactoryProvider.CreateLogger<LobbyViewModel>());
                     lobby.Initialize(
                         _navigationService,
                         _lobbyService,
@@ -157,32 +151,32 @@ namespace DominoAllFives.Client.WPF.Services
             switch (typeof(TViewModel).Name)
             {
                 case nameof(EditProfileViewModel):
-                    var editProfile = new EditProfileViewModel();
+                    EditProfileViewModel editProfile = new EditProfileViewModel();
                     editProfile.Initialize(_navigationService);
                     viewModel = editProfile;
                     break;
                 case nameof(FriendsViewModel):
-                    var friends = new FriendsViewModel();
+                    FriendsViewModel friends = new FriendsViewModel();
                     friends.Initialize(_navigationService);
                     viewModel = friends;
                     break;
                 case nameof(GameSettingsViewModel):
-                    var gameSettings = new GameSettingsViewModel();
+                    GameSettingsViewModel gameSettings = new GameSettingsViewModel();
                     gameSettings.Initialize(_navigationService);
                     viewModel = gameSettings;
                     break;
                 case nameof(HowToPlayViewModel):
-                    var howToPlay = new HowToPlayViewModel();
+                    HowToPlayViewModel howToPlay = new HowToPlayViewModel();
                     howToPlay.Initialize(_navigationService);
                     viewModel = howToPlay;
                     break;
                 case nameof(MatchHistoryViewModel):
-                    var matchHistory = new MatchHistoryViewModel();
+                    MatchHistoryViewModel matchHistory = new MatchHistoryViewModel();
                     matchHistory.Initialize(_navigationService);
                     viewModel = matchHistory;
                     break;
                 case nameof(ProfileViewModel):
-                    var profile = new ProfileViewModel();
+                    ProfileViewModel profile = new ProfileViewModel();
                     profile.Initialize(_navigationService);
                     viewModel = profile;
                     break;

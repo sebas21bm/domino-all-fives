@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
@@ -7,6 +7,7 @@ using System.ServiceModel;
 using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Exceptions;
 using DominoAllFives.BusinessLogic.Managers;
+using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Contracts.Services;
@@ -29,6 +30,8 @@ namespace DominoAllFives.Server
         private static readonly ChatCallbackRegistry callbacks;
         private static readonly ChatEventPublisher publisher;
         private static readonly ILogger<ChatService> logger;
+        private static readonly ProfilePictureStorage pictureStorage =
+            new ProfilePictureStorage(LoggerFactoryProvider.CreateLogger<ProfilePictureStorage>());
         private Player _player;
         private IChatCallback _callback;
         private ICommunicationObject _callbackChannel;
@@ -38,8 +41,10 @@ namespace DominoAllFives.Server
             callbacks = new ChatCallbackRegistry();
             publisher = new ChatEventPublisher(
                 callbacks,
-                new ConsoleLogger<ChatEventPublisher>());
-            logger = new ConsoleLogger<ChatService>();
+                LoggerFactoryProvider.CreateLogger<ChatEventPublisher>());
+
+            logger =
+                LoggerFactoryProvider.CreateLogger<ChatService>();
         }
 
         /// <summary>
@@ -56,21 +61,21 @@ namespace DominoAllFives.Server
         {
             if (_player != null)
             {
-                throw AccessFault(AccessIssue.PermissionDenied);
+                throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
             }
 
             if (string.IsNullOrWhiteSpace(sessionKey))
             {
-                throw AccessFault(AccessIssue.SessionRequired);
+                throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
             }
 
             try
             {
-                _player = SessionManager.GetPlayer(sessionKey);
+                _player = SessionManager.GetPlayer(sessionKey, pictureStorage);
             }
             catch (KeyNotFoundException)
             {
-                throw AccessFault(AccessIssue.SessionRequired);
+                throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
             }
             catch (SqlException ex)
             {
@@ -93,7 +98,7 @@ namespace DominoAllFives.Server
             if (!callbackRegistered)
             {
                 _player = null;
-                throw AccessFault(AccessIssue.PermissionDenied);
+                throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
             }
 
             _callback = callback;
@@ -114,8 +119,12 @@ namespace DominoAllFives.Server
         /// <summary>
         /// Registers and broadcasts a chat message to the authorized participants of its context.
         /// </summary>
-        /// <param name = "message">The message containing the target context and text content.</param>
-        /// <returns>The registered message with server-assigned identifier, sender, and timestamp.</returns>
+        /// <param name = "message">
+        /// The message containing the target context and text content.
+        /// </param>
+        /// <returns>
+        /// The registered message with server-assigned identifier, sender, and timestamp.
+        /// </returns>
         /// <exception cref="FaultException{AccessIssue}">
         /// The connection has no authenticated session or the player is a guest account.
         /// </exception>
@@ -128,12 +137,12 @@ namespace DominoAllFives.Server
             //Player player = GetPlayer();
             if (player.IsGuest)
             {
-                throw AccessFault(AccessIssue.RegisteredAccountRequired);
+                throw new FaultException<AccessIssue>(AccessIssue.RegisteredAccountRequired);
             }
 
             if (message == null || message.Context == null)
             {
-                throw ChatFault(ChatIssue.EmptyMessage);
+                throw new FaultException<ChatIssue>(ChatIssue.EmptyMessage);
             }
 
             try
@@ -145,21 +154,11 @@ namespace DominoAllFives.Server
             }
             catch (ChatRuleException ex)
             {
-                throw ChatFault(ex.Issue);
+                throw new FaultException<ChatIssue>(ex.Issue);
             }
         }
         */
 
-
-        private static FaultException<ChatIssue> ChatFault(ChatIssue issue)
-        {
-            return new FaultException<ChatIssue>(issue);
-        }
-
-        private static FaultException<AccessIssue> AccessFault(AccessIssue issue)
-        {
-            return new FaultException<AccessIssue>(issue);
-        }
 
         private void OnCallbackEnded(object sender, EventArgs eventArgs)
         {

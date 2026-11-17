@@ -31,28 +31,14 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public GameSettingsViewModel()
         {
-            ShowAccountSectionCommand = new RelayCommand(() =>
-            {
-            }, () => false);
-            ShowLanguageSectionCommand = new RelayCommand(() =>
-            {
-            }, () => false);
-            SelectLanguageCommand = new RelayCommand(() =>
-            {
-            }, () => false);
-            SaveLanguageCommand = new RelayCommand(() =>
-            {
-            }, () => false);
+            ShowAccountSectionCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
+            ShowLanguageSectionCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
+            SelectLanguageCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
+            SaveLanguageCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
             GoBackCommand = new RelayCommand(() => _navigationService.GoBack());
-            LogoutCommand = new RelayCommand(() =>
-            {
-            }, () => false);
-            GoToChangePassword = new RelayCommand(() =>
-            {
-            }, () => false);
-            GoToDeleteAccount = new RelayCommand(() =>
-            {
-            }, () => false);
+            LogoutCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
+            GoToChangePassword = new RelayCommand(IgnoreUnavailableCommand, () => false);
+            GoToDeleteAccount = new RelayCommand(IgnoreUnavailableCommand, () => false);
         }
 
         public void Initialize(IFrameNavigationService navigationService)
@@ -69,6 +55,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             _navigationService = navigationService;
+        }
+        private static void IgnoreUnavailableCommand()
+        {
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DominoAllFives.DataAccess.Interfaces;
@@ -21,7 +22,7 @@ namespace DominoAllFives.DataAccess.Repositories
         /// </param>
         public PlayerStatsRepository(DominoAllFivesEntities databaseContext)
         {
-            _context = databaseContext;
+            _context = databaseContext ?? throw new ArgumentNullException(nameof(databaseContext));
         }
 
         /// <inheritdoc/>
@@ -36,12 +37,9 @@ namespace DominoAllFives.DataAccess.Repositories
             return _context.PlayerStats.Where(
                 stats => !stats.Player.IsGuest
                 && stats.GamesWon > 0)
-                .OrderByDescending(
-                stats => stats.GamesWon)
-                .ThenByDescending(
-                stats => stats.LastVictoryDate)
-                .Take(
-                limit)
+                .OrderByDescending(stats => stats.GamesWon)
+                .ThenByDescending(stats => stats.LastVictoryDate)
+                .Take(limit)
                 .ToList();
         }
 

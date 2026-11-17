@@ -18,6 +18,7 @@ namespace DominoAllFives.Client.Tests
     [NonParallelizable]
     public class LoginViewModelTests
     {
+        private const int CompletionTimeoutMilliseconds = 5000;
         private CultureInfo _culture;
         private CultureInfo _uiCulture;
         private CultureInfo _defaultCulture;
@@ -32,6 +33,7 @@ namespace DominoAllFives.Client.Tests
         [SetUp]
         public void SetUp()
         {
+            WpfTestHost.EnsureStarted();
             _culture = Thread.CurrentThread.CurrentCulture;
             _uiCulture = Thread.CurrentThread.CurrentUICulture;
             _defaultCulture = CultureInfo.DefaultThreadCurrentCulture;
@@ -62,10 +64,10 @@ namespace DominoAllFives.Client.Tests
             // Arrange
             _client.Error = new FaultException<AccountIssue>(issue);
             // Act
-            CreateViewModel().LoginCommand.Execute(null);
+            ExecuteLogin(CreateViewModel());
             // Assert
             AssertFailure(messageKey, DialogType.Warning);
-            AssertLog(LogLevel.Warning);
+            AssertLog(LogLevel.Debug);
             Assert.That(_logger.Messages[0], Does.Contain(issue.ToString()));
         }
 
@@ -81,7 +83,7 @@ namespace DominoAllFives.Client.Tests
                 SessionKey = "valid-session-key"
             };
             // Act
-            CreateViewModel().LoginCommand.Execute(null);
+            ExecuteLogin(CreateViewModel());
             // Assert
             Assert.That(_session.PlayerId, Is.EqualTo(42));
             Assert.That(_session.Username, Is.EqualTo("player"));
@@ -101,7 +103,7 @@ namespace DominoAllFives.Client.Tests
             // Arrange
             _client.Error = new FaultException("Internal details must not be displayed");
             // Act
-            CreateViewModel().LoginCommand.Execute(null);
+            ExecuteLogin(CreateViewModel());
             // Assert
             AssertFailure("Global_msgDefaultError", DialogType.Error);
             AssertLog(LogLevel.Error);
@@ -113,7 +115,7 @@ namespace DominoAllFives.Client.Tests
             // Arrange
             _client.Error = new TimeoutException();
             // Act
-            CreateViewModel().LoginCommand.Execute(null);
+            ExecuteLogin(CreateViewModel());
             // Assert
             AssertFailure("MessageAuthentication_msgConnectionError", DialogType.Error);
             AssertLog(LogLevel.Error);
@@ -125,7 +127,7 @@ namespace DominoAllFives.Client.Tests
             // Arrange
             _client.Error = new EndpointNotFoundException();
             // Act
-            CreateViewModel().LoginCommand.Execute(null);
+            ExecuteLogin(CreateViewModel());
             // Assert
             AssertFailure("MessageAuthentication_msgConnectionError", DialogType.Error);
             AssertLog(LogLevel.Error);
@@ -137,7 +139,7 @@ namespace DominoAllFives.Client.Tests
             // Arrange
             _client.Error = new FaultException<AccountIssue>((AccountIssue)999);
             // Act
-            CreateViewModel().LoginCommand.Execute(null);
+            ExecuteLogin(CreateViewModel());
             // Assert
             AssertFailure("Global_msgDefaultError", DialogType.Error);
         }
@@ -152,7 +154,7 @@ namespace DominoAllFives.Client.Tests
             viewModel.Email = email;
             viewModel.Password = password;
             // Act
-            viewModel.LoginCommand.Execute(null);
+            ExecuteLogin(viewModel);
             // Assert
             Assert.That(viewModel.IsEmailRequiredVisible, Is.True);
             Assert.That(viewModel.IsPasswordRequiredVisible, Is.True);
@@ -174,7 +176,7 @@ namespace DominoAllFives.Client.Tests
                 Username = username
             };
             // Act
-            CreateViewModel().LoginCommand.Execute(null);
+            ExecuteLogin(CreateViewModel());
             // Assert
             AssertFailure("Global_msgDefaultError", DialogType.Error);
         }
@@ -184,7 +186,7 @@ namespace DominoAllFives.Client.Tests
         {
             // Arrange
             // Act
-            CreateViewModel().LoginCommand.Execute(null);
+            ExecuteLogin(CreateViewModel());
             // Assert
             AssertFailure("Global_msgDefaultError", DialogType.Error);
         }
@@ -193,13 +195,8 @@ namespace DominoAllFives.Client.Tests
         public void Login_BeforeInitialization_DoesNotCallService()
         {
             // Arrange
-            var viewModel = new LoginViewModel(_session, () => _navigations++, () =>
-            {
-            }, () =>
-            {
-            }, () =>
-            {
-            });
+            LoginViewModel viewModel = new LoginViewModel(_session, () => _navigations++,
+                NoOperation, NoOperation, NoOperation);
             // Act
             Assert.Throws<InvalidOperationException>(() => viewModel.LoginCommand.Execute(null));
             // Assert
@@ -212,12 +209,8 @@ namespace DominoAllFives.Client.Tests
             // Arrange
             LoginViewModel viewModel = CreateViewModel();
             // Act
-            Assert.Throws<InvalidOperationException>(
-                () => viewModel.Initialize(
-                _dialogs,
-                _client,
-                _logger,
-                _languages));
+            Assert.Throws<InvalidOperationException>(() => viewModel.Initialize(_dialogs,
+                _client, _logger, _languages));
             // Assert
             Assert.That(_client.CallCount, Is.Zero);
         }
@@ -229,15 +222,20 @@ namespace DominoAllFives.Client.Tests
             Assert.That(_logger.Messages[0], Does.Not.Contain("password"));
         }
 
+        private void ExecuteLogin(LoginViewModel viewModel)
+        {
+            WpfTestHost.Invoke(() => viewModel.LoginCommand.Execute(null));
+            bool completed = SpinWait.SpinUntil(
+                () => WpfTestHost.Invoke(() => _navigations > 0 || _dialogs.Requests.Count > 0
+                    || viewModel.IsEmailRequiredVisible || viewModel.IsPasswordRequiredVisible),
+                CompletionTimeoutMilliseconds);
+            Assert.That(completed, Is.True, "The login continuation did not complete.");
+        }
+
         private LoginViewModel CreateViewModel()
         {
-            var viewModel = new LoginViewModel(_session, () => _navigations++, () =>
-            {
-            }, () =>
-            {
-            }, () =>
-            {
-            })
+            LoginViewModel viewModel = new LoginViewModel(_session, () => _navigations++,
+                NoOperation, NoOperation, NoOperation)
             {
                 Email = " player ",
                 Password = "password"
@@ -282,7 +280,14 @@ namespace DominoAllFives.Client.Tests
         {
             public List<DialogRequest> Requests { get; } = new List<DialogRequest>();
 
-            public void ShowDialog(DialogRequest request) => Requests.Add(request);
+            public void ShowDialog(DialogRequest request)
+            {
+                Requests.Add(request);
+            }
+        }
+
+        private static void NoOperation()
+        {
         }
     }
 }

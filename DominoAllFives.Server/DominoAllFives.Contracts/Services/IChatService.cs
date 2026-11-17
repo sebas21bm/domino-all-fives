@@ -1,4 +1,4 @@
-﻿using System.ServiceModel;
+using System.ServiceModel;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 

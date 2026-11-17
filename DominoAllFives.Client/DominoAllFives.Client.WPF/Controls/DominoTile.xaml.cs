@@ -18,8 +18,7 @@ namespace DominoAllFives.Client.WPF.Controls
         private const int PipsPerHalf = 7;
         public static readonly DependencyProperty TopValueProperty =
             DependencyProperty.Register(
-            nameof(
-            TopValue),
+            nameof(TopValue),
             typeof(int),
             typeof(DominoTile),
             new PropertyMetadata(
@@ -30,8 +29,7 @@ namespace DominoAllFives.Client.WPF.Controls
         /// </summary>
         public static readonly DependencyProperty BottomValueProperty =
             DependencyProperty.Register(
-            nameof(
-            BottomValue),
+            nameof(BottomValue),
             typeof(int),
             typeof(DominoTile),
             new PropertyMetadata(
@@ -42,8 +40,7 @@ namespace DominoAllFives.Client.WPF.Controls
         /// </summary>
         public static readonly DependencyProperty TileTypeProperty =
             DependencyProperty.Register(
-            nameof(
-            TileType),
+            nameof(TileType),
             typeof(DominoTileType),
             typeof(DominoTile),
             new PropertyMetadata(
@@ -54,8 +51,7 @@ namespace DominoAllFives.Client.WPF.Controls
         /// </summary>
         public static readonly DependencyProperty PipBrushProperty =
             DependencyProperty.Register(
-            nameof(
-            PipBrush),
+            nameof(PipBrush),
             typeof(Brush),
             typeof(DominoTile),
             new PropertyMetadata(
@@ -63,39 +59,59 @@ namespace DominoAllFives.Client.WPF.Controls
         /// <summary>
         /// Gets or sets the top numeric value of the domino tile.
         /// </summary>
-        public int TopValue { get =>
-            (int)GetValue(
-            TopValueProperty); set =>
-            SetValue(
-            TopValueProperty,
-            value); }
+        public int TopValue
+        {
+            get
+            {
+                return (int)GetValue(TopValueProperty);
+            }
+            set
+            {
+                SetValue(TopValueProperty, value);
+            }
+        }
         /// <summary>
         /// Gets or sets the bottom numeric value of the domino tile.
         /// </summary>
-        public int BottomValue { get =>
-            (int)GetValue(
-            BottomValueProperty); set =>
-            SetValue(
-            BottomValueProperty,
-            value); }
+        public int BottomValue
+        {
+            get
+            {
+                return (int)GetValue(BottomValueProperty);
+            }
+            set
+            {
+                SetValue(BottomValueProperty, value);
+            }
+        }
         /// <summary>
         /// Gets or sets the type of the domino tile.
         /// </summary>
-        public DominoTileType TileType { get =>
-            (DominoTileType)GetValue(
-            TileTypeProperty); set =>
-            SetValue(
-            TileTypeProperty,
-            value); }
+        public DominoTileType TileType
+        {
+            get
+            {
+                return (DominoTileType)GetValue(TileTypeProperty);
+            }
+            set
+            {
+                SetValue(TileTypeProperty, value);
+            }
+        }
         /// <summary>
         /// Gets or sets the brush used to paint the pips of the domino tile.
         /// </summary>
-        public Brush PipBrush { get =>
-            (Brush)GetValue(
-            PipBrushProperty); set =>
-            SetValue(
-            PipBrushProperty,
-            value); }
+        public Brush PipBrush
+        {
+            get
+            {
+                return (Brush)GetValue(PipBrushProperty);
+            }
+            set
+            {
+                SetValue(PipBrushProperty, value);
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref = "DominoTile"/> class.
@@ -168,11 +184,11 @@ namespace DominoAllFives.Client.WPF.Controls
                 return;
             }
 
-            for (int index = 0; index < pips.Length; index++)
+            foreach (Ellipse pip in pips)
             {
-                if (pips[index] != null)
+                if (pip != null)
                 {
-                    pips[index].Visibility = Visibility.Collapsed;
+                    pip.Visibility = Visibility.Collapsed;
                 }
             }
 

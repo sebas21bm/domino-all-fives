@@ -16,20 +16,35 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private ViewModelBase _currentModal;
         private bool _isModalVisible;
         private string _selectedLanguage;
-        public ViewModelBase CurrentModal { get =>
-            _currentModal; private set =>
-            SetProperty(
-            ref _currentModal,
-            value); }
-        public bool IsModalVisible { get =>
-            _isModalVisible; private set =>
-            SetProperty(
-            ref _isModalVisible,
-            value); }
+        public ViewModelBase CurrentModal
+        {
+            get
+            {
+                return _currentModal;
+            }
+            private set
+            {
+                SetProperty(ref _currentModal, value);
+            }
+        }
+        public bool IsModalVisible
+        {
+            get
+            {
+                return _isModalVisible;
+            }
+            private set
+            {
+                SetProperty(ref _isModalVisible, value);
+            }
+        }
 
         public string SelectedLanguage
         {
-            get => _selectedLanguage;
+            get
+            {
+                return _selectedLanguage;
+            }
             set
             {
                 if (SetProperty(ref _selectedLanguage, value) && !string.IsNullOrEmpty(value))
@@ -66,9 +81,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             };
             _selectedLanguage = LanguageManager.Instance.CurrentLanguageCode;
             ShowLoginCommand = new RelayCommand(OpenLoginModal);
-            PlayAsGuestCommand = new RelayCommand(() =>
-            {
-            }, () => false);
+            PlayAsGuestCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
             ExitGameCommand = new RelayCommand(ExitGame);
         }
 
@@ -138,6 +151,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void ExitGame()
         {
             Application.Current.Shutdown();
+        }
+
+        private static void IgnoreUnavailableCommand()
+        {
         }
     }
 }

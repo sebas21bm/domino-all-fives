@@ -5,6 +5,7 @@ using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
+using DominoAllFives.Client.WPF.Services.Threading;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFivesService;
@@ -27,18 +28,51 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private string _password;
         private bool _isEmailRequiredVisible;
         private bool _isPasswordRequiredVisible;
-        public string Email { get => _email; set => SetProperty(ref _email, value); }
-        public string Password { get => _password; set => SetProperty(ref _password, value); }
-        public bool IsEmailRequiredVisible { get =>
-            _isEmailRequiredVisible; set =>
-            SetProperty(
-            ref _isEmailRequiredVisible,
-            value); }
-        public bool IsPasswordRequiredVisible { get =>
-            _isPasswordRequiredVisible; set =>
-            SetProperty(
-            ref _isPasswordRequiredVisible,
-            value); }
+        private bool _isBusy;
+        public string Email
+        {
+            get
+            {
+                return _email;
+            }
+            set
+            {
+                SetProperty(ref _email, value);
+            }
+        }
+        public string Password
+        {
+            get
+            {
+                return _password;
+            }
+            set
+            {
+                SetProperty(ref _password, value);
+            }
+        }
+        public bool IsEmailRequiredVisible
+        {
+            get
+            {
+                return _isEmailRequiredVisible;
+            }
+            set
+            {
+                SetProperty(ref _isEmailRequiredVisible, value);
+            }
+        }
+        public bool IsPasswordRequiredVisible
+        {
+            get
+            {
+                return _isPasswordRequiredVisible;
+            }
+            set
+            {
+                SetProperty(ref _isPasswordRequiredVisible, value);
+            }
+        }
         public RelayCommand LoginCommand { get; }
         public RelayCommand CancelCommand { get; }
         public RelayCommand GoToRegisterCommand { get; }
@@ -52,24 +86,20 @@ namespace DominoAllFives.Client.WPF.ViewModels
             Action onGoToRecover)
         {
             _playerSession = playerSession ?? throw new ArgumentNullException(
-                nameof(
-                playerSession));
+                nameof(playerSession));
             _onLoginSuccess = onLoginSuccess ?? throw new ArgumentNullException(
-                nameof(
-                onLoginSuccess));
+                nameof(onLoginSuccess));
             _onCancel = onCancel ?? throw new ArgumentNullException(nameof(onCancel));
             _onGoToRegister = onGoToRegister ?? throw new ArgumentNullException(
-                nameof(
-                onGoToRegister));
+                nameof(onGoToRegister));
             _onGoToRecover = onGoToRecover ?? throw new ArgumentNullException(
-                nameof(
-                onGoToRecover));
+                nameof(onGoToRecover));
             _email = string.Empty;
             _password = string.Empty;
             _isEmailRequiredVisible = false;
             _isPasswordRequiredVisible = false;
-            LoginCommand = new RelayCommand(ExecuteLogin);
-            CancelCommand = new RelayCommand(_onCancel);
+            LoginCommand = new RelayCommand(ExecuteLogin, CanExecuteLogin);
+            CancelCommand = new RelayCommand(CancelLogin, CanCancelLogin);
             GoToRegisterCommand = new RelayCommand(_onGoToRegister, () => false);
             GoToRecoverCommand = new RelayCommand(_onGoToRecover, () => false);
         }
@@ -78,8 +108,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             IDialogService dialogService,
             ILoginClient loginClient,
             ILogger<LoginViewModel> logger,
-            LanguageManager languageManager =
-            null)
+            LanguageManager languageManager = null)
         {
             if (_loginClient != null)
             {
@@ -87,8 +116,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             _dialogService = dialogService ?? throw new ArgumentNullException(
-                nameof(
-                dialogService));
+                nameof(dialogService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _languageManager = languageManager ?? LanguageManager.Instance;
             _loginClient = loginClient ?? throw new ArgumentNullException(nameof(loginClient));
@@ -96,6 +124,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ExecuteLogin(object parameter)
         {
+            if (_isBusy)
+            {
+                return;
+            }
+
             if (_loginClient == null)
             {
                 throw new InvalidOperationException(
@@ -112,48 +145,28 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            _logger.LogInformation("Attempting login for user: {EmailOrUsername}", Email.Trim());
-            PlayerAccount authenticatedAccount;
-            try
+            Credentials credentials = new Credentials
             {
-                Credentials credentials = new Credentials
-                {
-                    EmailOrUsername = Email.Trim(),
-                    Password = Password
-                };
-                authenticatedAccount = _loginClient.LoginWithAccount(credentials);
-            }
-            catch (FaultException<AccountIssue> ex)
-            {
-                _logger.LogWarning(ex, "Login rejected. Account issue: {AccountIssue}.", ex.Detail);
-                ShowMessageFailure(ex.Detail);
-                return;
-            }
-            catch (FaultException ex)
-            {
-                _logger.LogError(ex, "Authentication service could not complete login.");
-                ShowMessageFailure();
-                return;
-            }
-            catch (TimeoutException ex)
-            {
-                _logger.LogError(ex, "Authentication service timed out.");
-                ShowMessageFailure(connectionFailure: true);
-                return;
-            }
-            catch (CommunicationException ex)
-            {
-                _logger.LogError(ex, "Authentication service unavailable.");
-                ShowMessageFailure(connectionFailure: true);
-                return;
-            }
+                EmailOrUsername = Email.Trim(),
+                Password = Password
+            };
+            BackgroundJob<Credentials, PlayerAccount> job =
+                new BackgroundJob<Credentials, PlayerAccount>(
+                    _loginClient.LoginWithAccount,
+                    credentials,
+                    CompleteLogin,
+                    HandleLoginFailure);
+            SetBusy(true);
+            BackgroundWork.Start(job);
+        }
 
+        private void CompleteLogin(PlayerAccount authenticatedAccount, Credentials credentials)
+        {
+            SetBusy(false);
             if (authenticatedAccount == null
                 || authenticatedAccount.PlayerId <= 0
-                || string.IsNullOrWhiteSpace(
-                authenticatedAccount.Username)
-                || string.IsNullOrWhiteSpace(
-                authenticatedAccount.SessionKey))
+                || string.IsNullOrWhiteSpace(authenticatedAccount.Username)
+                || string.IsNullOrWhiteSpace(authenticatedAccount.SessionKey))
             {
                 _logger.LogError("Authentication service returned an invalid account.");
                 ShowMessageFailure();
@@ -165,7 +178,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             {
                 _logger.LogWarning(
                     "Unsupported stored account language "
-                        + "{PreferredLanguageId}; using fallback.",
+                    + "{PreferredLanguageId}; using fallback.",
                     authenticatedAccount.PreferredLanguageId);
             }
 
@@ -175,10 +188,52 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 authenticatedAccount.PreferredLanguageId,
                 authenticatedAccount.SessionKey);
             _logger.LogInformation(
-                "User {EmailOrUsername} logged in successfully with " + "PlayerId: {PlayerId}",
-                Email.Trim(),
+                "Player {PlayerId} logged in successfully.",
                 authenticatedAccount.PlayerId);
             _onLoginSuccess.Invoke();
+        }
+
+        private void HandleLoginFailure(Exception ex, Credentials credentials)
+        {
+            SetBusy(false);
+            if (ex is FaultException<AccountIssue> accountFault)
+            {
+                _logger.LogDebug(ex, "Login rejected. Account issue: {AccountIssue}.",
+                    accountFault.Detail);
+                ShowMessageFailure(accountFault.Detail);
+            }
+            else
+            {
+                _logger.LogError(ex, "Authentication service could not complete login.");
+                bool connectionFailure = ex is TimeoutException
+                    || (ex is CommunicationException && !(ex is FaultException));
+                ShowMessageFailure(connectionFailure: connectionFailure);
+            }
+        }
+
+        private bool CanExecuteLogin(object parameter)
+        {
+            return !_isBusy;
+        }
+
+        private bool CanCancelLogin()
+        {
+            return !_isBusy;
+        }
+
+        private void CancelLogin()
+        {
+            if (!_isBusy)
+            {
+                _onCancel();
+            }
+        }
+
+        private void SetBusy(bool isBusy)
+        {
+            _isBusy = isBusy;
+            LoginCommand.RaiseCanExecuteChanged();
+            CancelCommand.RaiseCanExecuteChanged();
         }
 
         private bool ValidateInput()

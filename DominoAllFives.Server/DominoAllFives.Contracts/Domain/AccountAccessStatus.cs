@@ -28,7 +28,9 @@ namespace DominoAllFives.Contracts.Domain
         /// </summary>
         /// <param name = "isDeleted">The persisted logical deletion flag.</param>
         /// <param name = "isBanned">The persisted ban flag.</param>
-        /// <param name = "suspensionUntil">The persisted suspension boundary without time-zone reinterpretation.</param>
+        /// <param name = "suspensionUntil">
+        /// The persisted suspension boundary without time-zone reinterpretation.
+        /// </param>
         /// <returns>The domain value produced by the operation.</returns>
         public static AccountAccessStatus FromStoredState(
             bool isDeleted,
@@ -46,7 +48,9 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Enforces restrictions using a time in the stored timestamp convention.
         /// </summary>
-        /// <param name = "currentTime">The comparison time in the timestamp convention of the stored restrictions.</param>
+        /// <param name = "currentTime">
+        /// The comparison time in the timestamp convention of the stored restrictions.
+        /// </param>
         public LoginStatus EnsureCanLogin(DateTime currentTime)
         {
             if (IsDeleted)

@@ -8,6 +8,12 @@ namespace DominoAllFives.Client.WPF.Models
         public string Username { get; set; }
         public string AvatarPath { get; set; }
         public bool IsInvited { get; set; }
-        public bool CanInvite => !IsInvited;
+        public bool CanInvite
+        {
+            get
+            {
+                return !IsInvited;
+            }
+        }
     }
 }

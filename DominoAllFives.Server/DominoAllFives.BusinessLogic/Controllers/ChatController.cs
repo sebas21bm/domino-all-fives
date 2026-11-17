@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using DominoAllFives.BusinessLogic.Exceptions;
 using DominoAllFives.BusinessLogic.Managers;

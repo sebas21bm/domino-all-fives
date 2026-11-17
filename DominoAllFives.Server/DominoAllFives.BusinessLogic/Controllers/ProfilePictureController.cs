@@ -26,8 +26,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             ILogger<ProfilePictureController> logger)
         {
             _profilePictureStorage = profilePictureStorage ?? throw new ArgumentNullException(
-                nameof(
-                profilePictureStorage));
+                nameof(profilePictureStorage));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -35,7 +34,9 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// Sets the profile picture of a player.
         /// </summary>
         /// <param name = "playerId">The account identifier.</param>
-        /// <param name = "picture">The selected snapshot; null or absent content is invalid.</param>
+        /// <param name = "picture">
+        /// The selected snapshot; null or absent content is invalid.
+        /// </param>
         public ProfilePictureStatus SetProfilePicture(int playerId, ProfilePicture picture)
         {
             ProfilePictureStatus validation = ValidatePictureSelection(playerId, picture);
@@ -66,9 +67,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     _profilePictureStorage.SaveProfilePicture(profilePictureFileName, imageData);
                     previousProfilePicture = player.ProfilePicture;
                     bool wasUpdated =
-                        playerRepository.UpdateProfilePicture(
-                        playerId,
-                        profilePictureFileName);
+                        playerRepository.UpdateProfilePicture(playerId, profilePictureFileName);
                     if (!wasUpdated)
                     {
                         _profilePictureStorage.TryDeleteProfilePicture(profilePictureFileName);
@@ -78,21 +77,6 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     context.SaveChanges();
                     changesCommitted = true;
                 }
-            }
-            catch (SqlException ex)
-            {
-                LogPictureFailure(ex, playerId);
-                throw;
-            }
-            catch (EntityException ex)
-            {
-                LogPictureFailure(ex, playerId);
-                throw;
-            }
-            catch (DbUpdateException ex)
-            {
-                LogPictureFailure(ex, playerId);
-                throw;
             }
             finally
             {
@@ -121,55 +105,28 @@ namespace DominoAllFives.BusinessLogic.Controllers
             }
 
             string previousProfilePicture = string.Empty;
-            try
+            using (DominoAllFivesEntities context = new DominoAllFivesEntities())
             {
-                using (DominoAllFivesEntities context = new DominoAllFivesEntities())
+                IPlayerRepository playerRepository = new PlayerRepository(context);
+                Player player = playerRepository.GetById(playerId);
+                if (player == null)
                 {
-                    IPlayerRepository playerRepository = new PlayerRepository(context);
-                    Player player = playerRepository.GetById(playerId);
-                    if (player == null)
-                    {
-                        return ProfilePictureStatus.PlayerNotFound;
-                    }
-
-                    previousProfilePicture = player.ProfilePicture;
-                    if (string.IsNullOrWhiteSpace(previousProfilePicture))
-                    {
-                        return ProfilePictureStatus.None;
-                    }
-
-                    bool wasUpdated = playerRepository.UpdateProfilePicture(playerId, null);
-                    if (!wasUpdated)
-                    {
-                        return ProfilePictureStatus.PlayerNotFound;
-                    }
-
-                    context.SaveChanges();
+                    return ProfilePictureStatus.PlayerNotFound;
                 }
-            }
-            catch (SqlException ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Unable to remove profile picture for player {PlayerId}.",
-                    playerId);
-                throw;
-            }
-            catch (EntityException ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Unable to remove profile picture for player {PlayerId}.",
-                    playerId);
-                throw;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Unable to remove profile picture for player {PlayerId}.",
-                    playerId);
-                throw;
+
+                previousProfilePicture = player.ProfilePicture;
+                if (string.IsNullOrWhiteSpace(previousProfilePicture))
+                {
+                    return ProfilePictureStatus.None;
+                }
+
+                bool wasUpdated = playerRepository.UpdateProfilePicture(playerId, null);
+                if (!wasUpdated)
+                {
+                    return ProfilePictureStatus.PlayerNotFound;
+                }
+
+                context.SaveChanges();
             }
 
             _profilePictureStorage.TryDeleteProfilePicture(previousProfilePicture);
@@ -183,8 +140,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             string previousProfilePicture,
             string currentProfilePicture)
         {
-            if (string.IsNullOrWhiteSpace(
-                previousProfilePicture)
+            if (string.IsNullOrWhiteSpace(previousProfilePicture)
                 || string.Equals(
                 previousProfilePicture,
                 currentProfilePicture,
@@ -229,8 +185,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 return ProfilePictureStatus.InvalidFormat;
             }
 
-            return ProfilePictureValidator.HasValidFileSize(
-                imageData)
+            return ProfilePictureValidator.HasValidFileSize(imageData)
                 ? ProfilePictureStatus.None : ProfilePictureStatus.FileTooLarge;
         }
     }

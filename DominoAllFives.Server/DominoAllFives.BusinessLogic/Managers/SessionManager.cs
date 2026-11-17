@@ -4,12 +4,11 @@ using System.Linq;
 using System.Security.Cryptography;
 using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.Contracts.Domain;
-using Player = DominoAllFives.Contracts.Domain.Player;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Models;
-using StoredPlayer = DominoAllFives.DataAccess.Models.Player;
 using DominoAllFives.DataAccess.Repositories;
-using Microsoft.Extensions.Logging.Abstractions;
+using Player = DominoAllFives.Contracts.Domain.Player;
+using StoredPlayer = DominoAllFives.DataAccess.Models.Player;
 
 namespace DominoAllFives.BusinessLogic.Managers
 {
@@ -18,11 +17,8 @@ namespace DominoAllFives.BusinessLogic.Managers
         private const int SessionKeySizeInBytes = 32;
         private static readonly object sessionLock = new object();
         private static readonly Dictionary<string, int> sessions =
-            new Dictionary<string, int>(
-            StringComparer.Ordinal);
-        private static readonly ProfilePictureStorage pictureStorage =
-            new ProfilePictureStorage(
-            NullLogger<ProfilePictureStorage>.Instance);
+            new Dictionary<string, int>(StringComparer.Ordinal);
+
         public static string CreateSession(int playerId)
         {
             if (playerId <= 0)
@@ -47,6 +43,11 @@ namespace DominoAllFives.BusinessLogic.Managers
 
         public static int GetPlayerId(string sessionKey)
         {
+            if (sessionKey == null)
+            {
+                throw new ArgumentNullException(nameof(sessionKey));
+            }
+
             if (string.IsNullOrWhiteSpace(sessionKey))
             {
                 throw new ArgumentException(null, nameof(sessionKey));
@@ -64,8 +65,13 @@ namespace DominoAllFives.BusinessLogic.Managers
             }
         }
 
-        public static Player GetPlayer(string sessionKey)
+        public static Player GetPlayer(string sessionKey, ProfilePictureStorage pictureStorage)
         {
+            if (pictureStorage == null)
+            {
+                throw new ArgumentNullException(nameof(pictureStorage));
+            }
+
             int playerId = GetPlayerId(sessionKey);
             using (DominoAllFivesEntities context = new DominoAllFivesEntities())
             {
@@ -81,8 +87,7 @@ namespace DominoAllFives.BusinessLogic.Managers
                     PlayerId = stored.IdPlayer,
                     Username = stored.Username,
                     Picture = ProfilePicture.FromStoredContent(
-                        pictureStorage.GetProfilePictureData(
-                        stored.ProfilePicture)),
+                        pictureStorage.GetProfilePictureData(stored.ProfilePicture)),
                     Presence = PlayerPresence.Online,
                     IsGuest = stored.IsGuest
                 };
@@ -91,6 +96,11 @@ namespace DominoAllFives.BusinessLogic.Managers
 
         public static bool RemoveSession(string sessionKey)
         {
+            if (sessionKey == null)
+            {
+                throw new ArgumentNullException(nameof(sessionKey));
+            }
+
             if (string.IsNullOrWhiteSpace(sessionKey))
             {
                 throw new ArgumentException(null, nameof(sessionKey));

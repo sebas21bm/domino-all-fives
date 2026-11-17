@@ -11,7 +11,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
     {
         private IFrameNavigationService _navigationService;
         public RelayCommand GoBackCommand { get; }
-        public ObservableCollection<object> MatchHistoryList { get; } =
+        public ObservableCollection<object> MatchHistoryEntries { get; } =
             new ObservableCollection<object>();
 
         public MatchHistoryViewModel()

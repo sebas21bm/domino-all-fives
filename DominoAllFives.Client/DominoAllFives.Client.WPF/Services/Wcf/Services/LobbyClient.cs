@@ -1,21 +1,23 @@
 using System;
 using System.ServiceModel;
+using System.Threading;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services.Wcf.Callbacks;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using LobbyService;
+using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.Services.Wcf.Services
 {
     public sealed class LobbyClient : ILobbyClient
     {
+        private static readonly TimeSpan lobbyCallbackTimeout = TimeSpan.FromSeconds(10);
         private readonly PlayerSession _playerSession;
         private readonly Func<LobbyCallbackHandler, LobbyServiceClient> _clientFactory;
+        private readonly ManualResetEventSlim _lobbyChangedSignal =
+            new ManualResetEventSlim(false);
         private LobbyServiceClient _client;
         private LobbyCallbackHandler _callback;
-        private Action<Lobby> _lobbyChangedHandler;
-        private Action _lobbyClosedHandler;
-        private Action<int> _matchStartedHandler;
         private bool _disposed;
         public CommunicationState State
         {
@@ -42,10 +44,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
         public LobbyClient(
             PlayerSession playerSession) : this(
             playerSession,
-            callback => new LobbyServiceClient(
-            new InstanceContext(
-            callback),
-            "LobbyEndpoint"))
+            CreateClient)
         {
         }
 
@@ -54,31 +53,25 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
             Func<LobbyCallbackHandler, LobbyServiceClient> clientFactory)
         {
             _playerSession = playerSession ?? throw new ArgumentNullException(
-                nameof(
-                playerSession));
+                nameof(playerSession));
             _clientFactory = clientFactory ?? throw new ArgumentNullException(
-                nameof(
-                clientFactory));
+                nameof(clientFactory));
         }
 
         public event Action<Lobby> LobbyChanged;
         public event Action LobbyClosed;
         public event Action<int> MatchStarted;
-        public Lobby CreateLobby(LobbySettings settings)
+        public void CreateLobby(LobbySettings settings)
         {
             OpenConnection();
+            _lobbyChangedSignal.Reset();
             bool completed = false;
             try
             {
-                Lobby response = _client.CreateLobby(settings);
+                _client.CreateLobby(settings);
+                WaitForLobbyChanged();
                 WasCreatedByThisClient = true;
-                if (CurrentLobby == null)
-                {
-                    CurrentLobby = response;
-                }
-
                 completed = true;
-                return CurrentLobby;
             }
             finally
             {
@@ -89,21 +82,17 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
             }
         }
 
-        public Lobby JoinLobby(string lobbyCode)
+        public void JoinLobby(string lobbyCode)
         {
             OpenConnection();
+            _lobbyChangedSignal.Reset();
             bool completed = false;
             try
             {
-                Lobby response = _client.JoinLobby(lobbyCode);
+                _client.JoinLobby(lobbyCode);
+                WaitForLobbyChanged();
                 WasCreatedByThisClient = false;
-                if (CurrentLobby == null)
-                {
-                    CurrentLobby = response;
-                }
-
                 completed = true;
-                return CurrentLobby;
             }
             finally
             {
@@ -186,6 +175,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
             finally
             {
                 _disposed = true;
+                _lobbyChangedSignal.Dispose();
             }
         }
 
@@ -209,7 +199,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
                 throw new InvalidOperationException("Lobby client factory returned null.");
             }
 
-            ConfigureCallbacks(callback, client);
+            ConfigureCallbacks(callback);
             _callback = callback;
             _client = client;
             bool completed = false;
@@ -228,14 +218,18 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
             }
         }
 
-        private void ConfigureCallbacks(LobbyCallbackHandler callback, LobbyServiceClient client)
+        private static LobbyServiceClient CreateClient(LobbyCallbackHandler callback)
         {
-            _lobbyChangedHandler = lobby => OnLobbyChanged(client, lobby);
-            _lobbyClosedHandler = () => OnLobbyClosed(client);
-            _matchStartedHandler = matchId => OnMatchStarted(client, matchId);
-            callback.LobbyChanged += _lobbyChangedHandler;
-            callback.LobbyClosed += _lobbyClosedHandler;
-            callback.MatchStarted += _matchStartedHandler;
+            return new LobbyServiceClient(
+                new InstanceContext(callback),
+                "LobbyEndpoint");
+        }
+
+        private void ConfigureCallbacks(LobbyCallbackHandler callback)
+        {
+            callback.LobbyChanged += OnLobbyChanged;
+            callback.LobbyClosed += OnLobbyClosed;
+            callback.MatchStarted += OnMatchStarted;
         }
 
         private void UnsubscribeCallbacks()
@@ -245,13 +239,10 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
                 return;
             }
 
-            _callback.LobbyChanged -= _lobbyChangedHandler;
-            _callback.LobbyClosed -= _lobbyClosedHandler;
-            _callback.MatchStarted -= _matchStartedHandler;
+            _callback.LobbyChanged -= OnLobbyChanged;
+            _callback.LobbyClosed -= OnLobbyClosed;
+            _callback.MatchStarted -= OnMatchStarted;
             _callback = null;
-            _lobbyChangedHandler = null;
-            _lobbyClosedHandler = null;
-            _matchStartedHandler = null;
         }
 
         private void CloseConnection()
@@ -272,12 +263,16 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
                     _client.Close();
                 }
             }
-            catch (CommunicationException)
+            catch (CommunicationException ex)
             {
+                LoggerFactoryProvider.CreateLogger<LobbyClient>().LogWarning(
+                    ex, "The WCF channel could not be closed cleanly.");
                 _client.Abort();
             }
-            catch (TimeoutException)
+            catch (TimeoutException ex)
             {
+                LoggerFactoryProvider.CreateLogger<LobbyClient>().LogWarning(
+                    ex, "The WCF channel could not be closed cleanly.");
                 _client.Abort();
             }
             finally
@@ -303,20 +298,29 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
             }
         }
 
-        private void OnLobbyChanged(LobbyServiceClient client, Lobby lobby)
+        private void WaitForLobbyChanged()
         {
-            if (!ReferenceEquals(_client, client))
+            if (!_lobbyChangedSignal.Wait(lobbyCallbackTimeout))
+            {
+                throw new TimeoutException("The lobby callback was not received in time.");
+            }
+        }
+
+        private void OnLobbyChanged(LobbyCallbackHandler callback, Lobby lobby)
+        {
+            if (!ReferenceEquals(_callback, callback))
             {
                 return;
             }
 
             CurrentLobby = lobby;
+            _lobbyChangedSignal.Set();
             LobbyChanged?.Invoke(lobby);
         }
 
-        private void OnLobbyClosed(LobbyServiceClient client)
+        private void OnLobbyClosed(LobbyCallbackHandler callback)
         {
-            if (!ReferenceEquals(_client, client))
+            if (!ReferenceEquals(_callback, callback))
             {
                 return;
             }
@@ -325,9 +329,9 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
             LobbyClosed?.Invoke();
         }
 
-        private void OnMatchStarted(LobbyServiceClient client, int matchId)
+        private void OnMatchStarted(LobbyCallbackHandler callback, int matchId)
         {
-            if (!ReferenceEquals(_client, client))
+            if (!ReferenceEquals(_callback, callback))
             {
                 return;
             }

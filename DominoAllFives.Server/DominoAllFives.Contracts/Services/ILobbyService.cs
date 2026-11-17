@@ -30,7 +30,6 @@ namespace DominoAllFives.Contracts.Services
         /// Creates a lobby owned by the authenticated player.
         /// </summary>
         /// <param name = "settings">The requested lobby configuration.</param>
-        /// <returns>The created lobby snapshot.</returns>
         /// <exception cref="FaultException{AccessIssue}">
         /// The connection has no authenticated session or the player lacks permission.
         /// </exception>
@@ -40,12 +39,11 @@ namespace DominoAllFives.Contracts.Services
         [OperationContract(IsInitiating = false, IsTerminating = false)]
         [FaultContract(typeof(LobbyIssue))]
         [FaultContract(typeof(AccessIssue))]
-        Lobby CreateLobby(LobbySettings settings);
+        void CreateLobby(LobbySettings settings);
         /// <summary>
         /// Adds the authenticated player to an existing lobby.
         /// </summary>
         /// <param name = "lobbyCode">The code identifying the target lobby.</param>
-        /// <returns>The lobby snapshot after the player joins.</returns>
         /// <exception cref="FaultException{AccessIssue}">
         /// The connection has no authenticated session or the player lacks permission.
         /// </exception>
@@ -55,7 +53,7 @@ namespace DominoAllFives.Contracts.Services
         [OperationContract(IsInitiating = false, IsTerminating = false)]
         [FaultContract(typeof(LobbyIssue))]
         [FaultContract(typeof(AccessIssue))]
-        Lobby JoinLobby(string lobbyCode);
+        void JoinLobby(string lobbyCode);
         /// <summary>
         /// Removes the authenticated player from the current lobby.
         /// </summary>

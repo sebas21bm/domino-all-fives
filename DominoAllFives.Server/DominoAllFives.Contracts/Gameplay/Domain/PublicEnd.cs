@@ -6,19 +6,19 @@ namespace DominoAllFives.Contracts.Gameplay
     [DataContract]
     public sealed class PublicEnd
     {
-        [DataMember(Order = 1)]
+        [DataMember]
         public BoardEnd End { get; set; }
 
-        [DataMember(Order = 2)]
+        [DataMember]
         public int Value { get; set; }
 
-        [DataMember(Order = 3)]
+        [DataMember]
         public int ScoreValue { get; set; }
 
-        [DataMember(Order = 4)]
+        [DataMember]
         public bool IsBlocked { get; set; }
 
-        [DataMember(Order = 5)]
+        [DataMember]
         public bool IsOpeningEnd { get; set; }
     }
 }

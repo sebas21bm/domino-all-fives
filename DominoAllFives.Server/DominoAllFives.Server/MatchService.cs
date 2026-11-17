@@ -2,27 +2,46 @@ using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using DominoAllFives.BusinessLogic.Controllers;
-using Domain = DominoAllFives.BusinessLogic.Gameplay;
 using DominoAllFives.BusinessLogic.Managers;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Contracts.Gameplay;
 using DominoAllFives.Contracts.Services;
 using DominoAllFives.Server.Infrastructure;
+using DominoAllFives.Server.Logging;
+using Domain = DominoAllFives.BusinessLogic.Gameplay;
+using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Server
 {
     /// <summary>
     /// Validates the session identity before applying authoritative match operations.
     /// </summary>
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode =
-        ConcurrencyMode.Reentrant, IncludeExceptionDetailInFaults = false)]
+    [ServiceBehavior(
+        InstanceContextMode = InstanceContextMode.PerSession,
+        ConcurrencyMode = ConcurrencyMode.Reentrant,
+        IncludeExceptionDetailInFaults = false)]
     public sealed class MatchService : IMatchService
     {
+        private static readonly MatchController controller;
+        private static readonly MatchCallbackRegistry callbacks;
+        private static readonly MatchEventPublisher publisher;
+        private static readonly ILogger<MatchEventPublisher> publisherLogger;
         private string _sessionKey;
         private int _playerId;
         private int _matchId;
         private IMatchCallback _callback;
-        private ICommunicationObject _channel;
+        private ICommunicationObject _callbackChannel;
+
+        static MatchService()
+        {
+            controller = new MatchController(MatchManager.Instance);
+            callbacks = new MatchCallbackRegistry();
+            publisherLogger = LoggerFactoryProvider.CreateLogger<MatchEventPublisher>();
+            publisher = new MatchEventPublisher(
+                callbacks,
+                publisherLogger);
+            publisher.MatchEnded += LobbyManager.Instance.ReleaseMatch;
+        }
 
         /// <summary>
         /// Binds the authenticated player and callback to a match they participate in.
@@ -47,22 +66,28 @@ namespace DominoAllFives.Server
                 throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
             }
 
-            int playerId = ResolvePlayer(sessionKey);
-            MatchView view = Execute(() => GameRuntime.Controller.GetMatch(matchId, playerId));
+            int playerId = GetAuthenticatedPlayerId(sessionKey);
+            GetMatchView(matchId, playerId);
             _sessionKey = sessionKey;
             _playerId = playerId;
             _matchId = matchId;
             _callback = OperationContext.Current.GetCallbackChannel<IMatchCallback>();
-            _channel = _callback as ICommunicationObject;
-            GameRuntime.Publisher.Register(matchId, playerId, _callback, sessionKey);
-            if (_channel != null)
+            _callbackChannel = _callback as ICommunicationObject;
+            publisher.Register(matchId, playerId, _callback, sessionKey);
+            if (_callbackChannel != null)
             {
-                _channel.Closed += OnChannelEnded;
-                _channel.Faulted += OnChannelEnded;
+                _callbackChannel.Closed += OnChannelEnded;
+                _callbackChannel.Faulted += OnChannelEnded;
             }
 
-            // GetHand/GetMatch recover a mutation that raced subscription.
-            return Execute(() => GameRuntime.Controller.GetMatch(matchId, playerId));
+            // The second snapshot recovers a mutation that raced callback registration.
+            MatchView current = GetMatchView(matchId, playerId);
+            if (current.Phase != MatchStatus.InProgress)
+            {
+                publisher.Remove(matchId, playerId, _callback);
+            }
+
+            return current;
         }
 
         /// <summary>
@@ -80,8 +105,8 @@ namespace DominoAllFives.Server
         /// </exception>
         public MatchView GetMatch(int matchId)
         {
-            EnsureSession(matchId);
-            return Execute(() => GameRuntime.Controller.GetMatch(matchId, _playerId));
+            ValidateSessionCanAccessMatch(matchId);
+            return GetMatchView(matchId, _playerId);
         }
 
         /// <summary>
@@ -99,8 +124,8 @@ namespace DominoAllFives.Server
         /// </exception>
         public PlayerHand GetHand(int matchId)
         {
-            EnsureSession(matchId);
-            return Execute(() => GameRuntime.Controller.GetHand(matchId, _playerId));
+            ValidateSessionCanAccessMatch(matchId);
+            return GetPlayerHand(matchId, _playerId);
         }
 
         /// <summary>
@@ -114,16 +139,16 @@ namespace DominoAllFives.Server
         /// <param name = "expectedVersion">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
         /// <exception cref = "FaultException{AccessIssue}">
         /// The session is missing, revoked or bound to another match.
         /// </exception>
         /// <exception cref = "FaultException{MatchIssue}">
         /// Membership, version or a gameplay rule rejects the request.
         /// </exception>
-        public MatchView PlayTile(int matchId, DominoTile tile, BoardEnd end, long expectedVersion)
+        public void PlayTile(int matchId, DominoTile tile, BoardEnd end, long expectedVersion)
         {
-            EnsureSession(matchId);
+            ValidateSessionCanAccessMatch(matchId);
             if (tile == null)
             {
                 throw new FaultException<MatchIssue>(MatchIssue.TileNotOwned);
@@ -133,10 +158,21 @@ namespace DominoAllFives.Server
             Move move = new Move
             {
                 TileId = tile.TileId,
-                End = (Domain.End)end,
+                End = (Domain.BoardEndPosition)end,
                 ExpectedVersion = expectedVersion
             };
-            return Execute(() => GameRuntime.Controller.Play(matchId, _playerId, move));
+            try
+            {
+                MatchUpdate update = controller.PlayTile(
+                    matchId,
+                    _playerId,
+                    move);
+                publisher.PublishPending(update);
+            }
+            catch (Domain.MatchRuleException ex)
+            {
+                throw new FaultException<MatchIssue>((MatchIssue)ex.Issue);
+            }
         }
 
         /// <summary>
@@ -148,17 +184,28 @@ namespace DominoAllFives.Server
         /// <param name = "expectedVersion">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
         /// <exception cref = "FaultException{AccessIssue}">
         /// The session is missing, revoked or bound to another match.
         /// </exception>
         /// <exception cref = "FaultException{MatchIssue}">
         /// Membership, version or a gameplay rule rejects the request.
         /// </exception>
-        public MatchView DrawTiles(int matchId, long expectedVersion)
+        public void DrawTiles(int matchId, long expectedVersion)
         {
-            EnsureSession(matchId);
-            return Execute(() => GameRuntime.Controller.Draw(matchId, _playerId, expectedVersion));
+            ValidateSessionCanAccessMatch(matchId);
+            try
+            {
+                MatchUpdate update = controller.DrawTiles(
+                    matchId,
+                    _playerId,
+                    expectedVersion);
+                publisher.PublishPending(update);
+            }
+            catch (Domain.MatchRuleException ex)
+            {
+                throw new FaultException<MatchIssue>((MatchIssue)ex.Issue);
+            }
         }
 
         /// <summary>
@@ -170,17 +217,28 @@ namespace DominoAllFives.Server
         /// <param name = "expectedVersion">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
         /// <exception cref = "FaultException{AccessIssue}">
         /// The session is missing, revoked or bound to another match.
         /// </exception>
         /// <exception cref = "FaultException{MatchIssue}">
         /// Membership, version or a gameplay rule rejects the request.
         /// </exception>
-        public MatchView PassTurn(int matchId, long expectedVersion)
+        public void PassTurn(int matchId, long expectedVersion)
         {
-            EnsureSession(matchId);
-            return Execute(() => GameRuntime.Controller.Pass(matchId, _playerId, expectedVersion));
+            ValidateSessionCanAccessMatch(matchId);
+            try
+            {
+                MatchUpdate update = controller.PassTurn(
+                    matchId,
+                    _playerId,
+                    expectedVersion);
+                publisher.PublishPending(update);
+            }
+            catch (Domain.MatchRuleException ex)
+            {
+                throw new FaultException<MatchIssue>((MatchIssue)ex.Issue);
+            }
         }
 
         /// <summary>
@@ -197,25 +255,28 @@ namespace DominoAllFives.Server
         /// </exception>
         public void LeaveMatch(int matchId)
         {
-            EnsureSession(matchId);
-            Execute(() => CancelMatch(matchId));
+            ValidateSessionCanAccessMatch(matchId);
+            try
+            {
+                MatchUpdate update = controller.LeaveMatch(matchId, _playerId);
+                publisher.PublishPending(update);
+            }
+            catch (Domain.MatchRuleException ex)
+            {
+                throw new FaultException<MatchIssue>((MatchIssue)ex.Issue);
+            }
         }
 
-        private bool CancelMatch(int matchId)
+        private void ValidateSessionCanAccessMatch(int matchId)
         {
-            GameRuntime.Controller.Leave(matchId, _playerId);
-            return true;
-        }
-
-        private void EnsureSession(int matchId)
-        {
-            if (ResolvePlayer(_sessionKey) != _playerId || matchId != _matchId)
+            if (GetAuthenticatedPlayerId(_sessionKey) != _playerId
+                || matchId != _matchId)
             {
                 throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
             }
         }
 
-        private static int ResolvePlayer(string sessionKey)
+        private static int GetAuthenticatedPlayerId(string sessionKey)
         {
             if (string.IsNullOrWhiteSpace(sessionKey))
             {
@@ -232,11 +293,23 @@ namespace DominoAllFives.Server
             }
         }
 
-        private static T Execute<T>(Func<T> action)
+        private static MatchView GetMatchView(int matchId, int playerId)
         {
             try
             {
-                return action();
+                return controller.GetMatch(matchId, playerId);
+            }
+            catch (Domain.MatchRuleException ex)
+            {
+                throw new FaultException<MatchIssue>((MatchIssue)ex.Issue);
+            }
+        }
+
+        private static PlayerHand GetPlayerHand(int matchId, int playerId)
+        {
+            try
+            {
+                return controller.GetPlayerHand(matchId, playerId);
             }
             catch (Domain.MatchRuleException ex)
             {
@@ -246,11 +319,11 @@ namespace DominoAllFives.Server
 
         private void OnChannelEnded(object sender, EventArgs eventArgs)
         {
-            GameRuntime.Publisher.Remove(_matchId, _playerId, _callback);
-            if (_channel != null)
+            publisher.Remove(_matchId, _playerId, _callback);
+            if (_callbackChannel != null)
             {
-                _channel.Closed -= OnChannelEnded;
-                _channel.Faulted -= OnChannelEnded;
+                _callbackChannel.Closed -= OnChannelEnded;
+                _callbackChannel.Faulted -= OnChannelEnded;
             }
         }
     }

@@ -27,7 +27,6 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- 1. Título: DECISIÓN -->
             <TextBlock Grid.Row="0"
                        Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_lblDecision]}"
                        Style="{StaticResource SectionTitleText}"
@@ -35,7 +34,6 @@
                        HorizontalAlignment="Center"
                        Margin="0,0,0,25"/>
 
-            <!-- 2. Tres Botones de Decisión: NO HACER NADA / BANEAR JUGADOR / SUSPENSIÓN -->
             <Grid Grid.Row="1" HorizontalAlignment="Center" Margin="0,0,0,15">
 
                 <Grid.ColumnDefinitions>
@@ -46,7 +44,6 @@
                     <ColumnDefinition Width="220"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Botón: NO HACER NADA -->
                 <Button x:Name="btnDoNothing"
                         Grid.Column="0"
                         MinHeight="54"
@@ -66,7 +63,6 @@
                     </Button.Style>
                 </Button>
 
-                <!-- Botón: BANEAR JUGADOR -->
                 <Button x:Name="btnBan"
                         Grid.Column="2"
                         MinHeight="54"
@@ -86,7 +82,6 @@
                     </Button.Style>
                 </Button>
 
-                <!-- Botón: SUSPENSIÓN -->
                 <Button x:Name="btnSuspend"
                         Grid.Column="4"
                         MinHeight="54"
@@ -108,7 +103,6 @@
 
             </Grid>
 
-            <!-- 3. Sub-sección de Días de Suspensión (Ubicado justo debajo de los botones a la derecha) -->
             <Grid Grid.Row="2" HorizontalAlignment="Right" Margin="0,0,30,20">
 
                 <StackPanel Orientation="Horizontal"
@@ -132,7 +126,6 @@
 
             </Grid>
 
-            <!-- 4. Etiqueta: MOTIVO: -->
             <TextBlock Grid.Row="3"
                        Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_lblReason]}"
                        Style="{StaticResource FieldLabelText}"
@@ -140,7 +133,6 @@
                        HorizontalAlignment="Left"
                        Margin="0,0,0,12"/>
 
-            <!-- 5. Campo de Texto: Motivo de la resolución -->
             <TextBox x:Name="txtReason"
                      Grid.Row="4"
                      MinHeight="120"
@@ -153,7 +145,6 @@
                      Padding="15,12"
                      FontSize="13"/>
 
-            <!-- 6. Botones de Acción: ENVIAR y REGRESAR -->
             <Grid Grid.Row="5" HorizontalAlignment="Center">
 
                 <Grid.ColumnDefinitions>

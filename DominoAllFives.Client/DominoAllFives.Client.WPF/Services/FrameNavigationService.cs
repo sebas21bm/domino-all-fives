@@ -13,12 +13,18 @@ namespace DominoAllFives.Client.WPF.Services
         private readonly Frame _navigationFrame;
         private readonly Dictionary<Type, Type> _viewModelToPageMap;
         private ViewModelFactory _viewModelFactory;
-        public bool CanGoBack => _navigationFrame != null && _navigationFrame.CanGoBack;
+        public bool CanGoBack
+        {
+            get
+            {
+                return _navigationFrame != null && _navigationFrame.CanGoBack;
+            }
+        }
 
         public FrameNavigationService(Frame navigationFrame)
         {
-            _navigationFrame = navigationFrame ?? throw new ArgumentNullException(nameof(
-                navigationFrame));
+            _navigationFrame = navigationFrame
+                ?? throw new ArgumentNullException(nameof(navigationFrame));
             _viewModelToPageMap = new Dictionary<Type, Type>();
             RegisterRoutes();
         }
@@ -71,8 +77,8 @@ namespace DominoAllFives.Client.WPF.Services
 
         public void SetViewModelFactory(ViewModelFactory viewModelFactory)
         {
-            _viewModelFactory = viewModelFactory ?? throw new ArgumentNullException(nameof(
-                viewModelFactory));
+            _viewModelFactory = viewModelFactory
+                ?? throw new ArgumentNullException(nameof(viewModelFactory));
         }
 
         private TViewModel CreateViewModel<TViewModel>(object parameter = null)

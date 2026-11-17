@@ -26,7 +26,6 @@
                     <RowDefinition Height="822"/>
                 </Grid.RowDefinitions>
 
-                <!-- Header Superior -->
                 <Border Grid.Row="0" Style="{StaticResource HeaderBarStyle}">
 
                     <Grid>
@@ -56,7 +55,6 @@
 
                 </Border>
 
-                <!-- Cuerpo Principal -->
                 <Grid Grid.Row="1">
 
                     <Grid.ColumnDefinitions>
@@ -65,7 +63,6 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Columna Izquierda: Título y Navegación de Pestañas -->
                     <Grid Grid.Column="0">
 
                         <Grid.RowDefinitions>
@@ -85,7 +82,6 @@
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Top">
 
-                            <!-- Pestaña Jugadores -->
                             <Button x:Name="btnPlayerReports"
                                     MinWidth="270"
                                     MinHeight="62"
@@ -105,7 +101,6 @@
                                 </Button.Style>
                             </Button>
 
-                            <!-- Pestaña Partidas -->
                             <Button x:Name="btnMatchReports"
                                     MinWidth="270"
                                     MinHeight="62"
@@ -128,15 +123,12 @@
 
                     </Grid>
 
-                    <!-- Divisor Vertical -->
                     <Border Grid.Column="1"
                             Margin="0,50,0,55"
                             Style="{StaticResource VerticalDividerStyle}"/>
 
-                    <!-- Columna Derecha: Contenido de Listados -->
                     <Grid Grid.Column="2">
 
-                        <!-- Sección 1: Reportes de JUGADORES -->
                         <Grid x:Name="grdPlayerReports"
                               Margin="55,65,85,40"
                               Visibility="{Binding IsPlayerReportsVisible, Converter={StaticResource BoolToVis}}">
@@ -174,7 +166,6 @@
                                                     <ColumnDefinition Width="220"/>
                                                 </Grid.ColumnDefinitions>
 
-                                                <!-- Avatar del Jugador -->
                                                 <Grid Grid.Column="0"
                                                       Width="68"
                                                       Height="68"
@@ -195,7 +186,6 @@
 
                                                 </Grid>
 
-                                                <!-- Nombre del Jugador -->
                                                 <Border Grid.Column="1"
                                                         MinHeight="64"
                                                         Style="{StaticResource OutlinedListItemStyle}">
@@ -210,7 +200,6 @@
 
                                                 </Border>
 
-                                                <!-- Botón Ver Reporte -->
                                                 <Button Grid.Column="3"
                                                         MinWidth="200"
                                                         MinHeight="64"
@@ -232,7 +221,6 @@
 
                         </Grid>
 
-                        <!-- Sección 2: Reportes de PARTIDAS -->
                         <Grid x:Name="grdMatchReports"
                               Margin="55,65,85,40"
                               Visibility="{Binding IsMatchReportsVisible, Converter={StaticResource BoolToVis}}">
@@ -269,7 +257,6 @@
                                                     <ColumnDefinition Width="220"/>
                                                 </Grid.ColumnDefinitions>
 
-                                                <!-- Info Concatenada de la Partida (Partida #X - Fecha: DD/MM/YYYY) -->
                                                 <Border Grid.Column="0"
                                                         MinHeight="64"
                                                         Style="{StaticResource OutlinedListItemStyle}">
@@ -284,7 +271,6 @@
 
                                                 </Border>
 
-                                                <!-- Botón Ver Reporte -->
                                                 <Button Grid.Column="2"
                                                         MinWidth="200"
                                                         MinHeight="64"

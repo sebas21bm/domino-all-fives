@@ -6,13 +6,13 @@ namespace DominoAllFives.Contracts.Gameplay
     [DataContract]
     public sealed class PlayerScore
     {
-        [DataMember(Order = 1)]
+        [DataMember]
         public int PlayerId { get; set; }
 
-        [DataMember(Order = 2)]
+        [DataMember]
         public int Points { get; set; }
 
-        [DataMember(Order = 3)]
+        [DataMember]
         public int TileCount { get; set; }
     }
 }

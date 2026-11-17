@@ -12,7 +12,6 @@ namespace DominoAllFives.Client.Tests
     public sealed class MatchBackgroundTests
     {
         private const int CompletionTimeoutMilliseconds = 5000;
-
         [OneTimeSetUp]
         public void StartDispatcher()
         {
@@ -152,8 +151,8 @@ namespace DominoAllFives.Client.Tests
                 // Assert
                 Assert.That(client.PlayCalls, Is.EqualTo(1));
                 Assert.That(client.GetMatchCalls, Is.EqualTo(previousQueries + 1));
-                Assert.That(WpfTestHost.Invoke(() => model.Hand.Count),
-                    Is.EqualTo(recoveryFails ? 1 : 0));
+                Assert.That(WpfTestHost.Invoke(() => model.Hand.Count), Is.EqualTo(
+                    recoveryFails ? 1 : 0));
             }
             finally
             {
@@ -223,8 +222,8 @@ namespace DominoAllFives.Client.Tests
                 // Assert
                 Assert.That(earlyNavigations, Is.Zero);
                 Assert.That(client.LeaveCalls, Is.EqualTo(1));
-                Assert.That(WpfTestHost.Invoke(() => navigation.RootNavigations),
-                    Is.EqualTo(fails ? 0 : 1));
+                Assert.That(WpfTestHost.Invoke(() => navigation.RootNavigations), Is.EqualTo(
+                    fails ? 0 : 1));
             }
             finally
             {
@@ -245,7 +244,8 @@ namespace DominoAllFives.Client.Tests
             try
             {
                 InitializeModel(model);
-                var command = draw ? model.DrawCommand : model.PassCommand;
+                DominoAllFives.Client.WPF.Commands.RelayCommand command =
+                    draw ? model.DrawCommand : model.PassCommand;
                 // Act
                 WpfTestHost.Invoke(() => command.Execute(null));
                 WaitUntilReady(model);
@@ -264,7 +264,11 @@ namespace DominoAllFives.Client.Tests
         {
             PlayerSession session = new PlayerSession();
             session.Start(1, "Alice", "es-MX", "test-session");
-            MatchNavigation context = new MatchNavigation { MatchId = 1, PlayerSession = session };
+            MatchNavigation context = new MatchNavigation
+            {
+                MatchId = 1,
+                PlayerSession = session
+            };
             return WpfTestHost.Invoke(() => new MatchViewModel(
                 navigation ?? new MatchWorkerNavigation(), context, client));
         }

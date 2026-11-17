@@ -20,15 +20,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public EditProfileViewModel()
         {
             GoBackCommand = new RelayCommand(() => _navigationService.GoBack());
-            ChangePictureCommand = new RelayCommand(() =>
-            {
-            }, () => false);
-            SaveCommand = new RelayCommand(() =>
-            {
-            }, () => false);
-            DiscardCommand = new RelayCommand(() =>
-            {
-            }, () => false);
+            ChangePictureCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
+            SaveCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
+            DiscardCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
         }
 
         public void Initialize(IFrameNavigationService navigationService)
@@ -45,6 +39,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             _navigationService = navigationService;
+        }
+        private static void IgnoreUnavailableCommand()
+        {
         }
     }
 }
