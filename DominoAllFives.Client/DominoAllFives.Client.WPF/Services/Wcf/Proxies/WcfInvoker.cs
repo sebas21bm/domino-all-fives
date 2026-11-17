@@ -1,5 +1,6 @@
 using System;
 using System.ServiceModel;
+using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.Services.Wcf
 {
@@ -18,7 +19,30 @@ namespace DominoAllFives.Client.WPF.Services.Wcf
             try
             {
                 TResult result = operation(proxy);
-                proxy.Close();
+                if (proxy.State == CommunicationState.Faulted)
+                {
+                    proxy.Abort();
+                }
+                else
+                {
+                    try
+                    {
+                        proxy.Close();
+                    }
+                    catch (CommunicationException ex)
+                    {
+                        LoggerFactoryProvider.CreateLogger<TProxy>().LogWarning(
+                            ex, "The WCF channel could not be closed cleanly.");
+                        proxy.Abort();
+                    }
+                    catch (TimeoutException ex)
+                    {
+                        LoggerFactoryProvider.CreateLogger<TProxy>().LogWarning(
+                            ex, "The WCF channel close operation timed out.");
+                        throw;
+                    }
+                }
+
                 completed = true;
                 return result;
             }

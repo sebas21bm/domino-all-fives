@@ -2,16 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using DominoAllFives.Contracts.Domain;
-using LobbyModel = DominoAllFives.Contracts.Domain.Lobby;
 using DominoAllFives.Contracts.Services;
 using Microsoft.Extensions.Logging;
+using LobbyModel = DominoAllFives.Contracts.Domain.Lobby;
 
 namespace DominoAllFives.Server.Infrastructure.Lobby
 {
     internal sealed class LobbyEventPublisher
     {
+        private enum LobbyCallbackEvent
+        {
+            LobbyChanged,
+            LobbyClosed,
+            MatchStarted
+        }
+
         private readonly LobbyCallbackRegistry _callbacks;
         private readonly ILogger<LobbyEventPublisher> _logger;
+
         public LobbyEventPublisher(
             LobbyCallbackRegistry callbacks,
             ILogger<LobbyEventPublisher> logger)
@@ -22,29 +30,23 @@ namespace DominoAllFives.Server.Infrastructure.Lobby
 
         public void PublishLobbyChanged(LobbyModel lobby)
         {
-            Publish(lobby, delegate (ILobbyCallback callback)
-            {
-                callback.OnLobbyChanged(lobby);
-            });
+            Publish(lobby, LobbyCallbackEvent.LobbyChanged, 0);
         }
 
         public void PublishLobbyClosed(LobbyModel lobby)
         {
-            Publish(lobby, delegate (ILobbyCallback callback)
-            {
-                callback.OnLobbyClosed();
-            });
+            Publish(lobby, LobbyCallbackEvent.LobbyClosed, 0);
         }
 
         public void PublishMatchStarted(LobbyModel lobby, int matchId)
         {
-            Publish(lobby, delegate (ILobbyCallback callback)
-            {
-                callback.OnMatchStarted(matchId);
-            });
+            Publish(lobby, LobbyCallbackEvent.MatchStarted, matchId);
         }
 
-        private void Publish(LobbyModel lobby, Action<ILobbyCallback> notification)
+        private void Publish(
+            LobbyModel lobby,
+            LobbyCallbackEvent callbackEvent,
+            int matchId)
         {
             if (lobby == null)
             {
@@ -54,44 +56,62 @@ namespace DominoAllFives.Server.Infrastructure.Lobby
             foreach (Player player in lobby.Participants)
             {
                 ILobbyCallback callback;
-                try
-                {
-                    callback = _callbacks.GetCallback(player.PlayerId);
-                }
-                catch (KeyNotFoundException)
+                if (!_callbacks.TryGetCallback(player.PlayerId, out callback))
                 {
                     continue;
                 }
 
                 try
                 {
-                    notification(callback);
+                    NotifyCallback(callback, callbackEvent, lobby, matchId);
                 }
                 catch (CommunicationException ex)
                 {
-                    _callbacks.RemoveCallback(player.PlayerId, callback);
-                    _logger.LogWarning(
-                        ex,
-                        "Lobby callback failed for player {PlayerId}.",
-                        player.PlayerId);
+                    RemoveFailedCallback(player.PlayerId, callback, ex);
                 }
                 catch (TimeoutException ex)
                 {
-                    _callbacks.RemoveCallback(player.PlayerId, callback);
-                    _logger.LogWarning(
-                        ex,
-                        "Lobby callback failed for player {PlayerId}.",
-                        player.PlayerId);
+                    RemoveFailedCallback(player.PlayerId, callback, ex);
                 }
                 catch (ObjectDisposedException ex)
                 {
-                    _callbacks.RemoveCallback(player.PlayerId, callback);
-                    _logger.LogWarning(
-                        ex,
-                        "Lobby callback failed for player {PlayerId}.",
-                        player.PlayerId);
+                    RemoveFailedCallback(player.PlayerId, callback, ex);
                 }
             }
+        }
+
+        private static void NotifyCallback(
+            ILobbyCallback callback,
+            LobbyCallbackEvent callbackEvent,
+            LobbyModel lobby,
+            int matchId)
+        {
+            switch (callbackEvent)
+            {
+                case LobbyCallbackEvent.LobbyChanged:
+                    callback.OnLobbyChanged(lobby);
+                    break;
+                case LobbyCallbackEvent.LobbyClosed:
+                    callback.OnLobbyClosed();
+                    break;
+                case LobbyCallbackEvent.MatchStarted:
+                    callback.OnMatchStarted(matchId);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(callbackEvent));
+            }
+        }
+
+        private void RemoveFailedCallback(
+            int playerId,
+            ILobbyCallback callback,
+            Exception ex)
+        {
+            _callbacks.RemoveCallback(playerId, callback);
+            _logger.LogDebug(
+                ex,
+                "Lobby callback failed for player {PlayerId}.",
+                playerId);
         }
     }
 }

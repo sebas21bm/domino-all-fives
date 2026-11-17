@@ -9,18 +9,36 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private IFrameNavigationService _navigationService;
         private bool _isDialogVisible;
         private CustomMessageViewModel _currentDialogViewModel;
-        public IFrameNavigationService Navigation => _navigationService;
+        public IFrameNavigationService Navigation
+        {
+            get
+            {
+                return _navigationService;
+            }
+        }
         public IDialogService DialogService { get; }
-        public bool IsDialogVisible { get =>
-            _isDialogVisible; set =>
-            SetProperty(
-            ref _isDialogVisible,
-            value); }
-        public CustomMessageViewModel CurrentDialogViewModel { get =>
-            _currentDialogViewModel; set =>
-            SetProperty(
-            ref _currentDialogViewModel,
-            value); }
+        public bool IsDialogVisible
+        {
+            get
+            {
+                return _isDialogVisible;
+            }
+            set
+            {
+                SetProperty(ref _isDialogVisible, value);
+            }
+        }
+        public CustomMessageViewModel CurrentDialogViewModel
+        {
+            get
+            {
+                return _currentDialogViewModel;
+            }
+            set
+            {
+                SetProperty(ref _currentDialogViewModel, value);
+            }
+        }
 
         public MainWindowViewModel()
         {
@@ -36,8 +54,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             _navigationService = navigationService ?? throw new ArgumentNullException(
-                nameof(
-                navigationService));
+                nameof(navigationService));
         }
 
         private void ShowDialog(CustomMessageViewModel dialogViewModel)

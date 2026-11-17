@@ -18,10 +18,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public RegisterAccountViewModel(Action onCancel = null)
         {
-            RegisterCommand = new RelayCommand(() =>
-            {
-            }, () => false);
+            RegisterCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
             CancelCommand = new RelayCommand(() => onCancel?.Invoke());
+        }
+        private static void IgnoreUnavailableCommand()
+        {
         }
     }
 }

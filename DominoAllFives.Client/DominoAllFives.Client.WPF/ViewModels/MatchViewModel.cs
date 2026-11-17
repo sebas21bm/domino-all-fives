@@ -24,7 +24,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private readonly IFrameNavigationService _navigation;
         private readonly MatchNavigation _context;
         private readonly IMatchClient _client;
-        private readonly Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
+        private readonly Dispatcher _dispatcher;
         private readonly ILogger<MatchViewModel> _logger =
             LoggerFactoryProvider.CreateLogger<MatchViewModel>();
         private MatchView _pendingView;
@@ -121,6 +121,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public MatchViewModel(IFrameNavigationService navigation, MatchNavigation context,
             IMatchClient client)
         {
+            _dispatcher = Dispatcher.CurrentDispatcher;
             _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _client = client ?? throw new ArgumentNullException(nameof(client));
@@ -163,7 +164,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private bool IsOwnTurn()
         {
             return !_disposed && !_isBusy && _match != null
-                && _match.Phase == MatchPhase.InProgress
+                && _match.Phase == MatchStatus.InProgress
                 && _match.CurrentPlayerId == _context.PlayerSession.PlayerId;
         }
 
@@ -322,7 +323,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             if (fault != null)
             {
                 Status = GetText("Match_msgRejected");
-                _logger.LogWarning(ex, "Match operation was rejected.");
+                _logger.LogDebug(ex, "Match operation was rejected.");
                 if (fault.Detail == MatchIssue.StaleVersion && action != (Action)Synchronize)
                 {
                     StartOperation(Synchronize);
@@ -380,19 +381,19 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void PlayAndSynchronize(DominoTile tile, BoardEnd end, long version)
         {
-            OnMatchChanged(_client.Play(_context.MatchId, tile, end, version));
+            _client.Play(_context.MatchId, tile, end, version);
             Synchronize();
         }
 
         private void DrawAndSynchronize(long version)
         {
-            OnMatchChanged(_client.Draw(_context.MatchId, version));
+            _client.Draw(_context.MatchId, version);
             Synchronize();
         }
 
         private void PassAndSynchronize(long version)
         {
-            OnMatchChanged(_client.Pass(_context.MatchId, version));
+            _client.Pass(_context.MatchId, version);
             Synchronize();
         }
 
@@ -485,13 +486,17 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 ? GetPlayerName(_match.CurrentPlayerId.Value) : string.Empty);
             RoundText = string.Format(GetText("Match_lblRound"), _match.RoundNumber,
                 _match.StockCount);
-            Status = _match.Phase == MatchPhase.InProgress ? string.Empty : GetText("Match_msg"
+            Status = _match.Phase == MatchStatus.InProgress ? string.Empty : GetText("Match_msg"
                 + _match.Phase);
-            RevealedHands = _match.LastRound == null ? new List<string>(
-                ) : _match.LastRound.RevealedHands.Select(hand => string.Format(GetText(
-                "Match_lblRevealed"), GetPlayerName(hand.PlayerId), string.Join(", ",
-                hand.Tiles.Select(tile => tile.FirstValue + "|" + tile.SecondValue))))
-                .ToList();
+            RevealedHands = _match.LastRound == null
+                ? new List<string>()
+                : _match.LastRound.RevealedHands
+                    .Select(hand => string.Format(
+                        GetText("Match_lblRevealed"),
+                        GetPlayerName(hand.PlayerId),
+                        string.Join(", ", hand.Tiles.Select(
+                            tile => tile.FirstValue + "|" + tile.SecondValue))))
+                    .ToList();
             SelectedTile = null;
             OnPropertyChanged(nameof(Hand));
             OnPropertyChanged(nameof(BoardTiles));
@@ -513,8 +518,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             AwardedPointsText = HasScoredPlay ? score.Points.ToString("+0",
                 System.Globalization.CultureInfo.CurrentCulture) : string.Empty;
             ScoreMultiplierText = HasScoredPlay && score.Multiplier > 1 ? "×"
-                + score.Multiplier.ToString(
-                System.Globalization.CultureInfo.CurrentCulture) : string.Empty;
+                + score.Multiplier.ToString(System.Globalization.CultureInfo.CurrentCulture)
+                    : string.Empty;
             OnPropertyChanged(nameof(AwardedPointsText));
             OnPropertyChanged(nameof(ScoreMultiplierText));
             OnPropertyChanged(nameof(HasScoredPlay));

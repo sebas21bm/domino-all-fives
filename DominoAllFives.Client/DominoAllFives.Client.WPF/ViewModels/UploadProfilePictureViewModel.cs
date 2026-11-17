@@ -16,16 +16,13 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public UploadProfilePictureViewModel(Action onCancel = null)
         {
-            SelectPhotoCommand = new RelayCommand(() =>
-            {
-            }, () => false);
-            AddPhotoCommand = new RelayCommand(() =>
-            {
-            }, () => false);
-            SkipPhotoCommand = new RelayCommand(() =>
-            {
-            }, () => false);
+            SelectPhotoCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
+            AddPhotoCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
+            SkipPhotoCommand = new RelayCommand(IgnoreUnavailableCommand, () => false);
             CancelCommand = new RelayCommand(() => onCancel?.Invoke());
+        }
+        private static void IgnoreUnavailableCommand()
+        {
         }
     }
 }

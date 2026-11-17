@@ -29,17 +29,16 @@ namespace DominoAllFives.Contracts.Domain
         {
             Credentials credentials = new Credentials
             {
-                EmailOrUsername = identifier,
+                EmailOrUsername = identifier?.Trim(),
                 Password = password
             };
-            credentials.EmailOrUsername = identifier?.Trim();
             return credentials;
         }
 
         /// <summary>
         /// Returns the rejection reason for missing credentials before accessing persistence.
         /// </summary>
-        public LoginStatus EnsureValid()
+        public LoginStatus Validate()
         {
             if (string.IsNullOrWhiteSpace(EmailOrUsername) || string.IsNullOrWhiteSpace(Password))
             {

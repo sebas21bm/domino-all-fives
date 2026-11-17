@@ -436,12 +436,12 @@ namespace LobbyService
         [System.ServiceModel.OperationContractAttribute(IsInitiating=false, Action="urn:domino-all-fives:services/ILobbyService/CreateLobby", ReplyAction="urn:domino-all-fives:services/ILobbyService/CreateLobbyResponse")]
         [System.ServiceModel.FaultContractAttribute(typeof(LobbyService.LobbyIssue), Action="urn:domino-all-fives:services/ILobbyService/CreateLobbyLobbyIssueFault", Name="LobbyIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
         [System.ServiceModel.FaultContractAttribute(typeof(LobbyService.AccessIssue), Action="urn:domino-all-fives:services/ILobbyService/CreateLobbyAccessIssueFault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
-        LobbyService.Lobby CreateLobby(LobbyService.LobbySettings settings);
+        void CreateLobby(LobbyService.LobbySettings settings);
         
         [System.ServiceModel.OperationContractAttribute(IsInitiating=false, Action="urn:domino-all-fives:services/ILobbyService/JoinLobby", ReplyAction="urn:domino-all-fives:services/ILobbyService/JoinLobbyResponse")]
         [System.ServiceModel.FaultContractAttribute(typeof(LobbyService.LobbyIssue), Action="urn:domino-all-fives:services/ILobbyService/JoinLobbyLobbyIssueFault", Name="LobbyIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
         [System.ServiceModel.FaultContractAttribute(typeof(LobbyService.AccessIssue), Action="urn:domino-all-fives:services/ILobbyService/JoinLobbyAccessIssueFault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
-        LobbyService.Lobby JoinLobby(string lobbyCode);
+        void JoinLobby(string lobbyCode);
         
         [System.ServiceModel.OperationContractAttribute(IsInitiating=false, Action="urn:domino-all-fives:services/ILobbyService/LeaveLobby", ReplyAction="urn:domino-all-fives:services/ILobbyService/LeaveLobbyResponse")]
         [System.ServiceModel.FaultContractAttribute(typeof(LobbyService.LobbyIssue), Action="urn:domino-all-fives:services/ILobbyService/LeaveLobbyLobbyIssueFault", Name="LobbyIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
@@ -518,14 +518,14 @@ namespace LobbyService
             base.Channel.OpenLobbySession(sessionKey);
         }
         
-        public LobbyService.Lobby CreateLobby(LobbyService.LobbySettings settings)
+        public void CreateLobby(LobbyService.LobbySettings settings)
         {
-            return base.Channel.CreateLobby(settings);
+            base.Channel.CreateLobby(settings);
         }
         
-        public LobbyService.Lobby JoinLobby(string lobbyCode)
+        public void JoinLobby(string lobbyCode)
         {
-            return base.Channel.JoinLobby(lobbyCode);
+            base.Channel.JoinLobby(lobbyCode);
         }
         
         public void LeaveLobby()

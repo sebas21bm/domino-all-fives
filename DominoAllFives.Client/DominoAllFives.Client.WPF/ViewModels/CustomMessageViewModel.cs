@@ -24,7 +24,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
         /// <exception cref = "ArgumentNullException">Thrown when value is null.</exception>
         public string Title
         {
-            get => _title;
+            get
+            {
+                return _title;
+            }
             set
             {
                 _title = value ?? throw new ArgumentNullException(nameof(value));
@@ -38,7 +41,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
         /// <exception cref = "ArgumentNullException">Thrown when value is null.</exception>
         public string Message
         {
-            get => _message;
+            get
+            {
+                return _message;
+            }
             set
             {
                 _message = value ?? throw new ArgumentNullException(nameof(value));
@@ -49,7 +55,17 @@ namespace DominoAllFives.Client.WPF.ViewModels
         /// <summary>
         /// Gets or sets the asset path for the icon displayed on the dialog.
         /// </summary>
-        public string IconPath { get => _iconPath; set => SetProperty(ref _iconPath, value); }
+        public string IconPath
+        {
+            get
+            {
+                return _iconPath;
+            }
+            set
+            {
+                SetProperty(ref _iconPath, value);
+            }
+        }
 
         /// <summary>
         /// Gets or sets the text for the primary acceptance button.
@@ -57,7 +73,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
         /// <exception cref = "ArgumentNullException">Thrown when value is null.</exception>
         public string AcceptButtonText
         {
-            get => _acceptButtonText;
+            get
+            {
+                return _acceptButtonText;
+            }
             set
             {
                 _acceptButtonText = value ?? throw new ArgumentNullException(nameof(value));
@@ -68,41 +87,61 @@ namespace DominoAllFives.Client.WPF.ViewModels
         /// <summary>
         /// Gets or sets the text for the secondary cancellation button.
         /// </summary>
-        public string CancelButtonText { get =>
-            _cancelButtonText; set =>
-            SetProperty(
-            ref _cancelButtonText,
-            value ?? string.Empty); }
+        public string CancelButtonText
+        {
+            get
+            {
+                return _cancelButtonText;
+            }
+            set
+            {
+                SetProperty(ref _cancelButtonText, value ?? string.Empty);
+            }
+        }
         /// <summary>
         /// Gets or sets a value indicating whether the cancellation button is visible.
         /// </summary>
-        public bool IsCancelVisible { get =>
-            _isCancelVisible; set =>
-            SetProperty(
-            ref _isCancelVisible,
-            value); }
+        public bool IsCancelVisible
+        {
+            get
+            {
+                return _isCancelVisible;
+            }
+            set
+            {
+                SetProperty(ref _isCancelVisible, value);
+            }
+        }
         /// <summary>
         /// Gets or sets the callback action executed when the user confirms or accepts.
         /// </summary>
         /// <exception cref = "ArgumentNullException">Thrown when value is null.</exception>
-        public Action OnAcceptAction { get =>
-            _onAcceptAction; set =>
-            _onAcceptAction = value ?? throw new ArgumentNullException(
-            nameof(
-            value)); }
+        public Action OnAcceptAction
+        {
+            get
+            {
+                return _onAcceptAction;
+            }
+            set
+            {
+                _onAcceptAction = value ?? throw new ArgumentNullException(nameof(value));
+            }
+        }
 
         /// <summary>
         /// Gets or sets the callback action executed when the user cancels or dismisses.
         /// </summary>
         public Action OnCancelAction
         {
-            get => _onCancelAction;
+            get
+            {
+                return _onCancelAction;
+            }
             set
             {
                 _onCancelAction = value;
                 IsCancelVisible = _onCancelAction != null
-                    && !string.IsNullOrEmpty(
-                    CancelButtonText);
+                    && !string.IsNullOrEmpty(CancelButtonText);
                 CancelCommand?.RaiseCanExecuteChanged();
             }
         }

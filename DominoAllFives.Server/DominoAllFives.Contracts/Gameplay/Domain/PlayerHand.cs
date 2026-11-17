@@ -6,16 +6,16 @@ namespace DominoAllFives.Contracts.Gameplay
     [DataContract]
     public sealed class PlayerHand
     {
-        [DataMember(Order = 1)]
+        [DataMember]
         public int MatchId { get; set; }
 
-        [DataMember(Order = 2)]
+        [DataMember]
         public int PlayerId { get; set; }
 
-        [DataMember(Order = 3)]
+        [DataMember]
         public List<DominoTile> Tiles { get; set; }
 
-        [DataMember(Order = 4)]
+        [DataMember]
         public long Version { get; set; }
     }
 }

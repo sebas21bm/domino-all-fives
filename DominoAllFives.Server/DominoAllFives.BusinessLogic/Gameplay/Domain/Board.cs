@@ -1,15 +1,43 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
     public sealed class Board
     {
-        private const int ScoringMultiple = 5;
         private const int UnblockedTurn = -1;
         private readonly List<Placement> _tiles = new List<Placement>();
-        private readonly List<BoardEnd> _ends = new List<BoardEnd>();
+        private readonly List<BoardEndState> _ends = new List<BoardEndState>();
+
+        internal Board Copy()
+        {
+            Board copy = new Board();
+            foreach (Placement placement in _tiles)
+            {
+                copy._tiles.Add(new Placement
+                {
+                    Tile = placement.Tile,
+                    End = placement.End,
+                    ConnectingValue = placement.ConnectingValue,
+                    ExposedValue = placement.ExposedValue
+                });
+            }
+
+            foreach (BoardEndState end in _ends)
+            {
+                copy._ends.Add(new BoardEndState
+                {
+                    End = end.End,
+                    Value = end.Value,
+                    ScoreValue = end.ScoreValue,
+                    BlockedTurn = end.BlockedTurn,
+                    IsOpeningEnd = end.IsOpeningEnd
+                });
+            }
+
+            return copy;
+        }
+
         public IReadOnlyList<Placement> Tiles
         {
             get
@@ -18,7 +46,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             }
         }
 
-        public IReadOnlyList<BoardEnd> Ends
+        public IReadOnlyList<BoardEndState> Ends
         {
             get
             {
@@ -26,28 +54,19 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             }
         }
 
-        public bool CanPlay(Tile tile, End end, int turnNumber)
+        public bool CanPlay(Tile tile, BoardEndPosition end, int turnNumber)
         {
-            if (!Enum.IsDefined(typeof(End), end))
+            if (!Enum.IsDefined(typeof(BoardEndPosition), end))
             {
                 return false;
             }
 
             if (_tiles.Count == 0)
             {
-                return end == End.Left;
+                return end == BoardEndPosition.Left;
             }
 
-            BoardEnd target = null;
-            foreach (BoardEnd candidate in _ends)
-            {
-                if (candidate.End == end)
-                {
-                    target = candidate;
-                    break;
-                }
-            }
-
+            BoardEndState target = FindEnd(end);
             if (target == null)
             {
                 return false;
@@ -59,16 +78,25 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             }
 
             return tile.Matches(target.Value);
-
         }
 
         public bool HasMove(IEnumerable<Tile> hand, int turnNumber)
         {
-            return hand.Any(tile => Enum.GetValues(typeof(End)).Cast<End>()
-                .Any(end => CanPlay(tile, end, turnNumber)));
+            foreach (Tile tile in hand)
+            {
+                foreach (BoardEndPosition end in Enum.GetValues(typeof(BoardEndPosition)))
+                {
+                    if (CanPlay(tile, end, turnNumber))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
-        public void Place(Tile tile, End end, int turnNumber)
+        public void Place(Tile tile, BoardEndPosition end, int turnNumber)
         {
             if (!CanPlay(tile, end, turnNumber))
             {
@@ -78,64 +106,131 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             if (_tiles.Count == 0)
             {
                 OpenBoard(tile);
-                if (tile.SpecialPower == SpecialPower.Block)
-                {
-                    _ends.Single(openingEnd => openingEnd.End == end).BlockedTurn = turnNumber + 1;
-                }
-
+                BlockOpeningEndWhenRequired(tile, end, turnNumber);
                 return;
             }
 
-            BoardEnd target = _ends.Single(candidate => candidate.End == end);
+            BoardEndState target = FindEnd(end);
             int connectingValue = target.Value;
             target.Value = tile.GetOtherValue(connectingValue);
-            target.ScoreValue = tile.IsDouble ? tile.TotalPips : target.Value;
-            target.IsOpeningEnd = false;
-            target.BlockedTurn = tile.SpecialPower == SpecialPower.Block ? turnNumber
-                + 1 : UnblockedTurn;
-            _tiles.Add(new Placement { Tile = tile, End = end, ConnectingValue =
-                connectingValue, ExposedValue = target.Value });
-        }
 
-        public int CalculatePoints(int turnNumber)
-        {
-            int sum = GetScoringValues(turnNumber)
-                .Sum();
-            return sum % ScoringMultiple == 0 ? sum : 0;
+            if (tile.IsDouble)
+            {
+                target.ScoreValue = tile.TotalPips;
+            }
+            else
+            {
+                target.ScoreValue = target.Value;
+            }
+
+            target.IsOpeningEnd = false;
+            target.BlockedTurn = UnblockedTurn;
+            if (tile.SpecialPower == SpecialPower.Block)
+            {
+                target.BlockedTurn = turnNumber + 1;
+            }
+
+            Placement placement = new Placement
+            {
+                Tile = tile,
+                End = end,
+                ConnectingValue = connectingValue,
+                ExposedValue = target.Value
+            };
+            _tiles.Add(placement);
         }
 
         public int[] GetScoringValues(int turnNumber)
         {
-            List<BoardEnd> available = _ends.Where(end => end.BlockedTurn != turnNumber)
-                .ToList();
-            List<int> values = available.Where(end => !end.IsOpeningEnd)
-                .Select(end => end.ScoreValue)
-                .ToList();
-            if (available.Any(end => end.IsOpeningEnd))
+            List<int> scoringValues = new List<int>();
+            bool includesOpeningEnd = false;
+
+            foreach (BoardEndState end in _ends)
             {
-                values.Add(_tiles[0].Tile.TotalPips);
+                bool isBlocked = end.BlockedTurn == turnNumber;
+                if (isBlocked)
+                {
+                    continue;
+                }
+
+                if (end.IsOpeningEnd)
+                {
+                    includesOpeningEnd = true;
+                    continue;
+                }
+
+                scoringValues.Add(end.ScoreValue);
             }
 
-            return values.ToArray();
+            if (includesOpeningEnd)
+            {
+                Tile openingTile = _tiles[0].Tile;
+                scoringValues.Add(openingTile.TotalPips);
+            }
+
+            return scoringValues.ToArray();
+        }
+
+        private void BlockOpeningEndWhenRequired(
+            Tile tile,
+            BoardEndPosition end,
+            int turnNumber)
+        {
+            if (tile.SpecialPower != SpecialPower.Block)
+            {
+                return;
+            }
+
+            BoardEndState openingEnd = FindEnd(end);
+            openingEnd.BlockedTurn = turnNumber + 1;
+        }
+
+        private BoardEndState FindEnd(BoardEndPosition end)
+        {
+            foreach (BoardEndState candidate in _ends)
+            {
+                if (candidate.End == end)
+                {
+                    return candidate;
+                }
+            }
+
+            return null;
         }
 
         private void OpenBoard(Tile tile)
         {
-            _tiles.Add(new Placement { Tile = tile, End = End.Left, ConnectingValue =
-                tile.FirstValue, ExposedValue = tile.SecondValue });
-            AddEnd(End.Left, tile.FirstValue, tile.IsDouble);
-            AddEnd(End.Right, tile.SecondValue, tile.IsDouble);
+            Placement openingPlacement = new Placement
+            {
+                Tile = tile,
+                End = BoardEndPosition.Left,
+                ConnectingValue = tile.FirstValue,
+                ExposedValue = tile.SecondValue
+            };
+            _tiles.Add(openingPlacement);
+
+            AddEnd(BoardEndPosition.Left, tile.FirstValue, tile.IsDouble);
+            AddEnd(BoardEndPosition.Right, tile.SecondValue, tile.IsDouble);
             if (tile.IsDouble)
             {
-                AddEnd(End.Top, tile.FirstValue, true);
-                AddEnd(End.Bottom, tile.FirstValue, true);
+                AddEnd(BoardEndPosition.Top, tile.FirstValue, true);
+                AddEnd(BoardEndPosition.Bottom, tile.FirstValue, true);
             }
         }
 
-        private void AddEnd(End end, int value, bool isOpeningEnd)
+        private void AddEnd(
+            BoardEndPosition end,
+            int value,
+            bool isOpeningEnd)
         {
-            _ends.Add(new BoardEnd { End = end, Value = value, ScoreValue = value,
-                IsOpeningEnd = isOpeningEnd });
+            BoardEndState boardEnd = new BoardEndState
+            {
+                End = end,
+                Value = value,
+                ScoreValue = value,
+                IsOpeningEnd = isOpeningEnd
+            };
+            _ends.Add(boardEnd);
         }
     }
 }

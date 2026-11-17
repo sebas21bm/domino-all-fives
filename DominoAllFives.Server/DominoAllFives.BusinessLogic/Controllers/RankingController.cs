@@ -15,11 +15,15 @@ namespace DominoAllFives.BusinessLogic.Controllers
     {
         private const int RankingLimit = 10;
         private readonly ProfilePictureStorage _profilePictureStorage;
+        /// <summary>
+        /// Initializes ranking operations with storage for optional profile pictures.
+        /// </summary>
+        /// <param name = "profilePictureStorage">The profile picture storage.</param>
+        /// <exception cref = "ArgumentNullException">The storage is null.</exception>
         public RankingController(ProfilePictureStorage profilePictureStorage)
         {
             _profilePictureStorage = profilePictureStorage ?? throw new ArgumentNullException(
-                nameof(
-                profilePictureStorage));
+                nameof(profilePictureStorage));
         }
 
         /// <summary>
@@ -34,20 +38,26 @@ namespace DominoAllFives.BusinessLogic.Controllers
             {
                 IPlayerStatsRepository playerStatsRepository = new PlayerStatsRepository(context);
                 IEnumerable<PlayerStats> topPlayerStats =
-                    playerStatsRepository.GetTopByGamesWon(
-                    RankingLimit);
+                    playerStatsRepository.GetTopByGamesWon(RankingLimit);
+
                 List<RankingEntry> entries = new List<RankingEntry>();
+
                 int rank = 1;
+                
                 foreach (PlayerStats playerStats in topPlayerStats)
                 {
-                    RankingEntry rankingEntry =
+                    byte[] pictureData = _profilePictureStorage.GetProfilePictureData(
+                        playerStats.Player.ProfilePicture);
+
+                    ProfilePicture picture = ProfilePicture.FromStoredContent(pictureData);
+                    
+                    RankingEntry rankingEntry = 
                         RankingEntry.FromRankedPlayer(
-                        rank,
-                        playerStats.Player.Username,
-                        playerStats.GamesWon,
-                        ProfilePicture.FromStoredContent(
-                        _profilePictureStorage.GetProfilePictureData(
-                        playerStats.Player.ProfilePicture)));
+                        rank, 
+                        playerStats.Player.Username, 
+                        playerStats.GamesWon, 
+                        picture);
+
                     entries.Add(rankingEntry);
                     rank++;
                 }
@@ -59,6 +69,9 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// <summary>
         /// Gets the player's position by games won, or zero when absent.
         /// </summary>
+        /// <param name = "playerId">The positive player identifier.</param>
+        /// <returns>The ranking position, or zero when absent.</returns>
+        /// <exception cref = "ArgumentOutOfRangeException">The identifier is not positive.</exception>
         public int GetWinsRankingPositionById(int playerId)
         {
             if (playerId <= 0)

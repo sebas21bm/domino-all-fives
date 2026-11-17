@@ -73,7 +73,8 @@ namespace DominoAllFives.Client.Tests
                 using (LobbyClient service = host.CreateClient())
                 {
                     // Act
-                    Lobby lobby = service.CreateLobby(new LobbySettings());
+                    service.CreateLobby(new LobbySettings());
+                    Lobby lobby = service.CurrentLobby;
                     // Assert
                     Assert.That(lobby.Participants.Count, Is.EqualTo(2));
                     Assert.That(service.WasCreatedByThisClient, Is.True);
@@ -246,24 +247,20 @@ namespace DominoAllFives.Client.Tests
                 _callback = OperationContext.Current.GetCallbackChannel<ILobbyServiceCallback>();
             }
 
-            public Lobby CreateLobby(LobbySettings settings)
+            public void CreateLobby(LobbySettings settings)
             {
-                if (ChangeBeforeResponse)
-                {
-                    _callback.OnLobbyChanged(CreateSnapshot(2));
-                }
-
-                return CreateSnapshot(1);
+                int participantCount = ChangeBeforeResponse ? 2 : 1;
+                _callback.OnLobbyChanged(CreateSnapshot(participantCount));
             }
 
-            public Lobby JoinLobby(string lobbyCode)
+            public void JoinLobby(string lobbyCode)
             {
                 if (RejectJoin)
                 {
                     throw new FaultException("Lobby not found.");
                 }
 
-                return CreateSnapshot(2);
+                _callback.OnLobbyChanged(CreateSnapshot(2));
             }
 
             public void LeaveLobby()

@@ -5,10 +5,10 @@ namespace DominoAllFives.BusinessLogic.Gameplay
     public sealed class Tile
     {
         public const int MaximumPips = 6;
-        public int TileId { get; private set; }
-        public int FirstValue { get; private set; }
-        public int SecondValue { get; private set; }
-        public SpecialPower SpecialPower { get; private set; }
+        public int TileId { get; }
+        public int FirstValue { get; }
+        public int SecondValue { get; }
+        public SpecialPower SpecialPower { get; }
 
         public bool IsDouble
         {

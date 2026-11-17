@@ -8,6 +8,7 @@ using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
+using DominoAllFives.Client.WPF.Services.Threading;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 using DominoAllFivesService;
@@ -27,26 +28,37 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private ProfilePictureImageService _profilePictureImageService;
         private ObservableCollection<PlayerRankingRecord> _leaderboard;
         private string _currentPlayerRank;
-        public ObservableCollection<PlayerRankingRecord> Leaderboard { get =>
-            _leaderboard; set =>
-            SetProperty(
-            ref _leaderboard,
-            value); }
-        public string CurrentPlayerRank { get =>
-            _currentPlayerRank; set =>
-            SetProperty(
-            ref _currentPlayerRank,
-            value); }
+        public ObservableCollection<PlayerRankingRecord> Leaderboard
+        {
+            get
+            {
+                return _leaderboard;
+            }
+            set
+            {
+                SetProperty(ref _leaderboard, value);
+            }
+        }
+        public string CurrentPlayerRank
+        {
+            get
+            {
+                return _currentPlayerRank;
+            }
+            set
+            {
+                SetProperty(ref _currentPlayerRank, value);
+            }
+        }
         public RelayCommand GoBackCommand { get; }
 
         public RankingsViewModel(PlayerSession playerSession)
         {
             _playerSession = playerSession ?? throw new ArgumentNullException(
-                nameof(
-                playerSession));
+                nameof(playerSession));
             _leaderboard = new ObservableCollection<PlayerRankingRecord>();
             _currentPlayerRank = string.Empty;
-            GoBackCommand = new RelayCommand(_ => _navigationService.GoBack());
+            GoBackCommand = new RelayCommand(unusedParameter => _navigationService.GoBack());
         }
 
         public void Initialize(
@@ -95,28 +107,35 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            Ranking rankingResult;
-            try
-            {
-                List<RankingEntry> topPlayers = _rankingService.GetTopWinsRanking();
-                if (topPlayers == null)
-                {
-                    return;
-                }
+            BackgroundJob<int, Ranking> job = new BackgroundJob<int, Ranking>(
+                RetrieveRanking,
+                _playerSession.PlayerId.Value,
+                CompleteRanking,
+                HandleRankingFailure);
+            BackgroundWork.Start(job);
+        }
 
-                int currentPlayerRank =
-                    _rankingService.GetWinsRankingPositionById(
-                    _playerSession.PlayerId.Value);
-                rankingResult = new Ranking(topPlayers, currentPlayerRank);
-            }
-            catch (CommunicationException ex)
+        private Ranking RetrieveRanking(int playerId)
+        {
+            List<RankingEntry> topPlayers = _rankingService.GetTopWinsRanking();
+            if (topPlayers == null)
             {
-                ShowRankingFailure(ex);
-                return;
+                return null;
             }
-            catch (TimeoutException ex)
+
+            int currentPlayerRank = _rankingService.GetWinsRankingPositionById(playerId);
+            return new Ranking(topPlayers, currentPlayerRank);
+        }
+
+        private void HandleRankingFailure(Exception ex, int playerId)
+        {
+            ShowRankingFailure(ex);
+        }
+
+        private void CompleteRanking(Ranking rankingResult, int playerId)
+        {
+            if (rankingResult == null)
             {
-                ShowRankingFailure(ex);
                 return;
             }
 

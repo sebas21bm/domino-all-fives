@@ -48,8 +48,8 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Interfaces
         /// <param name = "version">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
-        MatchView Play(int matchId, DominoTile tile, BoardEnd end, long version);
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
+        void Play(int matchId, DominoTile tile, BoardEnd end, long version);
         /// <summary>
         /// Requests drawing from the stock without advancing the player's turn.
         /// </summary>
@@ -59,8 +59,8 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Interfaces
         /// <param name = "version">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
-        MatchView Draw(int matchId, long version);
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
+        void Draw(int matchId, long version);
         /// <summary>
         /// Requests a pass against the displayed match version.
         /// </summary>
@@ -70,8 +70,8 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Interfaces
         /// <param name = "version">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
-        MatchView Pass(int matchId, long version);
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
+        void Pass(int matchId, long version);
         /// <summary>
         /// Explicitly leaves and cancels the match; closing the transport alone does not leave.
         /// </summary>

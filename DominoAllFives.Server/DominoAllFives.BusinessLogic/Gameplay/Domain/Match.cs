@@ -8,15 +8,6 @@ namespace DominoAllFives.BusinessLogic.Gameplay
     {
         private const int MinimumPlayers = 2;
         private const int MaximumPlayers = 4;
-        private const int TwoPlayerHandSize = 7;
-        private const int MultiplayerHandSize = 5;
-        private const int DeckSize = 28;
-        private const int MaximumSpecialTiles = 5;
-        private const int DoublePointsMultiplier = 2;
-        private const int ScoringMultiple = 5;
-        private const int RoundingOffset = 2;
-        private const int DoubleRankOffset = 100;
-        private const int PipValueRadix = Tile.MaximumPips + 1;
         private static readonly int[] allowedTargets =
         {
             100,
@@ -24,13 +15,15 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             200,
             250
         };
-        private readonly List<MatchPlayer> _players;
-        private readonly Func<List<Tile>> _createDeck;
+        private List<MatchPlayer> _players;
+        private readonly DeckGenerator _deckGenerator = new DeckGenerator();
+        private readonly RoundSetup _roundSetup = new RoundSetup();
         private Queue<Tile> _stock;
         private int _currentPlayerIndex;
         private int _consecutivePasses;
-        public int MatchId { get; private set; }
-        public int TargetPoints { get; private set; }
+
+        public int MatchId { get; }
+        public int TargetPoints { get; }
         public int RoundNumber { get; private set; }
         public int OpeningTileId { get; private set; }
         public int TurnNumber { get; private set; }
@@ -60,13 +53,21 @@ namespace DominoAllFives.BusinessLogic.Gameplay
         {
             get
             {
-                return Phase == MatchState.InProgress ? (int
-                    ? )_players[_currentPlayerIndex].PlayerId : null;
+                if (Phase != MatchState.InProgress)
+                {
+                    return null;
+                }
+
+                MatchPlayer currentPlayer = _players[_currentPlayerIndex];
+                return currentPlayer.PlayerId;
             }
         }
 
-        public Match(int matchId, IEnumerable<int> playerIds, int targetPoints,
-            Func<List<Tile>> createDeck)
+        public Match(
+            int matchId,
+            IEnumerable<int> playerIds,
+            int targetPoints,
+            List<Tile> initialDeck)
         {
             if (matchId <= 0)
             {
@@ -79,13 +80,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             }
 
             List<int> ids = playerIds.ToList();
-            if (ids.Count < MinimumPlayers || ids.Count > MaximumPlayers || ids.Distinct()
-                .Count() != ids.Count || ids.Any(id => id <= 0))
-            {
-                throw new ArgumentException("Two to four distinct players are required.",
-                    nameof(playerIds));
-            }
-
+            ValidatePlayerIds(ids, nameof(playerIds));
             if (!allowedTargets.Contains(targetPoints))
             {
                 throw new ArgumentOutOfRangeException(nameof(targetPoints));
@@ -93,16 +88,14 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 
             MatchId = matchId;
             TargetPoints = targetPoints;
-            _players = ids.Select(id => new MatchPlayer { PlayerId = id })
-                .ToList();
-            _createDeck = createDeck ?? throw new ArgumentNullException(nameof(createDeck));
-            BeginRound();
+            _players = CreatePlayers(ids);
+            BeginRound(initialDeck);
         }
 
         public MatchPlayer GetPlayer(int playerId)
         {
-            MatchPlayer player = _players.SingleOrDefault(candidate
-                => candidate.PlayerId == playerId);
+            MatchPlayer player = _players.SingleOrDefault(
+                candidate => candidate.PlayerId == playerId);
             if (player == null)
             {
                 throw new MatchRuleException(MatchIssue.PlayerNotInMatch);
@@ -111,81 +104,139 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             return player;
         }
 
-        public void Play(int playerId, int tileId, End end, long expectedVersion)
+        public void Play(
+            int playerId,
+            int tileId,
+            BoardEndPosition end,
+            long expectedVersion)
         {
             MatchPlayer player = ValidateTurn(playerId, expectedVersion);
-            Tile tile = player.Hand.SingleOrDefault(candidate => candidate.TileId == tileId);
+            Tile tile = player.Hand.SingleOrDefault(
+                candidate => candidate.TileId == tileId);
             if (tile == null)
             {
                 throw new MatchRuleException(MatchIssue.TileNotOwned);
             }
 
-            if (Board.Tiles.Count == 0 && tileId != OpeningTileId)
+            if (Board.Tiles.Count == 0
+                && tileId != OpeningTileId)
             {
                 throw new MatchRuleException(MatchIssue.OpeningTileRequired);
             }
 
-            Board.Place(tile, end, TurnNumber);
-            player.Hand.Remove(tile);
-            int points = Board.CalculatePoints(TurnNumber);
-            player.Points += tile.SpecialPower == SpecialPower.DoublePoints
-                ? points * DoublePointsMultiplier : points;
-            LastPlay = CreatePlayScore(playerId, tile, end, points);
+            PreparedPlay play = PreparePlay(player, tile, end);
+            ApplyPlay(play);
+        }
+
+        private PreparedPlay PreparePlay(MatchPlayer player, Tile tile, BoardEndPosition end)
+        {
+            Board board = Board.Copy();
+            board.Place(tile, end, TurnNumber);
+            MatchPlayer projectedPlayer = new MatchPlayer
+            {
+                PlayerId = player.PlayerId,
+                Points = player.Points,
+                Hand = new List<Tile>(player.Hand)
+            };
+            projectedPlayer.Hand.Remove(tile);
+
+            PlayScore score = PlayScoring.Evaluate(board, TurnNumber);
+            score.PlayerId = player.PlayerId;
+            score.RoundNumber = RoundNumber;
+            projectedPlayer.Points += score.Points;
+            PreparedPlay play = new PreparedPlay(board, projectedPlayer, score);
+
+            if (projectedPlayer.Points >= TargetPoints)
+            {
+                play.Phase = MatchState.Completed;
+                return play;
+            }
+
+            if (projectedPlayer.Hand.Count == 0)
+            {
+                List<MatchPlayer> projectedPlayers = new List<MatchPlayer>(_players);
+                projectedPlayers[_currentPlayerIndex] = projectedPlayer;
+                RoundSummary round = RoundResolution.ResolvePlayedOut(
+                    projectedPlayers,
+                    RoundNumber,
+                    player.PlayerId);
+                play.RoundEnd = PrepareRoundEnd(round);
+                score.RoundPoints = round.AwardedPoints;
+            }
+
+            return play;
+        }
+
+        private void ApplyPlay(PreparedPlay play)
+        {
+            MatchPlayer player = _players[_currentPlayerIndex];
+            player.Hand = play.Player.Hand;
+            player.Points = play.Player.Points;
+            Board = play.Board;
+            LastPlay = play.Score;
+            Phase = play.Phase;
             _consecutivePasses = 0;
+            if (play.RoundEnd != null)
+            {
+                ApplyRoundEnd(play.RoundEnd);
+            }
+            else if (Phase == MatchState.InProgress)
+            {
+                AdvanceTurn();
+            }
+
             Version++;
-            if (player.Points >= TargetPoints)
-            {
-                Phase = MatchState.Completed;
-                return;
-            }
-
-            if (player.Hand.Count == 0)
-            {
-                FinishRound(player.PlayerId);
-                LastPlay.RoundPoints = LastRound.AwardedPoints;
-                return;
-            }
-
-            AdvanceTurn();
         }
 
         public void Draw(int playerId, long expectedVersion)
         {
             MatchPlayer player = ValidateTurn(playerId, expectedVersion);
-            if (Board.HasMove(player.Hand, TurnNumber) || _stock.Count == 0)
+            bool playerHasMove = Board.HasMove(player.Hand, TurnNumber);
+            bool stockIsEmpty = _stock.Count == 0;
+            if (playerHasMove || stockIsEmpty)
             {
                 throw new MatchRuleException(MatchIssue.DrawNotAllowed);
             }
 
             do
             {
-                player.Hand.Add(_stock.Dequeue());
+                Tile drawnTile = _stock.Dequeue();
+                player.Hand.Add(drawnTile);
+                playerHasMove = Board.HasMove(player.Hand, TurnNumber);
+                stockIsEmpty = _stock.Count == 0;
             }
-            while (_stock.Count > 0 && !Board.HasMove(player.Hand, TurnNumber));
+            while (!stockIsEmpty && !playerHasMove);
+
             Version++;
         }
 
         public void Pass(int playerId, long expectedVersion)
         {
             MatchPlayer player = ValidateTurn(playerId, expectedVersion);
-            if (_stock.Count > 0 || Board.HasMove(player.Hand, TurnNumber))
+            bool stockHasTiles = _stock.Count > 0;
+            bool playerHasMove = Board.HasMove(player.Hand, TurnNumber);
+            if (stockHasTiles || playerHasMove)
             {
                 throw new MatchRuleException(MatchIssue.PassNotAllowed);
             }
 
-            _consecutivePasses++;
-            Version++;
-            AdvanceTurn();
-            // A temporary block expiring can make a previously impossible move legal.
-            bool hasAnyMove = _players.Any(candidate => Board.HasMove(candidate.Hand, TurnNumber));
-            if (_consecutivePasses >= _players.Count && !hasAnyMove)
+            int nextPassCount = _consecutivePasses + 1;
+            int nextTurnNumber = TurnNumber + 1;
+            PreparedRoundEnd roundEnd = null;
+            if (nextPassCount >= _players.Count && !AnyPlayerHasMove(nextTurnNumber))
             {
-                int minimum = _players.Min(candidate => candidate.Hand.Sum(tile => tile.TotalPips));
-                List<MatchPlayer> winners = _players.Where(candidate => candidate.Hand.Sum(tile
-                    => tile.TotalPips) == minimum)
-                    .ToList();
-                FinishRound(winners.Count == 1 ? (int? )winners[0].PlayerId : null);
+                RoundSummary round = RoundResolution.ResolveBlocked(_players, RoundNumber);
+                roundEnd = PrepareRoundEnd(round);
             }
+
+            _consecutivePasses = nextPassCount;
+            AdvanceTurn();
+            if (roundEnd != null)
+            {
+                ApplyRoundEnd(roundEnd);
+            }
+
+            Version++;
         }
 
         public void Cancel(int playerId)
@@ -198,6 +249,48 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 
             Phase = MatchState.Cancelled;
             Version++;
+        }
+
+        private static List<MatchPlayer> CreatePlayers(IEnumerable<int> playerIds)
+        {
+            List<MatchPlayer> players = new List<MatchPlayer>();
+            foreach (int playerId in playerIds)
+            {
+                MatchPlayer player = new MatchPlayer
+                {
+                    PlayerId = playerId
+                };
+                players.Add(player);
+            }
+
+            return players;
+        }
+
+        private static void ValidatePlayerIds(List<int> playerIds, string parameterName)
+        {
+            bool hasValidPlayerCount = playerIds.Count >= MinimumPlayers
+                && playerIds.Count <= MaximumPlayers;
+            HashSet<int> uniquePlayerIds = new HashSet<int>();
+            bool hasInvalidPlayerId = false;
+            foreach (int playerId in playerIds)
+            {
+                if (playerId <= 0)
+                {
+                    hasInvalidPlayerId = true;
+                }
+
+                uniquePlayerIds.Add(playerId);
+            }
+
+            bool hasUniquePlayerIds = uniquePlayerIds.Count == playerIds.Count;
+            if (!hasValidPlayerCount
+                || hasInvalidPlayerId
+                || !hasUniquePlayerIds)
+            {
+                throw new ArgumentException(
+                    "Two to four distinct players are required.",
+                    parameterName);
+            }
         }
 
         private MatchPlayer ValidateTurn(int playerId, long expectedVersion)
@@ -227,115 +320,102 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             TurnNumber++;
         }
 
-        private PlayScore CreatePlayScore(int playerId, Tile tile, End end, int points)
+        private bool AnyPlayerHasMove(int turnNumber)
         {
-            int multiplier = tile.SpecialPower == SpecialPower.DoublePoints
-                ? DoublePointsMultiplier : 1;
-            int[] values = Board.GetScoringValues(TurnNumber);
-            return new PlayScore
+            foreach (MatchPlayer player in _players)
             {
-                PlayerId = playerId,
-                RoundNumber = RoundNumber,
-                Tile = tile,
-                PlayedEnd = end,
-                EndValues = Array.AsReadOnly(values),
-                BlockedEnds = Board.Ends.Where(target => target.BlockedTurn == TurnNumber)
-                    .Select(target => target.End)
-                    .ToList().AsReadOnly(),
-                IncludesOpeningDouble = Board.Ends.Any(target => target.IsOpeningEnd
-                    && target.BlockedTurn != TurnNumber),
-                Total = values.Sum(),
-                BasePoints = points,
-                Multiplier = multiplier,
-                Points = points * multiplier
-            };
-        }
-
-        private void FinishRound(int? winnerId)
-        {
-            int total = _players.Sum(player => player.Hand.Sum(tile => tile.TotalPips));
-            int award = winnerId.HasValue ? ((total
-                + RoundingOffset) / ScoringMultiple) * ScoringMultiple : 0;
-            if (winnerId.HasValue)
-            {
-                GetPlayer(winnerId.Value).Points += award;
+                if (Board.HasMove(player.Hand, turnNumber))
+                {
+                    return true;
+                }
             }
 
-            LastRound = new RoundSummary
+            return false;
+        }
+
+        private PreparedRoundEnd PrepareRoundEnd(RoundSummary round)
+        {
+            MatchPlayer winner = null;
+            if (round.WinnerId.HasValue)
             {
-                RoundNumber = RoundNumber,
-                WinnerId = winnerId,
-                AwardedPoints = award,
-                Scores = _players.ToDictionary(player => player.PlayerId, player => player.Points),
-                RemainingHands = _players.ToDictionary(player => player.PlayerId, player
-                    => player.Hand.ToArray())
-            };
-            if (_players.Any(player => player.Points >= TargetPoints))
+                winner = GetPlayer(round.WinnerId.Value);
+            }
+
+            foreach (int score in round.Scores.Values)
+            {
+                if (score >= TargetPoints)
+                {
+                    return new PreparedRoundEnd(round, winner, null, null);
+                }
+            }
+
+            List<Tile> deck = _deckGenerator.Generate();
+            PreparedRound nextRound = _roundSetup.Prepare(GetPlayerIds(), deck);
+            List<MatchPlayer> orderedPlayers = OrderPlayers(nextRound);
+            return new PreparedRoundEnd(round, winner, nextRound, orderedPlayers);
+        }
+
+        private void ApplyRoundEnd(PreparedRoundEnd roundEnd)
+        {
+            if (roundEnd.Winner != null)
+            {
+                roundEnd.Winner.Points += roundEnd.Summary.AwardedPoints;
+            }
+
+            LastRound = roundEnd.Summary;
+            if (roundEnd.NextRound == null)
             {
                 Phase = MatchState.Completed;
                 return;
             }
 
-            BeginRound();
+            ApplyPreparedRound(roundEnd.NextRound, roundEnd.OrderedPlayers);
         }
 
-        private void BeginRound()
+        private void BeginRound(List<Tile> deck)
         {
-            List<Tile> deck = _createDeck();
-            ValidateDeck(deck);
-            _stock = new Queue<Tile>(deck);
-            int handSize = _players.Count == MinimumPlayers
-                ? TwoPlayerHandSize : MultiplayerHandSize;
+            PreparedRound round = _roundSetup.Prepare(GetPlayerIds(), deck);
+            List<MatchPlayer> orderedPlayers = OrderPlayers(round);
+            ApplyPreparedRound(round, orderedPlayers);
+        }
+
+        private List<int> GetPlayerIds()
+        {
+            List<int> playerIds = new List<int>();
             foreach (MatchPlayer player in _players)
             {
-                player.Hand.Clear();
-                for (int tileIndex = 0; tileIndex < handSize; tileIndex++)
-                {
-                    player.Hand.Add(_stock.Dequeue());
-                }
+                playerIds.Add(player.PlayerId);
             }
 
-            _players.Sort((left, right) => GetHandRank(right).CompareTo(GetHandRank(left)));
-            OpeningTileId = _players[0].Hand.OrderByDescending(GetTileRank)
-                .First().TileId;
-            Board = new Board();
+            return playerIds;
+        }
+
+        private List<MatchPlayer> OrderPlayers(PreparedRound round)
+        {
+            List<MatchPlayer> orderedPlayers = new List<MatchPlayer>();
+            foreach (MatchPlayer player in round.Players)
+            {
+                orderedPlayers.Add(GetPlayer(player.PlayerId));
+            }
+
+            return orderedPlayers;
+        }
+
+        private void ApplyPreparedRound(PreparedRound round, List<MatchPlayer> orderedPlayers)
+        {
+            for (int index = 0; index < orderedPlayers.Count; index++)
+            {
+                orderedPlayers[index].Hand = round.Players[index].Hand;
+            }
+
+            _players = orderedPlayers;
+            _stock = round.Stock;
+            OpeningTileId = round.OpeningTileId;
+            Board = round.Board;
             RoundNumber++;
             TurnNumber = 0;
             _currentPlayerIndex = 0;
             _consecutivePasses = 0;
-        }
-
-        private static int GetHandRank(MatchPlayer player)
-        {
-            return player.Hand.Max(GetTileRank);
-        }
-
-        private static int GetTileRank(Tile tile)
-        {
-            return tile.IsDouble ? DoubleRankOffset
-                + tile.FirstValue : tile.TotalPips * PipValueRadix + Math.Max(tile.FirstValue,
-                tile.SecondValue);
-        }
-
-        private static void ValidateDeck(List<Tile> deck)
-        {
-            if (deck == null || deck.Count != DeckSize || deck.Any(tile => tile == null))
-            {
-                throw new ArgumentException("A complete double-six deck is required.");
-            }
-
-            bool uniqueIds = deck.Select(tile => tile.TileId)
-                .Distinct()
-                .Count() == DeckSize;
-            bool uniqueValues = deck.Select(tile => Math.Min(tile.FirstValue,
-                tile.SecondValue) * PipValueRadix + Math.Max(tile.FirstValue, tile.SecondValue))
-                .Distinct()
-                .Count() == DeckSize;
-            if (!uniqueIds || !uniqueValues || deck.Count(tile
-                => tile.SpecialPower != SpecialPower.None) > MaximumSpecialTiles)
-            {
-                throw new ArgumentException("Invalid deck.");
-            }
         }
     }
 }

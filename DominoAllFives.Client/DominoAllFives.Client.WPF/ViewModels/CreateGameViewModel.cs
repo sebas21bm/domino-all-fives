@@ -123,8 +123,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public CreateGameViewModel(PlayerSession playerSession)
         {
             _playerSession = playerSession ?? throw new ArgumentNullException(
-                nameof(
-                playerSession));
+                nameof(playerSession));
             GoBackCommand = new RelayCommand(GoBack, CanInteract);
             CreateGameCommand = new RelayCommand(CreateGame, CanCreateGame);
         }
@@ -143,8 +142,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
             _lobbyService = lobbyService ?? throw new ArgumentNullException(nameof(lobbyService));
             _dialogService = dialogService ?? throw new ArgumentNullException(
-                nameof(
-                dialogService));
+                nameof(dialogService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             RaiseCommands();
         }
@@ -177,14 +175,19 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 TargetPoints = GetTargetPoints()
             };
             SetBusy(true);
-            BackgroundJob<LobbySettings, Lobby> job =
-                new BackgroundJob<LobbySettings, Lobby>(
-                value => _lobbyService.CreateLobby(
-                value),
+            BackgroundJob<LobbySettings, bool> job =
+                new BackgroundJob<LobbySettings, bool>(
+                CreateLobbyOnWorker,
                 settings,
                 OnLobbyReady,
                 OnLobbyFailed);
             BackgroundWork.Start(job);
+        }
+
+        private bool CreateLobbyOnWorker(LobbySettings settings)
+        {
+            _lobbyService.CreateLobby(settings);
+            return true;
         }
 
         private void HandleFailure(Exception error)
@@ -192,9 +195,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             FaultException<LobbyIssue> lobbyFault = error as FaultException<LobbyIssue>;
             if (lobbyFault != null)
             {
-                _logger.LogWarning(
-                    lobbyFault,
-                    "Create lobby rejected: {Issue}.",
+                _logger.LogDebug(lobbyFault,
+                    "Create lobby rejected: {LobbyIssue}.",
                     lobbyFault.Detail);
                 string key =
                     lobbyFault.Detail == LobbyIssue.PlayerAlreadyInLobby
@@ -235,7 +237,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             CreateGameCommand.RaiseCanExecuteChanged();
         }
 
-        private void OnLobbyReady(Lobby lobby, LobbySettings state)
+        private void OnLobbyReady(bool wasCreated, LobbySettings state)
         {
             SetBusy(false);
             _navigation.NavigateTo<LobbyViewModel>();

@@ -6,37 +6,37 @@ namespace DominoAllFives.Contracts.Gameplay
     [DataContract]
     public sealed class MatchView
     {
-        [DataMember(Order = 1)]
+        [DataMember]
         public int MatchId { get; set; }
 
-        [DataMember(Order = 2)]
+        [DataMember]
         public PublicBoard Board { get; set; }
 
-        [DataMember(Order = 3)]
+        [DataMember]
         public int? CurrentPlayerId { get; set; }
 
-        [DataMember(Order = 4)]
+        [DataMember]
         public List<PlayerScore> Scores { get; set; }
 
-        [DataMember(Order = 5)]
+        [DataMember]
         public MatchStatus Phase { get; set; }
 
-        [DataMember(Order = 6)]
+        [DataMember]
         public long Version { get; set; }
 
-        [DataMember(Order = 7)]
+        [DataMember]
         public int StockCount { get; set; }
 
-        [DataMember(Order = 8)]
+        [DataMember]
         public int RoundNumber { get; set; }
 
-        [DataMember(Order = 9)]
+        [DataMember]
         public RoundResult LastRound { get; set; }
 
-        [DataMember(Order = 10)]
+        [DataMember]
         public int OpeningTileId { get; set; }
 
-        [DataMember(Order = 11)]
+        [DataMember]
         public PlayScore LastPlay { get; set; }
     }
 }

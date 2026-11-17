@@ -124,7 +124,7 @@
   </Target>
   <Import Project="..\..\packages\EntityFramework.6.5.2\build\EntityFramework.targets" Condition="Exists('..\..\packages\EntityFramework.6.5.2\build\EntityFramework.targets')" />
   <ItemGroup>
-    <Compile Include="Gameplay\MatchProjection.cs" />
+    <Compile Include="Gameplay\MatchContractMapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\MatchController.cs" />
@@ -145,10 +145,17 @@
     <Compile Include="Gameplay\Domain\Board.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Gameplay\Domain\BoardEnd.cs" />
+    <Compile Include="Gameplay\Domain\BoardEndState.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Gameplay\Domain\Deck.cs" />
+    <Compile Include="Gameplay\DeckGenerator.cs" />
+    <Compile Include="Gameplay\RoundSetup.cs" />
+    <Compile Include="Gameplay\PlayScoring.cs" />
+    <Compile Include="Gameplay\RoundResolution.cs" />
+    <Compile Include="Gameplay\MatchUpdateQueue.cs" />
+    <Compile Include="Gameplay\Domain\PreparedRound.cs" />
+    <Compile Include="Gameplay\Domain\PreparedPlay.cs" />
+    <Compile Include="Gameplay\Domain\PreparedRoundEnd.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gameplay\Domain\Match.cs" />
@@ -169,7 +176,7 @@
     <Compile Include="Gameplay\Domain\Tile.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Gameplay\Enum\End.cs" />
+    <Compile Include="Gameplay\Enum\BoardEndPosition.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gameplay\Enum\MatchIssue.cs" />

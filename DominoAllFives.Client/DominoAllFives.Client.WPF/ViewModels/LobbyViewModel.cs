@@ -107,8 +107,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public LobbyViewModel(PlayerSession playerSession)
         {
             _logger = LoggerFactoryProvider.CreateLogger<LobbyViewModel>();
-            _playerSession = playerSession ?? throw new ArgumentNullException(nameof(
-                playerSession));
+            _playerSession = playerSession
+                ?? throw new ArgumentNullException(nameof(playerSession));
             GoBackCommand = new RelayCommand(Leave, CanLeave);
             InviteFriendsCommand = new RelayCommand(DoNothing, CannotExecute);
             StartGameCommand = new RelayCommand(StartGame, CanStartGame);
@@ -126,10 +126,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
             _client = lobbyService ?? throw new ArgumentNullException(nameof(lobbyService));
-            _pictureService = pictureService ?? throw new ArgumentNullException(nameof(
-                pictureService));
-            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(
-                dialogService));
+            _pictureService = pictureService
+                ?? throw new ArgumentNullException(nameof(pictureService));
+            _dialogService = dialogService
+                ?? throw new ArgumentNullException(nameof(dialogService));
             if (!_client.IsActive)
             {
                 throw new InvalidOperationException("No active lobby session.");
@@ -224,8 +224,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
             StatusMessage = string.Empty;
             _dialogService.ShowDialog(new DialogRequest { Type = DialogType.Information,
                 TitleKey = "Global_msgDefaultErrorTitle", MessageKey = "Lobby_msgClosed" });
-            _client.Reset();
-            _navigation.GoBack();
+            SetBusy(true);
+            BackgroundJob<object, bool> job = new BackgroundJob<object, bool>(
+                ResetLobbyOnWorker, null, OnLeaveLobbyCompleted, OnLeaveLobbyFailed);
+            BackgroundWork.Start(job);
         }
 
         private void HandleMatchStartedOnUi(int matchId)
@@ -244,7 +246,31 @@ namespace DominoAllFives.Client.WPF.ViewModels
                     => participant.PlayerId, participant => participant.Username)
             };
             Dispose();
+            BackgroundJob<MatchNavigation, bool> job =
+                new BackgroundJob<MatchNavigation, bool>(
+                    ResetLobbyForMatch, context, OnMatchReady, OnMatchResetFailed);
+            BackgroundWork.Start(job);
+        }
+
+        private bool ResetLobbyOnWorker(object state)
+        {
             _client.Reset();
+            return true;
+        }
+
+        private bool ResetLobbyForMatch(MatchNavigation context)
+        {
+            return ResetLobbyOnWorker(null);
+        }
+
+        private void OnMatchReady(bool result, MatchNavigation context)
+        {
+            _navigation.NavigateTo<MatchViewModel>(context);
+        }
+
+        private void OnMatchResetFailed(Exception ex, MatchNavigation context)
+        {
+            _logger.LogError(ex, "The lobby channel could not be reset before the match.");
             _navigation.NavigateTo<MatchViewModel>(context);
         }
 

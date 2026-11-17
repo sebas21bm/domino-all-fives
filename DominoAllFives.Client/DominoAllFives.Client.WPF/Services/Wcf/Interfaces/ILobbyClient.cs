@@ -21,8 +21,8 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Interfaces
 
         int ProvisionalMatchId { get; }
 
-        Lobby CreateLobby(LobbySettings settings);
-        Lobby JoinLobby(string lobbyCode);
+        void CreateLobby(LobbySettings settings);
+        void JoinLobby(string lobbyCode);
         Lobby GetLobby(string lobbyCode);
         void LeaveLobby();
         void StartMatch();

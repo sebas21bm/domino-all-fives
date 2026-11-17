@@ -2,6 +2,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+[assembly: InternalsVisibleTo("DominoAllFives.Server.UnitTests")]
+
 // The following attributes define general assembly information.
 // Change their values to update the assembly metadata.
 // Metadata is associated with the compiled assembly.

@@ -31,6 +31,7 @@ namespace DominoAllFives.Contracts.Services
         [FaultContract(typeof(AccessIssue))]
         [FaultContract(typeof(MatchIssue))]
         MatchView OpenMatchSession(string sessionKey, int matchId);
+
         /// <summary>
         /// Retrieves the public match snapshot without exposing opponents' hands.
         /// </summary>
@@ -48,6 +49,7 @@ namespace DominoAllFives.Contracts.Services
         [FaultContract(typeof(AccessIssue))]
         [FaultContract(typeof(MatchIssue))]
         MatchView GetMatch(int matchId);
+
         /// <summary>
         /// Retrieves only the authenticated player's hand and its snapshot version.
         /// </summary>
@@ -65,6 +67,7 @@ namespace DominoAllFives.Contracts.Services
         [FaultContract(typeof(AccessIssue))]
         [FaultContract(typeof(MatchIssue))]
         PlayerHand GetHand(int matchId);
+
         /// <summary>
         /// Places an owned tile using server values and the expected match version.
         /// </summary>
@@ -76,7 +79,7 @@ namespace DominoAllFives.Contracts.Services
         /// <param name = "expectedVersion">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
         /// <exception cref = "FaultException{AccessIssue}">
         /// The session is missing, revoked or bound to another match.
         /// </exception>
@@ -86,7 +89,8 @@ namespace DominoAllFives.Contracts.Services
         [OperationContract(IsInitiating = false)]
         [FaultContract(typeof(AccessIssue))]
         [FaultContract(typeof(MatchIssue))]
-        MatchView PlayTile(int matchId, DominoTile tile, BoardEnd end, long expectedVersion);
+        void PlayTile(int matchId, DominoTile tile, BoardEnd end, long expectedVersion);
+
         /// <summary>
         /// Draws until a legal move exists or the stock is exhausted, preserving the turn.
         /// </summary>
@@ -96,7 +100,7 @@ namespace DominoAllFives.Contracts.Services
         /// <param name = "expectedVersion">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
         /// <exception cref = "FaultException{AccessIssue}">
         /// The session is missing, revoked or bound to another match.
         /// </exception>
@@ -106,7 +110,8 @@ namespace DominoAllFives.Contracts.Services
         [OperationContract(IsInitiating = false)]
         [FaultContract(typeof(AccessIssue))]
         [FaultContract(typeof(MatchIssue))]
-        MatchView DrawTiles(int matchId, long expectedVersion);
+        void DrawTiles(int matchId, long expectedVersion);
+
         /// <summary>
         /// Passes only when the stock is empty and the player has no legal move.
         /// </summary>
@@ -116,7 +121,7 @@ namespace DominoAllFives.Contracts.Services
         /// <param name = "expectedVersion">
         /// The snapshot version on which the player's intention is based.
         /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
+        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
         /// <exception cref = "FaultException{AccessIssue}">
         /// The session is missing, revoked or bound to another match.
         /// </exception>
@@ -126,7 +131,8 @@ namespace DominoAllFives.Contracts.Services
         [OperationContract(IsInitiating = false)]
         [FaultContract(typeof(AccessIssue))]
         [FaultContract(typeof(MatchIssue))]
-        MatchView PassTurn(int matchId, long expectedVersion);
+        void PassTurn(int matchId, long expectedVersion);
+
         /// <summary>
         /// Cancels the match without a winner when a participant explicitly leaves.
         /// </summary>

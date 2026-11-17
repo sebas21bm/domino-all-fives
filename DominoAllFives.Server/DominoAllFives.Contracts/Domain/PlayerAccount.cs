@@ -11,6 +11,7 @@ namespace DominoAllFives.Contracts.Domain
     public sealed class PlayerAccount
     {
         private const int MaximumLanguageIdLength = 10;
+
         [DataMember(Order = 1, IsRequired = true)]
         public int PlayerId { get; private set; }
 
@@ -35,7 +36,9 @@ namespace DominoAllFives.Contracts.Domain
         /// </summary>
         /// <param name = "playerId">The account identifier.</param>
         /// <param name = "username">The stored or requested username.</param>
-        /// <param name = "preferredLanguageId">The preferred language identifier associated with the account.</param>
+        /// <param name = "preferredLanguageId">
+        /// The preferred language identifier associated with the account.
+        /// </param>
         /// <param name = "accessStatus">The restrictions reconstructed by the server.</param>
         /// <returns>The domain value produced by the operation.</returns>
         public static PlayerAccount FromStoredAccount(
@@ -48,7 +51,8 @@ namespace DominoAllFives.Contracts.Domain
             {
                 PlayerId = playerId,
                 Username = username,
-                AccessStatus = accessStatus ?? throw new ArgumentNullException(nameof(accessStatus))
+                AccessStatus = accessStatus
+                    ?? throw new ArgumentNullException(nameof(accessStatus))
             };
             account.SetPreferredLanguage(preferredLanguageId);
             return account;
@@ -57,15 +61,21 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Maps the preferred language stored with the account.
         /// </summary>
-        /// <param name = "preferredLanguageId">The preferred language identifier associated with the account.</param>
+        /// <param name = "preferredLanguageId">
+        /// The preferred language identifier associated with the account.
+        /// </param>
         public void SetPreferredLanguage(string preferredLanguageId)
         {
+            if (preferredLanguageId == null)
+            {
+                throw new ArgumentNullException(nameof(preferredLanguageId));
+            }
+
             if (!IsPreferredLanguageValid(preferredLanguageId))
             {
                 throw new ArgumentException(
                     "Invalid stored language identifier.",
-                    nameof(
-                    preferredLanguageId));
+                    nameof(preferredLanguageId));
             }
 
             PreferredLanguageId = preferredLanguageId;
@@ -74,12 +84,15 @@ namespace DominoAllFives.Contracts.Domain
         /// <summary>
         /// Checks server-reconstructed restrictions without authenticating a client session.
         /// </summary>
-        /// <param name = "currentTime">The comparison time in the timestamp convention of the stored restrictions.</param>
+        /// <param name = "currentTime">
+        /// The comparison time in the timestamp convention of the stored restrictions.
+        /// </param>
         public LoginStatus EnsureCanLogin(DateTime currentTime)
         {
             if (AccessStatus == null)
             {
-                throw new InvalidOperationException("Account access restrictions are unavailable.");
+                throw new InvalidOperationException(
+                    "Account access restrictions are unavailable.");
             }
 
             return AccessStatus.EnsureCanLogin(currentTime);
@@ -87,6 +100,11 @@ namespace DominoAllFives.Contracts.Domain
 
         public void SetSessionKey(string sessionKey)
         {
+            if (sessionKey == null)
+            {
+                throw new ArgumentNullException(nameof(sessionKey));
+            }
+
             if (string.IsNullOrWhiteSpace(sessionKey))
             {
                 throw new ArgumentException(null, nameof(sessionKey));

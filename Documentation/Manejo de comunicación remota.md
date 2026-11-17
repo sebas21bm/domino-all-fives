@@ -18,6 +18,45 @@ Se utiliza `netTcpBinding` para la comunicación cliente-servidor.
 
 Las operaciones que no requieren notificaciones posteriores utilizan llamadas request/response. Las funcionalidades que necesitan actualizaciones iniciadas por el servidor utilizan contratos duplex con callbacks.
 
+## Organización de los servicios
+
+Los contratos request/response se implementan en `DominoService`, como
+`IRankingService`. No requieren un servicio independiente ni un archivo parcial
+por contrato. Durante la refactorización se conserva esta organización; cualquier
+separación debe tener una necesidad concreta y acordarse antes de aplicarla.
+Los contratos duplex conservan sus servicios y el estado de su sesión según el
+flujo documentado.
+
+### Responsabilidad sobre Entity Framework
+
+En el servidor, la implementación WCF actúa como frontera remota: recibe la
+solicitud, invoca el controller, traduce excepciones a faults y registra el fallo
+en el nivel correspondiente. No crea repositorios ni administra el contexto de
+Entity Framework.
+
+El controller que ejecuta el caso de uso crea el contexto y los repositorios que
+necesita la operación. El contexto debe limitarse a esa operación y liberarse con
+`using` antes de devolver el resultado. Este patrón aplica tanto a Ranking como a
+Login y a los siguientes contratos que accedan a persistencia.
+
+```csharp
+public PlayerAccount LoginWithAccount(Credentials credentials)
+{
+    ValidateCredentials(credentials);
+
+    using (DominoAllFivesEntities context = new DominoAllFivesEntities())
+    {
+        IPlayerRepository playerRepository = new PlayerRepository(context);
+        return Authenticate(credentials, playerRepository);
+    }
+}
+```
+
+No se agregan constructores, sobrecargas ni rutas alternativas para inyectar el
+repositorio en estos controllers. Las pruebas que requieran persistencia deben
+usar infraestructura aislada; la facilidad de sustitución en pruebas no cambia
+la responsabilidad de composición del controller.
+
 ## Comunicación request/response
 Para cada operación:
 

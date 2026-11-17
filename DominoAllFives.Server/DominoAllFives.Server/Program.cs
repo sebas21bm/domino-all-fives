@@ -5,11 +5,15 @@ using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Server
 {
-    internal static class Program
+    internal sealed class Program
     {
+        private Program()
+        {
+        }
+
         private static int Main()
         {
-            ILogger<DominoService> logger = LoggerFactoryProvider.CreateLogger<DominoService>();
+            ILogger<Program> logger = LoggerFactoryProvider.CreateLogger<Program>();
             using (ServiceHost dominoServiceHost = new ServiceHost(typeof(DominoService)))
             {
                 using (ServiceHost lobbyServiceHost = new ServiceHost(typeof(LobbyService)))

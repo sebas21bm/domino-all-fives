@@ -6,40 +6,40 @@ namespace DominoAllFives.Contracts.Gameplay
     [DataContract]
     public sealed class PlayScore
     {
-        [DataMember(Order = 1)]
+        [DataMember]
         public int PlayerId { get; set; }
 
-        [DataMember(Order = 2)]
+        [DataMember]
         public int RoundNumber { get; set; }
 
-        [DataMember(Order = 3)]
+        [DataMember]
         public DominoTile Tile { get; set; }
 
-        [DataMember(Order = 4)]
+        [DataMember]
         public BoardEnd PlayedEnd { get; set; }
 
-        [DataMember(Order = 5)]
+        [DataMember]
         public List<int> EndValues { get; set; }
 
-        [DataMember(Order = 6)]
+        [DataMember]
         public List<BoardEnd> BlockedEnds { get; set; }
 
-        [DataMember(Order = 7)]
+        [DataMember]
         public bool IncludesOpeningDouble { get; set; }
 
-        [DataMember(Order = 8)]
+        [DataMember]
         public int Total { get; set; }
 
-        [DataMember(Order = 9)]
+        [DataMember]
         public int BasePoints { get; set; }
 
-        [DataMember(Order = 10)]
+        [DataMember]
         public int Multiplier { get; set; }
 
-        [DataMember(Order = 11)]
+        [DataMember]
         public int Points { get; set; }
 
-        [DataMember(Order = 12)]
+        [DataMember]
         public int RoundPoints { get; set; }
     }
 }

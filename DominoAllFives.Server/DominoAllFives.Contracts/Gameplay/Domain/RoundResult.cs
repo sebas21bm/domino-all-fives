@@ -6,19 +6,19 @@ namespace DominoAllFives.Contracts.Gameplay
     [DataContract]
     public sealed class RoundResult
     {
-        [DataMember(Order = 1)]
+        [DataMember]
         public int RoundNumber { get; set; }
 
-        [DataMember(Order = 2)]
+        [DataMember]
         public int? WinnerId { get; set; }
 
-        [DataMember(Order = 3)]
+        [DataMember]
         public int AwardedPoints { get; set; }
 
-        [DataMember(Order = 4)]
+        [DataMember]
         public List<PlayerScore> Scores { get; set; }
 
-        [DataMember(Order = 5)]
+        [DataMember]
         public List<PlayerHand> RevealedHands { get; set; }
     }
 }

@@ -11,7 +11,7 @@ namespace DominoAllFives.BusinessLogic.Managers
         private const int MinimumPlayersToStart = 2;
         private const int LobbyCodeLength = 6;
         private static readonly LobbyManager instance = new LobbyManager();
-        private readonly object _syncRoot = new object ();
+        private readonly object _syncRoot = new object();
         private readonly Dictionary<string, Lobby> _lobbies = new Dictionary<string, Lobby>(
             StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, string> _playerLobbyCodes = new Dictionary<int, string>();
@@ -41,7 +41,7 @@ namespace DominoAllFives.BusinessLogic.Managers
 
             lock (_syncRoot)
             {
-                EnsurePlayerIsAvailable(host.PlayerId);
+                ValidatePlayerCanEnterLobby(host.PlayerId);
                 string code = GenerateLobbyCode();
                 Lobby lobby = new Lobby
                 {
@@ -70,6 +70,11 @@ namespace DominoAllFives.BusinessLogic.Managers
                 throw new ArgumentNullException(nameof(player));
             }
 
+            if (lobbyCode == null)
+            {
+                throw new ArgumentNullException(nameof(lobbyCode));
+            }
+
             if (string.IsNullOrWhiteSpace(lobbyCode))
             {
                 throw new ArgumentException(null, nameof(lobbyCode));
@@ -77,8 +82,8 @@ namespace DominoAllFives.BusinessLogic.Managers
 
             lock (_syncRoot)
             {
-                EnsurePlayerIsAvailable(player.PlayerId);
-                Lobby lobby = GetLobbyInternal(lobbyCode);
+                ValidatePlayerCanEnterLobby(player.PlayerId);
+                Lobby lobby = GetRegisteredLobby(lobbyCode);
                 if (lobby.State != LobbyState.Waiting)
                 {
                     throw new LobbyRuleException(LobbyIssue.Unavailable);
@@ -104,10 +109,11 @@ namespace DominoAllFives.BusinessLogic.Managers
         {
             lock (_syncRoot)
             {
-                Lobby lobby = GetPlayerLobbyInternal(playerId);
+                Lobby lobby = GetPlayerLobby(playerId);
+                ValidateLobbyIsWaiting(lobby);
                 if (lobby.Host.PlayerId == playerId)
                 {
-                    return CloseLobbyInternal(lobby);
+                    return CloseLobby(lobby);
                 }
 
                 lobby.Participants.Remove(FindPlayer(lobby.Participants, playerId));
@@ -120,16 +126,16 @@ namespace DominoAllFives.BusinessLogic.Managers
         {
             lock (_syncRoot)
             {
-                return CreateSnapshot(GetLobbyInternal(lobbyCode));
+                return CreateSnapshot(GetRegisteredLobby(lobbyCode));
             }
         }
 
-        public Lobby StartLobby(int playerId, Action<Lobby> initializeMatch = null)
+        public Lobby PrepareLobbyForMatch(int playerId)
         {
             lock (_syncRoot)
             {
-                Lobby lobby = GetPlayerLobbyInternal(playerId);
-                EnsureHost(lobby, playerId);
+                Lobby lobby = GetPlayerLobby(playerId);
+                ValidatePlayerIsHost(lobby, playerId);
                 if (lobby.State != LobbyState.Waiting)
                 {
                     throw new LobbyRuleException(LobbyIssue.Unavailable);
@@ -140,10 +146,41 @@ namespace DominoAllFives.BusinessLogic.Managers
                     throw new LobbyRuleException(LobbyIssue.InsufficientPlayers);
                 }
 
-                initializeMatch?.Invoke(CreateSnapshot(lobby));
-                lobby.State = initializeMatch == null ? LobbyState.Starting : LobbyState.InProgress;
+                lobby.State = LobbyState.Starting;
+                return CreateSnapshot(lobby);
+            }
+        }
+
+        public Lobby ConfirmMatchStarted(int playerId)
+        {
+            lock (_syncRoot)
+            {
+                Lobby lobby = GetPlayerLobby(playerId);
+                ValidatePlayerIsHost(lobby, playerId);
+                if (lobby.State != LobbyState.Starting)
+                {
+                    throw new LobbyRuleException(LobbyIssue.Unavailable);
+                }
+
+                lobby.State = LobbyState.InProgress;
                 _lobbyMessages.Remove(lobby.LobbyId);
                 return CreateSnapshot(lobby);
+            }
+        }
+
+        public void RestoreLobbyAfterMatchStartFailure(int playerId)
+        {
+            lock (_syncRoot)
+            {
+                string lobbyCode;
+                Lobby lobby;
+                if (_playerLobbyCodes.TryGetValue(playerId, out lobbyCode)
+                    && _lobbies.TryGetValue(lobbyCode, out lobby)
+                    && lobby.Host.PlayerId == playerId
+                    && lobby.State == LobbyState.Starting)
+                {
+                    lobby.State = LobbyState.Waiting;
+                }
             }
         }
 
@@ -151,10 +188,10 @@ namespace DominoAllFives.BusinessLogic.Managers
         {
             lock (_syncRoot)
             {
-                Lobby lobby = FindLobbyByIdInternal(lobbyId);
+                Lobby lobby = FindLobbyById(lobbyId);
                 if (lobby != null)
                 {
-                    CloseLobbyInternal(lobby);
+                    CloseLobby(lobby);
                 }
             }
         }
@@ -163,9 +200,10 @@ namespace DominoAllFives.BusinessLogic.Managers
         {
             lock (_syncRoot)
             {
-                Lobby lobby = GetPlayerLobbyInternal(playerId);
-                EnsureHost(lobby, playerId);
-                return CloseLobbyInternal(lobby);
+                Lobby lobby = GetPlayerLobby(playerId);
+                ValidatePlayerIsHost(lobby, playerId);
+                ValidateLobbyIsWaiting(lobby);
+                return CloseLobby(lobby);
             }
         }
 
@@ -176,6 +214,11 @@ namespace DominoAllFives.BusinessLogic.Managers
                 throw new ArgumentNullException(nameof(sender));
             }
 
+            if (content == null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
             if (string.IsNullOrWhiteSpace(content))
             {
                 throw new ArgumentException(null, nameof(content));
@@ -183,7 +226,7 @@ namespace DominoAllFives.BusinessLogic.Managers
 
             lock (_syncRoot)
             {
-                Lobby lobby = GetAuthorizedChatLobbyInternal(lobbyId, sender.PlayerId);
+                Lobby lobby = GetChatLobbyForPlayer(lobbyId, sender.PlayerId);
                 List<ChatMessage> messages;
                 if (!_lobbyMessages.TryGetValue(lobby.LobbyId, out messages))
                 {
@@ -213,7 +256,7 @@ namespace DominoAllFives.BusinessLogic.Managers
         {
             lock (_syncRoot)
             {
-                Lobby lobby = GetAuthorizedChatLobbyInternal(lobbyId, playerId);
+                Lobby lobby = GetChatLobbyForPlayer(lobbyId, playerId);
                 List<ChatMessage> storedMessages;
                 if (!_lobbyMessages.TryGetValue(lobby.LobbyId, out storedMessages))
                 {
@@ -234,7 +277,7 @@ namespace DominoAllFives.BusinessLogic.Managers
         {
             lock (_syncRoot)
             {
-                Lobby lobby = FindLobbyByIdInternal(lobbyId);
+                Lobby lobby = FindLobbyById(lobbyId);
                 if (lobby == null || lobby.State != LobbyState.Waiting)
                 {
                     return new List<Player>();
@@ -250,7 +293,7 @@ namespace DominoAllFives.BusinessLogic.Managers
             }
         }
 
-        private void EnsurePlayerIsAvailable(int playerId)
+        private void ValidatePlayerCanEnterLobby(int playerId)
         {
             if (_playerLobbyCodes.ContainsKey(playerId))
             {
@@ -258,7 +301,7 @@ namespace DominoAllFives.BusinessLogic.Managers
             }
         }
 
-        private Lobby GetLobbyInternal(string code)
+        private Lobby GetRegisteredLobby(string code)
         {
             Lobby lobby;
             if (string.IsNullOrWhiteSpace(code) || !_lobbies.TryGetValue(code.Trim(), out lobby))
@@ -269,7 +312,7 @@ namespace DominoAllFives.BusinessLogic.Managers
             return lobby;
         }
 
-        private Lobby GetPlayerLobbyInternal(int playerId)
+        private Lobby GetPlayerLobby(int playerId)
         {
             string code;
             if (!_playerLobbyCodes.TryGetValue(playerId, out code))
@@ -277,12 +320,12 @@ namespace DominoAllFives.BusinessLogic.Managers
                 throw new LobbyRuleException(LobbyIssue.PlayerNotInLobby);
             }
 
-            return GetLobbyInternal(code);
+            return GetRegisteredLobby(code);
         }
 
-        private Lobby GetAuthorizedChatLobbyInternal(int lobbyId, int playerId)
+        private Lobby GetChatLobbyForPlayer(int lobbyId, int playerId)
         {
-            Lobby lobby = FindLobbyByIdInternal(lobbyId);
+            Lobby lobby = FindLobbyById(lobbyId);
             if (lobby == null || lobby.State != LobbyState.Waiting || !ContainsPlayer(
                 lobby.Participants, playerId))
             {
@@ -292,7 +335,7 @@ namespace DominoAllFives.BusinessLogic.Managers
             return lobby;
         }
 
-        private Lobby FindLobbyByIdInternal(int lobbyId)
+        private Lobby FindLobbyById(int lobbyId)
         {
             if (lobbyId <= 0)
             {
@@ -310,7 +353,7 @@ namespace DominoAllFives.BusinessLogic.Managers
             return null;
         }
 
-        private Lobby CloseLobbyInternal(Lobby lobby)
+        private Lobby CloseLobby(Lobby lobby)
         {
             lobby.State = LobbyState.Closed;
             Lobby snapshot = CreateSnapshot(lobby);
@@ -336,11 +379,19 @@ namespace DominoAllFives.BusinessLogic.Managers
             return code;
         }
 
-        private static void EnsureHost(Lobby lobby, int playerId)
+        private static void ValidatePlayerIsHost(Lobby lobby, int playerId)
         {
             if (lobby.Host.PlayerId != playerId)
             {
                 throw new UnauthorizedAccessException();
+            }
+        }
+
+        private static void ValidateLobbyIsWaiting(Lobby lobby)
+        {
+            if (lobby.State != LobbyState.Waiting)
+            {
+                throw new LobbyRuleException(LobbyIssue.Unavailable);
             }
         }
 

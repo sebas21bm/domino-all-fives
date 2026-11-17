@@ -86,8 +86,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public JoinGameViewModel(PlayerSession playerSession)
         {
             _playerSession = playerSession ?? throw new ArgumentNullException(
-                nameof(
-                playerSession));
+                nameof(playerSession));
             GoBackCommand = new RelayCommand(GoBack, CanInteract);
             SwitchModeCommand = new RelayCommand(SwitchMode, CanInteract);
             JoinRoomCommand = new RelayCommand(JoinRoom, CanJoinRoom);
@@ -108,8 +107,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
             _lobbyService = lobbyService ?? throw new ArgumentNullException(nameof(lobbyService));
             _dialogService = dialogService ?? throw new ArgumentNullException(
-                nameof(
-                dialogService));
+                nameof(dialogService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             RaiseCommands();
         }
@@ -142,8 +140,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             return CanInteract()
                 && _playerSession.HasServerSession
-                && !string.IsNullOrWhiteSpace(
-                RoomCode);
+                && !string.IsNullOrWhiteSpace(RoomCode);
         }
 
         private void JoinRoom()
@@ -156,14 +153,19 @@ namespace DominoAllFives.Client.WPF.ViewModels
             string code = RoomCode.Trim().ToUpperInvariant();
             ErrorMessage = string.Empty;
             SetBusy(true);
-            BackgroundJob<string, Lobby> job =
-                new BackgroundJob<string, Lobby>(
-                value => _lobbyService.JoinLobby(
-                value),
+            BackgroundJob<string, bool> job =
+                new BackgroundJob<string, bool>(
+                JoinLobbyOnWorker,
                 code,
                 OnLobbyReady,
                 OnLobbyFailed);
             BackgroundWork.Start(job);
+        }
+
+        private bool JoinLobbyOnWorker(string lobbyCode)
+        {
+            _lobbyService.JoinLobby(lobbyCode);
+            return true;
         }
 
         private void HandleFailure(Exception error)
@@ -171,7 +173,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
             FaultException<LobbyIssue> lobbyFault = error as FaultException<LobbyIssue>;
             if (lobbyFault != null)
             {
-                _logger.LogWarning(lobbyFault, "Join lobby rejected: {Issue}.", lobbyFault.Detail);
+                _logger.LogDebug(
+                    lobbyFault, "Join lobby rejected: {LobbyIssue}.", lobbyFault.Detail);
                 string key = GetLobbyFailureKey(lobbyFault.Detail);
                 Show(DialogType.Warning, key);
                 return;
@@ -210,7 +213,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             JoinRoomCommand.RaiseCanExecuteChanged();
         }
 
-        private void OnLobbyReady(Lobby lobby, string state)
+        private void OnLobbyReady(bool wasJoined, string state)
         {
             SetBusy(false);
             _navigation.NavigateTo<LobbyViewModel>();

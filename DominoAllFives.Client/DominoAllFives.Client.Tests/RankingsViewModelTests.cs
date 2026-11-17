@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
+using System.Threading;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.ProfilePicture;
@@ -16,6 +17,14 @@ namespace DominoAllFives.Client.Tests
     [TestFixture]
     public class RankingsViewModelTests
     {
+        private const int CompletionTimeoutMilliseconds = 5000;
+
+        [OneTimeSetUp]
+        public void StartDispatcher()
+        {
+            WpfTestHost.EnsureStarted();
+        }
+
         [Test]
         public void Ranking_RemoteEntriesAndPosition_CombinesBothValues()
         {
@@ -38,8 +47,7 @@ namespace DominoAllFives.Client.Tests
 
         [TestCase(7, "7")]
         [TestCase(0, "-")]
-        public void LoadRanking_AvailablePosition_ComposesPositionWithLeaderboard(
-            int position,
+        public void LoadRanking_AvailablePosition_ComposesPositionWithLeaderboard(int position,
             string displayedPosition)
         {
             // Arrange
@@ -119,39 +127,31 @@ namespace DominoAllFives.Client.Tests
         public void Initialize_InvalidOrRepeatedDependencies_RejectsBeforeLoading()
         {
             // Arrange
-            var session = new PlayerSession();
+            PlayerSession session = new PlayerSession();
             session.Start(42, "player");
-            var client = new RankingClient
+            RankingClient client = new RankingClient
             {
                 TopRanking = new List<RankingEntry>(),
                 Position = 7
             };
-            var dialogs = new DialogService();
-            var pictures =
-                new ProfilePictureImageService(
+            DialogService dialogs = new DialogService();
+            ProfilePictureImageService pictures = new ProfilePictureImageService(
                 NullLogger<ProfilePictureImageService>.Instance);
-            var navigation = new NavigationService();
-            var viewModel = new RankingsViewModel(session);
+            NavigationService navigation = new NavigationService();
+            RankingsViewModel viewModel = new RankingsViewModel(session);
             // Assert
             Assert.That(client.Calls, Is.Empty);
             // Act
-            Assert.Throws<ArgumentNullException>(
-                () => viewModel.Initialize(
-                navigation,
-                client,
-                pictures,
-                null));
+            Assert.Throws<ArgumentNullException>(() => viewModel.Initialize(navigation, client,
+                pictures, null));
             // Assert
             Assert.That(client.Calls, Is.Empty);
             // Act
             viewModel.Initialize(navigation, client, pictures, dialogs);
+            WaitForRanking(viewModel, client, dialogs);
             // Assert
-            Assert.Throws<InvalidOperationException>(
-                () => viewModel.Initialize(
-                navigation,
-                client,
-                pictures,
-                dialogs));
+            Assert.Throws<InvalidOperationException>(() => viewModel.Initialize(navigation,
+                client, pictures, dialogs));
             Assert.That(client.Calls, Is.EqualTo(new[] { "top", "position:42" }));
             Assert.That(viewModel.CurrentPlayerRank, Is.EqualTo("7"));
         }
@@ -160,33 +160,27 @@ namespace DominoAllFives.Client.Tests
         public void Factory_AuthenticatedSession_ReturnsInitializedPagesAndModal()
         {
             // Arrange
-            var navigation = new NavigationService();
-            var session = new PlayerSession();
+            NavigationService navigation = new NavigationService();
+            PlayerSession session = new PlayerSession();
             session.Start(42, "player");
-            var client = new RankingClient
+            RankingClient client = new RankingClient
             {
                 TopRanking = new List<RankingEntry>(),
                 Position = 7
             };
-            using (var factory =
-                new ViewModelFactory(
-                navigation,
-                new DialogService(),
-                new LoginClient(),
-                client,
-                session,
-                NullLoggerFactory.Instance,
-                new ProfilePictureImageService(
-                NullLogger<ProfilePictureImageService>.Instance)))
+            using (ViewModelFactory factory = new ViewModelFactory(navigation,
+                new DialogService(), new LoginClient(), client, session,
+                    NullLoggerFactory.Instance, new ProfilePictureImageService(
+                        NullLogger<ProfilePictureImageService>.Instance)))
             {
                 // Act
-                var home = factory.Create<HomePageViewModel>();
+                HomePageViewModel home = factory.Create<HomePageViewModel>();
                 home.ShowLoginCommand.Execute(null);
                 // Assert
                 Assert.That(home.IsModalVisible, Is.True);
                 Assert.That(home.CurrentModal, Is.TypeOf<LoginViewModel>());
                 // Arrange
-                var login = (LoginViewModel)home.CurrentModal;
+                LoginViewModel login = (LoginViewModel)home.CurrentModal;
                 // Act
                 login.LoginCommand.Execute(null);
                 // Assert
@@ -203,6 +197,7 @@ namespace DominoAllFives.Client.Tests
                 Assert.That(mainMenu.Username, Is.EqualTo("player"));
                 // Act
                 RankingsViewModel rankings = factory.Create<RankingsViewModel>();
+                WaitForRanking(rankings, client, new DialogService());
                 // Assert
                 Assert.That(rankings.CurrentPlayerRank, Is.EqualTo("7"));
                 // Act
@@ -224,8 +219,8 @@ namespace DominoAllFives.Client.Tests
         public void MainWindow_Initialize_SetsNavigationAndPreservesDialogService()
         {
             // Arrange
-            var navigation = new NavigationService();
-            var shell = new MainWindowViewModel();
+            NavigationService navigation = new NavigationService();
+            MainWindowViewModel shell = new MainWindowViewModel();
             // Act
             shell.Initialize(navigation);
             // Assert
@@ -236,13 +231,14 @@ namespace DominoAllFives.Client.Tests
 
         private sealed class LoginClient : ILoginClient
         {
-            public PlayerAccount LoginWithAccount(Credentials credentials) => null;
+            public PlayerAccount LoginWithAccount(Credentials credentials)
+            {
+                return null;
+            }
         }
 
-        private static RankingsViewModel CreateViewModel(
-            RankingClient client,
-            DialogService dialogs,
-            bool authenticated)
+        private static RankingsViewModel CreateViewModel(RankingClient client,
+            DialogService dialogs, bool authenticated)
         {
             PlayerSession session = new PlayerSession();
             if (authenticated)
@@ -250,14 +246,28 @@ namespace DominoAllFives.Client.Tests
                 session.Start(42, "player");
             }
 
-            var viewModel = new RankingsViewModel(session);
-            viewModel.Initialize(
-                new NavigationService(),
-                client,
-                new ProfilePictureImageService(
-                NullLogger<ProfilePictureImageService>.Instance),
-                dialogs);
+            RankingsViewModel viewModel = new RankingsViewModel(session);
+            viewModel.Initialize(new NavigationService(), client,
+                new ProfilePictureImageService(NullLogger<ProfilePictureImageService>.Instance),
+                    dialogs);
+            if (authenticated)
+            {
+                WaitForRanking(viewModel, client, dialogs);
+            }
             return viewModel;
+        }
+
+        private static void WaitForRanking(
+            RankingsViewModel viewModel,
+            RankingClient client,
+            DialogService dialogs)
+        {
+            bool completed = SpinWait.SpinUntil(
+                () => WpfTestHost.Invoke(() => dialogs.Requests.Count > 0
+                    || !string.IsNullOrEmpty(viewModel.CurrentPlayerRank)
+                    || (client.TopRanking == null && client.Calls.Count > 0)),
+                CompletionTimeoutMilliseconds);
+            Assert.That(completed, Is.True, "The ranking continuation did not complete.");
         }
 
         private sealed class RankingClient : IRankingClient
@@ -289,13 +299,23 @@ namespace DominoAllFives.Client.Tests
         {
             public List<DialogRequest> Requests { get; } = new List<DialogRequest>();
 
-            public void ShowDialog(DialogRequest request) => Requests.Add(request);
+            public void ShowDialog(DialogRequest request)
+            {
+                Requests.Add(request);
+            }
         }
 
         private sealed class NavigationService : IFrameNavigationService
         {
             public int BackCalls { get; private set; }
-            public bool CanGoBack => false;
+
+            public bool CanGoBack
+            {
+                get
+                {
+                    return false;
+                }
+            }
 
             public void NavigateTo<TViewModel>()
                 where TViewModel : ViewModelBase

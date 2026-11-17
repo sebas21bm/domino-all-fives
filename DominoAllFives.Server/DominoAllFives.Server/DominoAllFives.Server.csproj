@@ -102,6 +102,7 @@
   <ItemGroup>
     <Compile Include="ChatService.cs" />
     <Compile Include="Infrastructure\Chat\ChatCallbackRegistry.cs" />
+    <Compile Include="Infrastructure\Match\MatchCallbackRegistry.cs" />
     <Compile Include="Infrastructure\Chat\ChatEventPublisher.cs" />
     <Compile Include="Logging\LoggerFactoryProvider.cs" />
     <Compile Include="Program.cs" />
@@ -136,9 +137,6 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="MatchService.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Infrastructure\GameRuntime.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Infrastructure\Match\MatchEventPublisher.cs" />

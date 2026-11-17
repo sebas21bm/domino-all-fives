@@ -172,12 +172,12 @@ namespace DominoAllFives.Client.Tests
             }
         }
 
-        [TestCase(1, MatchPhase.InProgress, true)]
-        [TestCase(2, MatchPhase.InProgress, false)]
-        [TestCase(1, MatchPhase.Completed, false)]
-        [TestCase(1, MatchPhase.Cancelled, false)]
+        [TestCase(1, MatchStatus.InProgress, true)]
+        [TestCase(2, MatchStatus.InProgress, false)]
+        [TestCase(1, MatchStatus.Completed, false)]
+        [TestCase(1, MatchStatus.Cancelled, false)]
         public void PlayCommand_TurnAndPhase_EnforcesLocalAvailability(int currentPlayer,
-            MatchPhase phase, bool expected)
+            MatchStatus phase, bool expected)
         {
             // Arrange
             Client client = new Client();
@@ -203,7 +203,7 @@ namespace DominoAllFives.Client.Tests
             session.Start(1, "Alice", "es-MX", "test-session");
             return new MatchViewModel(new Navigation(), new MatchNavigation { MatchId = 1,
                 PlayerSession = session, TargetPoints = 150, PlayerNames = new Dictionary<int,
-                string> { { 1, "Alice" }, { 2, "Bob" } } }, client);
+                    string> { { 1, "Alice" }, { 2, "Bob" } } }, client);
         }
 
         private static MatchView View(long version)
@@ -220,7 +220,7 @@ namespace DominoAllFives.Client.Tests
                     Ends = new List<PublicEnd>()
                 },
                 Scores = new List<PlayerScore>(),
-                Phase = MatchPhase.InProgress
+                Phase = MatchStatus.InProgress
             };
         }
 
@@ -245,9 +245,8 @@ namespace DominoAllFives.Client.Tests
 
         private static void Pump()
         {
-            Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-            {
-            }));
+            Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Background, new Action(
+                NoOperation));
         }
 
         private sealed class Client : IMatchClient
@@ -275,17 +274,17 @@ namespace DominoAllFives.Client.Tests
                 throw new NotSupportedException();
             }
 
-            public MatchView Play(int matchId, DominoTile tile, BoardEnd end, long version)
+            public void Play(int matchId, DominoTile tile, BoardEnd end, long version)
             {
                 throw new NotSupportedException();
             }
 
-            public MatchView Draw(int matchId, long version)
+            public void Draw(int matchId, long version)
             {
                 throw new NotSupportedException();
             }
 
-            public MatchView Pass(int matchId, long version)
+            public void Pass(int matchId, long version)
             {
                 throw new NotSupportedException();
             }
@@ -333,6 +332,10 @@ namespace DominoAllFives.Client.Tests
             public void GoBack()
             {
             }
+        }
+
+        private static void NoOperation()
+        {
         }
     }
 }
