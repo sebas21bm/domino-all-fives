@@ -61,16 +61,21 @@
     <Compile Include="AccountRuleExceptionTests.cs" />
     <Compile Include="AuthenticationControllerTests.cs" />
     <Compile Include="CredentialsTests.cs" />
+    <Compile Include="GameplayTests.cs" />
     <Compile Include="LobbyContractTests.cs" />
     <Compile Include="LobbyControllerTests.cs" />
     <Compile Include="LobbyManagerTests.cs" />
     <Compile Include="LobbyRuleExceptionTests.cs" />
+    <Compile Include="MatchContractTests.cs" />
+    <Compile Include="MatchRuleExceptionTests.cs" />
+    <Compile Include="PlayScoreTests.cs" />
     <Compile Include="PasswordHasherTests.cs" />
     <Compile Include="PlayerAccountTests.cs" />
     <Compile Include="PlayerRepositoryTests.cs" />
     <Compile Include="RankingControllerTests.cs" />
     <Compile Include="SessionContractTests.cs" />
     <Compile Include="SessionManagerTests.cs" />
+    <Compile Include="TileTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

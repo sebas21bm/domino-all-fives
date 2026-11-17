@@ -1,8 +1,6 @@
-using System;
-
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
-    public enum End
+    public enum BoardEndPosition
     {
         Left,
         Right,

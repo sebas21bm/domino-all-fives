@@ -140,7 +140,9 @@ CreateLobby
 JoinPlayer
 LeavePlayer
 GetLobby
-StartLobby
+PrepareLobbyForMatch
+ConfirmMatchStarted
+RestoreLobbyAfterMatchStartFailure
 ReleaseMatch
 CloseLobby
 AddChatMessage
@@ -376,6 +378,37 @@ Esto es importante porque un callback puede:
 - producir una `CommunicationException`.
 
 El estado principal no debe permanecer bloqueado mientras se espera una operación de red.
+
+En Jugabilidad se aplica la misma frontera. `MatchManager` valida la versión,
+modifica el dominio y construye `MatchUpdate` dentro de `_syncRoot`, pero no
+encola ni publica callbacks mientras conserva el bloqueo:
+
+```text
+MatchManager
+    │ lock
+    ▼
+valida jugador y versión
+    │
+    ▼
+modifica Match y crea snapshots
+    │
+    ▼
+libera lock y devuelve MatchUpdate
+    │
+    ▼
+MatchService
+    │
+    ▼
+MatchEventPublisher.Enqueue
+    │
+    ▼
+callbacks WCF desde la cola del partido
+```
+
+No se debe entregar un `Action<MatchUpdate>` al controller o al manager para
+ocultar el publicador. La actualización producida por la transición se devuelve
+como dato; la frontera del servidor decide si debe encolarla después de liberar
+el estado compartido.
 
 
 ## Concurrencia en `CallbackRegistry`

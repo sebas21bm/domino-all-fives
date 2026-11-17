@@ -158,10 +158,18 @@ namespace DominoAllFives.Server.Tests.Gameplay
             Tile tile = new Tile(1, 2, 5, SpecialPower.None);
 
             // Act
-            TestDelegate getOtherValue = () => tile.GetOtherValue(4);
+            MatchRuleException exception = null;
+            try
+            {
+                tile.GetOtherValue(4);
+            }
+            catch (MatchRuleException ex)
+            {
+                exception = ex;
+            }
 
             // Assert
-            Assert.Throws<MatchRuleException>(getOtherValue);
+            Assert.That(exception, Is.TypeOf<MatchRuleException>());
         }
 
         [Test]
@@ -171,10 +179,18 @@ namespace DominoAllFives.Server.Tests.Gameplay
             int tileId = 0;
 
             // Act
-            TestDelegate createTile = () => new Tile(tileId, 2, 5, SpecialPower.None);
+            ArgumentOutOfRangeException exception = null;
+            try
+            {
+                new Tile(tileId, 2, 5, SpecialPower.None);
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                exception = ex;
+            }
 
             // Assert
-            Assert.Throws<ArgumentOutOfRangeException>(createTile);
+            Assert.That(exception, Is.TypeOf<ArgumentOutOfRangeException>());
         }
 
         [Test]
@@ -184,10 +200,18 @@ namespace DominoAllFives.Server.Tests.Gameplay
             int firstValue = -1;
 
             // Act
-            TestDelegate createTile = () => new Tile(1, firstValue, 5, SpecialPower.None);
+            ArgumentOutOfRangeException exception = null;
+            try
+            {
+                new Tile(1, firstValue, 5, SpecialPower.None);
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                exception = ex;
+            }
 
             // Assert
-            Assert.Throws<ArgumentOutOfRangeException>(createTile);
+            Assert.That(exception, Is.TypeOf<ArgumentOutOfRangeException>());
         }
 
         [Test]
@@ -197,10 +221,18 @@ namespace DominoAllFives.Server.Tests.Gameplay
             int secondValue = 7;
 
             // Act
-            TestDelegate createTile = () => new Tile(1, 2, secondValue, SpecialPower.None);
+            ArgumentOutOfRangeException exception = null;
+            try
+            {
+                new Tile(1, 2, secondValue, SpecialPower.None);
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                exception = ex;
+            }
 
             // Assert
-            Assert.Throws<ArgumentOutOfRangeException>(createTile);
+            Assert.That(exception, Is.TypeOf<ArgumentOutOfRangeException>());
         }
 
         [Test]
@@ -210,10 +242,18 @@ namespace DominoAllFives.Server.Tests.Gameplay
             SpecialPower undefinedPower = (SpecialPower)99;
 
             // Act
-            TestDelegate createTile = () => new Tile(1, 2, 5, undefinedPower);
+            ArgumentOutOfRangeException exception = null;
+            try
+            {
+                new Tile(1, 2, 5, undefinedPower);
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                exception = ex;
+            }
 
             // Assert
-            Assert.Throws<ArgumentOutOfRangeException>(createTile);
+            Assert.That(exception, Is.TypeOf<ArgumentOutOfRangeException>());
         }
     }
 }

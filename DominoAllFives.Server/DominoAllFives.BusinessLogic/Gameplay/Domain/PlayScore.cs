@@ -7,9 +7,9 @@ namespace DominoAllFives.BusinessLogic.Gameplay
         public int PlayerId { get; internal set; }
         public int RoundNumber { get; internal set; }
         public Tile Tile { get; internal set; }
-        public End PlayedEnd { get; internal set; }
+        public BoardEndPosition PlayedEnd { get; internal set; }
         public IReadOnlyList<int> EndValues { get; internal set; }
-        public IReadOnlyList<End> BlockedEnds { get; internal set; }
+        public IReadOnlyList<BoardEndPosition> BlockedEnds { get; internal set; }
         public bool IncludesOpeningDouble { get; internal set; }
         public int Total { get; internal set; }
         public int BasePoints { get; internal set; }

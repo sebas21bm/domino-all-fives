@@ -1,19 +1,18 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.ServiceModel;
 using System.Threading;
+using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Managers;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.Contracts.Gameplay;
 using DominoAllFives.Contracts.Services;
-using DominoAllFives.Server.Infrastructure;
 using NUnit.Framework;
 using Proxy = global::MatchService;
 
-namespace DominoAllFives.Server.Tests
+namespace DominoAllFives.Server.AdditionalTest
 {
     [TestFixture]
     public sealed class MatchServiceWcfTests
@@ -27,7 +26,10 @@ namespace DominoAllFives.Server.Tests
             const int SecondPlayerId = 83002;
             const int CallbackTimeoutMilliseconds = 5000;
             int matchId = Interlocked.Increment(ref nextMatchId);
-            GameRuntime.Controller.Create(matchId, new[] { FirstPlayerId, SecondPlayerId }, 100);
+            CreateMatch(
+                matchId,
+                new[] { FirstPlayerId, SecondPlayerId },
+                100);
             string[] keys =
             {
                 SessionManager.CreateSession(FirstPlayerId),
@@ -41,15 +43,24 @@ namespace DominoAllFives.Server.Tests
             using (ServiceHost host = CreateHost())
             {
                 host.Open();
-                Proxy.MatchServiceClient[] clients = callbacks.Select(callback
-                    => new Proxy.MatchServiceClient(new InstanceContext(callback),
-                    new NetTcpBinding(SecurityMode.None), host.Description.Endpoints[0].Address))
-                    .ToArray();
+                Proxy.MatchServiceClient[] clients =
+                    new Proxy.MatchServiceClient[callbacks.Length];
+                for (int index = 0; index < callbacks.Length; index++)
+                {
+                    clients[index] = new Proxy.MatchServiceClient(
+                        new InstanceContext(callbacks[index]),
+                        CreateBinding(),
+                        host.Description.Endpoints[0].Address);
+                }
                 try
                 {
                     Proxy.MatchView view = clients[0].OpenMatchSession(keys[0], matchId);
                     clients[1].OpenMatchSession(keys[1], matchId);
-                    int activeIndex = view.CurrentPlayerId == FirstPlayerId ? 0 : 1;
+                    int activeIndex = 1;
+                    if (view.CurrentPlayerId == FirstPlayerId)
+                    {
+                        activeIndex = 0;
+                    }
                     Proxy.DominoTile tile = clients[activeIndex].GetHand(matchId).Tiles.Single(
                         candidate => candidate.TileId == view.OpeningTileId);
                     int originalValue = tile.FirstValue;
@@ -57,8 +68,9 @@ namespace DominoAllFives.Server.Tests
                     // Act
                     Proxy.MatchView after = clients[activeIndex].PlayTile(matchId, tile,
                         Proxy.BoardEnd.Left, view.Version);
-                    bool received = SpinWait.SpinUntil(() => callbacks.All(callback
-                        => callback.Hands.Count > 0), CallbackTimeoutMilliseconds);
+                    bool received = WaitForProxyHands(
+                        callbacks,
+                        CallbackTimeoutMilliseconds);
                     // Assert
                     Assert.That(typeof(Proxy.DominoTile).Assembly, Is.Not.EqualTo(typeof(
                         DominoTile).Assembly));
@@ -73,14 +85,33 @@ namespace DominoAllFives.Server.Tests
                         Is.True);
                     Assert.That(callbacks[1].Hands.All(hand => hand.PlayerId == SecondPlayerId),
                         Is.True);
-                    FaultException<Proxy.MatchIssue> stale =
-                        Assert.Throws<FaultException<Proxy.MatchIssue>>(()
-                        => clients[activeIndex].PlayTile(matchId, tile, Proxy.BoardEnd.Left,
-                        view.Version));
+                    FaultException<Proxy.MatchIssue> stale = null;
+                    try
+                    {
+                        clients[activeIndex].PlayTile(
+                            matchId,
+                            tile,
+                            Proxy.BoardEnd.Left,
+                            view.Version);
+                    }
+                    catch (FaultException<Proxy.MatchIssue> ex)
+                    {
+                        stale = ex;
+                    }
+
                     Assert.That(stale.Detail, Is.EqualTo(Proxy.MatchIssue.StaleVersion));
                     SessionManager.RemoveSession(keys[activeIndex]);
-                    Assert.Throws<FaultException<Proxy.AccessIssue>>(()
-                        => clients[activeIndex].GetMatch(matchId));
+                    FaultException<Proxy.AccessIssue> accessFault = null;
+                    try
+                    {
+                        clients[activeIndex].GetMatch(matchId);
+                    }
+                    catch (FaultException<Proxy.AccessIssue> ex)
+                    {
+                        accessFault = ex;
+                    }
+
+                    Assert.That(accessFault, Is.Not.Null);
                 }
                 finally
                 {
@@ -98,11 +129,11 @@ namespace DominoAllFives.Server.Tests
         }
 
         [Test]
-        public void PlayTile_NetTcp_IgnoresForgedValuesAndPublishesOnlyOwnHand()
+        public void PlayTile_NamedPipe_IgnoresForgedValuesAndPublishesOnlyOwnHand()
         {
             // Arrange
             int matchId = Interlocked.Increment(ref nextMatchId);
-            GameRuntime.Controller.Create(matchId, new[] { 81001, 81002 }, 100);
+            CreateMatch(matchId, new[] { 81001, 81002 }, 100);
             string[] keys =
             {
                 SessionManager.CreateSession(81001),
@@ -116,17 +147,26 @@ namespace DominoAllFives.Server.Tests
             using (ServiceHost host = CreateHost())
             {
                 host.Open();
-                DuplexChannelFactory<IMatchService>[] factories = callbacks.Select(callback
-                    => new DuplexChannelFactory<IMatchService>(new InstanceContext(callback),
-                    new NetTcpBinding(SecurityMode.None), host.Description.Endpoints[0].Address))
-                    .ToArray();
-                IMatchService[] channels = factories.Select(factory => factory.CreateChannel())
-                    .ToArray();
+                DuplexChannelFactory<IMatchService>[] factories =
+                    new DuplexChannelFactory<IMatchService>[callbacks.Length];
+                IMatchService[] channels = new IMatchService[callbacks.Length];
+                for (int index = 0; index < callbacks.Length; index++)
+                {
+                    factories[index] = new DuplexChannelFactory<IMatchService>(
+                        new InstanceContext(callbacks[index]),
+                        CreateBinding(),
+                        host.Description.Endpoints[0].Address);
+                    channels[index] = factories[index].CreateChannel();
+                }
                 try
                 {
                     MatchView view = channels[0].OpenMatchSession(keys[0], matchId);
                     channels[1].OpenMatchSession(keys[1], matchId);
-                    int activeIndex = view.CurrentPlayerId == 81001 ? 0 : 1;
+                    int activeIndex = 1;
+                    if (view.CurrentPlayerId == 81001)
+                    {
+                        activeIndex = 0;
+                    }
                     DominoTile owned = channels[activeIndex].GetHand(matchId).Tiles.Single(tile
                         => tile.TileId == view.OpeningTileId);
                     DominoTile forged = new DominoTile
@@ -139,8 +179,7 @@ namespace DominoAllFives.Server.Tests
                     // Act
                     MatchView after = channels[activeIndex].PlayTile(matchId, forged,
                         BoardEnd.Left, view.Version);
-                    bool received = SpinWait.SpinUntil(() => callbacks.All(callback
-                        => callback.Hands.Count > 0), 5000);
+                    bool received = WaitForHands(callbacks, 5000);
                     // Assert
                     Assert.That(after.Board.Tiles[0].Tile.FirstValue, Is.EqualTo(owned.FirstValue));
                     Assert.That(after.Board.Tiles[0].Tile.SpecialPower, Is.EqualTo(
@@ -148,14 +187,33 @@ namespace DominoAllFives.Server.Tests
                     Assert.That(received, Is.True);
                     Assert.That(callbacks[0].Hands.All(hand => hand.PlayerId == 81001), Is.True);
                     Assert.That(callbacks[1].Hands.All(hand => hand.PlayerId == 81002), Is.True);
-                    FaultException<MatchIssue> stale =
-                        Assert.Throws<FaultException<MatchIssue>>(()
-                        => channels[activeIndex].PlayTile(matchId, forged, BoardEnd.Left,
-                        view.Version));
+                    FaultException<MatchIssue> stale = null;
+                    try
+                    {
+                        channels[activeIndex].PlayTile(
+                            matchId,
+                            forged,
+                            BoardEnd.Left,
+                            view.Version);
+                    }
+                    catch (FaultException<MatchIssue> ex)
+                    {
+                        stale = ex;
+                    }
+
                     Assert.That(stale.Detail, Is.EqualTo(MatchIssue.StaleVersion));
                     SessionManager.RemoveSession(keys[activeIndex]);
-                    Assert.Throws<FaultException<AccessIssue>>(()
-                        => channels[activeIndex].GetMatch(matchId));
+                    FaultException<AccessIssue> accessFault = null;
+                    try
+                    {
+                        channels[activeIndex].GetMatch(matchId);
+                    }
+                    catch (FaultException<AccessIssue> ex)
+                    {
+                        accessFault = ex;
+                    }
+
+                    Assert.That(accessFault, Is.Not.Null);
                 }
                 finally
                 {
@@ -182,21 +240,30 @@ namespace DominoAllFives.Server.Tests
         {
             // Arrange
             int matchId = Interlocked.Increment(ref nextMatchId);
-            GameRuntime.Controller.Create(matchId, new[] { 82001, 82002 }, 100);
+            CreateMatch(matchId, new[] { 82001, 82002 }, 100);
             string key = SessionManager.CreateSession(82003);
             using (ServiceHost host = CreateHost())
             {
                 host.Open();
                 DuplexChannelFactory<IMatchService> factory =
                     new DuplexChannelFactory<IMatchService>(
-                    new InstanceContext(new Callback()), new NetTcpBinding(SecurityMode.None),
+                    new InstanceContext(new Callback()),
+                    CreateBinding(),
                     host.Description.Endpoints[0].Address);
                 IMatchService channel = factory.CreateChannel();
                 try
                 {
                     // Act
-                    FaultException<MatchIssue> ex = Assert.Throws<FaultException<MatchIssue>>(
-                        () => channel.OpenMatchSession(key, matchId));
+                    FaultException<MatchIssue> ex = null;
+                    try
+                    {
+                        channel.OpenMatchSession(key, matchId);
+                    }
+                    catch (FaultException<MatchIssue> fault)
+                    {
+                        ex = fault;
+                    }
+
                     // Assert
                     Assert.That(ex.Detail, Is.EqualTo(MatchIssue.PlayerNotInMatch));
                 }
@@ -211,14 +278,84 @@ namespace DominoAllFives.Server.Tests
 
         private static ServiceHost CreateHost()
         {
-            TcpListener listener = new TcpListener(IPAddress.Loopback, 0);
-            listener.Start();
-            int port = ((IPEndPoint)listener.LocalEndpoint).Port;
-            listener.Stop();
             ServiceHost host = new ServiceHost(typeof(MatchService));
-            host.AddServiceEndpoint(typeof(IMatchService), new NetTcpBinding(SecurityMode.None),
-                "net.tcp://localhost:" + port + "/MatchTest");
+            string address = "net.pipe://localhost/DominoAllFives/MatchTest/"
+                + Guid.NewGuid().ToString("N");
+            host.AddServiceEndpoint(typeof(IMatchService), CreateBinding(), address);
             return host;
+        }
+
+        private static void CreateMatch(
+            int matchId,
+            IEnumerable<int> playerIds,
+            int targetPoints)
+        {
+            MatchController matchController = new MatchController(MatchManager.Instance);
+            matchController.CreateMatch(
+                matchId,
+                playerIds,
+                targetPoints);
+        }
+
+        private static NetNamedPipeBinding CreateBinding()
+        {
+            return new NetNamedPipeBinding(NetNamedPipeSecurityMode.None);
+        }
+
+        private static bool WaitForProxyHands(
+            IEnumerable<MatchProxyCallback> callbacks,
+            int timeoutMilliseconds)
+        {
+            DateTime timeout = DateTime.UtcNow.AddMilliseconds(timeoutMilliseconds);
+            while (DateTime.UtcNow < timeout)
+            {
+                bool allCallbacksReceivedHand = true;
+                foreach (MatchProxyCallback callback in callbacks)
+                {
+                    if (callback.Hands.Count == 0)
+                    {
+                        allCallbacksReceivedHand = false;
+                        break;
+                    }
+                }
+
+                if (allCallbacksReceivedHand)
+                {
+                    return true;
+                }
+
+                Thread.Sleep(10);
+            }
+
+            return false;
+        }
+
+        private static bool WaitForHands(
+            IEnumerable<Callback> callbacks,
+            int timeoutMilliseconds)
+        {
+            DateTime timeout = DateTime.UtcNow.AddMilliseconds(timeoutMilliseconds);
+            while (DateTime.UtcNow < timeout)
+            {
+                bool allCallbacksReceivedHand = true;
+                foreach (Callback callback in callbacks)
+                {
+                    if (callback.Hands.Count == 0)
+                    {
+                        allCallbacksReceivedHand = false;
+                        break;
+                    }
+                }
+
+                if (allCallbacksReceivedHand)
+                {
+                    return true;
+                }
+
+                Thread.Sleep(10);
+            }
+
+            return false;
         }
 
         [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode =

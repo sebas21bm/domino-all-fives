@@ -14,12 +14,18 @@ namespace DominoAllFives.Server.Infrastructure
 
         public void Register(int matchId, int playerId, IMatchCallback callback, string sessionKey)
         {
+            ValidateRegistration(matchId, playerId, callback, sessionKey);
             _callbacks[Tuple.Create(matchId, playerId)] =
                 new MatchCallbackRegistration(matchId, playerId, callback, sessionKey);
         }
 
         public void Remove(int matchId, int playerId, IMatchCallback callback)
         {
+            if (callback == null)
+            {
+                return;
+            }
+
             Tuple<int, int> key = Tuple.Create(matchId, playerId);
             MatchCallbackRegistration current;
             if (_callbacks.TryGetValue(key, out current)
@@ -34,9 +40,41 @@ namespace DominoAllFives.Server.Infrastructure
 
         public List<MatchCallbackRegistration> GetCallbacks(int matchId)
         {
+            if (matchId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(matchId));
+            }
+
             return _callbacks.Values
                 .Where(registration => registration.MatchId == matchId)
                 .ToList();
+        }
+
+        private static void ValidateRegistration(
+            int matchId,
+            int playerId,
+            IMatchCallback callback,
+            string sessionKey)
+        {
+            if (matchId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(matchId));
+            }
+
+            if (playerId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(playerId));
+            }
+
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+
+            if (string.IsNullOrWhiteSpace(sessionKey))
+            {
+                throw new ArgumentException(null, nameof(sessionKey));
+            }
         }
     }
 
@@ -48,7 +86,10 @@ namespace DominoAllFives.Server.Infrastructure
         public string SessionKey { get; }
 
         public MatchCallbackRegistration(
-            int matchId, int playerId, IMatchCallback callback, string sessionKey)
+            int matchId,
+            int playerId,
+            IMatchCallback callback,
+            string sessionKey)
         {
             MatchId = matchId;
             PlayerId = playerId;

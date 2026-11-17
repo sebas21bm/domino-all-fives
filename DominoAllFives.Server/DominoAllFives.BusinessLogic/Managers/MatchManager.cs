@@ -3,26 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Gameplay;
-using Network = DominoAllFives.Contracts.Gameplay;
+using GameplayContracts = DominoAllFives.Contracts.Gameplay;
 
 namespace DominoAllFives.BusinessLogic.Managers
 {
     public sealed class MatchManager
     {
         private const int MatchRetentionMinutes = 30;
+        private static readonly MatchManager instance = new MatchManager();
         private readonly object _syncRoot = new object();
         private readonly Dictionary<int, ActiveMatch> _matches =
             new Dictionary<int, ActiveMatch>();
 
-        public ActiveMatch GetMatch(int matchId)
+        public static MatchManager Instance
         {
-            lock (_syncRoot)
+            get
             {
-                return GetMatchInternal(matchId);
+                return instance;
             }
         }
 
-        public ActiveMatch CreateMatch(int matchId, IEnumerable<int> players, int targetPoints)
+        public void CreateMatch(int matchId, IEnumerable<int> players, int targetPoints)
         {
             lock (_syncRoot)
             {
@@ -41,8 +42,6 @@ namespace DominoAllFives.BusinessLogic.Managers
                         new Match(matchId, players, targetPoints, Deck.Create));
                     _matches.Add(matchId, active);
                 }
-
-                return active;
             }
         }
 
@@ -54,65 +53,152 @@ namespace DominoAllFives.BusinessLogic.Managers
             }
         }
 
-        public Network.MatchView GetMatchView(int matchId, int playerId)
+        public GameplayContracts.MatchView GetMatchView(int matchId, int playerId)
         {
             lock (_syncRoot)
             {
-                Match match = GetMatchInternal(matchId).Match;
+                Match match = GetActiveMatch(matchId).Match;
                 match.GetPlayer(playerId);
-                return MatchProjection.CreateView(match);
+                return MatchContractMapper.CreateMatchView(match);
             }
         }
 
-        public Network.PlayerHand GetPlayerHand(int matchId, int playerId)
+        public GameplayContracts.PlayerHand GetPlayerHand(int matchId, int playerId)
         {
             lock (_syncRoot)
             {
-                return MatchProjection.CreateHand(GetMatchInternal(matchId).Match, playerId);
+                Match match = GetActiveMatch(matchId).Match;
+                return MatchContractMapper.CreatePlayerHand(match, playerId);
             }
         }
 
-        public Network.MatchView ChangeMatch(
+        public MatchUpdate PlayTile(
             int matchId,
             int playerId,
-            Action<Match> change,
-            Action<MatchUpdate> enqueue)
+            Move move)
         {
             lock (_syncRoot)
             {
-                ActiveMatch active = GetMatchInternal(matchId);
-                Match match = active.Match;
+                ActiveMatch activeMatch = GetActiveMatch(matchId);
+                Match match = activeMatch.Match;
                 match.GetPlayer(playerId);
                 RoundSummary previousRound = match.LastRound;
                 long previousVersion = match.Version;
-                change(match);
-                if (match.Phase != MatchState.InProgress && !active.FinishedAt.HasValue)
-                {
-                    active.FinishedAt = DateTime.UtcNow;
-                }
 
-                Network.MatchView view = MatchProjection.CreateView(match);
-                if (previousVersion == match.Version)
-                {
-                    return view;
-                }
-
-                // Queue snapshots atomically; the publisher delivers WCF notifications later.
-                enqueue(new MatchUpdate
-                {
-                    View = view,
-                    Hands = match.Players
-                        .Select(player => MatchProjection.CreateHand(match, player.PlayerId))
-                        .ToList(),
-                    Round = ReferenceEquals(previousRound, match.LastRound) ? null : view.LastRound,
-                    Result = match.Phase == MatchState.InProgress
-                        ? null : MatchProjection.CreateResult(match)
-                });
-                return view;
+                match.Play(
+                    playerId,
+                    move.TileId,
+                    move.End,
+                    move.ExpectedVersion);
+                return CreateUpdate(
+                    activeMatch,
+                    previousRound,
+                    previousVersion);
             }
         }
 
-        private ActiveMatch GetMatchInternal(int matchId)
+        public MatchUpdate DrawTiles(int matchId, int playerId, long expectedVersion)
+        {
+            lock (_syncRoot)
+            {
+                ActiveMatch activeMatch = GetActiveMatch(matchId);
+                Match match = activeMatch.Match;
+                match.GetPlayer(playerId);
+                RoundSummary previousRound = match.LastRound;
+                long previousVersion = match.Version;
+
+                match.Draw(playerId, expectedVersion);
+                return CreateUpdate(
+                    activeMatch,
+                    previousRound,
+                    previousVersion);
+            }
+        }
+
+        public MatchUpdate PassTurn(int matchId, int playerId, long expectedVersion)
+        {
+            lock (_syncRoot)
+            {
+                ActiveMatch activeMatch = GetActiveMatch(matchId);
+                Match match = activeMatch.Match;
+                match.GetPlayer(playerId);
+                RoundSummary previousRound = match.LastRound;
+                long previousVersion = match.Version;
+
+                match.Pass(playerId, expectedVersion);
+                return CreateUpdate(
+                    activeMatch,
+                    previousRound,
+                    previousVersion);
+            }
+        }
+
+        public MatchUpdate LeaveMatch(int matchId, int playerId)
+        {
+            lock (_syncRoot)
+            {
+                ActiveMatch activeMatch = GetActiveMatch(matchId);
+                Match match = activeMatch.Match;
+                match.GetPlayer(playerId);
+                RoundSummary previousRound = match.LastRound;
+                long previousVersion = match.Version;
+
+                match.Cancel(playerId);
+                return CreateUpdate(
+                    activeMatch,
+                    previousRound,
+                    previousVersion);
+            }
+        }
+
+        private static MatchUpdate CreateUpdate(
+            ActiveMatch activeMatch,
+            RoundSummary previousRound,
+            long previousVersion)
+        {
+            Match match = activeMatch.Match;
+            if (match.Phase != MatchState.InProgress
+                && !activeMatch.FinishedAt.HasValue)
+            {
+                activeMatch.FinishedAt = DateTime.UtcNow;
+            }
+
+            GameplayContracts.MatchView view = MatchContractMapper.CreateMatchView(match);
+            bool hasStateChange = previousVersion != match.Version;
+            MatchUpdate update = new MatchUpdate
+            {
+                View = view,
+                HasStateChange = hasStateChange
+            };
+
+            if (!hasStateChange)
+            {
+                return update;
+            }
+
+            update.Hands = new List<GameplayContracts.PlayerHand>();
+            foreach (MatchPlayer player in match.Players)
+            {
+                GameplayContracts.PlayerHand hand = MatchContractMapper.CreatePlayerHand(
+                    match,
+                    player.PlayerId);
+                update.Hands.Add(hand);
+            }
+
+            if (!ReferenceEquals(previousRound, match.LastRound))
+            {
+                update.Round = view.LastRound;
+            }
+
+            if (match.Phase != MatchState.InProgress)
+            {
+                update.Result = MatchContractMapper.CreateMatchResult(match);
+            }
+
+            return update;
+        }
+
+        private ActiveMatch GetActiveMatch(int matchId)
         {
             ActiveMatch active;
             if (!_matches.TryGetValue(matchId, out active))

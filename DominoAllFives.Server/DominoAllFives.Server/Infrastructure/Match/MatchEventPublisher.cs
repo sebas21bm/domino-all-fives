@@ -8,19 +8,28 @@ using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Gameplay;
 using DominoAllFives.BusinessLogic.Managers;
 using DominoAllFives.Contracts.Services;
-using DominoAllFives.Server.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Server.Infrastructure
 {
-    public sealed class MatchEventPublisher
+    internal sealed class MatchEventPublisher
     {
-        private readonly MatchCallbackRegistry _callbacks = new MatchCallbackRegistry();
-        private readonly ConcurrentDictionary<int, MatchDeliveryManager> _queues =
-            new ConcurrentDictionary<int, MatchDeliveryManager>();
-        private readonly ILogger<MatchEventPublisher> _logger =
-            LoggerFactoryProvider.CreateLogger<MatchEventPublisher>();
-        public Action<int> MatchEnded { get; set; }
+        private readonly MatchCallbackRegistry _callbacks;
+        private readonly ConcurrentDictionary<int, MatchUpdateQueue> _queues =
+            new ConcurrentDictionary<int, MatchUpdateQueue>();
+        private readonly ILogger<MatchEventPublisher> _logger;
+
+        public event Action<int> MatchEnded;
+
+        public MatchEventPublisher(
+            MatchCallbackRegistry callbacks,
+            ILogger<MatchEventPublisher> logger)
+        {
+            _callbacks = callbacks
+                ?? throw new ArgumentNullException(nameof(callbacks));
+            _logger = logger
+                ?? throw new ArgumentNullException(nameof(logger));
+        }
 
         public void Register(int matchId, int playerId, IMatchCallback callback, string sessionKey)
         {
@@ -34,16 +43,33 @@ namespace DominoAllFives.Server.Infrastructure
 
         public void Enqueue(MatchUpdate notification)
         {
-            MatchDeliveryManager queue = _queues.GetOrAdd(notification.View.MatchId,
-                matchId => new MatchDeliveryManager());
+            if (notification == null)
+            {
+                throw new ArgumentNullException(nameof(notification));
+            }
+
+            MatchUpdateQueue queue = _queues.GetOrAdd(
+                notification.View.MatchId,
+                CreateUpdateQueue);
             if (queue.Enqueue(notification))
             {
-                ThreadPool.QueueUserWorkItem(unused => Drain(queue));
+                ThreadPool.QueueUserWorkItem(DrainQueue, queue);
             }
         }
 
-        private void Drain(MatchDeliveryManager queue)
+        private static MatchUpdateQueue CreateUpdateQueue(int matchId)
         {
+            if (matchId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(matchId));
+            }
+
+            return new MatchUpdateQueue();
+        }
+
+        private void DrainQueue(object state)
+        {
+            MatchUpdateQueue queue = (MatchUpdateQueue)state;
             MatchUpdate notification;
             while (queue.TryDequeue(out notification))
             {
@@ -52,7 +78,7 @@ namespace DominoAllFives.Server.Infrastructure
                 {
                     MatchEnded?.Invoke(notification.View.MatchId);
                     Release(notification.View.MatchId);
-                    MatchDeliveryManager removed;
+                    MatchUpdateQueue removed;
                     _queues.TryRemove(notification.View.MatchId, out removed);
                 }
             }
@@ -65,7 +91,7 @@ namespace DominoAllFives.Server.Infrastructure
 
             foreach (MatchCallbackRegistration recipient in recipients)
             {
-                if (!IsAuthenticated(recipient, recipient.PlayerId))
+                if (!IsAuthenticated(recipient))
                 {
                     Remove(recipient.MatchId, recipient.PlayerId, recipient.Callback);
                     continue;
@@ -75,8 +101,8 @@ namespace DominoAllFives.Server.Infrastructure
                 {
                     IMatchCallback callback = recipient.Callback;
                     callback.OnMatchChanged(notification.View);
-                    callback.OnPrivateHandChanged(notification.Hands.Single(hand
-                        => hand.PlayerId == recipient.PlayerId));
+                    callback.OnPrivateHandChanged(
+                        notification.Hands.Single(hand => hand.PlayerId == recipient.PlayerId));
                     if (notification.Round != null)
                     {
                         callback.OnRoundFinished(notification.Round);
@@ -102,11 +128,12 @@ namespace DominoAllFives.Server.Infrastructure
             }
         }
 
-        private bool IsAuthenticated(MatchCallbackRegistration registration, int playerId)
+        private static bool IsAuthenticated(MatchCallbackRegistration registration)
         {
             try
             {
-                return SessionManager.GetPlayerId(registration.SessionKey) == playerId;
+                return SessionManager.GetPlayerId(registration.SessionKey)
+                    == registration.PlayerId;
             }
             catch (KeyNotFoundException)
             {
@@ -132,7 +159,7 @@ namespace DominoAllFives.Server.Infrastructure
                 ex, "Match callback failed for player {PlayerId}.", recipient.PlayerId);
         }
 
-        private sealed class MatchDeliveryManager
+        private sealed class MatchUpdateQueue
         {
             private readonly object _syncRoot = new object();
             private readonly Queue<MatchUpdate> _items = new Queue<MatchUpdate>();

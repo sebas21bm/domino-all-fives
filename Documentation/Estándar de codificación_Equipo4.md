@@ -799,6 +799,34 @@ Las consultas de colecciones sin resultados deberán devolver colecciones vacía
 
 **Excepción para consultas de Entity Framework:** Se permite devolver `null` en métodos de acceso a datos que consulten una entidad individual mediante operaciones como `FirstOrDefault` o `SingleOrDefault`, exclusivamente para indicar que no existe una coincidencia. El consumidor deberá comprobar el resultado antes de utilizarlo. No se permite capturar errores de conexión, consulta o persistencia y convertirlos en un retorno nulo.
 
+### Tipos de valor anulables
+
+Se permitirá utilizar la sintaxis anulable, como `int?`, cuando la ausencia del valor tenga un significado válido y explícito dentro del dominio. Esta sintaxis equivale a `Nullable<int>` y no deberá utilizarse para ocultar un error, una inicialización faltante o un resultado que el método esté obligado a producir.
+
+El nombre de la variable y el flujo que le asigna un valor deberán comunicar qué representa la ausencia. Por ejemplo, un identificador de ganador anulable puede utilizar `null` para indicar que una ronda no tuvo un ganador único:
+
+```csharp
+int? winnerId = null;
+
+if (roundWinners.Count == 1)
+{
+    MatchPlayer winner = roundWinners[0];
+    winnerId = winner.PlayerId;
+}
+```
+
+### Operador condicional nulo
+
+El operador condicional nulo `?.` se permitirá cuando el objeto pueda estar ausente de manera válida y, en ese caso, omitir la operación sea el comportamiento esperado. Su uso no deberá ocultar una dependencia obligatoria, un estado inválido ni un error que deba comunicarse.
+
+Podrá utilizarse para invocar un evento que legítimamente puede no tener suscriptores:
+
+```csharp
+MatchEnded?.Invoke(matchId);
+```
+
+Si la ausencia requiere una acción alternativa, registro, excepción o varias instrucciones, se utilizará una comprobación explícita mediante `if`.
+
 | Con estándar |
 | :---- |
 | `public Player GetById(int playerId) {     return _context.Player.FirstOrDefault(         player => player.IdPlayer == playerId); }` |
@@ -827,10 +855,47 @@ Los errores deberán clasificarse y manejarse según su naturaleza y la capa don
 
 ## 4.8. Expresiones lambda y cuerpos de expresión {#4.8.-expresiones-lambda-y-cuerpos-de-expresión}
 
-Se distingue entre miembros con cuerpo de expresión y expresiones lambda utilizadas como delegados:
+Se distingue entre miembros con cuerpo de expresión, expresiones lambda y grupos de métodos:
 
 * **Prohibición de miembros con cuerpo de expresión (=\>):** Queda prohibido utilizar el operador `=>` para definir el cuerpo de métodos, constructores, propiedades calculadas o descriptores de acceso (`get`, `set`, `add`, `remove`). Todo miembro deberá implementar su cuerpo mediante bloques explícitos con llaves `{ }` siguiendo el estilo Allman (Sección 3.1.4).  
-* **Uso acotado de expresiones lambda:** Las expresiones lambda (`parametro => expresion`) deberán mantenerse simples y enfocadas en una sola expresión sin bloque de llaves, limitando su uso a argumentos de métodos que requieran delegados (`Action`, `Func`, `Predicate`), consultas de Entity Framework o inicialización de comandos y pruebas. Los parámetros deberán utilizar nombres descriptivos. Cuando la lógica requiera múltiples instrucciones, deberá extraerse a un método privado con nombre descriptivo o sustituirse por un bucle `foreach` explícito.
+* **Uso acotado de expresiones lambda:** Las expresiones lambda (`parametro => expresion`) se utilizarán únicamente dentro de operaciones LINQ. Una lambda simple tendrá una sola expresión sin llaves, representará una sola intención y utilizará parámetros descriptivos. No contendrá otra lambda, otra operación LINQ, ternarios, `&&`, `||`, conversiones, creación de objetos, modificaciones de estado ni llamadas. Cuando no pueda cumplirse esta regla, se utilizarán variables intermedias, métodos con nombres descriptivos o un `foreach` explícito.
+
+```csharp
+List<Player> qualifiedPlayers = players
+    .Where(player => player.Points >= targetPoints)
+    .ToList();
+```
+
+No se considerará simple una lambda que contenga consultas o llamadas:
+
+```csharp
+int minimumRemainingPips = players
+    .Min(player => player.Hand.Sum(tile => tile.TotalPips));
+```
+
+### Grupos de métodos y recorridos explícitos
+
+Un grupo de métodos proporciona el nombre de un método sin ejecutarlo inmediatamente. Se utilizará cuando una API necesite registrar o ejecutar posteriormente una operación, como en eventos o trabajos enviados al `ThreadPool`:
+
+```csharp
+publisher.MatchEnded += lobbyManager.ReleaseMatch;
+
+ThreadPool.QueueUserWorkItem(
+    DrainQueue,
+    queue);
+```
+
+No se envolverá el método innecesariamente en una lambda. En transformaciones de colecciones, cálculos y construcción de contratos se preferirá un `foreach` explícito cuando haga visibles el elemento actual, la operación, el resultado y su incorporación a la colección de destino:
+
+```csharp
+List<DominoTile> dominoTiles = new List<DominoTile>();
+
+foreach (Tile tile in tiles)
+{
+    DominoTile dominoTile = CreateDominoTile(tile);
+    dominoTiles.Add(dominoTile);
+}
+```
 
 | Con estándar |
 | ----- |
@@ -1248,6 +1313,8 @@ Se utilizará `default` cuando exista la posibilidad de recibir un valor no cont
 
 Podrá utilizarse para **seleccionar uno de dos valores mediante una condición**, siempre que **ambas alternativas sean simples y la expresión resulte fácil de comprender.** Esto incluye la selección de objetos, implementaciones de servicios y delegados durante la construcción o configuración de dependencias..
 
+Aunque las alternativas sean simples, se preferirá una estructura `if`/`else` cuando el ternario represente una regla de negocio, incluya cálculos, conversiones o accesos a colecciones, o dificulte reconocer el valor finalmente asignado. La decisión, el cálculo y la modificación del estado deberán permanecer como etapas visibles.
+
 No deberá utilizarse cuando las alternativas requieran varias instrucciones, produzcan efectos secundarios difíciles de reconocer o contengan lógica extensa. Se evitarán los ternarios anidados cuando dificulten la lectura; en esos casos se utilizará una estructura condicional o un método auxiliar.
 
 Las expresiones podrán distribuirse en varias líneas para mejorar su legibilidad.
@@ -1262,7 +1329,7 @@ Las expresiones podrán distribuirse en varias líneas para mejorar su legibilid
 
 El operador `??` podrá utilizarse para proporcionar un valor alternativo cuando una expresión sea `null`, siempre que dicho valor sea válido para la operación y no oculte errores.
 
-En constructores y métodos que reciban dependencias obligatorias, podrá combinarse con una expresión `throw` para validar y asignar la dependencia. Se utilizará `ArgumentNullException` con `nameof` para identificar el parámetro inválido.
+En constructores y métodos que reciban dependencias obligatorias, se preferirá combinar `??` con una expresión `throw` para validar y asignar la dependencia. Se utilizará `ArgumentNullException` con `nameof` para identificar el parámetro inválido.
 
 No deberá utilizarse para sustituir silenciosamente una dependencia obligatoria ni para asignar valores predeterminados que oculten datos inválidos.
 

@@ -58,8 +58,15 @@
   <ItemGroup>
     <Compile Include="LobbyIntegrationTests.cs" />
     <Compile Include="LobbyServiceWcfTests.cs" />
+    <Compile Include="MatchProxyCallback.cs" />
+    <Compile Include="MatchServiceWcfTests.cs" />
     <Compile Include="RankingServiceTests.cs" />
     <Compile Include="SessionServiceTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\DominoAllFives.Client\DominoAllFives.Client.WPF\Connected Services\MatchService\Reference.cs">
+      <Link>Proxy\MatchServiceReference.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

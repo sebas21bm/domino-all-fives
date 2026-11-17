@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
-using System.Linq;
 using System.ServiceModel;
 using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Exceptions;
@@ -28,6 +27,7 @@ namespace DominoAllFives.Server
     public sealed class LobbyService : ILobbyService
     {
         private static readonly LobbyController controller;
+        private static readonly MatchController matchController;
         private static readonly LobbyCallbackRegistry callbacks;
         private static readonly LobbyEventPublisher publisher;
         private static readonly ILogger<LobbyService> logger;
@@ -39,8 +39,8 @@ namespace DominoAllFives.Server
         static LobbyService()
         {
             LobbyManager lobbyManager = LobbyManager.Instance;
-            Infrastructure.GameRuntime.Publisher.MatchEnded = lobbyManager.ReleaseMatch;
             controller = new LobbyController(lobbyManager);
+            matchController = new MatchController(MatchManager.Instance);
             callbacks = new LobbyCallbackRegistry();
             publisher = new LobbyEventPublisher(
                 callbacks,
@@ -232,9 +232,15 @@ namespace DominoAllFives.Server
             try
             {
                 startingLobby = controller.PrepareLobbyForMatch(player.PlayerId);
-                Infrastructure.GameRuntime.Controller.Create(
+                List<int> playerIds = new List<int>();
+                foreach (Player participant in startingLobby.Participants)
+                {
+                    playerIds.Add(participant.PlayerId);
+                }
+
+                matchController.CreateMatch(
                     startingLobby.LobbyId,
-                    startingLobby.Participants.Select(participant => participant.PlayerId),
+                    playerIds,
                     startingLobby.Settings.TargetPoints);
                 matchCreated = true;
 

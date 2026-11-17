@@ -8,6 +8,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
     {
         private const int PowerOptions = 2;
         private const int SpecialTileCount = 5;
+
         public static List<Tile> Create()
         {
             List<Tile> tiles = new List<Tile>();
@@ -15,8 +16,12 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             {
                 for (int secondValue = firstValue; secondValue <= Tile.MaximumPips; secondValue++)
                 {
-                    tiles.Add(new Tile(tiles.Count + 1, firstValue, secondValue,
-                        SpecialPower.None));
+                    Tile tile = new Tile(
+                        tiles.Count + 1,
+                        firstValue,
+                        secondValue,
+                        SpecialPower.None);
+                    tiles.Add(tile);
                 }
             }
 
@@ -26,9 +31,16 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 for (int tileIndex = 0; tileIndex < SpecialTileCount; tileIndex++)
                 {
                     Tile tile = tiles[tileIndex];
-                    SpecialPower power = Next(random, PowerOptions) == 0
-                        ? SpecialPower.DoublePoints : SpecialPower.Block;
-                    tiles[tileIndex] = new Tile(tile.TileId, tile.FirstValue, tile.SecondValue,
+                    SpecialPower power = SpecialPower.Block;
+                    if (Next(random, PowerOptions) == 0)
+                    {
+                        power = SpecialPower.DoublePoints;
+                    }
+
+                    tiles[tileIndex] = new Tile(
+                        tile.TileId,
+                        tile.FirstValue,
+                        tile.SecondValue,
                         power);
                 }
 

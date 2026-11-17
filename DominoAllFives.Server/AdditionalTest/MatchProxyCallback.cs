@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using System.ServiceModel;
 using Proxy = global::MatchService;
 
-namespace DominoAllFives.Server.Tests
+namespace DominoAllFives.Server.AdditionalTest
 {
     [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode =
         ConcurrencyMode.Multiple)]
