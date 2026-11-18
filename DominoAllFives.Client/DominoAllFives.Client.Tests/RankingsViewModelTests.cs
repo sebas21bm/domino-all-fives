@@ -169,7 +169,7 @@ namespace DominoAllFives.Client.Tests
                 Position = 7
             };
             using (ViewModelFactory factory = new ViewModelFactory(navigation,
-                new DialogService(), new LoginClient(), client, session,
+                new DialogService(), new SessionClient(), client, session,
                     NullLoggerFactory.Instance, new ProfilePictureImageService(
                         NullLogger<ProfilePictureImageService>.Instance)))
             {
@@ -229,7 +229,7 @@ namespace DominoAllFives.Client.Tests
             Assert.Throws<InvalidOperationException>(() => shell.Initialize(navigation));
         }
 
-        private sealed class LoginClient : ILoginClient
+        private sealed class SessionClient : ISessionClient
         {
             public PlayerAccount LoginWithAccount(Credentials credentials)
             {

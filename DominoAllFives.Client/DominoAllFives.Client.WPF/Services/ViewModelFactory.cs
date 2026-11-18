@@ -16,7 +16,7 @@ namespace DominoAllFives.Client.WPF.Services
     {
         private readonly IFrameNavigationService _navigationService;
         private readonly IDialogService _dialogService;
-        private readonly ILoginClient _loginClient;
+        private readonly ISessionClient _loginClient;
         private readonly IRankingClient _rankingClient;
         private readonly PlayerSession _playerSession;
         private readonly ILoggerFactory _loggerFactory;
@@ -25,7 +25,7 @@ namespace DominoAllFives.Client.WPF.Services
         public ViewModelFactory(
             IFrameNavigationService navigationService,
             IDialogService dialogService,
-            ILoginClient loginClient,
+            ISessionClient loginClient,
             IRankingClient rankingClient,
             PlayerSession playerSession,
             ILoggerFactory loggerFactory,

@@ -16,7 +16,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
     public class LoginViewModel : ViewModelBase
     {
         private IDialogService _dialogService;
-        private ILoginClient _loginClient;
+        private ISessionClient _loginClient;
         private readonly PlayerSession _playerSession;
         private ILogger<LoginViewModel> _logger;
         private LanguageManager _languageManager;
@@ -106,7 +106,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public void Initialize(
             IDialogService dialogService,
-            ILoginClient loginClient,
+            ISessionClient loginClient,
             ILogger<LoginViewModel> logger,
             LanguageManager languageManager = null)
         {

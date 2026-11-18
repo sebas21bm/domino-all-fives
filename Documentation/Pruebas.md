@@ -2262,7 +2262,7 @@ precondiciones, postcondiciones, resultado esperado, observado y evidencia.
 - **Caso ejecutable:** `ServiceContract_SessionAccount_PreservesPublishedIdentity`.
 - **Origen:** [SessionContractTests.cs](../DominoAllFives.Server/Tests/SessionContractTests.cs#L15).
 - **Datos:** Sin parámetros; valores de preparación descritos abajo.
-- **Precondiciones:** Reflexión sobre ISessionAccountService.
+- **Precondiciones:** Reflexión sobre ISessionService.
 - **Postcondiciones:** Atributo leído en memoria.
 - **Resultado esperado:** Name=ISessionAccount; Namespace=urn:domino-all-fives:services.
 - **Resultado obtenido:** Aprobada (Passed); las aserciones del resultado esperado se cumplieron.

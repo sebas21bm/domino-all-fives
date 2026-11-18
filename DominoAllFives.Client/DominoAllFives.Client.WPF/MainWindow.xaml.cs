@@ -32,7 +32,7 @@ namespace DominoAllFives.Client.WPF
                 new ViewModelFactory(
                 navigationService,
                 mainWindowViewModel.DialogService,
-                new LoginClient(),
+                new SessionClient(),
                 rankingService,
                 playerSession,
                 loggerFactory,

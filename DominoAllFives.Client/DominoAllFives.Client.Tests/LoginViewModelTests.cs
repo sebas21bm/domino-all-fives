@@ -23,7 +23,7 @@ namespace DominoAllFives.Client.Tests
         private CultureInfo _uiCulture;
         private CultureInfo _defaultCulture;
         private CultureInfo _defaultUiCulture;
-        private LoginClient _client;
+        private SessionClient _client;
         private DialogService _dialogs;
         private PlayerSession _session;
         private LanguageManager _languages;
@@ -39,7 +39,7 @@ namespace DominoAllFives.Client.Tests
             _defaultCulture = CultureInfo.DefaultThreadCurrentCulture;
             _defaultUiCulture = CultureInfo.DefaultThreadCurrentUICulture;
             _logger = new TestLogger<LoginViewModel>();
-            _client = new LoginClient();
+            _client = new SessionClient();
             _dialogs = new DialogService();
             _session = new PlayerSession();
             _navigations = 0;
@@ -256,7 +256,7 @@ namespace DominoAllFives.Client.Tests
             Assert.That(_dialogs.Requests[0].Type, Is.EqualTo(dialogType));
         }
 
-        private sealed class LoginClient : ILoginClient
+        private sealed class SessionClient : ISessionClient
         {
             public Exception Error { get; set; }
             public PlayerAccount Account { get; set; }

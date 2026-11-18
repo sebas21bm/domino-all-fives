@@ -136,7 +136,7 @@ Esto evita reutilizar canales WCF que hayan quedado en estado `Faulted`.
 El cliente utiliza:
 
 ```text
-LoginClient (:ILoginClient)
+SessionClient (:ISessionClient)
     │
     ▼
 SessionAccountClient
@@ -148,7 +148,7 @@ AuthenticationEndpoint
 DominoService
 ```
 
-`LoginClient` no contiene lógica de autenticación. Su responsabilidad consiste en adaptar la llamada del cliente al proxy generado:
+`SessionClient` no contiene lógica de autenticación. Su responsabilidad consiste en adaptar la llamada del cliente al proxy generado:
 
 ```csharp
 return WcfInvoker.Invoke<SessionAccountClient, PlayerAccount>(

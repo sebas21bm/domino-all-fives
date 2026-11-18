@@ -15,7 +15,7 @@ namespace DominoAllFives.Server.Tests
         public void ServiceContract_SessionAccount_PreservesPublishedIdentity()
         {
             // Arrange
-            System.Type serviceType = typeof(ISessionAccountService);
+            System.Type serviceType = typeof(ISessionService);
             // Act
             ServiceContractAttribute contract = (ServiceContractAttribute)
                 serviceType.GetCustomAttributes(typeof(ServiceContractAttribute), false)[0];

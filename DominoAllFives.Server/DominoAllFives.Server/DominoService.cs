@@ -23,7 +23,7 @@ namespace DominoAllFives.Server
         InstanceContextMode = InstanceContextMode.PerCall,
         ConcurrencyMode = ConcurrencyMode.Reentrant,
         IncludeExceptionDetailInFaults = false)]
-    public partial class DominoService : ISessionAccountService
+    public partial class DominoService : ISessionService
     {
         private readonly ILogger<DominoService> _logger;
 

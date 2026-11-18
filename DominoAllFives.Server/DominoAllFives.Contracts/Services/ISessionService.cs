@@ -8,7 +8,7 @@ namespace DominoAllFives.Contracts.Services
     /// Exposes account authentication and session creation over WCF.
     /// </summary>
     [ServiceContract(Name = "ISessionAccount", Namespace = "urn:domino-all-fives:services")]
-    public interface ISessionAccountService
+    public interface ISessionService
     {
         /// <summary>
         /// Authenticates credentials and returns the account with its server session.
