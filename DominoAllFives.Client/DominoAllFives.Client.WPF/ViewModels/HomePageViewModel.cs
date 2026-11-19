@@ -138,7 +138,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OpenRegisterModal()
         {
-            CurrentModal = _viewModelFactory.CreateRegisterAccount(CloseModal);
+            CurrentModal = _viewModelFactory.CreateRegisterAccount(OnLoginSuccess, CloseModal);
             IsModalVisible = true;
         }
 

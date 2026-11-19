@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="urn:domino-all-fives:services" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="urn:domino-all-fives:services" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="urn:domino-all-fives:services/Imports">
+      <xsd:import namespace="urn:domino-all-fives:services" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="ISessionAccount_LoginWithAccount_InputMessage">
+    <wsdl:part name="parameters" element="tns:LoginWithAccount" />
+  </wsdl:message>
+  <wsdl:message name="ISessionAccount_LoginWithAccount_OutputMessage">
+    <wsdl:part name="parameters" element="tns:LoginWithAccountResponse" />
+  </wsdl:message>
+  <wsdl:message name="ISessionAccount_LoginWithAccount_AccountIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q1="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" element="q1:AccountIssue" />
+  </wsdl:message>
+  <wsdl:message name="IRankingRemoteService_GetTopWinsRanking_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetTopWinsRanking" />
+  </wsdl:message>
+  <wsdl:message name="IRankingRemoteService_GetTopWinsRanking_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetTopWinsRankingResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRankingRemoteService_GetWinsRankingPositionById_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetWinsRankingPositionById" />
+  </wsdl:message>
+  <wsdl:message name="IRankingRemoteService_GetWinsRankingPositionById_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetWinsRankingPositionByIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRegistrationService_Register_InputMessage">
+    <wsdl:part name="parameters" element="tns:Register" />
+  </wsdl:message>
+  <wsdl:message name="IRegistrationService_Register_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RegisterResponse" />
+  </wsdl:message>
+  <wsdl:message name="IRegistrationService_Register_RegistrationIssueFault_FaultMessage">
+    <wsdl:part name="detail" xmlns:q2="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" element="q2:RegistrationIssue" />
+  </wsdl:message>
+  <wsdl:portType name="ISessionAccount">
+    <wsdl:operation name="LoginWithAccount">
+      <wsdl:input wsaw:Action="urn:domino-all-fives:services/ISessionAccount/LoginWithAccount" message="tns:ISessionAccount_LoginWithAccount_InputMessage" />
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/ISessionAccount/LoginWithAccountResponse" message="tns:ISessionAccount_LoginWithAccount_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/ISessionAccount/LoginWithAccountAccountIssueFault" name="AccountIssueFault" message="tns:ISessionAccount_LoginWithAccount_AccountIssueFault_FaultMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="IRankingRemoteService">
+    <wsdl:operation name="GetTopWinsRanking">
+      <wsdl:input wsaw:Action="urn:domino-all-fives:services/IRankingRemoteService/GetTopWinsRanking" message="tns:IRankingRemoteService_GetTopWinsRanking_InputMessage" />
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IRankingRemoteService/GetTopWinsRankingResponse" message="tns:IRankingRemoteService_GetTopWinsRanking_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWinsRankingPositionById">
+      <wsdl:input wsaw:Action="urn:domino-all-fives:services/IRankingRemoteService/GetWinsRankingPositionById" message="tns:IRankingRemoteService_GetWinsRankingPositionById_InputMessage" />
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IRankingRemoteService/GetWinsRankingPositionByIdResponse" message="tns:IRankingRemoteService_GetWinsRankingPositionById_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="IRegistrationService">
+    <wsdl:operation name="Register">
+      <wsdl:input wsaw:Action="urn:domino-all-fives:services/IRegistrationService/Register" message="tns:IRegistrationService_Register_InputMessage" />
+      <wsdl:output wsaw:Action="urn:domino-all-fives:services/IRegistrationService/RegisterResponse" message="tns:IRegistrationService_Register_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:domino-all-fives:services/IRegistrationService/RegisterRegistrationIssueFault" name="RegistrationIssueFault" message="tns:IRegistrationService_Register_RegistrationIssueFault_FaultMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

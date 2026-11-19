@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="urn:domino-all-fives:services" elementFormDefault="qualified" targetNamespace="urn:domino-all-fives:services" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" />
+  <xs:element name="LoginWithAccount">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="credentials" nillable="true" xmlns:q1="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q1:Credentials" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LoginWithAccountResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="LoginWithAccountResult" nillable="true" xmlns:q2="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q2:PlayerAccount" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetTopWinsRanking">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetTopWinsRankingResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetTopWinsRankingResult" nillable="true" xmlns:q3="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q3:ArrayOfRankingEntry" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetWinsRankingPositionById">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="playerId" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetWinsRankingPositionByIdResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetWinsRankingPositionByIdResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Register">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="registrationData" nillable="true" xmlns:q4="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q4:AccountRegistration" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RegisterResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="RegisterResult" nillable="true" xmlns:q5="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q5:PlayerAccount" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

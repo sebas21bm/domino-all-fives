@@ -169,7 +169,8 @@ namespace DominoAllFives.Client.Tests
                 Position = 7
             };
             using (ViewModelFactory factory = new ViewModelFactory(navigation,
-                new DialogService(), new SessionClient(), client, session,
+                new DialogService(), new SessionClient(),
+                new WPF.Services.Wcf.Services.RegistrationClient(), client, session,
                     NullLoggerFactory.Instance, new ProfilePictureImageService(
                         NullLogger<ProfilePictureImageService>.Instance)))
             {
@@ -185,7 +186,17 @@ namespace DominoAllFives.Client.Tests
                 login.LoginCommand.Execute(null);
                 // Assert
                 Assert.That(login.IsEmailRequiredVisible, Is.True);
-                Assert.That(login.GoToRegisterCommand.CanExecute(null), Is.False);
+                Assert.That(login.GoToRegisterCommand.CanExecute(null), Is.True);
+                // Act
+                login.GoToRegisterCommand.Execute(null);
+                // Assert
+                Assert.That(home.CurrentModal, Is.TypeOf<RegisterAccountViewModel>());
+                RegisterAccountViewModel registration = (RegisterAccountViewModel)home.CurrentModal;
+                Assert.That(registration.RegisterCommand.CanExecute(null), Is.True);
+                // Act
+                registration.CancelCommand.Execute(null);
+                // Assert
+                Assert.That(home.IsModalVisible, Is.False);
                 // Act
                 login.CancelCommand.Execute(null);
                 // Assert

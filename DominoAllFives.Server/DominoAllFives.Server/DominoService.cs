@@ -154,4 +154,74 @@ namespace DominoAllFives.Server
             }
         }
     }
+
+    public partial class DominoService : IRegistrationService
+    {
+        /// <inheritdoc/>
+        public PlayerAccount Register(AccountRegistration registrationData)
+        {
+            if (registrationData == null)
+            {
+                _logger.LogDebug("Registration rejected a missing request.");
+                throw new FaultException<RegistrationIssue>(
+                    RegistrationIssue.InvalidRegistrationData);
+            }
+
+            try
+            {
+                RegistrationController controller = new RegistrationController(
+                    LoggerFactoryProvider.CreateLogger<RegistrationController>());
+                RegistrationResult result = controller.Register(registrationData);
+                if (result.Status != RegistrationStatus.None)
+                {
+                    RegistrationIssue issue = GetRegistrationIssue(result.Status);
+                    _logger.LogDebug("Registration rejected. Issue: {RegistrationIssue}.", issue);
+                    throw new FaultException<RegistrationIssue>(issue);
+                }
+
+                PlayerAccount account = result.Account;
+                account.SetSessionKey(SessionManager.CreateSession(account.PlayerId));
+                return account;
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "Registration could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (EntityException ex)
+            {
+                _logger.LogError(ex, "Registration could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Registration could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (System.Data.Entity.Validation.DbEntityValidationException ex)
+            {
+                _logger.LogError(ex, "Registration persistence validation failed.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+        }
+
+        private static RegistrationIssue GetRegistrationIssue(RegistrationStatus status)
+        {
+            switch (status)
+            {
+                case RegistrationStatus.InvalidUsername:
+                    return RegistrationIssue.InvalidUsername;
+                case RegistrationStatus.InvalidEmail:
+                    return RegistrationIssue.InvalidEmail;
+                case RegistrationStatus.InvalidPassword:
+                    return RegistrationIssue.InvalidPassword;
+                case RegistrationStatus.UsernameAlreadyExists:
+                    return RegistrationIssue.UsernameAlreadyExists;
+                case RegistrationStatus.EmailAlreadyExists:
+                    return RegistrationIssue.EmailAlreadyExists;
+                default:
+                    return RegistrationIssue.InvalidRegistrationData;
+            }
+        }
+    }
 }

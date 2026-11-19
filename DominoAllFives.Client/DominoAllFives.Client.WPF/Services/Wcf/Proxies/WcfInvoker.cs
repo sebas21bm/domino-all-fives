@@ -39,7 +39,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf
                     {
                         LoggerFactoryProvider.CreateLogger<TProxy>().LogWarning(
                             ex, "The WCF channel close operation timed out.");
-                        throw;
+                        proxy.Abort();
                     }
                 }
 

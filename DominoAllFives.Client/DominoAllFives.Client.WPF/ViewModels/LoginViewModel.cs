@@ -100,7 +100,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _isPasswordRequiredVisible = false;
             LoginCommand = new RelayCommand(ExecuteLogin, CanExecuteLogin);
             CancelCommand = new RelayCommand(CancelLogin, CanCancelLogin);
-            GoToRegisterCommand = new RelayCommand(_onGoToRegister, () => false);
+            GoToRegisterCommand = new RelayCommand(_onGoToRegister, CanCancelLogin);
             GoToRecoverCommand = new RelayCommand(_onGoToRecover, () => false);
         }
 
@@ -234,6 +234,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _isBusy = isBusy;
             LoginCommand.RaiseCanExecuteChanged();
             CancelCommand.RaiseCanExecuteChanged();
+            GoToRegisterCommand.RaiseCanExecuteChanged();
         }
 
         private bool ValidateInput()

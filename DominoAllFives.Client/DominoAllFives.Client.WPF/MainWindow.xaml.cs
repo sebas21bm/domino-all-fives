@@ -33,6 +33,7 @@ namespace DominoAllFives.Client.WPF
                 navigationService,
                 mainWindowViewModel.DialogService,
                 new SessionClient(),
+                new RegistrationClient(),
                 rankingService,
                 playerSession,
                 loggerFactory,

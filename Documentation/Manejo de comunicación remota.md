@@ -187,6 +187,48 @@ GetWinsRankingPositionById(int playerId)
 Cada operación crea y libera su propio proxy mediante `WcfInvoker`.
 
 
+### Ejemplo: Registro de cuenta
+
+El registro utiliza el patrón request/response:
+RegisterAccountViewModel → IRegistrationClient / RegistrationClient →
+RegistrationServiceClient (proxy generado) → RegistrationEndpoint
+(net.tcp, ruta Domino/registration) → DominoService : IRegistrationService →
+RegistrationController → RegistrationValidator / repositorios / Entity Framework.
+
+`Register(AccountRegistration)` devuelve un `PlayerAccount` con su `SessionKey`.
+El controller conserva las reglas de negocio, el hash de contraseña y la creación
+de Player y PlayerStats dentro del contexto de una operación. Conserva su
+RegistrationResult interno; DominoService traduce sus rechazos a
+FaultException<RegistrationIssue> y los errores de persistencia a faults seguros.
+Una solicitud nula produce InvalidRegistrationData. La frontera abre la sesión
+con SessionManager después del alta, como en Login.
+
+El ViewModel comprueba campos requeridos y coincidencia de contraseñas, captura
+usuario/correo sin espacios externos y el idioma actual, y conserva la contraseña
+sin transformarla. Ejecuta el registro con BackgroundJob y BackgroundWork;
+deshabilita registrar y cancelar mientras espera. Clasifica rechazo, fault técnico
+y pérdida de comunicación para seleccionar mensajes existentes de los recursos.
+Después de validar la respuesta inicia PlayerSession con cuatro argumentos y
+navega al menú principal al aceptar el mensaje de éxito.
+
+Los metadatos WSDL/XSD se conservan junto a la referencia DominoAllFivesService.
+RegenerateProxy.ps1 permite exportarlos desde Contracts y generar Reference.cs
+con SvcUtil o con el generador de .NET Framework. No requiere iniciar el servidor.
+Se ejecuta con Windows PowerShell, indicando el ensamblado Contracts compilado en
+`-ContractsAssembly` y, opcionalmente, `-SvcUtilPath`.
+
+WcfInvoker conserva el resultado recibido cuando Close falla por comunicación o
+timeout: registra el cierre anómalo y aborta el canal. Un timeout durante la
+operación sigue propagándose. No hay reintento automático de registro: un fallo
+de transporte antes de recibir respuesta no permite asegurar si el alta ocurrió.
+
+OldClient permanece como implementación histórica; el cliente actual no
+referencia IAccountService local, BusinessLogic, repositorios ni Entity Framework.
+
+[Verificaciones del registro](Verificaciones%20auxiliares.md#migración-del-registro-de-cuenta-2026-11-18).
+
+---
+
 ## Comunicación duplex
 
 Lobby requiere que el servidor pueda enviar cambios a los jugadores sin esperar una nueva solicitud.

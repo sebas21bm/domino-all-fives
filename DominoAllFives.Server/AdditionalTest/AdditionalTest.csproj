@@ -45,6 +45,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xml" />
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
@@ -62,9 +63,13 @@
     <Compile Include="MatchServiceWcfTests.cs" />
     <Compile Include="MatchPublicationWcfTests.cs" />
     <Compile Include="RankingServiceTests.cs" />
+    <Compile Include="RegistrationServiceWcfTests.cs" />
     <Compile Include="SessionServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\DominoAllFives.Client\DominoAllFives.Client.WPF\Connected Services\DominoAllFivesService\Reference.cs">
+      <Link>Proxy\DominoAllFivesServiceReference.cs</Link>
+    </Compile>
     <Compile Include="..\..\DominoAllFives.Client\DominoAllFives.Client.WPF\Connected Services\MatchService\Reference.cs">
       <Link>Proxy\MatchServiceReference.cs</Link>
     </Compile>

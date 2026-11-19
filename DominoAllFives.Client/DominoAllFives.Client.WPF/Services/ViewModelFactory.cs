@@ -17,6 +17,7 @@ namespace DominoAllFives.Client.WPF.Services
         private readonly IFrameNavigationService _navigationService;
         private readonly IDialogService _dialogService;
         private readonly ISessionClient _loginClient;
+        private readonly IRegistrationClient _registrationClient;
         private readonly IRankingClient _rankingClient;
         private readonly PlayerSession _playerSession;
         private readonly ILoggerFactory _loggerFactory;
@@ -26,6 +27,7 @@ namespace DominoAllFives.Client.WPF.Services
             IFrameNavigationService navigationService,
             IDialogService dialogService,
             ISessionClient loginClient,
+            IRegistrationClient registrationClient,
             IRankingClient rankingClient,
             PlayerSession playerSession,
             ILoggerFactory loggerFactory,
@@ -36,6 +38,8 @@ namespace DominoAllFives.Client.WPF.Services
             _dialogService = dialogService ?? throw new ArgumentNullException(
                 nameof(dialogService));
             _loginClient = loginClient ?? throw new ArgumentNullException(nameof(loginClient));
+            _registrationClient = registrationClient ?? throw new ArgumentNullException(
+                nameof(registrationClient));
             _rankingClient = rankingClient ?? throw new ArgumentNullException(
                 nameof(rankingClient));
             _playerSession = playerSession ?? throw new ArgumentNullException(
@@ -73,9 +77,19 @@ namespace DominoAllFives.Client.WPF.Services
             return viewModel;
         }
 
-        public RegisterAccountViewModel CreateRegisterAccount(Action onCancel)
+        public RegisterAccountViewModel CreateRegisterAccount(
+            Action onRegistrationSuccess,
+            Action onCancel)
         {
-            return new RegisterAccountViewModel(onCancel);
+            RegisterAccountViewModel viewModel = new RegisterAccountViewModel(
+                _playerSession,
+                onRegistrationSuccess,
+                onCancel);
+            viewModel.Initialize(
+                _dialogService,
+                _registrationClient,
+                LoggerFactoryProvider.CreateLogger<RegisterAccountViewModel>());
+            return viewModel;
         }
 
         public RecoverAccountViewModel CreateRecoverAccount(Action onCancel)

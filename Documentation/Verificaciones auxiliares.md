@@ -374,3 +374,72 @@ generador durante el comando real. Tampoco se afirma atomicidad ante fallos al
 construir o registrar el snapshot después de aplicar el dominio, ni persistencia
 o confirmación de recepción de callbacks. Las 359 fichas unitarias, cada una con
 su propia numeración y evidencia, están exclusivamente en Pruebas.md.
+
+
+## Migración del registro de cuenta (2026-11-18)
+
+Se incorporaron doce verificaciones auxiliares: nueve de RegistrationServiceWcfTests
+y tres de RegistrationPresentationTests. Todas pasaron. Las primeras usan
+DominoService y el proxy generado real con un host net.pipe aislado; los datos
+inválidos detienen el controller antes de abrir persistencia. El roundtrip usa
+serializadores concretos del contrato servidor y del DTO generado. Las pruebas de
+presentación usan PasswordBox, DialogService, MainWindowViewModel, PlayerSession
+y RegistrationClient concretos; campos vacíos y contraseñas distintas no llegan a WCF.
+La cancelación comprueba navegación local sin modificar la sesión.
+
+No se añadieron interfaces ni rutas de producción para facilitar las pruebas.
+IRegistrationClient es la dependencia remota de presentación solicitada en la
+arquitectura. Los casos se conservan como auxiliares por su colaboración con
+transporte, serialización y WPF; no amplían el catálogo unitario de Pruebas.md.
+
+Los reportes están bajo `DominoAllFives.Server/Tests/TestResults`.
+Cada fila identifica un caso nuevo ejecutado y su evidencia individual.
+En los rechazos se espera exactamente el RegistrationIssue indicado en los
+parámetros o InvalidRegistrationData para null. El roundtrip conserva los cuatro
+campos, los espacios de la contraseña y pt-BR. La presentación conserva la sesión
+sin autenticar; el caso de contraseñas distintas muestra el mensaje localizado.
+
+| N.º | Caso ejecutado | Resultado y evidencia |
+| --- | --- | --- |
+| AUX-047 | `Register_InvalidInput_ReturnsTypedFaultBeforePersistence("player","player@example.com","StrongPass1!",InvalidEmail)` | Passed; `registration-wcf.trx`; `92d54abe-afcc-0ee0-00a9-9fc0d2647ae3`; `00:00:00.0050000`. |
+| AUX-048 | `Serialize_RegistrationRequest_PreservesFieldsAcrossGeneratedProxy` | Passed; `registration-wcf.trx`; `8bb69cc1-2364-4837-539c-f200abc96f71`; `00:00:00.0170000`. |
+| AUX-049 | `Register_InvalidInput_ReturnsTypedFaultBeforePersistence("   ","invalid-email","weak",InvalidUsername)` | Passed; `registration-wcf.trx`; `2a04cb2a-e658-db58-73ba-47b8d4d0a233`; `00:00:00.0090000`. |
+| AUX-050 | `Register_InvalidInput_ReturnsTypedFaultBeforePersistence("player",null,"StrongPass1!",InvalidEmail)` | Passed; `registration-wcf.trx`; `68966240-5f7b-b7aa-11d2-feaf96c87d0d`; `00:00:00.0050000`. |
+| AUX-051 | `Register_InvalidInput_ReturnsTypedFaultBeforePersistence("player","player@gmail.com","weak",InvalidPassword)` | Passed; `registration-wcf.trx`; `d84579c1-0d5d-8a8f-e185-67eefcd31b4e`; `00:00:00.0080000`. |
+| AUX-052 | `Register_InvalidInput_ReturnsTypedFaultBeforePersistence("player","player@gmail.com",null,InvalidPassword)` | Passed; `registration-wcf.trx`; `50238fe4-098a-b1ff-d7c5-c5c95bed1650`; `00:00:00.0050000`. |
+| AUX-053 | `Register_InvalidInput_ReturnsTypedFaultBeforePersistence(null,"player@gmail.com","StrongPass1!",InvalidUsername)` | Passed; `registration-wcf.trx`; `1b7072c2-d942-84ff-f036-140e77f0acc7`; `00:00:01.0030000`. |
+| AUX-054 | `Register_NullRequest_ReturnsTypedInvalidDataFault` | Passed; `registration-wcf.trx`; `77a5ac35-4355-10c8-e60e-bf243948b3de`; `00:00:00.0060000`. |
+| AUX-055 | `Register_InvalidInput_ReturnsTypedFaultBeforePersistence("player","invalid-email","weak",InvalidEmail)` | Passed; `registration-wcf.trx`; `23954b8b-dd85-82dd-6e6c-faacbd8f3550`; `00:00:00.0070000`. |
+| AUX-056 | `Register_DifferentPasswords_ShowsLocalizedWarningWithoutStartingSession` | Passed; `registration-client.trx`; `9d2fb0b6-bcc0-811b-8111-8a3075dea7a2`; `00:00:00.2110000`. |
+| AUX-057 | `Register_EmptyFields_ShowsRequiredIndicatorsWithoutStartingSession` | Passed; `registration-client.trx`; `4de4f2aa-d6b2-9759-e4ab-9dea4a494141`; `00:00:00.0000001`. |
+| AUX-058 | `Cancel_IdleRegistration_InvokesNavigationWithoutChangingSession` | Passed; `registration-client.trx`; `0d04b246-f360-980d-5120-51a272e99291`; `00:00:00.0000001`. |
+
+Fuentes:
+[RegistrationServiceWcfTests.cs](../DominoAllFives.Server/AdditionalTest/RegistrationServiceWcfTests.cs)
+y [RegistrationPresentationTests.cs](../DominoAllFives.Client/DominoAllFives.Client.Tests/RegistrationPresentationTests.cs).
+
+La selección completa pasó 64 casos: 13 en registration-wcf.trx (incluye cuatro
+regresiones de guardas de Login y Ranking), 30 en registration-client.trx
+(incluye 27 regresiones existentes de Login, Credentials y Ranking) y 21 en
+registration-server-regression.trx (PlayerAccount, SessionManager y contrato Login).
+La prueba existente Factory_AuthenticatedSession_ReturnsInitializedPagesAndModal
+también comprueba la apertura y cancelación del registro ya habilitado.
+Se ejecutó inicialmente ese caso sobre un binario anterior mientras compilaba;
+la ejecución final, tras finalizar la compilación, pasó los 30 casos del cliente.
+
+Compilaron ambas soluciones Debug con MSBuild de Visual Studio. Evidencia:
+registration-server-build.log y registration-client-build.log. Permanecen las
+advertencias preexistentes MSB3836 del servidor y CS0168 de LanguageManager y
+MatchClient. El intento inicial con dotnet build terminó sin diagnóstico útil;
+se utilizó MSBuild de Visual Studio para la compilación verificada.
+
+El proxy se regeneró dos veces desde Contracts con SvcUtil 4.8 y produjo el mismo
+SHA-256: `f98b993b8339f8d110e4697bd18758af1406d3aa3c35dd107384dd8d8fd1dee3`.
+El script y los metadatos quedan junto a Reference.cs.
+
+Límites: no se usó SQL Server ni se creó una cuenta real. El alta exitosa con
+Player+PlayerStats, duplicados, hash persistido y sesión devuelta requiere una BD
+aislada configurada antes de su verificación integral. No se probaron UI manual,
+net.tcp desplegado, fallos reales de persistencia ni el timeout exacto de Close.
+No se afirma cobertura de fallos posteriores al commit ni idempotencia; una
+respuesta perdida puede corresponder a una cuenta ya creada.
