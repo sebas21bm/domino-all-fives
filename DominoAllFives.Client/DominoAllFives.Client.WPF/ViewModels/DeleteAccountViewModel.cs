@@ -1,5 +1,4 @@
 using System;
-using System.ServiceModel;
 using System.Windows.Controls;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
@@ -7,7 +6,6 @@ using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Threading;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFivesService;
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.ViewModels
@@ -148,68 +146,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            if (error is FaultException<AccountIssue> accountFault)
-            {
-                _logger.LogDebug(error, "Account deletion rejected. Account issue: {AccountIssue}.",
-                    accountFault.Detail);
-                ShowMessageFailure(accountFault.Detail);
-            }
-            else if (error is FaultException<AccessIssue> accessFault)
-            {
-                _logger.LogDebug(error, "Account deletion rejected. Access issue: {AccessIssue}.",
-                    accessFault.Detail);
-                ShowMessageFailure(accessIssue: accessFault.Detail);
-            }
-            else
-            {
-                _logger.LogError(error, "Account deletion could not complete.");
-                bool connectionFailure = error is TimeoutException
-                    || (error is CommunicationException && !(error is FaultException));
-                ShowMessageFailure(connectionFailure: connectionFailure);
-            }
-        }
-
-        private void ShowMessageFailure(
-            AccountIssue? issue = null,
-            AccessIssue? accessIssue = null,
-            bool connectionFailure = false)
-        {
-            switch (issue)
-            {
-                case AccountIssue.IncorrectCurrentPassword:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Warning,
-                        TitleKey = "MessageAccount_msgWrongCurrentPasswordTitle",
-                        MessageKey = "MessageAccount_msgWrongCurrentPassword"
-                    });
-                    break;
-                case AccountIssue.PlayerNotFound:
-                case null when accessIssue == AccessIssue.SessionRequired:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Warning,
-                        TitleKey = "MessageAccount_msgAccountNotFoundTitle",
-                        MessageKey = "MessageAccount_msgAccountNotFound"
-                    });
-                    break;
-                case null when connectionFailure:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Error,
-                        TitleKey = "Global_msgConnectionErrorTitle",
-                        MessageKey = "Global_msgConnectionError"
-                    });
-                    break;
-                default:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Error,
-                        TitleKey = "Global_msgDefaultErrorTitle",
-                        MessageKey = "Global_msgDefaultError"
-                    });
-                    break;
-            }
+            DialogRequest dialog = AccountFailureDialogs.ForAccountDeletion(error, _logger);
+            _dialogService.ShowDialog(dialog);
         }
 
         private void SetBusy(bool isBusy)

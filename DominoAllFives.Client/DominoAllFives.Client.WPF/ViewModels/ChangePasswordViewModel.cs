@@ -1,5 +1,4 @@
 using System;
-using System.ServiceModel;
 using System.Windows;
 using System.Windows.Controls;
 using DominoAllFives.Client.WPF.Commands;
@@ -8,7 +7,6 @@ using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.Services.Threading;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using DominoAllFivesService;
 using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.ViewModels
@@ -123,7 +121,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             if (newPassword != confirmPassword)
             {
-                ShowMessageFailure(passwordConfirmationMismatch: true);
+                _dialogService.ShowDialog(FailureDialogs.Create(
+                    DialogType.Warning,
+                    "MessageAccount_msgIncorrectPasswordTitle",
+                    "MessageAccount_msgIncorrectPassword"));
                 return;
             }
 
@@ -180,93 +181,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            if (error is FaultException<AccountIssue> accountFault)
-            {
-                _logger.LogDebug(error, "Password change rejected. Account issue: {AccountIssue}.",
-                    accountFault.Detail);
-                ShowMessageFailure(accountFault.Detail);
-            }
-            else if (error is FaultException<AccessIssue> accessFault)
-            {
-                _logger.LogDebug(error, "Password change rejected. Access issue: {AccessIssue}.",
-                    accessFault.Detail);
-                ShowMessageFailure(accessIssue: accessFault.Detail);
-            }
-            else
-            {
-                _logger.LogError(error, "Password change could not complete.");
-                bool connectionFailure = error is TimeoutException
-                    || (error is CommunicationException && !(error is FaultException));
-                ShowMessageFailure(connectionFailure: connectionFailure);
-            }
-        }
-
-        private void ShowMessageFailure(
-            AccountIssue? issue = null,
-            AccessIssue? accessIssue = null,
-            bool connectionFailure = false,
-            bool passwordConfirmationMismatch = false)
-        {
-            switch (issue)
-            {
-                case AccountIssue.IncorrectCurrentPassword:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Warning,
-                        TitleKey = "MessageAccount_msgWrongCurrentPasswordTitle",
-                        MessageKey = "MessageAccount_msgWrongCurrentPassword"
-                    });
-                    break;
-                case AccountIssue.PlayerNotFound:
-                case null when accessIssue == AccessIssue.SessionRequired:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Warning,
-                        TitleKey = "MessageAccount_msgAccountNotFoundTitle",
-                        MessageKey = "MessageAccount_msgAccountNotFound"
-                    });
-                    break;
-                case AccountIssue.InvalidPassword:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Warning,
-                        TitleKey = "MessageAccount_msgUnsafePasswordTitle",
-                        MessageKey = "MessageAccount_msgUnsafePassword"
-                    });
-                    break;
-                case AccountIssue.PasswordUnchanged:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Warning,
-                        TitleKey = "MessageAccount_msgSamePasswordTitle",
-                        MessageKey = "MessageAccount_msgSamePassword"
-                    });
-                    break;
-                case null when passwordConfirmationMismatch:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Warning,
-                        TitleKey = "MessageAccount_msgIncorrectPasswordTitle",
-                        MessageKey = "MessageAccount_msgIncorrectPassword"
-                    });
-                    break;
-                case null when connectionFailure:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Error,
-                        TitleKey = "Global_msgConnectionErrorTitle",
-                        MessageKey = "Global_msgConnectionError"
-                    });
-                    break;
-                default:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Error,
-                        TitleKey = "Global_msgDefaultErrorTitle",
-                        MessageKey = "Global_msgDefaultError"
-                    });
-                    break;
-            }
+            DialogRequest dialog = AccountFailureDialogs.ForPasswordChange(error, _logger);
+            _dialogService.ShowDialog(dialog);
         }
 
         private void SetBusy(bool isBusy)

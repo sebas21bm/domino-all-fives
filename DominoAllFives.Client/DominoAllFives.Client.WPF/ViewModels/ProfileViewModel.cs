@@ -1,5 +1,4 @@
 using System;
-using System.ServiceModel;
 using System.Windows.Media.Imaging;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
@@ -222,25 +221,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            if (ex is FaultException<ProfileIssue> profileFault)
-            {
-                _logger.LogDebug(ex, "Profile query rejected. Issue: {ProfileIssue}.",
-                    profileFault.Detail);
-                ShowFailure(profileFault.Detail);
-                return;
-            }
-
-            if (ex is FaultException<AccessIssue>)
-            {
-                _logger.LogDebug(ex, "Profile query requires an authorized session.");
-                ShowFailure(ProfileIssue.PlayerNotFound);
-                return;
-            }
-
-            _logger.LogError(ex, "Profile query could not complete.");
-            bool connectionFailure = ex is TimeoutException
-                || (ex is CommunicationException && !(ex is FaultException));
-            ShowFailure(connectionFailure: connectionFailure);
+            ProfileFailureDialogs.HandleRemoteFailure(ex, _logger, "Profile query", ShowFailure);
         }
 
         private bool CanGoBack()
@@ -290,30 +271,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ShowFailure(ProfileIssue? issue = null, bool connectionFailure = false)
         {
-            string titleKey;
-            string messageKey;
-            switch (issue)
-            {
-                case ProfileIssue.PlayerNotFound:
-                    titleKey = "Global_msgNotFoundTitle";
-                    messageKey = "Global_msgNotFound";
-                    break;
-                case null when connectionFailure:
-                    titleKey = "Global_msgConnectionErrorTitle";
-                    messageKey = "Global_msgConnectionError";
-                    break;
-                default:
-                    titleKey = "Global_msgDefaultErrorTitle";
-                    messageKey = "Global_msgDefaultError";
-                    break;
-            }
-
-            _dialogService.ShowDialog(new DialogRequest
-            {
-                Type = DialogType.Error,
-                TitleKey = titleKey,
-                MessageKey = messageKey
-            });
+            DialogRequest dialog = issue == ProfileIssue.PlayerNotFound
+                ? ProfileFailureDialogs.ProfileNotFound()
+                : FailureDialogs.ForTechnicalFailure(!issue.HasValue && connectionFailure);
+            _dialogService.ShowDialog(dialog);
         }
     }
 }

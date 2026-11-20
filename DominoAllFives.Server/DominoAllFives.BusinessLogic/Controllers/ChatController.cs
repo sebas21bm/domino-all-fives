@@ -17,6 +17,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
             _lobbyManager = lobbyManager ?? throw new ArgumentNullException(nameof(lobbyManager));
         }
 
+        /*
         public ChatMessage SendMessage(
             Player sender,
             ChatMessage message,
@@ -47,7 +48,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 default:
                     throw new ArgumentOutOfRangeException(nameof(message));
             }
-        }
+        }*/
 
         /*
         public List<ChatMessage> GetMessages(int playerId, ChatContext context)

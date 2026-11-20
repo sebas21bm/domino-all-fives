@@ -1,5 +1,4 @@
 using System;
-using System.ServiceModel;
 using System.Windows.Media.Imaging;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
@@ -368,25 +367,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void HandleFailure(Exception ex)
         {
-            if (ex is FaultException<ProfileIssue> profileFault)
-            {
-                _logger.LogDebug(ex, "Profile operation rejected. Issue: {ProfileIssue}.",
-                    profileFault.Detail);
-                ShowFailure(profileFault.Detail);
-                return;
-            }
-
-            if (ex is FaultException<AccessIssue>)
-            {
-                _logger.LogDebug(ex, "Profile operation requires an authorized session.");
-                ShowFailure(ProfileIssue.PlayerNotFound);
-                return;
-            }
-
-            _logger.LogError(ex, "Profile operation could not complete.");
-            bool connectionFailure = ex is TimeoutException
-                || (ex is CommunicationException && !(ex is FaultException));
-            ShowFailure(connectionFailure: connectionFailure);
+            ProfileFailureDialogs.HandleRemoteFailure(
+                ex,
+                _logger,
+                "Profile operation",
+                ShowFailure);
         }
 
         private bool CanGoBack()
@@ -453,75 +438,34 @@ namespace DominoAllFives.Client.WPF.ViewModels
             ProfileIssue? issue = null,
             bool connectionFailure = false)
         {
+            DialogRequest dialog;
             switch (issue)
             {
                 case ProfileIssue.InvalidUsername:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Warning,
-                        TitleKey = "MessageAccount_msgInvalidUsernameTitle",
-                        MessageKey = "MessageAccount_msgInvalidUsername"
-                    });
+                    dialog = FailureDialogs.Create(
+                        DialogType.Warning,
+                        "MessageAccount_msgInvalidUsernameTitle",
+                        "MessageAccount_msgInvalidUsername");
                     break;
                 case ProfileIssue.UsernameAlreadyExists:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Warning,
-                        TitleKey = "MessageAccount_msgUsernameUsedTitle",
-                        MessageKey = "MessageAccount_msgUsernameUsed"
-                    });
-                    break;
-                case ProfileIssue.InvalidProfilePictureFormat:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Warning,
-                        TitleKey = "MessageProfile_msgPhotoInvalidFormatTitle",
-                        MessageKey = "MessageProfile_msgPhotoInvalidFormat"
-                    });
-                    break;
-                case ProfileIssue.ProfilePictureTooLarge:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Warning,
-                        TitleKey = "MessageProfile_msgPhotoTooLargeTitle",
-                        MessageKey = "MessageProfile_msgPhotoTooLarge"
-                    });
-                    break;
-                case ProfileIssue.InvalidProfilePicture:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Warning,
-                        TitleKey = "MessageProfile_msgPhotoInvalidTitle",
-                        MessageKey = "MessageProfile_msgPhotoInvalid"
-                    });
+                    dialog = FailureDialogs.Create(
+                        DialogType.Warning,
+                        "MessageAccount_msgUsernameUsedTitle",
+                        "MessageAccount_msgUsernameUsed");
                     break;
                 case ProfileIssue.PlayerNotFound:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Error,
-                        TitleKey = "Global_msgNotFoundTitle",
-                        MessageKey = "Global_msgNotFound"
-                    });
+                    dialog = ProfileFailureDialogs.ProfileNotFound();
                     break;
                 case ProfileIssue.SameUsername:
                     return;
-                case null when connectionFailure:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Error,
-                        TitleKey = "Global_msgConnectionErrorTitle",
-                        MessageKey = "Global_msgConnectionError"
-                    });
-                    break;
                 default:
-                    _dialogService.ShowDialog(new DialogRequest
-                    {
-                        Type = DialogType.Error,
-                        TitleKey = "Global_msgDefaultErrorTitle",
-                        MessageKey = "Global_msgDefaultError"
-                    });
+                    dialog = ProfileFailureDialogs.ForPictureOrTechnicalFailure(
+                        issue,
+                        connectionFailure);
                     break;
             }
+
+            _dialogService.ShowDialog(dialog);
         }
 
         private sealed class ProfileChanges

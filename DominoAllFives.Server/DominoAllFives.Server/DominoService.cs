@@ -212,6 +212,8 @@ namespace DominoAllFives.Server
         /// <inheritdoc/>
         public void ChangePreferredLanguage(string sessionKey, string preferredLanguageId)
         {
+            const string persistenceFailureMessage =
+                "Preferred language change could not complete persistence.";
             int playerId = GetSessionPlayerId(sessionKey);
             try
             {
@@ -228,23 +230,19 @@ namespace DominoAllFives.Server
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "Preferred language change could not complete persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (EntityException ex)
             {
-                _logger.LogError(ex, "Preferred language change could not complete persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Preferred language change could not complete persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbEntityValidationException ex)
             {
-                _logger.LogError(ex, "Preferred language change could not complete persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (InvalidOperationException ex)
             {
@@ -256,6 +254,8 @@ namespace DominoAllFives.Server
         /// <inheritdoc/>
         public void ChangePassword(string sessionKey, string currentPassword, string newPassword)
         {
+            const string persistenceFailureMessage =
+                "Password change could not complete persistence.";
             int playerId = GetSessionPlayerId(sessionKey);
             try
             {
@@ -271,29 +271,27 @@ namespace DominoAllFives.Server
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "Password change could not complete persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (EntityException ex)
             {
-                _logger.LogError(ex, "Password change could not complete persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Password change could not complete persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbEntityValidationException ex)
             {
-                _logger.LogError(ex, "Password change could not complete persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
         }
 
         /// <inheritdoc/>
         public void DeleteAccount(string sessionKey, string password)
         {
+            const string persistenceFailureMessage =
+                "Account deletion could not complete persistence.";
             int playerId = GetSessionPlayerId(sessionKey);
             try
             {
@@ -309,23 +307,19 @@ namespace DominoAllFives.Server
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "Account deletion could not complete persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (EntityException ex)
             {
-                _logger.LogError(ex, "Account deletion could not complete persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Account deletion could not complete persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbEntityValidationException ex)
             {
-                _logger.LogError(ex, "Account deletion could not complete persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
         }
     }
@@ -335,6 +329,8 @@ namespace DominoAllFives.Server
         /// <inheritdoc/>
         public PlayerProfile GetMyProfile(string sessionKey)
         {
+            const string persistenceFailureMessage =
+                "Profile retrieval could not access persistence.";
             int playerId = GetSessionPlayerId(sessionKey);
             try
             {
@@ -353,18 +349,15 @@ namespace DominoAllFives.Server
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "Profile retrieval could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (EntityException ex)
             {
-                _logger.LogError(ex, "Profile retrieval could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Profile retrieval could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (InvalidOperationException ex)
             {
@@ -376,6 +369,7 @@ namespace DominoAllFives.Server
         /// <inheritdoc/>
         public void UpdateProfileName(string sessionKey, string username)
         {
+            const string persistenceFailureMessage = "Profile update could not access persistence.";
             int playerId = GetSessionPlayerId(sessionKey);
             try
             {
@@ -394,23 +388,19 @@ namespace DominoAllFives.Server
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "Profile update could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (EntityException ex)
             {
-                _logger.LogError(ex, "Profile update could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Profile update could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbEntityValidationException ex)
             {
-                _logger.LogError(ex, "Profile update failed persistence validation.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, "Profile update failed persistence validation.");
             }
         }
 
@@ -420,6 +410,8 @@ namespace DominoAllFives.Server
             string username,
             ProfilePicture picture)
         {
+            const string persistenceFailureMessage =
+                "Profile and picture update could not access persistence.";
             int playerId = GetSessionPlayerId(sessionKey);
             if (picture == null)
             {
@@ -444,23 +436,21 @@ namespace DominoAllFives.Server
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "Profile and picture update could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (EntityException ex)
             {
-                _logger.LogError(ex, "Profile and picture update could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Profile and picture update could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbEntityValidationException ex)
             {
-                _logger.LogError(ex, "Profile and picture update failed persistence validation.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(
+                    ex,
+                    "Profile and picture update failed persistence validation.");
             }
             catch (IOException ex)
             {
@@ -477,6 +467,8 @@ namespace DominoAllFives.Server
         /// <inheritdoc/>
         public void SetProfilePicture(string sessionKey, ProfilePicture picture)
         {
+            const string persistenceFailureMessage =
+                "Picture replacement could not access persistence.";
             int playerId = GetSessionPlayerId(sessionKey);
             try
             {
@@ -501,23 +493,21 @@ namespace DominoAllFives.Server
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "Picture replacement could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (EntityException ex)
             {
-                _logger.LogError(ex, "Picture replacement could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Picture replacement could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbEntityValidationException ex)
             {
-                _logger.LogError(ex, "Picture replacement failed persistence validation.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(
+                    ex,
+                    "Picture replacement failed persistence validation.");
             }
             catch (IOException ex)
             {
@@ -534,6 +524,8 @@ namespace DominoAllFives.Server
         /// <inheritdoc/>
         public void RemoveProfilePicture(string sessionKey)
         {
+            const string persistenceFailureMessage =
+                "Picture removal could not access persistence.";
             int playerId = GetSessionPlayerId(sessionKey);
             try
             {
@@ -552,24 +544,26 @@ namespace DominoAllFives.Server
             }
             catch (SqlException ex)
             {
-                _logger.LogError(ex, "Picture removal could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (EntityException ex)
             {
-                _logger.LogError(ex, "Picture removal could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Picture removal could not access persistence.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, persistenceFailureMessage);
             }
             catch (DbEntityValidationException ex)
             {
-                _logger.LogError(ex, "Picture removal failed persistence validation.");
-                throw new FaultException(ServiceFailureReason);
+                throw CreatePersistenceFault(ex, "Picture removal failed persistence validation.");
             }
+        }
+
+        private FaultException CreatePersistenceFault(Exception ex, string message)
+        {
+            _logger.LogError(ex, message);
+            return new FaultException(ServiceFailureReason);
         }
 
         private int GetSessionPlayerId(string sessionKey)
