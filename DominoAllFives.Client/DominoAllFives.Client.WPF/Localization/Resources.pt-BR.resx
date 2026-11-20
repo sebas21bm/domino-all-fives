@@ -1160,6 +1160,9 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
   <data name="Match_lblRound">
     <value>Rodada {0} · Monte: {1}</value>
   </data>
+  <data name="Match_lblScoreMultiplier">
+    <value>×{0}</value>
+  </data>
   <data name="Match_msgCompleted">
     <value>Partida encerrada. A maior pontuação identifica o vencedor.</value>
   </data>

@@ -114,13 +114,15 @@ namespace DominoAllFives.Server.Tests
                 Is.EqualTo(new object[] { 2, tiles[7].TileId }));
         }
 
-        [TestCase(0)]
-        [TestCase(1)]
-        [TestCase(2)]
-        [TestCase(3)]
-        [TestCase(4)]
-        [TestCase(5)]
-        public void Constructor_InvalidDeck_RejectsBeforeDealing(int scenario)
+        [TestCase(0, typeof(ArgumentNullException))]
+        [TestCase(1, typeof(ArgumentException))]
+        [TestCase(2, typeof(ArgumentException))]
+        [TestCase(3, typeof(ArgumentException))]
+        [TestCase(4, typeof(ArgumentException))]
+        [TestCase(5, typeof(ArgumentException))]
+        public void Constructor_InvalidDeck_RejectsBeforeDealing(
+            int scenario,
+            Type expectedExceptionType)
         {
             // Arrange
             List<Tile> tiles = MatchTestDeck.Ordered();
@@ -164,7 +166,7 @@ namespace DominoAllFives.Server.Tests
                 failure = ex;
             }
             // Assert
-            Assert.That(failure, Is.TypeOf<ArgumentException>());
+            Assert.That(failure, Is.TypeOf(expectedExceptionType));
         }
 
         [TestCase(new int[] { 1 })]

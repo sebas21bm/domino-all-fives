@@ -4,9 +4,6 @@ using DominoAllFives.Contracts.Enums;
 
 namespace DominoAllFives.Contracts.Services
 {
-    /// <summary>
-    /// Exposes authenticated lobby operations over a duplex WCF session.
-    /// </summary>
     [ServiceContract(
         Namespace = "urn:domino-all-fives:services",
         CallbackContract = typeof(ILobbyCallback),
@@ -26,6 +23,7 @@ namespace DominoAllFives.Contracts.Services
         [OperationContract(IsInitiating = true, IsTerminating = false)]
         [FaultContract(typeof(AccessIssue))]
         void OpenLobbySession(string sessionKey);
+
         /// <summary>
         /// Creates a lobby owned by the authenticated player.
         /// </summary>
@@ -40,6 +38,7 @@ namespace DominoAllFives.Contracts.Services
         [FaultContract(typeof(LobbyIssue))]
         [FaultContract(typeof(AccessIssue))]
         void CreateLobby(LobbySettings settings);
+
         /// <summary>
         /// Adds the authenticated player to an existing lobby.
         /// </summary>
@@ -54,6 +53,7 @@ namespace DominoAllFives.Contracts.Services
         [FaultContract(typeof(LobbyIssue))]
         [FaultContract(typeof(AccessIssue))]
         void JoinLobby(string lobbyCode);
+
         /// <summary>
         /// Removes the authenticated player from the current lobby.
         /// </summary>
@@ -67,6 +67,7 @@ namespace DominoAllFives.Contracts.Services
         [FaultContract(typeof(LobbyIssue))]
         [FaultContract(typeof(AccessIssue))]
         void LeaveLobby();
+
         /// <summary>
         /// Retrieves a lobby snapshot for an authenticated connection.
         /// </summary>
@@ -82,8 +83,9 @@ namespace DominoAllFives.Contracts.Services
         [FaultContract(typeof(LobbyIssue))]
         [FaultContract(typeof(AccessIssue))]
         Lobby GetLobby(string lobbyCode);
+
         /// <summary>
-        /// Starts the current lobby when the authenticated player is its owner.
+        /// Starts a match for the current lobby and notifies its participants.
         /// </summary>
         /// <exception cref="FaultException{AccessIssue}">
         /// The connection has no authenticated session or the player lacks permission.
@@ -95,6 +97,7 @@ namespace DominoAllFives.Contracts.Services
         [FaultContract(typeof(LobbyIssue))]
         [FaultContract(typeof(AccessIssue))]
         void StartMatch();
+
         /// <summary>
         /// Closes the current lobby when the authenticated player is its owner.
         /// </summary>

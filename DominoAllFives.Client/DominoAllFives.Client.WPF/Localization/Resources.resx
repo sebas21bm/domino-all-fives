@@ -1159,6 +1159,9 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
   <data name="Match_lblRound">
     <value>Ronda {0} · Pozo: {1}</value>
   </data>
+  <data name="Match_lblScoreMultiplier">
+    <value>×{0}</value>
+  </data>
   <data name="Match_msgCompleted">
     <value>Partida terminada. La puntuación mayor identifica al ganador.</value>
   </data>

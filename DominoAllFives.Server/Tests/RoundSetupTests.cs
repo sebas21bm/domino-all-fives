@@ -230,13 +230,13 @@ namespace DominoAllFives.Server.Tests
                 Is.EqualTo(new object[] { openingPlayerId, openingValue, new[] { 1, 2 } }));
         }
 
-        [TestCase(0)]
-        [TestCase(1)]
-        [TestCase(2)]
-        [TestCase(3)]
-        [TestCase(4)]
-        [TestCase(5)]
-        public void Prepare_InvalidDeck_PreservesInputs(int scenario)
+        [TestCase(0, typeof(ArgumentNullException))]
+        [TestCase(1, typeof(ArgumentException))]
+        [TestCase(2, typeof(ArgumentException))]
+        [TestCase(3, typeof(ArgumentException))]
+        [TestCase(4, typeof(ArgumentException))]
+        [TestCase(5, typeof(ArgumentException))]
+        public void Prepare_InvalidDeck_PreservesInputs(int scenario, Type expectedExceptionType)
         {
             // Arrange
             List<Tile> tiles = CreateInvalidDeck(scenario);
@@ -263,7 +263,7 @@ namespace DominoAllFives.Server.Tests
                 new object[] { failure?.GetType(), playerIds, tiles },
                 Is.EqualTo(new object[]
                 {
-                    typeof(ArgumentException), new[] { 1, 2 }, previousDeck
+                    expectedExceptionType, new[] { 1, 2 }, previousDeck
                 }));
         }
 

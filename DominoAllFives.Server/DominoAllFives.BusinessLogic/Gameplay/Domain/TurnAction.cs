@@ -1,6 +1,6 @@
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
-    public sealed class TurnAction
+    internal sealed class TurnAction
     {
         public int PlayerId { get; }
         public bool IsPass { get; }

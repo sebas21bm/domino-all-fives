@@ -4,7 +4,12 @@ namespace DominoAllFives.Client.WPF.Models
 {
     public sealed class EndOption
     {
-        public BoardEnd End { get; set; }
+        public BoardEnd End { get; }
+
+        public EndOption(BoardEnd end)
+        {
+            End = end;
+        }
 
         public override string ToString()
         {

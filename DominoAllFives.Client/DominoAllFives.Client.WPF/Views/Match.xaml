@@ -37,10 +37,17 @@
                             VerticalAlignment="Center" Margin="10,0,0,0"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
                                 VerticalAlignment="Center" Margin="0,0,36,0">
-                        <TextBlock Text="{Binding Source={x:Static strings:LanguageManager.Instance}, Path=[Match_lblTarget]}"
-                                   Style="{StaticResource TextGray}" FontSize="22" VerticalAlignment="Center" Margin="0,0,28,0"/>
+                        <TextBlock
+                            Text="{Binding Source={x:Static strings:LanguageManager.Instance},
+                                Path=[Match_lblTarget]}"
+                                   Style="{StaticResource TextGray}"
+                                   FontSize="22"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,28,0"/>
                         <TextBlock x:Name="txbTargetPoints" Text="{Binding TargetPoints}"
-                                   Style="{StaticResource TextCream}" FontSize="40" VerticalAlignment="Center"/>
+                                   Style="{StaticResource TextCream}"
+                                   FontSize="40"
+                                   VerticalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -54,30 +61,58 @@
                 <ItemsControl ItemsSource="{Binding Opponents}" Grid.Column="0"
                               HorizontalAlignment="Right" VerticalAlignment="Center">
                     <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="8,0">
-                                <TextBlock Text="{Binding Username}" Style="{StaticResource TextGray}"
-                                           FontSize="13" VerticalAlignment="Center" MaxWidth="140" TextTrimming="CharacterEllipsis"/>
-                                <Border Width="28" Height="54" Background="{StaticResource MutedTextBrush}"
-                                        BorderBrush="{StaticResource PureBlackBrush}" BorderThickness="2" Margin="14,0,0,0">
-                                    <TextBlock Text="{Binding TileCount}" Style="{StaticResource TextCream}"
-                                               FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock
+                                    Text="{Binding Username}"
+                                    Style="{StaticResource TextGray}"
+                                           FontSize="13"
+                                           VerticalAlignment="Center"
+                                           MaxWidth="140"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <Border
+                                    Width="28"
+                                    Height="54"
+                                    Background="{StaticResource MutedTextBrush}"
+                                        BorderBrush="{StaticResource PureBlackBrush}"
+                                        BorderThickness="2"
+                                        Margin="14,0,0,0">
+                                    <TextBlock
+                                        Text="{Binding TileCount}"
+                                        Style="{StaticResource TextCream}"
+                                               FontSize="12"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
                                 </Border>
                             </StackPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
                 <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="28,0,0,0">
-                    <TextBlock x:Name="txbTurn" Text="{Binding TurnText}" Style="{StaticResource TextCream}"
+                    <TextBlock
+                        x:Name="txbTurn"
+                        Text="{Binding TurnText}"
+                        Style="{StaticResource TextCream}"
                                FontSize="16" TextWrapping="Wrap"/>
-                    <TextBlock x:Name="txbRound" Text="{Binding RoundText}" Style="{StaticResource TextGray}"
+                    <TextBlock
+                        x:Name="txbRound"
+                        Text="{Binding RoundText}"
+                        Style="{StaticResource TextGray}"
                                FontSize="9" Margin="0,8,0,0"/>
-                    <TextBlock x:Name="txbTurnAction" Text="{Binding TurnActionText}" Style="{StaticResource TextCream}"
+                    <TextBlock
+                        x:Name="txbTurnAction"
+                        Text="{Binding TurnActionText}"
+                        Style="{StaticResource TextCream}"
                                FontSize="10" TextWrapping="Wrap"/>
-                    <TextBlock x:Name="txbStatus" Text="{Binding Status}" Style="{StaticResource TextRed}"
+                    <TextBlock
+                        x:Name="txbStatus"
+                        Text="{Binding Status}"
+                        Style="{StaticResource TextRed}"
                                FontSize="9" TextWrapping="Wrap" Margin="0,6,0,0"/>
                 </StackPanel>
             </Grid>
@@ -100,9 +135,15 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Viewbox Width="48" Height="96" RenderTransformOrigin="0.5,0.5">
-                                        <Viewbox.RenderTransform><RotateTransform Angle="{Binding Angle}"/></Viewbox.RenderTransform>
-                                        <controls:DominoTile Width="56" Height="112" TopValue="{Binding TopValue}"
-                                                            BottomValue="{Binding BottomValue}" TileType="{Binding TileType}"/>
+                                        <Viewbox.RenderTransform>
+                                            <RotateTransform Angle="{Binding Angle}"/>
+                                        </Viewbox.RenderTransform>
+                                        <controls:DominoTile
+                                            Width="56"
+                                            Height="112"
+                                            TopValue="{Binding TopValue}"
+                                                            BottomValue="{Binding BottomValue}"
+                                                            TileType="{Binding TileType}"/>
                                     </Viewbox>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -110,35 +151,57 @@
                     </Viewbox>
                     <Grid Width="190" Height="100" HorizontalAlignment="Right"
                           VerticalAlignment="Top" Margin="0,28,38,0" IsHitTestVisible="False"
-                          Visibility="{Binding HasScoredPlay, Converter={StaticResource BoolToVis}}">
+                          Visibility="{Binding HasScoredPlay,
+                              Converter={StaticResource BoolToVis}}">
                         <Ellipse Height="16" VerticalAlignment="Bottom" Margin="18,0,18,12"
                                  Fill="{StaticResource DarkBgBrush}">
                             <Ellipse.Effect>
-                                <DropShadowEffect Color="#E8DFC8" BlurRadius="28" ShadowDepth="0" Opacity="0.8"/>
+                                <DropShadowEffect
+                                    Color="#E8DFC8"
+                                    BlurRadius="28"
+                                    ShadowDepth="0"
+                                    Opacity="0.8"/>
                             </Ellipse.Effect>
                         </Ellipse>
                         <StackPanel HorizontalAlignment="Center">
                             <TextBlock x:Name="txbAwardedPoints" Text="{Binding AwardedPointsText}"
                                        Style="{StaticResource TextCream}" FontSize="38"
                                        HorizontalAlignment="Center"/>
-                            <TextBlock x:Name="txbScoreMultiplier" Text="{Binding ScoreMultiplierText}"
-                                       Style="{StaticResource TextRed}" FontSize="22" Margin="0,8,0,0"
+                            <TextBlock
+                                x:Name="txbScoreMultiplier"
+                                Text="{Binding ScoreMultiplierText}"
+                                       Style="{StaticResource TextRed}"
+                                       FontSize="22"
+                                       Margin="0,8,0,0"
                                        HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Grid>
-                    <controls:RoundSummary Visibility="{Binding IsRoundSummaryVisible, Converter={StaticResource BoolToVis}}"/>
-                    <controls:StartingGame Visibility="{Binding IsStarting, Converter={StaticResource BoolToVis}}"/>
+                    <controls:RoundSummary
+                        Visibility="{Binding IsRoundSummaryVisible,
+                            Converter={StaticResource BoolToVis}}"/>
+                    <controls:StartingGame
+                        Visibility="{Binding IsStarting, Converter={StaticResource BoolToVis}}"/>
                     <Border VerticalAlignment="Top" Margin="16" Padding="18,10"
-                            Background="{StaticResource DarkBgBrush}" BorderBrush="{StaticResource PrimaryRedBrush}"
-                            BorderThickness="2" Visibility="{Binding ShowConnectionAlert, Converter={StaticResource BoolToVis}}">
+                            Background="{StaticResource DarkBgBrush}"
+                            BorderBrush="{StaticResource PrimaryRedBrush}"
+                            BorderThickness="2"
+                            Visibility="{Binding ShowConnectionAlert,
+                                Converter={StaticResource BoolToVis}}">
                         <DockPanel LastChildFill="True">
                             <Button x:Name="btnReconnect" DockPanel.Dock="Right" Margin="20,0,0,0"
-                                    Content="{Binding Source={x:Static strings:LanguageManager.Instance}, Path=[Match_btnReconnect]}"
-                                    Command="{Binding ReconnectCommand}" Style="{StaticResource PrimaryButton}"
+                            Content="{Binding Source={x:Static strings:LanguageManager.Instance},
+                                        Path=[Match_btnReconnect]}"
+                                    Command="{Binding ReconnectCommand}"
+                                    Style="{StaticResource PrimaryButton}"
                                     MinWidth="220" MinHeight="42"/>
-                            <TextBlock x:Name="txbConnectionMessage" Text="{Binding ConnectionMessage}"
-                                       Style="{StaticResource TextCream}" FontSize="13" TextWrapping="Wrap"
-                                       VerticalAlignment="Center" AutomationProperties.LiveSetting="Assertive"/>
+                            <TextBlock
+                                x:Name="txbConnectionMessage"
+                                Text="{Binding ConnectionMessage}"
+                                       Style="{StaticResource TextCream}"
+                                       FontSize="13"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"
+                                       AutomationProperties.LiveSetting="Assertive"/>
                         </DockPanel>
                     </Border>
                 </Grid>
@@ -167,38 +230,62 @@
                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
                          ScrollViewer.VerticalScrollBarVisibility="Disabled">
                     <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Viewbox Width="44" Height="88" Margin="7,0">
-                                <controls:DominoTile Width="56" Height="112" TopValue="{Binding FirstValue}"
+                                <controls:DominoTile
+                                    Width="56"
+                                    Height="112"
+                                    TopValue="{Binding FirstValue}"
                                     BottomValue="{Binding SecondValue}"
-                                    TileType="{Binding SpecialPower, Converter={StaticResource MatchValueConverter}}"/>
+                                    TileType="{Binding SpecialPower,
+                                        Converter={StaticResource MatchValueConverter}}"/>
                             </Viewbox>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Label Content="{Binding Source={x:Static strings:LanguageManager.Instance}, Path=[Match_lblEnd]}"
-                           Target="{Binding ElementName=cbxEnd}" Foreground="{StaticResource CreamLightBrush}"
-                           FontFamily="{StaticResource PressStartFont}" FontSize="10" VerticalAlignment="Center"
+                <StackPanel
+                    Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                    <Label
+                        Content="{Binding Source={x:Static strings:LanguageManager.Instance},
+                            Path=[Match_lblEnd]}"
+                           Target="{Binding ElementName=cbxEnd}"
+                           Foreground="{StaticResource CreamLightBrush}"
+                           FontFamily="{StaticResource PressStartFont}"
+                           FontSize="10"
+                           VerticalAlignment="Center"
                            Margin="0,0,8,0"/>
                     <ComboBox x:Name="cbxEnd" ItemsSource="{Binding Ends}" SelectedValuePath="End"
-                              SelectedValue="{Binding SelectedEnd}" Style="{StaticResource DarkComboBox}"
+                              SelectedValue="{Binding SelectedEnd}"
+                              Style="{StaticResource DarkComboBox}"
                               IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
                               Width="155" Height="30" Margin="0,0,12,0"/>
                     <Button x:Name="btnPlay"
-                            Content="{Binding Source={x:Static strings:LanguageManager.Instance}, Path=[Match_btnPlay]}"
-                            Command="{Binding PlayCommand}" Style="{StaticResource PrimaryButton}" Height="30"/>
+                            Content="{Binding Source={x:Static strings:LanguageManager.Instance},
+                                Path=[Match_btnPlay]}"
+                            Command="{Binding PlayCommand}"
+                            Style="{StaticResource PrimaryButton}"
+                            Height="30"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Grid.RowSpan="2">
                     <Button x:Name="btnPass"
-                            Content="{Binding Source={x:Static strings:LanguageManager.Instance}, Path=[Match_btnPass]}"
-                            Command="{Binding PassCommand}" Style="{StaticResource MatchActionButton}" Margin="0,0,0,10"/>
+                            Content="{Binding Source={x:Static strings:LanguageManager.Instance},
+                                Path=[Match_btnPass]}"
+                            Command="{Binding PassCommand}"
+                            Style="{StaticResource MatchActionButton}"
+                            Margin="0,0,0,10"/>
                     <Button x:Name="btnStock"
-                            Content="{Binding Source={x:Static strings:LanguageManager.Instance}, Path=[Match_btnStock]}"
-                            Command="{Binding DrawCommand}" Style="{StaticResource MatchActionButton}"/>
+                            Content="{Binding Source={x:Static strings:LanguageManager.Instance},
+                                Path=[Match_btnStock]}"
+                            Command="{Binding DrawCommand}"
+                            Style="{StaticResource MatchActionButton}"/>
                 </StackPanel>
             </Grid>
 
@@ -209,8 +296,12 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Text="{Binding Source={x:Static strings:LanguageManager.Instance}, Path=[Match_lblScores]}"
-                               Style="{StaticResource TextGray}" FontSize="22" HorizontalAlignment="Center"/>
+                    <TextBlock
+                        Text="{Binding Source={x:Static strings:LanguageManager.Instance},
+                            Path=[Match_lblScores]}"
+                               Style="{StaticResource TextGray}"
+                               FontSize="22"
+                               HorizontalAlignment="Center"/>
                     <ItemsControl Grid.Row="1" ItemsSource="{Binding Players}" Margin="4,28,0,0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -219,10 +310,19 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="65"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Username}" Style="{StaticResource TextRed}"
-                                               FontSize="16" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding Points}" Style="{StaticResource TextCream}"
-                                               FontSize="22" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                    <TextBlock
+                                        Text="{Binding Username}"
+                                        Style="{StaticResource TextRed}"
+                                               FontSize="16"
+                                               TextTrimming="CharacterEllipsis"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Text="{Binding Points}"
+                                        Style="{StaticResource TextCream}"
+                                               FontSize="22"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"/>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -230,7 +330,8 @@
                 </Grid>
             </Border>
             <controls:MatchResult Grid.Row="1" Grid.RowSpan="3" Grid.ColumnSpan="2"
-                                  Visibility="{Binding IsMatchResultVisible, Converter={StaticResource BoolToVis}}"/>
+                                  Visibility="{Binding IsMatchResultVisible,
+                                      Converter={StaticResource BoolToVis}}"/>
         </Grid>
     </Viewbox>
 </Page>

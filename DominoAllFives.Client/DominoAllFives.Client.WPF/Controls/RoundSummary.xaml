@@ -15,11 +15,19 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="{Binding Source={x:Static strings:LanguageManager.Instance}, Path=[Match_lblRoundSummary]}"
+            <TextBlock
+                Text="{Binding Source={x:Static strings:LanguageManager.Instance},
+                    Path=[Match_lblRoundSummary]}"
                        Style="{StaticResource TextRed}" FontSize="30" HorizontalAlignment="Center"/>
-            <TextBlock Grid.Row="1" Text="{Binding RoundSummaryText}" Style="{StaticResource TextCream}"
+            <TextBlock
+                Grid.Row="1"
+                Text="{Binding RoundSummaryText}"
+                Style="{StaticResource TextCream}"
                        FontSize="15" HorizontalAlignment="Center" Margin="0,16,0,24"/>
-            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <ScrollViewer
+                Grid.Row="2"
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled">
                 <ItemsControl ItemsSource="{Binding RoundPlayers}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -29,20 +37,36 @@
                                     <ColumnDefinition Width="100"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Username}" Style="{StaticResource TextCream}"
-                                           FontSize="18" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Points}" Style="{StaticResource TextCream}"
-                                           FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <ItemsControl Grid.Column="2" ItemsSource="{Binding Tiles}" Margin="20,0,0,0">
+                                <TextBlock
+                                    Text="{Binding Username}"
+                                    Style="{StaticResource TextCream}"
+                                           FontSize="18"
+                                           TextTrimming="CharacterEllipsis"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Text="{Binding Points}"
+                                    Style="{StaticResource TextCream}"
+                                           FontSize="18"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                                <ItemsControl
+                                    Grid.Column="2"
+                                    ItemsSource="{Binding Tiles}"
+                                    Margin="20,0,0,0">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Viewbox Width="28" Height="56" Margin="0,3,5,3">
-                                                <controls:DominoTile Width="56" Height="112" TopValue="{Binding FirstValue}"
+                                                <controls:DominoTile
+                                                    Width="56"
+                                                    Height="112"
+                                                    TopValue="{Binding FirstValue}"
                                                     BottomValue="{Binding SecondValue}"
-                                                    TileType="{Binding SpecialPower, Converter={StaticResource MatchValueConverter}}"/>
+                                                    TileType="{Binding SpecialPower,
+                                                Converter={StaticResource MatchValueConverter}}"/>
                                             </Viewbox>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
