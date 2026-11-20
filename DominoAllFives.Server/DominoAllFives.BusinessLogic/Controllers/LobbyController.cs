@@ -18,12 +18,12 @@ namespace DominoAllFives.BusinessLogic.Controllers
         private const int MinimumPlayers = 2;
         private const int MaximumPlayers = 4;
         private static readonly HashSet<int> validTargetPoints = new HashSet<int>
-        {
-            100,
-            150,
-            200,
-            250
-        };
+{
+    100,
+    150,
+    200,
+    250
+};
         private readonly LobbyManager _lobbyManager;
 
         public LobbyController(LobbyManager lobbyManager)

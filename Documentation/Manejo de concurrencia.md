@@ -1,14 +1,14 @@
-# Manejo de concurrencia
+### Manejo de concurrencia
 
 Domino All Fives debe permitir que diferentes clientes interactúen simultáneamente con el servidor sin corromper el estado compartido y sin bloquear innecesariamente la interfaz WPF.
 
 La implementación divide la concurrencia en:
+* **Servidor:** donde varias sesiones WCF pueden acceder al mismo estado compartido.
+* **Cliente WPF:** donde las operaciones remotas no deben bloquear el hilo de interfaz (UI).
 
-- **Servidor**: donde varias sesiones WCF pueden acceder al mismo estado compartido.
-- **Cliente WPF**: donde las operaciones remotas no deben bloquear el hilo de interfaz (UI).
+---
 
-
-# Concurrencia en servicios WCF duplex
+### Concurrencia en servicios WCF duplex
 
 Los servicios duplex siguen la configuración utilizada por Lobby:
 
@@ -19,11 +19,10 @@ Los servicios duplex siguen la configuración utilizada por Lobby:
     IncludeExceptionDetailInFaults = false)]
 ```
 
-### `InstanceContextMode.PerSession`
-
+#### InstanceContextMode.PerSession
 WCF crea una instancia del servicio para cada sesión duplex.
 
-En `LobbyService`, esto permite conservar información propia de la conexión:
+En LobbyService, esto permite conservar información propia de la conexión:
 
 ```csharp
 private Player _player;
@@ -33,7 +32,7 @@ private ICommunicationObject _callbackChannel;
 
 Por lo tanto:
 
-```text
+```
 Jugador A ──► LobbyService instancia A
 Jugador B ──► LobbyService instancia B
 Jugador C ──► LobbyService instancia C
@@ -42,12 +41,9 @@ Jugador C ──► LobbyService instancia C
 El estado almacenado en estas variables pertenece a la conexión correspondiente.
 
 > [!IMPORTANT]
-> `PerSession` no protege el estado compartido entre jugadores. Las distintas instancias de `LobbyService` continúan utilizando el mismo `LobbyManager`, por lo que dicho estado necesita sincronización propia.
+> `PerSession` no protege el estado compartido entre jugadores. Las distintas instancias de `LobbyService` y `ChatService` continúan utilizando el mismo `LobbyManager.Instance`, por lo que dicho estado necesita sincronización propia.
 
----
-
-### `ConcurrencyMode.Reentrant`
-
+#### ConcurrencyMode.Reentrant
 Los servicios duplex utilizan:
 
 ```csharp
@@ -58,7 +54,7 @@ Esta configuración permite que una operación del servicio pueda realizar callb
 
 Es apropiada para el modelo utilizado por Lobby, donde después de realizar una operación se pueden enviar notificaciones a otros clientes:
 
-```text
+```
 Cliente
    │
    ▼
@@ -78,47 +74,22 @@ Callbacks
 ```
 
 > [!IMPORTANT]
-> `ConcurrencyMode.Reentrant` controla cómo WCF administra las llamadas sobre la instancia del servicio. No hace thread-safe a `LobbyManager`, `Dictionary`, listas u otros objetos compartidos.
+> `ConcurrencyMode.Reentrant` controla cómo WCF administra las llamadas sobre la instancia del servicio. No hace thread-safe a `LobbyManager`, `Dictionary`, listas u otros objetos compartidos. La protección del estado compartido se realiza explitamente mediante mecanismos de sincronización.
 
-La protección del estado compartido se realiza explícitamente mediante mecanismos de sincronización.
+---
 
-## Estado compartido del servidor
+### Estado compartido del servidor
 
-### `LobbyManager`
-
+#### LobbyManager
 `LobbyManager` mantiene información utilizada por diferentes jugadores y sesiones:
 
 ```csharp
 private readonly Dictionary<string, Lobby> _lobbies;
 private readonly Dictionary<int, string> _playerLobbyCodes;
-private readonly Dictionary<int, List<ChatMessage>> _lobbyMessages;
-
 private int _nextLobbyId;
-private int _nextMessageId;
 ```
 
-Estos objetos representan estado compartido.
-
-Por ejemplo, dos clientes podrían intentar entrar simultáneamente al mismo lobby.
-
-Sin sincronización podría ocurrir:
-
-```text
-Jugador A                     Jugador B
-    │                             │
-    ▼                             ▼
-lee Participants.Count = 3    lee Participants.Count = 3
-    │                             │
-    ▼                             ▼
-agrega jugador                agrega jugador
-```
-
-Si el máximo fuera cuatro jugadores, ambas operaciones podrían considerar válido el estado anterior y producir un resultado inconsistente.
-
-
-## Uso de `lock`
-
-Para proteger este estado se utiliza un único objeto de sincronización:
+Estos objetos representan estado compartido. Por ejemplo, dos clientes podrían intentar entrar simultáneamente al mismo lobby. Para proteger estas estructuras relacionadas se utiliza:
 
 ```csharp
 private readonly object _syncRoot = new object();
@@ -135,7 +106,7 @@ lock (_syncRoot)
 
 Ejemplos:
 
-```text
+```
 CreateLobby
 JoinPlayer
 LeavePlayer
@@ -145,15 +116,10 @@ ConfirmMatchStarted
 RestoreLobbyAfterMatchStartFailure
 ReleaseMatch
 CloseLobby
-AddChatMessage
-GetChatMessages
-GetChatRecipients
+GetChatRecipientIds
 ```
 
----
-
-### ¿Qué garantiza el `lock`?
-
+#### ¿Qué garantiza el lock?
 Mientras un hilo ejecuta:
 
 ```csharp
@@ -165,39 +131,9 @@ lock (_syncRoot)
 
 otro hilo que necesite el mismo `_syncRoot` debe esperar.
 
-Conceptualmente:
+Una sola operación puede modificar varias estructuras relacionadas. Por ejemplo, crear un lobby implica:
 
-```text
-Thread A
-   │
-   ▼
-lock adquirido
-   │
-   │ modifica Lobby
-   │
-   ▼
-lock liberado
-             │
-             ▼
-         Thread B
-             │
-             ▼
-       lock adquirido
 ```
-
-Esto permite que operaciones compuestas se ejecuten como una única sección crítica.
-
----
-
-### Por qué no solo usar colecciones concurrentes
-
-El problema de `LobbyManager` no consiste únicamente en realizar una operación segura sobre un `Dictionary`.
-
-Una sola operación puede modificar varias estructuras relacionadas.
-
-Por ejemplo, crear un lobby implica:
-
-```text
 generar LobbyId
     │
     ▼
@@ -205,26 +141,12 @@ crear Lobby
     │
     ├── agregar a _lobbies
     ├── agregar a _playerLobbyCodes
-    ├── crear _lobbyMessages
     └── incrementar _nextLobbyId
 ```
 
-Todas estas modificaciones deben representar una sola transición consistente.
+Todas estas modificaciones deben representar una sola transición consistente. Aunque cada colección fuera individualmente thread-safe, podría ocurrir que otro hilo observara un estado intermedio. Por eso se utiliza `lock (_syncRoot)` para proteger la operación completa, no solamente una llamada a una colección.
 
-Aunque cada colección fuera individualmente thread-safe, podría ocurrir que otro hilo observara un estado intermedio.
-
-Por eso se utiliza:
-
-```csharp
-lock (_syncRoot)
-```
-
-para proteger la **operación completa**, no solamente una llamada a una colección.
-
----
-
-### Regla para utilizar `lock`
-
+#### Regla para utilizar lock
 Se debe utilizar `lock` cuando:
 
 - existe estado mutable compartido entre múltiples sesiones o hilos;
@@ -238,8 +160,8 @@ Ejemplo:
 lock (_syncRoot)
 {
     ValidatePlayerCanEnterLobby(player.PlayerId);
-
     Lobby lobby = GetRegisteredLobby(lobbyCode);
+    ValidateLobbyIsWaiting(lobby);
 
     if (lobby.Participants.Count >= lobby.Settings.MaxPlayers)
     {
@@ -251,41 +173,24 @@ lock (_syncRoot)
 }
 ```
 
-La validación:
+La validación `lobby.Participants.Count` y la modificación `lobby.Participants.Add(...)` permanecen protegidas por el mismo `lock`.
 
-```csharp
-lobby.Participants.Count
-```
-
-y la modificación:
-
-```csharp
-lobby.Participants.Add(...)
-```
-
-deben permanecer protegidas por el mismo `lock`.
-
----
-
-### Métodos internos y `lock`
-
+#### Métodos internos y lock
 Los métodos auxiliares de `LobbyManager`, como:
 
-```text
+```
+ValidatePlayerCanEnterLobby
 GetRegisteredLobby
 GetPlayerLobby
-CloseLobby
-ValidatePlayerCanEnterLobby
+RemoveLobby
 GenerateLobbyCode
 ```
 
-no adquieren necesariamente su propio `lock`.
-
-Se ejecutan dentro de una operación pública que ya posee `_syncRoot`.
+no adquieren su propio `lock`. Se ejecutan dentro de una operación pública que ya posee `_syncRoot`.
 
 La estructura buscada es:
 
-```text
+```
 Método público
    │
    ▼
@@ -294,60 +199,41 @@ lock (_syncRoot)
    ├── validaciones internas
    ├── búsquedas internas
    ├── modificaciones
-   └── creación del snapshot
+   └── creación del snapshot o proyección
 ```
 
 Esto evita distribuir múltiples locks sobre una misma operación.
 
----
+#### No exponer el estado mutable
+Otro elemento importante de la estrategia es que `LobbyManager` no devuelve directamente las colecciones ni entidades mutables internas que mantiene. Según el contexto de la operación, aplica dos mecanismos:
 
-### No exponer el estado mutable
+1. **Copias defensivas (snapshots):** Cuando el consumidor necesita la entidad completa (como en operaciones de sala), construye una copia mediante `CreateSnapshot(lobby)`, copiando también:
+   - `Player`
+   - `LobbySettings`
 
-Otro elemento importante de la estrategia es que `LobbyManager` no devuelve directamente los objetos internos que mantiene.
+   Conceptualmente:
+   ```
+   Estado interno
+       │
+       │ copia
+       ▼
+   Snapshot
+       │
+       ▼
+   Controller / Service / Client
+   ```
 
-En su lugar crea snapshots:
-
-```csharp
-return CreateSnapshot(lobby);
-```
-
-También realiza copias de:
-
-```text
-Player
-LobbySettings
-ChatMessage
-```
-
-Conceptualmente:
-
-```text
-Estado interno
-    │
-    │ copia
-    ▼
-Snapshot
-    │
-    ▼
-Controller / Service / Client
-```
-
-De esta forma, código externo no conserva una referencia que pueda modificar directamente el estado protegido después de salir del `lock`.
+2. **Proyecciones de identificadores:** Cuando el consumidor únicamente necesita identificar a los participantes sin requerir sus datos completos ni imágenes de perfil (como en `GetChatRecipientIds`), retorna una lista nueva de tipos por valor (`List<int>`), evitando clonar objetos innecesariamente y manteniendo aislada la lista interna `lobby.Participants`.
 
 > [!IMPORTANT]
 > El `lock` protege el estado dentro de `LobbyManager`. Por ello no se deben devolver referencias mutables directas a las colecciones u objetos internos protegidos.
 
----
-
-### Duración del `lock`
-
-La sección protegida debe limitarse al trabajo necesario para mantener consistente el estado compartido.
-
-La comunicación WCF con los clientes no debe realizarse dentro del `lock` de `LobbyManager`.
+#### Duración del lock
+La sección protegida debe limitarse al trabajo necesario para mantener consistente el estado compartido. La comunicación WCF con los clientes no debe realizarse dentro del lock de `LobbyManager`.
 
 En Lobby el flujo es:
 
-```text
+```
 LobbyManager
     │
     │ lock
@@ -379,81 +265,28 @@ Esto es importante porque un callback puede:
 
 El estado principal no debe permanecer bloqueado mientras se espera una operación de red.
 
-En Jugabilidad se aplica la misma frontera. `MatchManager` valida la versión,
-modifica el dominio, construye `MatchUpdate` y registra el snapshot en la cola
-en memoria de `ActiveMatch` dentro de `_syncRoot`. Ese registro conserva el orden
-de las versiones aceptadas. No programa trabajadores ni ejecuta callbacks bajo
-ese bloqueo:
+---
 
-```text
-MatchManager
-    │ lock
-    ▼
-valida jugador y versión
-    │
-    ▼
-modifica Match, crea snapshots y los registra en PendingUpdates
-    │
-    ▼
-libera lock y devuelve MatchUpdate
-    │
-    ▼
-MatchService
-    │
-    ▼
-MatchEventPublisher.PublishPending
-    │
-    ▼
-un consumidor drena la cola del partido y ejecuta callbacks WCF
-```
+### Concurrencia en CallbackRegistry
 
-No se debe entregar un `Action<MatchUpdate>` al controller o al manager para
-ocultar el publicador. La actualización producida por la transición se devuelve
-como dato; después de liberar el estado compartido, el servicio activa la
-publicación pendiente. Incluso una salida repetida sin cambios puede activar
-snapshots ya registrados; no vuelve a agregarlos.
-
-`MatchUpdateQueue` permite un solo consumidor y protege únicamente operaciones
-cortas sobre datos. Libera su bloqueo antes de entregar cada snapshot al
-publicador; no llama al manager, al lobby ni a la red bajo ese bloqueo. El
-consumidor libera el lobby antes de emitir los callbacks del snapshot terminal
-y retira sus registros de callbacks al finalizar la entrega. La cola pertenece
-a `ActiveMatch`, se cierra al registrar el resultado final y no se recrea por
-una activación tardía. El transporte sigue siendo en memoria y no ofrece
-persistencia ni confirmación de recepción del cliente.
-
-
-## Concurrencia en `CallbackRegistry`
-
-Los callbacks representan otro estado compartido.
-
-Varias sesiones WCF pueden:
+Los callbacks representan otro estado compartido. Varias sesiones WCF pueden:
 
 - registrar un callback;
 - consultar un callback;
 - eliminar un callback;
 
-simultáneamente.
-
-Para este caso se utiliza:
+simultáneamente. Para este caso se utiliza:
 
 ```csharp
 ConcurrentDictionary<int, ILobbyCallback>
 ```
 
-dentro de:
+dentro de `LobbyCallbackRegistry` (y su equivalente `ConcurrentDictionary<int, IChatCallback>` en `ChatCallbackRegistry`).
 
-```text
-LobbyCallbackRegistry
-```
-
----
-
-### Por qué aquí se usa `ConcurrentDictionary`
-
+#### Por qué aquí se usa ConcurrentDictionary
 Las operaciones del registry son simples e independientes:
 
-```text
+```
 PlayerId → Callback
 ```
 
@@ -465,13 +298,11 @@ TryGetValue(...)
 Remove(...)
 ```
 
-No es necesario coordinar varias colecciones ni mantener una transición compleja entre diferentes estructuras.
-
-Por ello `ConcurrentDictionary` es suficiente para este caso.
+No es necesario coordinar varias colecciones ni mantener una transición compleja entre diferentes estructuras. Por ello `ConcurrentDictionary` es suficiente para este caso.
 
 La diferencia con `LobbyManager` es:
 
-```text
+```
 LobbyManager
     │
     └── varias estructuras + invariantes
@@ -480,7 +311,7 @@ LobbyManager
       lock (_syncRoot)
 ```
 
-```text
+```
 LobbyCallbackRegistry
     │
     └── asociación independiente
@@ -490,28 +321,24 @@ LobbyCallbackRegistry
      ConcurrentDictionary
 ```
 
----
+#### Regla para elegir entre lock y colecciones concurrentes
 
-## Regla para elegir entre `lock` y colecciones concurrentes
-
-### Utilizar `lock` cuando:
-
+Utilizar `lock` cuando:
 - varias instrucciones forman una operación atómica;
 - existen varias colecciones relacionadas;
 - una validación debe mantenerse válida hasta completar la modificación;
-- se debe proteger una invariantes del dominio.
+- se deben proteger invariantes del dominio.
 
-### Utilizar una colección concurrente cuando:
-
+Utilizar una colección concurrente cuando:
 - la estructura es compartida entre hilos;
 - las operaciones son principalmente independientes;
 - las operaciones atómicas proporcionadas por la colección son suficientes.
 
 No debe sustituirse automáticamente un `Dictionary` por `ConcurrentDictionary` suponiendo que eso hace thread-safe toda la lógica que lo utiliza.
 
+---
 
-
-# Concurrencia en el cliente WPF
+### Concurrencia en el cliente WPF
 
 WPF posee un hilo de interfaz encargado de:
 
@@ -522,7 +349,7 @@ WPF posee un hilo de interfaz encargado de:
 
 Si una llamada remota se ejecuta directamente sobre este hilo:
 
-```text
+```
 UI Thread
    │
    ▼
@@ -534,21 +361,16 @@ llamada WCF
 respuesta
 ```
 
-la interfaz permanece bloqueada mientras finaliza la operación.
+la interfaz permanece bloqueada mientras finaliza la operación. Para evitarlo, el proyecto utiliza:
 
-Para evitarlo, el proyecto utiliza:
-
-```text
+```
 Services/Threading/
 ├── IBackgroundJob
 ├── BackgroundJob
 └── BackgroundWork
 ```
 
----
-
-## `BackgroundWork`
-
+#### BackgroundWork
 `BackgroundWork` envía el trabajo al `ThreadPool`:
 
 ```csharp
@@ -557,11 +379,9 @@ ThreadPool.QueueUserWorkItem(
     job);
 ```
 
-Por lo tanto, la operación no se ejecuta sobre el hilo principal de WPF.
+Por lo tanto, la operación no se ejecuta sobre el hilo principal de WPF. El flujo es:
 
-El flujo es:
-
-```text
+```
 UI Thread
    │
    │ BackgroundWork.Start(job)
@@ -576,9 +396,7 @@ job.Execute()
 resultado / error
 ```
 
-Cuando termina, la continuación debe regresar al hilo de UI.
-
-Para esto se utiliza:
+Cuando termina, la continuación debe regresar al hilo de UI. Para esto se utiliza:
 
 ```csharp
 Application.Current.Dispatcher.BeginInvoke(
@@ -587,127 +405,69 @@ Application.Current.Dispatcher.BeginInvoke(
 
 El flujo completo es:
 
-```text
+```
 UI Thread
-   |
-   | Start()
+   │
+   │ Start()
    ▼
 ThreadPool worker
-   |
-   | Execute()
+   │
+   │ Execute()
    ▼
 operación remota
-   |
+   │
    ▼
 resultado
-   |
-   | Dispatcher.BeginInvoke()
+   │
+   │ Dispatcher.BeginInvoke()
    ▼
 UI Thread
-   |
+   │
    ▼
 Complete()
 ```
 
----
+#### Ejemplo conceptual
 
-## `BackgroundJob`
-
-`BackgroundJob<TState, TResult>` encapsula:
-
-```text
-Work
-State
-OnCompleted
-OnFailed
-OnCompletedAfterCancel
-Result
-Error
 ```
-
-Esto permite separar claramente:
-
-```text
-Trabajo en segundo plano
-        |
-        ▼
-Work
-```
-
-de:
-
-```text
-Actualización de interfaz
-        |
-        ▼
-OnCompleted / OnFailed
-```
-
-Los callbacks de finalización se ejecutan después de regresar al `Dispatcher`.
-
-Por eso es seguro que estos callbacks actualicen propiedades utilizadas por la interfaz WPF.
-
----
-
-### Ejemplo conceptual
-
-```text
 ViewModel
-   |
-   | crea BackgroundJob
+   │
+   │ crea BackgroundJob
    ▼
 BackgroundWork.Start()
-   |
+   │
    ▼
 Worker Thread
-   |
-   | ILobbyClient.JoinLobby(...)
+   │
+   │ ILobbyClient.JoinLobby(...)
    ▼
 WCF
-   |
+   │
    ▼
 resultado
-   |
+   │
    ▼
 Dispatcher
-   |
+   │
    ▼
 OnLobbyReady(...)
-   |
+   │
    ▼
 ViewModel / UI
 ```
 
 Este mecanismo se utiliza actualmente en funcionalidades como creación, unión, salida e inicio de Lobby.
 
-
-### Cancelación
-
-`BackgroundJob` contiene:
-
-```csharp
-Cancel()
-```
-
-y protege su estado mediante:
+#### Cancelación
+`BackgroundJob` contiene `Cancel()` y protege su estado mediante:
 
 ```csharp
 lock (_stateLock)
 ```
 
-Este `lock` protege exclusivamente:
+Este `lock` protege exclusivamente `_isCancelled`. La cancelación no detiene forzosamente una operación WCF que ya comenzó; su función es indicar que el resultado normal ya no debe procesarse como una operación activa de la interfaz. Por ello existen dos posibles caminos:
 
-```csharp
-_isCancelled
 ```
-
-La cancelación no detiene forzosamente una operación WCF que ya comenzó.
-
-Su función es indicar que el resultado normal ya no debe procesarse como una operación activa de la interfaz.
-
-Por ello existen dos posibles caminos:
-
-```text
 operación termina
      │
      ├── no cancelada
@@ -719,123 +479,20 @@ operación termina
      OnCompletedAfterCancel
 ```
 
-
-## Uso de `Task`, `Task.Run`, `async` y `await`
-
-La implementación actual no utiliza `Task.Run` ni un flujo basado en `async`/`await` para ejecutar las operaciones remotas de la aplicación.
-
-Esto es una decisión de implementación, no una limitación del lenguaje o de .NET Framework 4.8.
+#### Uso de Task, Task.Run, async y await
+La implementación actual no utiliza `Task.Run` ni un flujo basado en `async`/`await` para ejecutar las operaciones remotas de la aplicación. Esto es una decisión de implementación, no una limitación del lenguaje o de .NET Framework 4.8.
 
 > [!IMPORTANT]
 > `async`/`await` no son incorrectos. Simplemente no forman parte del modelo de concurrencia adoptado actualmente por el proyecto.
 
----
+##### Por qué no Task.Run sobre las llamadas WCF
+Los proxies utilizados por el proyecto exponen las operaciones que estamos consumiendo de forma síncrona, por ejemplo `_client.JoinLobby(lobbyCode);`. Colocar esta operación dentro de `Task.Run(...)` no convierte la operación de red verdaderamente asíncrona; únicamente ejecutaría la llamada síncrona en otro hilo del `ThreadPool`, que es precisamente lo que el proyecto ya centraliza mediante `BackgroundWork` y `ThreadPool.QueueUserWorkItem`.
 
-### Por qué no `Task.Run` sobre las llamadas WCF
+##### Por qué no async/await
+Para adoptar `async`/`await` como modelo general sería necesario definir de forma consistente contratos o proxies asíncronos, interfaces del cliente con métodos `Task<T>`, ViewModels asíncronos, propagación de excepciones mediante `Task`, cancelación, ciclo de vida de los canales WCF, tratamiento de callbacks duplex y pruebas correspondientes. La implementación actual ya posee una solución común para ejecutar operaciones sin bloquear WPF (`BackgroundJob` + `BackgroundWork` + `ThreadPool` + `Dispatcher`).
 
-Los proxies utilizados por el proyecto exponen las operaciones que estamos consumiendo de forma síncrona.
-
-Por ejemplo:
-
-```csharp
-_client.JoinLobby(lobbyCode);
-```
-
-Colocar esta operación dentro de:
-
-```csharp
-Task.Run(...)
-```
-
-no convierte la operación WCF en una operación de red verdaderamente asíncrona.
-
-Únicamente ejecutaría la llamada síncrona en otro hilo del `ThreadPool`.
-
-Eso es precisamente lo que el proyecto ya centraliza mediante:
-
-```text
-BackgroundWork
-    │
-    ▼
-ThreadPool.QueueUserWorkItem
-```
-
-Introducir `Task.Run` adicionalmente produciría dos formas diferentes de resolver el mismo problema.
-
----
-
-### Por qué no `async`/`await`
-
-Para adoptar `async`/`await` como modelo general sería necesario definir de forma consistente:
-
-- contratos o proxies asíncronos;
-- interfaces del cliente con métodos `Task<T>`;
-- ViewModels asíncronos;
-- propagación de excepciones mediante `Task`;
-- cancelación;
-- ciclo de vida de los canales WCF;
-- tratamiento de callbacks duplex;
-- pruebas correspondientes.
-
-La implementación actual ya posee una solución común para ejecutar operaciones sin bloquear WPF:
-
-```text
-BackgroundJob
-+
-BackgroundWork
-+
-ThreadPool
-+
-Dispatcher
-```
-
-Por consistencia, las nuevas operaciones deben utilizar este mecanismo.
-
----
-
-### Uso interno de `Task` en `BackgroundJob`
-
-`BackgroundJob` sí utiliza internamente:
-
-```csharp
-Task<TResult>
-```
-
-mediante:
-
-```csharp
-Task<TResult> operation =
-    new Task<TResult>(() => Work(State));
-
-operation.RunSynchronously();
-```
-
-Esto no representa un modelo `async`/`await`.
-
-El `Task` se ejecuta sincrónicamente sobre el worker (hilo de trabajo del ThreadPool) que `BackgroundWork` ya obtuvo del `ThreadPool`.
-
-Por lo tanto:
-
-```text
-BackgroundWork
-    │
-    │ obtiene worker
-    ▼
-BackgroundJob.Execute()
-    │
-    │ Task.RunSynchronously()
-    ▼
-Work(State)
-```
-
-No se crea una segunda operación concurrente mediante `Task.Run`.
-
-
-## Regla para operaciones desde ViewModel
-
-Una operación que pueda bloquear por comunicación, persistencia o trabajo relevante no debe ejecutarse directamente sobre el hilo de UI.
-
-El patrón es:
+#### Regla para operaciones desde ViewModel
+Una operación que pueda bloquear por comunicación, persistencia o trabajo relevante no debe ejecutarse directamente sobre el hilo de UI. El patrón es:
 
 ```csharp
 BackgroundJob<TState, TResult> job =
@@ -848,51 +505,9 @@ BackgroundJob<TState, TResult> job =
 BackgroundWork.Start(job);
 ```
 
-La separación debe mantenerse:
-
-```text
-WorkOnWorker
-    │
-    └── comunicación / procesamiento
-```
-
-```text
-OnCompleted
-OnFailed
-    │
-    └── actualización del estado del ViewModel
-```
-
-
-
-# Regla general de implementación
-
-Al implementar una nueva funcionalidad se debe identificar primero qué tipo de estado concurrente existe.
-
-```text
-¿Existe estado mutable compartido?
-          |
-     ┌────┴────┐
-     |         |
-    Sí         No
-     |
-     ▼
-¿la operación necesita
-varios pasos atómicos?
-     |
- ┌───┴────┐
- |        |
-Sí        No
- |        |
- ▼        ▼
-lock   colección concurrente
-       si sus operaciones
-       son suficientes
-```
-
 En el cliente:
 
-```text
+```
 ¿La operación puede bloquear el UI?
           │
           ▼
@@ -914,33 +529,33 @@ Dispatcher
 actualización del ViewModel
 ```
 
+---
 
-# Resumen
+### Resumen
+La estrategia de concurrencia adoptada se divide en cuatro mecanismos:
 
-La estrategia de concurrencia adoptada se divide en cuatro mecanismos.
-
-```text
+```
 WCF duplex
     │
     ├── InstanceContextMode.PerSession
     └── ConcurrencyMode.Reentrant
 ```
 
-```text
+```
 Estado de dominio compartido
     │
     └── lock (_syncRoot)
         Ejemplo: LobbyManager
 ```
 
-```text
+```
 Registro concurrente simple
     │
     └── ConcurrentDictionary
         Ejemplo: LobbyCallbackRegistry
 ```
 
-```text
+```
 Cliente WPF
     │
     └── BackgroundWork

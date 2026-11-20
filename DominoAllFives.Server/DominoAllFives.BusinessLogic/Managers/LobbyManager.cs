@@ -10,15 +10,15 @@ namespace DominoAllFives.BusinessLogic.Managers
     {
         private const int MinimumPlayersToStart = 2;
         private const int LobbyCodeLength = 6;
+
         private static readonly LobbyManager instance = new LobbyManager();
+
         private readonly object _syncRoot = new object();
-        private readonly Dictionary<string, Lobby> _lobbies = new Dictionary<string, Lobby>(
-            StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, Lobby> _lobbies =
+            new Dictionary<string, Lobby>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, string> _playerLobbyCodes = new Dictionary<int, string>();
-        private readonly Dictionary<int, List<ChatMessage>> _lobbyMessages = new Dictionary<int,
-            List<ChatMessage>>();
         private int _nextLobbyId = 1;
-        private int _nextMessageId = 1;
+
         public static LobbyManager Instance
         {
             get
@@ -48,17 +48,13 @@ namespace DominoAllFives.BusinessLogic.Managers
                     LobbyId = _nextLobbyId++,
                     LobbyCode = code,
                     Host = CopyPlayer(host),
-                    Participants = new List<Player>
-                    {
-                        CopyPlayer(host)
-                    },
+                    Participants = new List<Player> { CopyPlayer(host) },
                     KickedPlayers = new List<Player>(),
                     Settings = CopySettings(settings),
                     State = LobbyState.Waiting
                 };
                 _lobbies.Add(code, lobby);
                 _playerLobbyCodes.Add(host.PlayerId, code);
-                _lobbyMessages[lobby.LobbyId] = new List<ChatMessage>();
                 return CreateSnapshot(lobby);
             }
         }
@@ -77,21 +73,22 @@ namespace DominoAllFives.BusinessLogic.Managers
 
             if (string.IsNullOrWhiteSpace(lobbyCode))
             {
-                throw new ArgumentException(null, nameof(lobbyCode));
+                throw new ArgumentException(
+                    "The lobby code cannot be empty.",
+                    nameof(lobbyCode));
             }
 
             lock (_syncRoot)
             {
                 ValidatePlayerCanEnterLobby(player.PlayerId);
                 Lobby lobby = GetRegisteredLobby(lobbyCode);
-                if (lobby.State != LobbyState.Waiting)
+                ValidateLobbyIsWaiting(lobby);
+                foreach (Player kickedPlayer in lobby.KickedPlayers)
                 {
-                    throw new LobbyRuleException(LobbyIssue.Unavailable);
-                }
-
-                if (ContainsPlayer(lobby.KickedPlayers, player.PlayerId))
-                {
-                    throw new LobbyRuleException(LobbyIssue.PlayerExpelled);
+                    if (kickedPlayer.PlayerId == player.PlayerId)
+                    {
+                        throw new LobbyRuleException(LobbyIssue.PlayerExpelled);
+                    }
                 }
 
                 if (lobby.Participants.Count >= lobby.Settings.MaxPlayers)
@@ -113,7 +110,8 @@ namespace DominoAllFives.BusinessLogic.Managers
                 ValidateLobbyIsWaiting(lobby);
                 if (lobby.Host.PlayerId == playerId)
                 {
-                    return CloseLobby(lobby);
+                    RemoveLobby(lobby);
+                    return CreateSnapshot(lobby);
                 }
 
                 lobby.Participants.Remove(FindPlayer(lobby.Participants, playerId));
@@ -136,11 +134,7 @@ namespace DominoAllFives.BusinessLogic.Managers
             {
                 Lobby lobby = GetPlayerLobby(playerId);
                 ValidatePlayerIsHost(lobby, playerId);
-                if (lobby.State != LobbyState.Waiting)
-                {
-                    throw new LobbyRuleException(LobbyIssue.Unavailable);
-                }
-
+                ValidateLobbyIsWaiting(lobby);
                 if (lobby.Participants.Count < MinimumPlayersToStart)
                 {
                     throw new LobbyRuleException(LobbyIssue.InsufficientPlayers);
@@ -163,7 +157,6 @@ namespace DominoAllFives.BusinessLogic.Managers
                 }
 
                 lobby.State = LobbyState.InProgress;
-                _lobbyMessages.Remove(lobby.LobbyId);
                 return CreateSnapshot(lobby);
             }
         }
@@ -186,12 +179,20 @@ namespace DominoAllFives.BusinessLogic.Managers
 
         public void ReleaseMatch(int lobbyId)
         {
+            if (lobbyId <= 0)
+            {
+                return;
+            }
+
             lock (_syncRoot)
             {
-                Lobby lobby = FindLobbyById(lobbyId);
-                if (lobby != null)
+                foreach (Lobby lobby in _lobbies.Values)
                 {
-                    CloseLobby(lobby);
+                    if (lobby.LobbyId == lobbyId)
+                    {
+                        RemoveLobby(lobby);
+                        break;
+                    }
                 }
             }
         }
@@ -203,180 +204,43 @@ namespace DominoAllFives.BusinessLogic.Managers
                 Lobby lobby = GetPlayerLobby(playerId);
                 ValidatePlayerIsHost(lobby, playerId);
                 ValidateLobbyIsWaiting(lobby);
-                return CloseLobby(lobby);
+                RemoveLobby(lobby);
+                return CreateSnapshot(lobby);
             }
         }
 
-        public ChatMessage AddChatMessage(Player sender, int lobbyId, string content)
-        {
-            if (sender == null)
-            {
-                throw new ArgumentNullException(nameof(sender));
-            }
-
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
-
-            if (string.IsNullOrWhiteSpace(content))
-            {
-                throw new ArgumentException(null, nameof(content));
-            }
-
-            lock (_syncRoot)
-            {
-                Lobby lobby = GetChatLobbyForPlayer(lobbyId, sender.PlayerId);
-                List<ChatMessage> messages;
-                if (!_lobbyMessages.TryGetValue(lobby.LobbyId, out messages))
-                {
-                    messages = new List<ChatMessage>();
-                    _lobbyMessages[lobby.LobbyId] = messages;
-                }
-
-                ChatMessage registeredMessage = new ChatMessage
-                {
-                    MessageId = _nextMessageId++,
-                    Context = new ChatContext
-                    {
-                        Scope = ChatScope.Lobby,
-                        ContextId = lobby.LobbyId
-                    },
-                    SenderId = sender.PlayerId,
-                    SenderUsername = sender.Username,
-                    Content = content,
-                    SentAtUtc = DateTime.UtcNow
-                };
-                messages.Add(registeredMessage);
-                return CopyChatMessage(registeredMessage);
-            }
-        }
-
-        public List<ChatMessage> GetChatMessages(int lobbyId, int playerId)
-        {
-            lock (_syncRoot)
-            {
-                Lobby lobby = GetChatLobbyForPlayer(lobbyId, playerId);
-                List<ChatMessage> storedMessages;
-                if (!_lobbyMessages.TryGetValue(lobby.LobbyId, out storedMessages))
-                {
-                    return new List<ChatMessage>();
-                }
-
-                List<ChatMessage> snapshot = new List<ChatMessage>(storedMessages.Count);
-                foreach (ChatMessage message in storedMessages)
-                {
-                    snapshot.Add(CopyChatMessage(message));
-                }
-
-                return snapshot;
-            }
-        }
-
-        public List<Player> GetChatRecipients(int lobbyId)
-        {
-            lock (_syncRoot)
-            {
-                Lobby lobby = FindLobbyById(lobbyId);
-                if (lobby == null || lobby.State != LobbyState.Waiting)
-                {
-                    return new List<Player>();
-                }
-
-                List<Player> recipients = new List<Player>(lobby.Participants.Count);
-                foreach (Player participant in lobby.Participants)
-                {
-                    recipients.Add(CopyPlayer(participant));
-                }
-
-                return recipients;
-            }
-        }
-
-        private void ValidatePlayerCanEnterLobby(int playerId)
-        {
-            if (_playerLobbyCodes.ContainsKey(playerId))
-            {
-                throw new LobbyRuleException(LobbyIssue.PlayerAlreadyInLobby);
-            }
-        }
-
-        private Lobby GetRegisteredLobby(string code)
-        {
-            Lobby lobby;
-            if (string.IsNullOrWhiteSpace(code) || !_lobbies.TryGetValue(code.Trim(), out lobby))
-            {
-                throw new LobbyRuleException(LobbyIssue.NotFound);
-            }
-
-            return lobby;
-        }
-
-        private Lobby GetPlayerLobby(int playerId)
-        {
-            string code;
-            if (!_playerLobbyCodes.TryGetValue(playerId, out code))
-            {
-                throw new LobbyRuleException(LobbyIssue.PlayerNotInLobby);
-            }
-
-            return GetRegisteredLobby(code);
-        }
-
-        private Lobby GetChatLobbyForPlayer(int lobbyId, int playerId)
-        {
-            Lobby lobby = FindLobbyById(lobbyId);
-            if (lobby == null || lobby.State != LobbyState.Waiting || !ContainsPlayer(
-                lobby.Participants, playerId))
-            {
-                throw new ChatRuleException(ChatIssue.PlayerNotInChat);
-            }
-
-            return lobby;
-        }
-
-        private Lobby FindLobbyById(int lobbyId)
+        public List<int> GetChatRecipientIds(int lobbyId, int senderId)
         {
             if (lobbyId <= 0)
             {
-                return null;
+                throw new ArgumentOutOfRangeException(nameof(lobbyId));
             }
 
-            foreach (Lobby lobby in _lobbies.Values)
+            if (senderId <= 0)
             {
-                if (lobby.LobbyId == lobbyId)
+                throw new ArgumentOutOfRangeException(nameof(senderId));
+            }
+
+            lock (_syncRoot)
+            {
+                string lobbyCode;
+                Lobby lobby;
+                if (!_playerLobbyCodes.TryGetValue(senderId, out lobbyCode)
+                    || !_lobbies.TryGetValue(lobbyCode, out lobby)
+                    || lobby.LobbyId != lobbyId
+                    || lobby.State != LobbyState.Waiting)
                 {
-                    return lobby;
+                    throw new ChatRuleException(ChatIssue.PlayerNotInChat);
                 }
+
+                List<int> recipientIds = new List<int>(lobby.Participants.Count);
+                foreach (Player participant in lobby.Participants)
+                {
+                    recipientIds.Add(participant.PlayerId);
+                }
+
+                return recipientIds;
             }
-
-            return null;
-        }
-
-        private Lobby CloseLobby(Lobby lobby)
-        {
-            lobby.State = LobbyState.Closed;
-            Lobby snapshot = CreateSnapshot(lobby);
-            foreach (Player player in lobby.Participants)
-            {
-                _playerLobbyCodes.Remove(player.PlayerId);
-            }
-
-            _lobbyMessages.Remove(lobby.LobbyId);
-            _lobbies.Remove(lobby.LobbyCode);
-            return snapshot;
-        }
-
-        private string GenerateLobbyCode()
-        {
-            string code;
-            do
-            {
-                code = Guid.NewGuid().ToString("N").Substring(0,
-                    LobbyCodeLength).ToUpperInvariant();
-            }
-            while (_lobbies.ContainsKey(code));
-            return code;
         }
 
         private static void ValidatePlayerIsHost(Lobby lobby, int playerId)
@@ -395,20 +259,7 @@ namespace DominoAllFives.BusinessLogic.Managers
             }
         }
 
-        private static bool ContainsPlayer(IEnumerable<Player> players, int playerId)
-        {
-            foreach (Player player in players)
-            {
-                if (player.PlayerId == playerId)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private static Player FindPlayer(IEnumerable<Player> players, int playerId)
+        private static Player FindPlayer(List<Player> players, int playerId)
         {
             foreach (Player player in players)
             {
@@ -469,21 +320,59 @@ namespace DominoAllFives.BusinessLogic.Managers
             };
         }
 
-        private static ChatMessage CopyChatMessage(ChatMessage message)
+        private void ValidatePlayerCanEnterLobby(int playerId)
         {
-            return new ChatMessage
+            if (_playerLobbyCodes.ContainsKey(playerId))
             {
-                MessageId = message.MessageId,
-                Context = new ChatContext
-                {
-                    Scope = message.Context.Scope,
-                    ContextId = message.Context.ContextId
-                },
-                SenderId = message.SenderId,
-                SenderUsername = message.SenderUsername,
-                Content = message.Content,
-                SentAtUtc = message.SentAtUtc
-            };
+                throw new LobbyRuleException(LobbyIssue.PlayerAlreadyInLobby);
+            }
+        }
+
+        private Lobby GetRegisteredLobby(string code)
+        {
+            Lobby lobby;
+            if (string.IsNullOrWhiteSpace(code) || !_lobbies.TryGetValue(code.Trim(), out lobby))
+            {
+                throw new LobbyRuleException(LobbyIssue.NotFound);
+            }
+
+            return lobby;
+        }
+
+        private Lobby GetPlayerLobby(int playerId)
+        {
+            string code;
+            if (!_playerLobbyCodes.TryGetValue(playerId, out code))
+            {
+                throw new LobbyRuleException(LobbyIssue.PlayerNotInLobby);
+            }
+
+            return GetRegisteredLobby(code);
+        }
+
+        private void RemoveLobby(Lobby lobby)
+        {
+            lobby.State = LobbyState.Closed;
+            foreach (Player player in lobby.Participants)
+            {
+                _playerLobbyCodes.Remove(player.PlayerId);
+            }
+
+            _lobbies.Remove(lobby.LobbyCode);
+        }
+
+        private string GenerateLobbyCode()
+        {
+            string code;
+            do
+            {
+                code = Guid.NewGuid()
+                    .ToString("N")
+                    .Substring(0, LobbyCodeLength)
+                    .ToUpperInvariant();
+            }
+            while (_lobbies.ContainsKey(code));
+            return code;
         }
     }
 }
