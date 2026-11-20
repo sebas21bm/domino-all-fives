@@ -2,6 +2,11 @@
 
 ## Alcance y evidencia
 
+Ampliación del 2026-11-19: se añaden PU-360 a PU-413 para las reglas de registro
+y perfil. Pasaron los 54 casos nuevos y 36 regresiones unitarias existentes;
+evidencia rules-unit.trx y rules-server-regression.trx. El catálogo contiene
+413 fichas; las siguientes cifras de la revisión del 2026-11-17 son históricas.
+
 Catálogo unitario actualizado el 2026-11-17 tras separar preparación y aplicación
 de jugadas y cierres de ronda. Conserva PU-001 a PU-338, actualizando los casos
 afectados por la nueva preparación, y añade PU-339 a PU-359. Cada ficha describe
@@ -2262,7 +2267,7 @@ precondiciones, postcondiciones, resultado esperado, observado y evidencia.
 - **Caso ejecutable:** `ServiceContract_SessionAccount_PreservesPublishedIdentity`.
 - **Origen:** [SessionContractTests.cs](../DominoAllFives.Server/Tests/SessionContractTests.cs#L15).
 - **Datos:** Sin parámetros; valores de preparación descritos abajo.
-- **Precondiciones:** Reflexión sobre ISessionAccountService.
+- **Precondiciones:** Reflexión sobre ISessionService.
 - **Postcondiciones:** Atributo leído en memoria.
 - **Resultado esperado:** Name=ISessionAccount; Namespace=urn:domino-all-fives:services.
 - **Resultado obtenido:** Aprobada (Passed); las aserciones del resultado esperado se cumplieron.
@@ -4344,15 +4349,659 @@ precondiciones, postcondiciones, resultado esperado, observado y evidencia.
 - **Resultado obtenido:** Aprobada (Passed); las aserciones del resultado esperado se cumplieron.
 - **Evidencia:** `prepared-transition-unit.trx`, caso `fc5d0d39-afbb-eb73-f167-2c5dfa783966`; duración `00:00:00.0010000`.
 
+### PU-360. Constructor_DefinedProfileIssue_PreservesIssue
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `Constructor_DefinedProfileIssue_PreservesIssue(InvalidProfilePicture)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L25).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Issue conserva exactamente el valor enumerado indicado.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `26d18ea4-0616-54d7-4129-ce01e70e4df9`; `00:00:00.0000001`.
+
+### PU-361. Constructor_DefinedProfileIssue_PreservesIssue
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `Constructor_DefinedProfileIssue_PreservesIssue(InvalidProfilePictureFormat)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L25).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Issue conserva exactamente el valor enumerado indicado.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `dfc4b13e-d60f-2c38-e5e6-2f3788fb2d2f`; `00:00:00.0000001`.
+
+### PU-362. Constructor_DefinedProfileIssue_PreservesIssue
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `Constructor_DefinedProfileIssue_PreservesIssue(InvalidUsername)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L25).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Issue conserva exactamente el valor enumerado indicado.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `4ef18219-93ce-fec2-3bcd-f09b2358c976`; `00:00:00.0000001`.
+
+### PU-363. Constructor_DefinedProfileIssue_PreservesIssue
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `Constructor_DefinedProfileIssue_PreservesIssue(PlayerNotFound)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L25).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Issue conserva exactamente el valor enumerado indicado.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `d43167b0-9359-94b6-8d51-9a4e0f21a6b9`; `00:00:00.0350000`.
+
+### PU-364. Constructor_DefinedProfileIssue_PreservesIssue
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `Constructor_DefinedProfileIssue_PreservesIssue(ProfilePictureTooLarge)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L25).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Issue conserva exactamente el valor enumerado indicado.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `ae0c0284-c897-c2ba-18e1-09d5788d4967`; `00:00:00.0000001`.
+
+### PU-365. Constructor_DefinedProfileIssue_PreservesIssue
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `Constructor_DefinedProfileIssue_PreservesIssue(SameUsername)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L25).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Issue conserva exactamente el valor enumerado indicado.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `71641571-f7db-0453-3bd4-f526e90fda55`; `00:00:00.0000001`.
+
+### PU-366. Constructor_DefinedProfileIssue_PreservesIssue
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `Constructor_DefinedProfileIssue_PreservesIssue(UsernameAlreadyExists)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L25).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Issue conserva exactamente el valor enumerado indicado.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `841a15d2-d4ed-0827-9c3d-0ef7456a619e`; `00:00:00.0000001`.
+
+### PU-367. Constructor_PictureControllerWithoutStorage_ThrowsArgumentNullException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `Constructor_PictureControllerWithoutStorage_ThrowsArgumentNullException`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L69).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentNullException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `341eb074-5ff6-049c-9ba6-4b1fe82239f8`; `00:00:00.0090000`.
+
+### PU-368. Constructor_ProfileControllerWithoutStorage_ThrowsArgumentNullException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `Constructor_ProfileControllerWithoutStorage_ThrowsArgumentNullException`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L53).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentNullException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `c822bf54-93cc-44c9-308b-f76340bdd0ee`; `00:00:00.0010000`.
+
+### PU-369. Constructor_UndefinedProfileIssue_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `Constructor_UndefinedProfileIssue_ThrowsArgumentOutOfRangeException(-1)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L37).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `0cc8a947-0118-d30e-0c41-c3eba123d9d2`; `00:00:00.0010000`.
+
+### PU-370. Constructor_UndefinedProfileIssue_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `Constructor_UndefinedProfileIssue_ThrowsArgumentOutOfRangeException(int.MaxValue)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L37).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `86e92d04-d595-e896-b781-7b6d908a7caa`; `00:00:00.0010000`.
+
+### PU-371. GetProfile_InvalidPlayerId_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `GetProfile_InvalidPlayerId_ThrowsArgumentOutOfRangeException(-1)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L87).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `584a9b6c-28b9-8473-b7d1-b49a9de4bd2e`; `00:00:00.0010000`.
+
+### PU-372. GetProfile_InvalidPlayerId_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `GetProfile_InvalidPlayerId_ThrowsArgumentOutOfRangeException(0)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L87).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `4fc4359a-0579-0ee4-d84e-b032df274f19`; `00:00:00.0820000`.
+
+### PU-373. GetProfile_InvalidPlayerId_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `GetProfile_InvalidPlayerId_ThrowsArgumentOutOfRangeException(int.MinValue)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L87).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `4d8c1d53-0e56-673a-b2a8-fd644cd99885`; `00:00:00.0010000`.
+
+### PU-374. RemoveProfilePicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `RemoveProfilePicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException(-1)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L195).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `968dc95d-4666-f9cc-bbf9-2c800fdc0892`; `00:00:00.0000001`.
+
+### PU-375. RemoveProfilePicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `RemoveProfilePicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException(0)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L195).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `636a77c3-b0ba-3586-7489-283f0f9cba96`; `00:00:00.0010000`.
+
+### PU-376. RemoveProfilePicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `RemoveProfilePicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException(int.MinValue)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L195).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `fc52e439-809b-ab54-b0d5-215b94c487fd`; `00:00:00.0000001`.
+
+### PU-377. SetProfilePicture_InvalidContent_ThrowsProfileRuleBeforePersistence
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `SetProfilePicture_InvalidContent_ThrowsProfileRuleBeforePersistence("absent",InvalidProfilePicture)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L217).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ProfileRuleException con Issue InvalidProfilePicture.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `16514c44-3843-79ba-e57a-fdb918589123`; `00:00:00.0030000`.
+
+### PU-378. SetProfilePicture_InvalidContent_ThrowsProfileRuleBeforePersistence
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `SetProfilePicture_InvalidContent_ThrowsProfileRuleBeforePersistence("empty",InvalidProfilePicture)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L217).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ProfileRuleException con Issue InvalidProfilePicture.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `7f748f48-ab19-7736-e948-f5420f075144`; `00:00:00.0010000`.
+
+### PU-379. SetProfilePicture_InvalidContent_ThrowsProfileRuleBeforePersistence
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `SetProfilePicture_InvalidContent_ThrowsProfileRuleBeforePersistence("format-before-size",InvalidProfilePictureFormat)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L217).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ProfileRuleException con Issue InvalidProfilePictureFormat.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `9fc607be-c787-a398-1a3f-2281bfeea848`; `00:00:00.0010000`.
+
+### PU-380. SetProfilePicture_InvalidContent_ThrowsProfileRuleBeforePersistence
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `SetProfilePicture_InvalidContent_ThrowsProfileRuleBeforePersistence("format",InvalidProfilePictureFormat)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L217).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ProfileRuleException con Issue InvalidProfilePictureFormat.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `56d95128-72dd-238d-f5f7-587797c316ea`; `00:00:00.0010000`.
+
+### PU-381. SetProfilePicture_InvalidContent_ThrowsProfileRuleBeforePersistence
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `SetProfilePicture_InvalidContent_ThrowsProfileRuleBeforePersistence("large",ProfilePictureTooLarge)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L217).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ProfileRuleException con Issue ProfilePictureTooLarge.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `100b8519-64bb-cafd-8e4e-6596796e9842`; `00:00:00.0050000`.
+
+### PU-382. SetProfilePicture_InvalidContent_ThrowsProfileRuleBeforePersistence
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `SetProfilePicture_InvalidContent_ThrowsProfileRuleBeforePersistence("missing-name",InvalidProfilePictureFormat)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L217).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ProfileRuleException con Issue InvalidProfilePictureFormat.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `5470a6b1-8561-b762-fccc-cb26afb9511d`; `00:00:00.0020000`.
+
+### PU-383. SetProfilePicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `SetProfilePicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException(-1)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L160).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `a0d2dcc5-b1d6-8b5b-1927-0b580f9f894e`; `00:00:00.0000001`.
+
+### PU-384. SetProfilePicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `SetProfilePicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException(0)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L160).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `6dbe83d3-f5cd-c49d-7b43-c34439663f2a`; `00:00:00.0010000`.
+
+### PU-385. SetProfilePicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `SetProfilePicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException(int.MinValue)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L160).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `1422ae66-34b3-6d15-2c3e-984d85bad8d5`; `00:00:00.0010000`.
+
+### PU-386. SetProfilePicture_NullPicture_ThrowsArgumentNullExceptionBeforePersistence
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `SetProfilePicture_NullPicture_ThrowsArgumentNullExceptionBeforePersistence`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L177).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentNullException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `5cde6452-e35d-8ce6-b0e1-2fcc759dd351`; `00:00:00.0010000`.
+
+### PU-387. UpdateProfileName_InvalidPlayerId_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `UpdateProfileName_InvalidPlayerId_ThrowsArgumentOutOfRangeException(-1)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L105).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `0091b94e-7988-1bb0-c4e9-43534a811b81`; `00:00:00.0000001`.
+
+### PU-388. UpdateProfileName_InvalidPlayerId_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `UpdateProfileName_InvalidPlayerId_ThrowsArgumentOutOfRangeException(0)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L105).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `d261de21-e8ff-b8b4-c22d-f1aa4b48c639`; `00:00:00.0010000`.
+
+### PU-389. UpdateProfileName_InvalidPlayerId_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `UpdateProfileName_InvalidPlayerId_ThrowsArgumentOutOfRangeException(int.MinValue)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L105).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `aaadf949-1817-9280-e8eb-667e952a0b29`; `00:00:00.0000001`.
+
+### PU-390. UpdateProfileWithPicture_NullReplacement_ThrowsArgumentNullExceptionBeforePersistence
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `UpdateProfileWithPicture_NullReplacement_ThrowsArgumentNullExceptionBeforePersistence`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L142).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentNullException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `45667c53-83f3-4156-6f0e-2b6bf5e35472`; `00:00:00.0010000`.
+
+### PU-391. UpdateProfileWithPicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `UpdateProfileWithPicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException(-1)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L122).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `066d9ffe-b076-9520-1fc1-21a97b746bff`; `00:00:00.0010000`.
+
+### PU-392. UpdateProfileWithPicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.ProfileRuleTests`.
+- **Caso ejecutable:** `UpdateProfileWithPicture_InvalidPlayerId_ThrowsArgumentOutOfRangeException(0)`.
+- **Origen:** [ProfileRuleTests.cs](../DominoAllFives.Server/Tests/ProfileRuleTests.cs#L122).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `1a45ac3e-54c9-af96-9ec3-1b351135a9d2`; `00:00:00.0050000`.
+
+### PU-393. Constructor_DefinedRegistrationIssue_PreservesIssue
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Constructor_DefinedRegistrationIssue_PreservesIssue(EmailAlreadyExists)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L25).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Issue conserva exactamente el valor enumerado indicado.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `c75202a9-5e78-bde6-99c7-dbff713ec227`; `00:00:00.0000001`.
+
+### PU-394. Constructor_DefinedRegistrationIssue_PreservesIssue
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Constructor_DefinedRegistrationIssue_PreservesIssue(InvalidEmail)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L25).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Issue conserva exactamente el valor enumerado indicado.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `b758a677-f40d-cca1-d344-8378b500fb8b`; `00:00:00.0000001`.
+
+### PU-395. Constructor_DefinedRegistrationIssue_PreservesIssue
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Constructor_DefinedRegistrationIssue_PreservesIssue(InvalidPassword)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L25).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Issue conserva exactamente el valor enumerado indicado.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `1039a0f2-369b-ca83-3eca-3e79a58e3290`; `00:00:00.0000001`.
+
+### PU-396. Constructor_DefinedRegistrationIssue_PreservesIssue
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Constructor_DefinedRegistrationIssue_PreservesIssue(InvalidRegistrationData)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L25).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Issue conserva exactamente el valor enumerado indicado.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `49659eb0-2e91-25e2-bad3-6d6c2e133427`; `00:00:00.0010000`.
+
+### PU-397. Constructor_DefinedRegistrationIssue_PreservesIssue
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Constructor_DefinedRegistrationIssue_PreservesIssue(InvalidUsername)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L25).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Issue conserva exactamente el valor enumerado indicado.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `d1169ac9-da5e-f3dc-5d72-44aa21a9b106`; `00:00:00.0000001`.
+
+### PU-398. Constructor_DefinedRegistrationIssue_PreservesIssue
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Constructor_DefinedRegistrationIssue_PreservesIssue(UsernameAlreadyExists)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L25).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Issue conserva exactamente el valor enumerado indicado.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `9ed866e7-c578-f94a-d8c5-628a4a08819a`; `00:00:00.0000001`.
+
+### PU-399. Constructor_UndefinedRegistrationIssue_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Constructor_UndefinedRegistrationIssue_ThrowsArgumentOutOfRangeException(-1)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L37).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `7b850883-ccc3-8c6e-665d-bf38f63aa179`; `00:00:00.0010000`.
+
+### PU-400. Constructor_UndefinedRegistrationIssue_ThrowsArgumentOutOfRangeException
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Constructor_UndefinedRegistrationIssue_ThrowsArgumentOutOfRangeException(int.MaxValue)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L37).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentOutOfRangeException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `5ece8469-c9a2-3363-331c-d32d80502e99`; `00:00:00.0000001`.
+
+### PU-401. Register_InvalidFields_ThrowsRegistrationRuleBeforePersistence
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Register_InvalidFields_ThrowsRegistrationRuleBeforePersistence("   ","invalid-email","weak",InvalidUsername)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L127).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza RegistrationRuleException con Issue InvalidUsername.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `ea5bb6c9-b3da-5dd7-0844-1e1c6967e950`; `00:00:00.0040000`.
+
+### PU-402. Register_InvalidFields_ThrowsRegistrationRuleBeforePersistence
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Register_InvalidFields_ThrowsRegistrationRuleBeforePersistence("player","invalid-email","weak",InvalidEmail)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L127).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza RegistrationRuleException con Issue InvalidEmail.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `0e8dd07c-c324-6cd7-e361-97a4bcd7c730`; `00:00:00.0050000`.
+
+### PU-403. Register_InvalidFields_ThrowsRegistrationRuleBeforePersistence
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Register_InvalidFields_ThrowsRegistrationRuleBeforePersistence("player","player@gmail.com","weak",InvalidPassword)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L127).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza RegistrationRuleException con Issue InvalidPassword.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `2c565bcb-c0d7-8781-8fd6-5233e6c090f7`; `00:00:00.0030000`.
+
+### PU-404. Register_NullRegistration_ThrowsArgumentNullExceptionBeforePersistence
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Register_NullRegistration_ThrowsArgumentNullExceptionBeforePersistence`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L153).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentNullException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `f70e9600-688d-828c-d265-e722e9113767`; `00:00:00.0010000`.
+
+### PU-405. Validate_InvalidFields_ThrowsOrderedRegistrationRule
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Validate_InvalidFields_ThrowsOrderedRegistrationRule("   ","invalid-email","weak",InvalidUsername)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L100).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza RegistrationRuleException con Issue InvalidUsername.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `5843c016-62e3-8b97-41ef-309cb26c031f`; `00:00:00.0010000`.
+
+### PU-406. Validate_InvalidFields_ThrowsOrderedRegistrationRule
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Validate_InvalidFields_ThrowsOrderedRegistrationRule("player","invalid-email","weak",InvalidEmail)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L100).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza RegistrationRuleException con Issue InvalidEmail.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `c34c9c7e-7a4e-d4b5-bc50-622275e4a17c`; `00:00:00.0000001`.
+
+### PU-407. Validate_InvalidFields_ThrowsOrderedRegistrationRule
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Validate_InvalidFields_ThrowsOrderedRegistrationRule("player","player@example.com","StrongPass1!",InvalidEmail)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L100).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza RegistrationRuleException con Issue InvalidEmail.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `44b8e39c-2db8-412e-868a-b59c5c3f9964`; `00:00:00.0000001`.
+
+### PU-408. Validate_InvalidFields_ThrowsOrderedRegistrationRule
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Validate_InvalidFields_ThrowsOrderedRegistrationRule("player","player@gmail.com","weak",InvalidPassword)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L100).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza RegistrationRuleException con Issue InvalidPassword.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `40f176f3-3f27-3fec-2d01-dca574515725`; `00:00:00.0010000`.
+
+### PU-409. Validate_InvalidFields_ThrowsOrderedRegistrationRule
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Validate_InvalidFields_ThrowsOrderedRegistrationRule("player","player@gmail.com",null,InvalidPassword)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L100).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza RegistrationRuleException con Issue InvalidPassword.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `fb24d63e-05d7-4286-7795-4610093f0fd3`; `00:00:00.0000001`.
+
+### PU-410. Validate_InvalidFields_ThrowsOrderedRegistrationRule
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Validate_InvalidFields_ThrowsOrderedRegistrationRule("player",null,"StrongPass1!",InvalidEmail)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L100).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza RegistrationRuleException con Issue InvalidEmail.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `4c4193f3-d036-ef5e-cb18-cf771fc7c9cc`; `00:00:00.0000001`.
+
+### PU-411. Validate_InvalidFields_ThrowsOrderedRegistrationRule
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Validate_InvalidFields_ThrowsOrderedRegistrationRule(null,"player@gmail.com","StrongPass1!",InvalidUsername)`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L100).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza RegistrationRuleException con Issue InvalidUsername.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `844e5b15-5744-8eb3-7978-abe48b7946cf`; `00:00:00.0010000`.
+
+### PU-412. Validate_NullRegistration_ThrowsArgumentNullException
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Validate_NullRegistration_ThrowsArgumentNullException`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L74).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** Se lanza ArgumentNullException.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `dfc75546-24ed-ba78-6330-7d56c6f99f29`; `00:00:00.0010000`.
+
+### PU-413. Validate_ValidRegistration_DoesNotThrow
+
+- **Clase:** `DominoAllFives.Server.Tests.RegistrationRuleTests`.
+- **Caso ejecutable:** `Validate_ValidRegistration_DoesNotThrow`.
+- **Origen:** [RegistrationRuleTests.cs](../DominoAllFives.Server/Tests/RegistrationRuleTests.cs#L54).
+- **Datos:** Parámetros concretos incluidos en el nombre del caso; tipos reales del servidor.
+- **Precondiciones:** Componentes concretos y datos controlados; no se requiere infraestructura externa.
+- **Caso a probar y resultado esperado:** La validación termina sin excepción.
+- **Postcondiciones:** Se satisface la aserción sin abrir persistencia ni modificar entradas.
+- **Resultado obtenido:** Passed, coincidente con el esperado.
+- **Evidencia:** `rules-unit.trx`; `3a398b7b-3e32-b0aa-c1a8-fcb1dc328ec3`; `00:00:00.0000001`.
+
 ## Verificación del catálogo
 
-- 359 fichas únicas y consecutivas, PU-001 a PU-359.
-- Correspondencia exacta con los 351 casos Passed de prepared-transition-unit.trx
-  y los ocho de prepared-transition-client-unit.trx; cero fallidos y omitidos.
-- Se conservaron los 338 casos del catálogo previo, con actualización de nombres,
-  origen y expectativas de preparación; se añadieron 21 casos individuales.
-- Los métodos unitarios nuevos y los modificados de RoundSetup conservan
-  Arrange, Act, Assert y una sola aserción por caso ejecutado.
-- VSTest 18.10, NUnit3TestAdapter 4.5 y compilación Debug del servidor aprobada.
-- La preparación y copia se utilizan en producción; no se agregaron sustitutos
-  ni mecanismos para provocar artificialmente errores del generador.
+- 413 fichas únicas y consecutivas, PU-001 a PU-413.
+- PU-001 a PU-359 conservan su evidencia histórica; esta ejecución no repite el catálogo completo.
+- PU-360 a PU-413 corresponden individualmente a los 54 Passed de rules-unit.trx.
+- rules-server-regression.trx repitió 36 casos existentes: AccountRuleException, AuthenticationController, RankingController, PlayerAccount, SessionContract y SessionManager; todos Passed.
+- Los casos nuevos usan una aserción, AAA y componentes concretos; las guardas y rechazos se detienen antes de persistencia.
+- Compilación Debug de servidor y pruebas aprobada; reglas y contexto EF se ejercitan según el alcance unitario descrito.

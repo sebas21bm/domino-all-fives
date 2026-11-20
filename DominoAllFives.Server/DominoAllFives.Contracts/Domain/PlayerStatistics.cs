@@ -1,12 +1,18 @@
+using System.Runtime.Serialization;
+
 namespace DominoAllFives.Contracts.Domain
 {
     /// <summary>
     /// Represents a read-only snapshot of the statistics maintained by the server.
     /// </summary>
+    [DataContract]
     public sealed class PlayerStatistics
     {
+        [DataMember(Order = 1, IsRequired = true)]
         public int GamesWon { get; private set; }
+        [DataMember(Order = 2, IsRequired = true)]
         public int TotalPointsScored { get; private set; }
+        [DataMember(Order = 3, IsRequired = true)]
         public int GamesPlayed { get; private set; }
 
         private PlayerStatistics()

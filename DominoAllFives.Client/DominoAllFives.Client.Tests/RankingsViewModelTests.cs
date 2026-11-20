@@ -169,9 +169,12 @@ namespace DominoAllFives.Client.Tests
                 Position = 7
             };
             using (ViewModelFactory factory = new ViewModelFactory(navigation,
-                new DialogService(), new LoginClient(), client, session,
-                    NullLoggerFactory.Instance, new ProfilePictureImageService(
-                        NullLogger<ProfilePictureImageService>.Instance)))
+                new DialogService(), new SessionClient(),
+                new WPF.Services.Wcf.Services.RegistrationClient(), client,
+                new WPF.Services.Wcf.Services.ProfileClient(),
+                new WPF.Services.Wcf.Services.AccountClient(), session,
+                new ProfilePictureImageService(
+                    NullLogger<ProfilePictureImageService>.Instance)))
             {
                 // Act
                 HomePageViewModel home = factory.Create<HomePageViewModel>();
@@ -185,7 +188,17 @@ namespace DominoAllFives.Client.Tests
                 login.LoginCommand.Execute(null);
                 // Assert
                 Assert.That(login.IsEmailRequiredVisible, Is.True);
-                Assert.That(login.GoToRegisterCommand.CanExecute(null), Is.False);
+                Assert.That(login.GoToRegisterCommand.CanExecute(null), Is.True);
+                // Act
+                login.GoToRegisterCommand.Execute(null);
+                // Assert
+                Assert.That(home.CurrentModal, Is.TypeOf<RegisterAccountViewModel>());
+                RegisterAccountViewModel registration = (RegisterAccountViewModel)home.CurrentModal;
+                Assert.That(registration.RegisterCommand.CanExecute(null), Is.True);
+                // Act
+                registration.CancelCommand.Execute(null);
+                // Assert
+                Assert.That(home.IsModalVisible, Is.False);
                 // Act
                 login.CancelCommand.Execute(null);
                 // Assert
@@ -210,7 +223,8 @@ namespace DominoAllFives.Client.Tests
                 factory.Create<MatchHistoryViewModel>().GoBackCommand.Execute(null);
                 factory.Create<ProfileViewModel>().GoBackCommand.Execute(null);
                 // Assert
-                Assert.That(navigation.BackCalls, Is.EqualTo(8));
+                Assert.That(navigation.BackCalls, Is.EqualTo(7));
+                Assert.That(navigation.LastRefreshedViewModel, Is.EqualTo(typeof(MainMenuViewModel)));
                 Assert.Throws<InvalidOperationException>(() => factory.Create<LobbyViewModel>());
             }
         }
@@ -229,7 +243,7 @@ namespace DominoAllFives.Client.Tests
             Assert.Throws<InvalidOperationException>(() => shell.Initialize(navigation));
         }
 
-        private sealed class LoginClient : ILoginClient
+        private sealed class SessionClient : ISessionClient
         {
             public PlayerAccount LoginWithAccount(Credentials credentials)
             {
@@ -308,6 +322,7 @@ namespace DominoAllFives.Client.Tests
         private sealed class NavigationService : IFrameNavigationService
         {
             public int BackCalls { get; private set; }
+            public Type LastRefreshedViewModel { get; private set; }
 
             public bool CanGoBack
             {
@@ -330,6 +345,7 @@ namespace DominoAllFives.Client.Tests
             public void GoBackToRefresh<TViewModel>()
                 where TViewModel : ViewModelBase
             {
+                LastRefreshedViewModel = typeof(TViewModel);
             }
 
             public void NavigateAsRoot<TViewModel>()

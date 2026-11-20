@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="Credentials">
+    <xs:sequence>
+      <xs:element name="EmailOrUsername" nillable="true" type="xs:string" />
+      <xs:element name="Password" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Credentials" nillable="true" type="tns:Credentials" />
+  <xs:complexType name="PlayerAccount">
+    <xs:sequence>
+      <xs:element name="PlayerId" type="xs:int" />
+      <xs:element name="Username" nillable="true" type="xs:string" />
+      <xs:element name="PreferredLanguageId" nillable="true" type="xs:string" />
+      <xs:element name="AccessStatus" nillable="true" type="tns:AccountAccessStatus" />
+      <xs:element minOccurs="0" name="SessionKey" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PlayerAccount" nillable="true" type="tns:PlayerAccount" />
+  <xs:complexType name="AccountAccessStatus">
+    <xs:sequence>
+      <xs:element name="IsDeleted" type="xs:boolean" />
+      <xs:element name="IsBanned" type="xs:boolean" />
+      <xs:element name="SuspensionUntil" nillable="true" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AccountAccessStatus" nillable="true" type="tns:AccountAccessStatus" />
+  <xs:complexType name="AccountRegistration">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Username" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Email" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Password" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="PreferredLanguageId" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AccountRegistration" nillable="true" type="tns:AccountRegistration" />
+  <xs:complexType name="PlayerProfile">
+    <xs:sequence>
+      <xs:element name="Username" nillable="true" type="xs:string" />
+      <xs:element name="Statistics" nillable="true" type="tns:PlayerStatistics" />
+      <xs:element name="Picture" nillable="true" type="tns:ProfilePicture" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PlayerProfile" nillable="true" type="tns:PlayerProfile" />
+  <xs:complexType name="PlayerStatistics">
+    <xs:sequence>
+      <xs:element name="GamesWon" type="xs:int" />
+      <xs:element name="TotalPointsScored" type="xs:int" />
+      <xs:element name="GamesPlayed" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PlayerStatistics" nillable="true" type="tns:PlayerStatistics" />
+  <xs:complexType name="ProfilePicture">
+    <xs:sequence>
+      <xs:element name="OriginalFileName" nillable="true" type="xs:string" />
+      <xs:element name="ImageData" nillable="true" type="xs:base64Binary" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ProfilePicture" nillable="true" type="tns:ProfilePicture" />
+  <xs:complexType name="ArrayOfRankingEntry">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="RankingEntry" nillable="true" type="tns:RankingEntry" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfRankingEntry" nillable="true" type="tns:ArrayOfRankingEntry" />
+  <xs:complexType name="RankingEntry">
+    <xs:sequence>
+      <xs:element name="Rank" type="xs:int" />
+      <xs:element name="Username" nillable="true" type="xs:string" />
+      <xs:element name="GamesWon" type="xs:int" />
+      <xs:element name="Picture" nillable="true" type="tns:ProfilePicture" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="RankingEntry" nillable="true" type="tns:RankingEntry" />
+</xs:schema>

@@ -1145,4 +1145,13 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
   <data name="Match_msgOperationFailed" xml:space="preserve">
     <value>Não foi possível concluir a operação. Atualize o estado e tente novamente.</value>
   </data>
+  <data name="EditProfile_btnRemovePicture" xml:space="preserve">
+    <value>Remover imagem</value>
+  </data>
+  <data name="MessageProfile_msgRemovePictureTitle" xml:space="preserve">
+    <value>Remover imagem de perfil</value>
+  </data>
+  <data name="MessageProfile_msgRemovePicture" xml:space="preserve">
+    <value>Deseja remover sua imagem de perfil? Esta alteração será salva imediatamente.</value>
+  </data>
 </root>

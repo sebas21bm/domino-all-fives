@@ -1,4 +1,4 @@
-﻿<Page x:Class="DominoAllFives.Client.WPF.Views.EditProfile"
+<Page x:Class="DominoAllFives.Client.WPF.Views.EditProfile"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -116,6 +116,12 @@
                                 </Button.Template>
                             </Button>
                         </Grid>
+
+                        <Button x:Name="btnRemovePicture"
+                                Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[EditProfile_btnRemovePicture]}"
+                                Command="{Binding RemovePictureCommand}"
+                                Style="{StaticResource DarkButton}"
+                                Width="360" Height="50" Margin="0,0,0,15"/>
 
                         <TextBox x:Name="txtUsername" 
                                  Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" 

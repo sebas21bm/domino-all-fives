@@ -1,3 +1,4 @@
+using System.Runtime.Serialization;
 using DominoAllFives.Contracts.Enums;
 
 namespace DominoAllFives.Contracts.Domain
@@ -5,11 +6,16 @@ namespace DominoAllFives.Contracts.Domain
     /// <summary>
     /// Encapsulates account creation data and the existing ordered validation policy.
     /// </summary>
+    [DataContract]
     public sealed class AccountRegistration
     {
+        [DataMember(Order = 1)]
         public string Username { get; private set; }
+        [DataMember(Order = 2)]
         public string Email { get; private set; }
+        [DataMember(Order = 3)]
         public string Password { get; private set; }
+        [DataMember(Order = 4)]
         public string PreferredLanguageId { get; private set; }
 
         private AccountRegistration()

@@ -16,7 +16,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
     public class LoginViewModel : ViewModelBase
     {
         private IDialogService _dialogService;
-        private ILoginClient _loginClient;
+        private ISessionClient _loginClient;
         private readonly PlayerSession _playerSession;
         private ILogger<LoginViewModel> _logger;
         private LanguageManager _languageManager;
@@ -100,13 +100,13 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _isPasswordRequiredVisible = false;
             LoginCommand = new RelayCommand(ExecuteLogin, CanExecuteLogin);
             CancelCommand = new RelayCommand(CancelLogin, CanCancelLogin);
-            GoToRegisterCommand = new RelayCommand(_onGoToRegister, () => false);
+            GoToRegisterCommand = new RelayCommand(_onGoToRegister, CanCancelLogin);
             GoToRecoverCommand = new RelayCommand(_onGoToRecover, () => false);
         }
 
         public void Initialize(
             IDialogService dialogService,
-            ILoginClient loginClient,
+            ISessionClient loginClient,
             ILogger<LoginViewModel> logger,
             LanguageManager languageManager = null)
         {
@@ -234,6 +234,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _isBusy = isBusy;
             LoginCommand.RaiseCanExecuteChanged();
             CancelCommand.RaiseCanExecuteChanged();
+            GoToRegisterCommand.RaiseCanExecuteChanged();
         }
 
         private bool ValidateInput()
