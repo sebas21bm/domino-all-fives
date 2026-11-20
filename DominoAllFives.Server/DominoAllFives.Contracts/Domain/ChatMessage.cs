@@ -1,5 +1,5 @@
-using DominoAllFives.Contracts.Enums;
 using System.Runtime.Serialization;
+using DominoAllFives.Contracts.Enums;
 
 namespace DominoAllFives.Contracts.Domain
 {
@@ -10,7 +10,7 @@ namespace DominoAllFives.Contracts.Domain
     public sealed class ChatMessage
     {
         [DataMember]
-        public int ContextId {  get; set; }
+        public int ContextId { get; set; }
 
         [DataMember]
         public ChatScope Scope { get; set; }

@@ -8,6 +8,7 @@ namespace DominoAllFives.Contracts.Services
     /// Defines authenticated duplex operations for sending chat messages.
     /// </summary>
     [ServiceContract(
+        Namespace = "urn:domino-all-fives:services",
         CallbackContract = typeof(IChatCallback),
         SessionMode = SessionMode.Required)]
     public interface IChatService
@@ -22,7 +23,7 @@ namespace DominoAllFives.Contracts.Services
         /// <exception cref="FaultException">
         /// The server cannot resolve the player session because persistence failed.
         /// </exception>
-        [OperationContract]
+        [OperationContract(IsInitiating =  true, IsTerminating = false)]
         [FaultContract(typeof(AccessIssue))]
         void OpenChatSession(string sessionKey);
 
@@ -36,7 +37,7 @@ namespace DominoAllFives.Contracts.Services
         /// <exception cref="FaultException{ChatIssue}">
         /// The message violates a chat validation rule or the player is not in the target chat.
         /// </exception>
-        [OperationContract]
+        [OperationContract(IsInitiating = true, IsTerminating = false)]
         [FaultContract(typeof(AccessIssue))]
         [FaultContract(typeof(ChatIssue))]
         void SendMessage(ChatMessage message);
