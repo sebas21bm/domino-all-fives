@@ -91,6 +91,7 @@ namespace DominoAllFives.Client.Tests
 
         public event Action<MatchView> MatchChanged;
         public event Action<PlayerHand> HandChanged;
+        public event Action ConnectionLost;
         public MatchView Open(string sessionKey, int matchId)
         {
             Interlocked.Increment(ref _openCalls);
@@ -170,6 +171,11 @@ namespace DominoAllFives.Client.Tests
         {
             MatchChanged?.Invoke(view);
             HandChanged?.Invoke(hand);
+        }
+
+        public void Disconnect()
+        {
+            ConnectionLost?.Invoke();
         }
 
         public static MatchView CreateView(long version)

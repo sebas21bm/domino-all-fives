@@ -195,7 +195,7 @@ namespace DominoAllFives.BusinessLogic.Managers
 
             if (match.Phase != MatchState.InProgress)
             {
-                update.Result = MatchContractMapper.CreateMatchResult(match);
+                update.Result = view.Result;
             }
 
             activeMatch.PendingUpdates.Enqueue(update);

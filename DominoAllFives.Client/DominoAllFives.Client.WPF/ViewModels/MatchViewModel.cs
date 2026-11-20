@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
+using System.Windows.Media;
 using System.Windows.Threading;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
@@ -21,22 +22,31 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private const double InitialBoardWidth = 400;
         private const double InitialBoardHeight = 300;
         private const double BoardMargin = 96;
+        private const int RoundSummarySeconds = 4;
+        private static readonly BoardEnd[] availableBoardEnds =
+            (BoardEnd[])Enum.GetValues(typeof(BoardEnd));
         private readonly IFrameNavigationService _navigation;
         private readonly MatchNavigation _context;
         private readonly IMatchClient _client;
         private readonly Dispatcher _dispatcher;
+        private readonly DispatcherTimer _roundSummaryTimer;
         private readonly ILogger<MatchViewModel> _logger =
             LoggerFactoryProvider.CreateLogger<MatchViewModel>();
         private MatchView _pendingView;
         private PlayerHand _pendingHand;
+        private Tuple<MatchView, PlayerHand> _confirmedSnapshot;
         private MatchView _match;
         private DominoTile _selectedTile;
-        private BoardEnd _selectedEnd;
+        private BoardEnd? _selectedEnd;
         private bool _isBusy;
         private bool _disposed;
         private bool _opened;
         private string _status;
         private bool _isClientDisposalStarted;
+        private bool _showConnectionAlert;
+        private bool _isReconnecting;
+        private int _connectionRevision;
+        private int _lastPresentedRound;
         public List<DominoTile> Hand { get; private set; } = new List<DominoTile>();
         public List<TilePosition> BoardTiles { get; private set; } = new List<TilePosition>();
         public double BoardWidth { get; private set; } = InitialBoardWidth;
@@ -55,10 +65,16 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
         }
 
-        public List<string> RevealedHands { get; private set; } = new List<string>();
-        public List<EndOption> Ends { get; } = Enum.GetValues(typeof(BoardEnd)).Cast<BoardEnd>()
-            .Select(end => new EndOption { End = end })
-            .ToList();
+        public IReadOnlyList<EndOption> Ends { get; private set; } = Array.Empty<EndOption>();
+
+        public bool IsStarting
+        {
+            get
+            {
+                return _match == null && _isBusy && !IsRoundSummaryVisible
+                    && !ShowConnectionAlert;
+            }
+        }
 
         public string Status
         {
@@ -74,7 +90,19 @@ namespace DominoAllFives.Client.WPF.ViewModels
         }
 
         public string TurnText { get; private set; }
+        public bool ShowConnectionAlert => _showConnectionAlert;
+        public string ConnectionMessage => GetText(_isReconnecting
+            ? "Match_msgReconnecting" : "Match_msgConnectionFailed");
         public string RoundText { get; private set; }
+        public string TurnActionText { get; private set; }
+        public string RoundSummaryText { get; private set; }
+        public IReadOnlyList<RoundPlayerRecord> RoundPlayers { get; private set; }
+        public string WinnerNames { get; private set; }
+        public ImageSource WinnerAvatar { get; private set; }
+        public bool IsRoundSummaryVisible => RoundPlayers != null;
+        public bool IsMatchResultVisible => _match?.Result != null;
+        public bool IsMatchCancelled => _match?.Result?.Phase == MatchStatus.Cancelled;
+        public bool HasWinner => !string.IsNullOrEmpty(WinnerNames);
         public string AwardedPointsText { get; private set; } = string.Empty;
         public string ScoreMultiplierText { get; private set; } = string.Empty;
         public bool HasScoredPlay { get; private set; }
@@ -88,12 +116,17 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             set
             {
-                SetProperty(ref _selectedTile, value);
+                if (!SetProperty(ref _selectedTile, value))
+                {
+                    return;
+                }
+
+                UpdateEndOptions();
                 RaiseCommands();
             }
         }
 
-        public BoardEnd SelectedEnd
+        public BoardEnd? SelectedEnd
         {
             get
             {
@@ -102,15 +135,17 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
             set
             {
-                SetProperty(ref _selectedEnd, value);
-                RaiseCommands();
+                if (SetProperty(ref _selectedEnd, value))
+                {
+                    RaiseCommands();
+                }
             }
         }
 
         public RelayCommand PlayCommand { get; }
         public RelayCommand DrawCommand { get; }
         public RelayCommand PassCommand { get; }
-        public RelayCommand RefreshCommand { get; }
+        public RelayCommand ReconnectCommand { get; }
         public RelayCommand LeaveCommand { get; }
 
         public MatchViewModel(IFrameNavigationService navigation,
@@ -122,26 +157,32 @@ namespace DominoAllFives.Client.WPF.ViewModels
             IMatchClient client)
         {
             _dispatcher = Dispatcher.CurrentDispatcher;
+            _roundSummaryTimer = new DispatcherTimer(DispatcherPriority.Normal, _dispatcher)
+            {
+                Interval = TimeSpan.FromSeconds(RoundSummarySeconds)
+            };
+            _roundSummaryTimer.Tick += EndRoundSummary;
             _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _client.MatchChanged += OnMatchChanged;
             _client.HandChanged += OnHandChanged;
+            _client.ConnectionLost += OnConnectionLost;
             PlayCommand = new RelayCommand(Play, CanPlay);
             DrawCommand = new RelayCommand(Draw, CanDraw);
             PassCommand = new RelayCommand(Pass, CanPass);
-            RefreshCommand = new RelayCommand(Refresh, CanRefresh);
+            ReconnectCommand = new RelayCommand(Reconnect, CanReconnect);
             LeaveCommand = new RelayCommand(Leave, () => !_isBusy && !_disposed);
         }
 
         public void Initialize()
         {
-            if (_opened || _isBusy || _disposed)
+            if (_opened || _isBusy || _disposed || ShowConnectionAlert)
             {
                 return;
             }
 
-            StartOperation(OpenAndSynchronize);
+            StartOperation(() => OpenAndSynchronize(0));
         }
 
         public void Dispose()
@@ -152,8 +193,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             _disposed = true;
+            _roundSummaryTimer.Stop();
+            _roundSummaryTimer.Tick -= EndRoundSummary;
             _client.MatchChanged -= OnMatchChanged;
             _client.HandChanged -= OnHandChanged;
+            _client.ConnectionLost -= OnConnectionLost;
             RaiseCommands();
             if (!_isBusy)
             {
@@ -163,14 +207,32 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private bool IsOwnTurn()
         {
-            return !_disposed && !_isBusy && _match != null
+            return !_disposed && !_isBusy && !ShowConnectionAlert && !IsRoundSummaryVisible
+                && _match != null
                 && _match.Phase == MatchStatus.InProgress
                 && _match.CurrentPlayerId == _context.PlayerSession.PlayerId;
         }
 
         private bool CanPlay()
         {
-            return IsOwnTurn() && SelectedTile != null && IsPlayable(SelectedTile, SelectedEnd);
+            return IsOwnTurn() && SelectedTile != null && SelectedEnd.HasValue
+                && IsPlayable(SelectedTile, SelectedEnd.Value);
+        }
+
+        private void UpdateEndOptions()
+        {
+            SelectedEnd = null;
+            Ends = _match == null || SelectedTile == null
+                ? Array.Empty<EndOption>()
+                : availableBoardEnds.Where(end => IsPlayable(SelectedTile, end))
+                    .Select(end => new EndOption { End = end })
+                    .ToArray();
+            OnPropertyChanged(nameof(Ends));
+
+            if (Ends.Count == 1)
+            {
+                SelectedEnd = Ends[0].End;
+            }
         }
 
         private bool IsPlayable(DominoTile tile, BoardEnd end)
@@ -186,7 +248,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private bool HasMove()
         {
-            return Hand.Any(tile => Ends.Any(end => IsPlayable(tile, end.End)));
+            return Hand.Any(tile => availableBoardEnds.Any(end => IsPlayable(tile, end)));
         }
 
         private bool CanDraw()
@@ -199,9 +261,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
             return IsOwnTurn() && _match.StockCount == 0 && !HasMove();
         }
 
-        private bool CanRefresh()
+        private bool CanReconnect()
         {
-            return !_isBusy && !_disposed;
+            return ShowConnectionAlert && !_isBusy && !_isReconnecting && !_disposed;
         }
 
         private void Play()
@@ -218,7 +280,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 SecondValue = SelectedTile.SecondValue,
                 SpecialPower = SelectedTile.SpecialPower
             };
-            BoardEnd end = SelectedEnd;
+            BoardEnd end = SelectedEnd.Value;
             long version = _match.Version;
             StartOperation(() => PlayAndSynchronize(tile, end, version));
         }
@@ -245,13 +307,45 @@ namespace DominoAllFives.Client.WPF.ViewModels
             StartOperation(() => PassAndSynchronize(version));
         }
 
-        private void Refresh()
+        private void Reconnect()
         {
-            StartOperation(OpenAndSynchronize);
+            if (!CanReconnect())
+            {
+                return;
+            }
+
+            _pendingView = null;
+            _pendingHand = null;
+            _confirmedSnapshot = null;
+            _isReconnecting = true;
+            OnPropertyChanged(nameof(ConnectionMessage));
+            int connectionRevision = _connectionRevision;
+            long minimumVersion = _match?.Version ?? 0;
+            StartOperation(() => OpenAndSynchronize(minimumVersion),
+                () => CompleteReconnect(connectionRevision));
+        }
+
+        private void CompleteReconnect(int connectionRevision)
+        {
+            _isReconnecting = false;
+            if (connectionRevision == _connectionRevision)
+            {
+                Status = string.Empty;
+                _showConnectionAlert = false;
+                ApplySnapshot();
+            }
+
+            NotifyConnectionState();
         }
 
         private void Leave()
         {
+            if (_match != null && _match.Phase != MatchStatus.InProgress)
+            {
+                NavigateToMenu();
+                return;
+            }
+
             StartOperation(LeaveMatch, NavigateToMenu);
         }
 
@@ -262,17 +356,24 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void Synchronize()
         {
+            Synchronize(0);
+        }
+
+        private void Synchronize(long minimumVersion)
+        {
             for (int attempt = 0; attempt < SynchronizationAttempts; attempt++)
             {
                 MatchView view = _client.GetMatch(_context.MatchId);
                 PlayerHand hand = _client.GetHand(_context.MatchId);
-                OnMatchChanged(view);
-                OnHandChanged(hand);
-                if (view.Version == hand.Version)
+                if (IsMatchView(view) && IsOwnHand(hand)
+                    && view.Version == hand.Version && view.Version >= minimumVersion)
                 {
+                    Dispatch(() => AcceptConfirmedSnapshot(view, hand));
                     return;
                 }
             }
+
+            throw new TimeoutException("Could not retrieve matching match and hand versions.");
         }
 
         private void StartOperation(Action action, Action onCompleted = null)
@@ -283,6 +384,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             }
 
             _isBusy = true;
+            OnPropertyChanged(nameof(IsStarting));
             RaiseCommands();
             BackgroundJob<Action, bool> job = new BackgroundJob<Action, bool>(
                 ExecuteOperation, action,
@@ -299,6 +401,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void OnOperationCompleted(Action onCompleted)
         {
             _isBusy = false;
+            OnPropertyChanged(nameof(IsStarting));
             if (_disposed)
             {
                 BeginClientDisposal();
@@ -312,6 +415,8 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void OnOperationFailed(Exception ex, Action action)
         {
             _isBusy = false;
+            _isReconnecting = false;
+            OnPropertyChanged(nameof(IsStarting));
             if (_disposed)
             {
                 _logger.LogWarning(ex, "Match operation failed after the view was disposed.");
@@ -340,7 +445,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 _logger.LogError(ex, "Unexpected match operation failure.");
             }
 
-            RaiseCommands();
+            NotifyConnectionState();
         }
 
         private void BeginClientDisposal()
@@ -372,11 +477,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _logger.LogWarning(ex, "Match connection could not be closed cleanly.");
         }
 
-        private void OpenAndSynchronize()
+        private void OpenAndSynchronize(long minimumVersion)
         {
-            OnMatchChanged(_client.Open(_context.PlayerSession.SessionKey, _context.MatchId));
+            _client.Open(_context.PlayerSession.SessionKey, _context.MatchId);
             _opened = true;
-            Synchronize();
+            Synchronize(minimumVersion);
         }
 
         private void PlayAndSynchronize(DominoTile tile, BoardEnd end, long version)
@@ -407,8 +512,54 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ReportConnectionFailure(Exception ex)
         {
-            Status = GetText("Match_msgConnectionFailed");
+            ShowConnectionFailure();
             _logger.LogWarning(ex, "Match connection failed.");
+        }
+
+        private void OnConnectionLost()
+        {
+            Dispatch(ShowConnectionFailure);
+        }
+
+        private void ShowConnectionFailure()
+        {
+            if (_match != null && _match.Phase != MatchStatus.InProgress)
+            {
+                return;
+            }
+
+            _connectionRevision++;
+            _showConnectionAlert = true;
+            NotifyConnectionState();
+        }
+
+        private void NotifyConnectionState()
+        {
+            OnPropertyChanged(nameof(ShowConnectionAlert));
+            OnPropertyChanged(nameof(ConnectionMessage));
+            OnPropertyChanged(nameof(IsStarting));
+            RaiseCommands();
+        }
+
+        private void AcceptConfirmedSnapshot(MatchView view, PlayerHand hand)
+        {
+            if (_confirmedSnapshot == null || view.Version >= _confirmedSnapshot.Item1.Version)
+            {
+                _confirmedSnapshot = Tuple.Create(view, hand);
+            }
+
+            ApplySnapshot();
+        }
+
+        private bool IsMatchView(MatchView view)
+        {
+            return view != null && view.MatchId == _context.MatchId;
+        }
+
+        private bool IsOwnHand(PlayerHand hand)
+        {
+            return hand != null && hand.MatchId == _context.MatchId
+                && hand.PlayerId == _context.PlayerSession.PlayerId;
         }
 
         private void OnMatchChanged(MatchView view)
@@ -418,7 +569,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void AcceptView(MatchView view)
         {
-            if (view == null || view.MatchId != _context.MatchId)
+            if (!IsMatchView(view))
             {
                 return;
             }
@@ -438,8 +589,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void AcceptHand(PlayerHand hand)
         {
-            if (hand == null || hand.MatchId != _context.MatchId
-                || hand.PlayerId != _context.PlayerSession.PlayerId)
+            if (!IsOwnHand(hand))
             {
                 return;
             }
@@ -454,67 +604,172 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ApplySnapshot()
         {
-            if (_disposed || _pendingView == null || _pendingHand == null)
+            if (_disposed || ShowConnectionAlert || IsRoundSummaryVisible)
             {
                 return;
             }
 
-            if (_pendingView.Version != _pendingHand.Version)
+            MatchView view = _pendingView;
+            PlayerHand hand = _pendingHand;
+            bool hasMatchingCallbacks = view != null && hand != null && view.Version == hand.Version;
+            if (_confirmedSnapshot != null && (!hasMatchingCallbacks
+                || _confirmedSnapshot.Item1.Version > view.Version))
+            {
+                view = _confirmedSnapshot.Item1;
+                hand = _confirmedSnapshot.Item2;
+            }
+            else if (!hasMatchingCallbacks)
             {
                 return;
             }
 
-            if (_match != null && _pendingView.Version <= _match.Version)
+            if (_match != null && view.Version <= _match.Version)
             {
                 return;
             }
 
-            _match = _pendingView;
+            UpdateTurnAction(view);
+            if (ShouldShowRoundSummary(view))
+            {
+                ShowRoundSummary(view.LastRound);
+                return;
+            }
+
+            _match = view;
             UpdateScoreIndicator();
-            Hand = _pendingHand.Tiles;
-            BoardTiles = BoardLayout.Arrange(_match.Board);
-            FitBoard();
-            Scores = _match.Scores.Select(score => string.Format(GetText("Match_lblScore"),
-                GetPlayerName(score.PlayerId), score.Points, score.TileCount))
-                .ToList();
-            Players = _match.Scores.Select(score => new MatchPlayerRecord(score, GetPlayerName(
-                score.PlayerId), _context.PlayerSession.PlayerId))
-                .ToList();
-            Opponents = Players.Where(player => !player.IsCurrentPlayer)
-                .ToList();
-            TurnText = string.Format(GetText("Match_lblTurn"), _match.CurrentPlayerId.HasValue
-                ? GetPlayerName(_match.CurrentPlayerId.Value) : string.Empty);
+            Hand = hand.Tiles;
+            DisplayBoard(_match.Board);
+            UpdatePlayerSummaries(_match.Result?.Scores ?? _match.Scores);
+            UpdateMatchResult(_match.Result);
+            TurnText = GetTurnText();
             RoundText = string.Format(GetText("Match_lblRound"), _match.RoundNumber,
                 _match.StockCount);
             Status = _match.Phase == MatchStatus.InProgress ? string.Empty : GetText("Match_msg"
                 + _match.Phase);
-            RevealedHands = _match.LastRound == null
-                ? new List<string>()
-                : _match.LastRound.RevealedHands
-                    .Select(hand => string.Format(
-                        GetText("Match_lblRevealed"),
-                        GetPlayerName(hand.PlayerId),
-                        string.Join(", ", hand.Tiles.Select(
-                            tile => tile.FirstValue + "|" + tile.SecondValue))))
-                    .ToList();
             SelectedTile = null;
             OnPropertyChanged(nameof(Hand));
+            OnPropertyChanged(nameof(TurnText));
+            OnPropertyChanged(nameof(RoundText));
+            OnPropertyChanged(nameof(IsStarting));
+            RaiseCommands();
+        }
+
+        private void DisplayBoard(PublicBoard board)
+        {
+            BoardTiles = BoardLayout.Arrange(board);
+            FitBoard();
             OnPropertyChanged(nameof(BoardTiles));
             OnPropertyChanged(nameof(BoardWidth));
             OnPropertyChanged(nameof(BoardHeight));
+        }
+
+        private void UpdatePlayerSummaries(IEnumerable<PlayerScore> scores)
+        {
+            Scores = scores.Select(score => string.Format(GetText("Match_lblScore"),
+                GetPlayerName(score.PlayerId), score.Points, score.TileCount))
+                .ToList();
+            Players = scores.Select(score => new MatchPlayerRecord(score, GetPlayerName(
+                score.PlayerId), _context.PlayerSession.PlayerId))
+                .ToList();
+            Opponents = Players.Where(player => !player.IsCurrentPlayer)
+                .ToList();
             OnPropertyChanged(nameof(Scores));
             OnPropertyChanged(nameof(Players));
             OnPropertyChanged(nameof(Opponents));
+        }
+
+        private void UpdateTurnAction(MatchView view)
+        {
+            TurnActionNotice action = view.LastTurnAction;
+            TurnActionText = action == null || action.Version != view.Version
+                ? string.Empty
+                : string.Format(GetText(action.IsPass ? "Match_msgPassed" : "Match_msgDrew"),
+                    GetPlayerName(action.PlayerId));
+            OnPropertyChanged(nameof(TurnActionText));
+        }
+
+        private bool ShouldShowRoundSummary(MatchView view)
+        {
+            RoundResult round = view.LastRound;
+            return round?.ClosedBoard != null && round.RoundNumber > _lastPresentedRound
+                && (round.Version == view.Version || (_match != null
+                    && view.Phase == MatchStatus.InProgress
+                    && round.RoundNumber >= _match.RoundNumber));
+        }
+
+        private void ShowRoundSummary(RoundResult round)
+        {
+            Dictionary<int, PlayerHand> revealedHands = round.RevealedHands
+                .ToDictionary(hand => hand.PlayerId);
+            RoundPlayers = round.Scores.Select(score => new RoundPlayerRecord(
+                GetPlayerName(score.PlayerId), score.Points, revealedHands[score.PlayerId].Tiles))
+                .ToList();
+            RoundSummaryText = round.WinnerId.HasValue
+                ? string.Format(GetText("Match_msgRoundAward"), GetPlayerName(round.WinnerId.Value),
+                    round.AwardedPoints)
+                : GetText("Match_msgRoundTied");
+            _lastPresentedRound = round.RoundNumber;
+            SelectedTile = null;
+            DisplayBoard(round.ClosedBoard);
+            UpdatePlayerSummaries(round.Scores);
+            TurnText = string.Empty;
             OnPropertyChanged(nameof(TurnText));
-            OnPropertyChanged(nameof(RoundText));
-            OnPropertyChanged(nameof(RevealedHands));
+            OnPropertyChanged(nameof(RoundPlayers));
+            OnPropertyChanged(nameof(RoundSummaryText));
+            OnPropertyChanged(nameof(IsRoundSummaryVisible));
+            OnPropertyChanged(nameof(IsStarting));
             RaiseCommands();
+            _roundSummaryTimer.Start();
+        }
+
+        private void EndRoundSummary(object sender, EventArgs eventArgs)
+        {
+            _roundSummaryTimer.Stop();
+            RoundPlayers = null;
+            ApplySnapshot();
+            OnPropertyChanged(nameof(RoundPlayers));
+            OnPropertyChanged(nameof(IsRoundSummaryVisible));
+            RaiseCommands();
+        }
+
+        private void UpdateMatchResult(MatchResult result)
+        {
+            if (result == null)
+            {
+                return;
+            }
+
+            WinnerNames = string.Join(", ", result.WinnerIds.Select(GetPlayerName));
+            ImageSource avatar;
+            if (result.WinnerIds.Count > 0
+                && _context.PlayerAvatars.TryGetValue(result.WinnerIds[0], out avatar))
+            {
+                WinnerAvatar = avatar;
+            }
+
+            OnPropertyChanged(nameof(WinnerNames));
+            OnPropertyChanged(nameof(WinnerAvatar));
+            OnPropertyChanged(nameof(IsMatchResultVisible));
+            OnPropertyChanged(nameof(IsMatchCancelled));
+            OnPropertyChanged(nameof(HasWinner));
+        }
+
+        private string GetTurnText()
+        {
+            if (!_match.CurrentPlayerId.HasValue)
+            {
+                return string.Empty;
+            }
+
+            string textKey = _match.Board.Tiles.Count == 0 ? "Match_lblOpener" : "Match_lblTurn";
+            return string.Format(GetText(textKey), GetPlayerName(_match.CurrentPlayerId.Value));
         }
 
         private void UpdateScoreIndicator()
         {
             PlayScore score = _match.LastPlay;
-            HasScoredPlay = score != null && score.Points > 0;
+            HasScoredPlay = score != null && score.RoundNumber == _match.RoundNumber
+                && score.Points > 0;
             AwardedPointsText = HasScoredPlay ? score.Points.ToString("+0",
                 System.Globalization.CultureInfo.CurrentCulture) : string.Empty;
             ScoreMultiplierText = HasScoredPlay && score.Multiplier > 1 ? "×"
@@ -568,7 +823,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             PlayCommand.RaiseCanExecuteChanged();
             DrawCommand.RaiseCanExecuteChanged();
             PassCommand.RaiseCanExecuteChanged();
-            RefreshCommand.RaiseCanExecuteChanged();
+            ReconnectCommand.RaiseCanExecuteChanged();
             LeaveCommand.RaiseCanExecuteChanged();
         }
 

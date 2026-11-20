@@ -1077,19 +1077,49 @@ Only the following are allowed: .png, .jpg, .jpeg.</value>
     <value>The lobby is full or has already started.</value>
   </data>
   <data name="Match_btnPass">
-    <value>Pass</value>
+    <value>PASS</value>
   </data>
   <data name="Match_msgRejected">
     <value>The move was rejected. Check the updated state.</value>
   </data>
   <data name="Match_btnLeave">
-    <value>Leave</value>
+    <value>LEAVE</value>
+  </data>
+  <data name="Match_msgDrew">
+    <value>{0} drew from the stock</value>
+  </data>
+  <data name="Match_msgPassed">
+    <value>{0} passed</value>
+  </data>
+  <data name="Match_msgRoundAward">
+    <value>{0} earns {1} points</value>
+  </data>
+  <data name="Match_msgRoundTied">
+    <value>The round is tied. No points awarded.</value>
+  </data>
+  <data name="Match_lblRoundSummary">
+    <value>SCORES</value>
+  </data>
+  <data name="Match_lblGameOver">
+    <value>GAME OVER</value>
+  </data>
+  <data name="Match_lblGameCancelled">
+    <value>MATCH CANCELLED</value>
+  </data>
+  <data name="Match_lblWinner">
+    <value>WINNER</value>
   </data>
   <data name="Match_lblPreviousRound">
     <value>Hands revealed at the end of the previous round</value>
   </data>
   <data name="Match_lblTurn">
     <value>Player {0} turn</value>
+  </data>
+  <data name="Match_lblOpener">
+    <value>{0} starts</value>
+  </data>
+  <data name="Match_lblEnd">
+    <value>End</value>
   </data>
   <data name="Match_lblRevealed">
     <value>Player {0}: {1}</value>
@@ -1101,7 +1131,10 @@ Only the following are allowed: .png, .jpg, .jpeg.</value>
     <value>Bottom</value>
   </data>
   <data name="Match_msgConnectionFailed">
-    <value>The server could not be reached. Press Refresh to reconnect.</value>
+    <value>The connection to the server was lost.</value>
+  </data>
+  <data name="Match_msgReconnecting">
+    <value>Reconnecting…</value>
   </data>
   <data name="Match_lblScore">
     <value>Player {0}: {1} points · {2} tiles</value>
@@ -1109,8 +1142,8 @@ Only the following are allowed: .png, .jpg, .jpeg.</value>
   <data name="Match_msgCancelled">
     <value>Match cancelled without a winner.</value>
   </data>
-  <data name="Match_btnRefresh">
-    <value>Refresh</value>
+  <data name="Match_btnReconnect">
+    <value>RECONNECT</value>
   </data>
   <data name="Match_endRight">
     <value>Right</value>
@@ -1119,7 +1152,7 @@ Only the following are allowed: .png, .jpg, .jpeg.</value>
     <value>Top</value>
   </data>
   <data name="Match_btnPlay">
-    <value>Play</value>
+    <value>PLAY</value>
   </data>
   <data name="Match_btnDraw">
     <value>Draw from stock</value>
@@ -1143,7 +1176,7 @@ Only the following are allowed: .png, .jpg, .jpeg.</value>
     <value>CHAT</value>
   </data>
   <data name="Match_msgOperationFailed" xml:space="preserve">
-    <value>The operation could not be completed. Refresh the state and try again.</value>
+    <value>The operation could not be completed. Try again.</value>
   </data>
   <data name="EditProfile_btnRemovePicture" xml:space="preserve">
     <value>Remove picture</value>

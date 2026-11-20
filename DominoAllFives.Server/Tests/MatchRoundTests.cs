@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DominoAllFives.BusinessLogic.Gameplay;
 using NUnit.Framework;
+using GameplayContracts = DominoAllFives.Contracts.Gameplay;
 
 namespace DominoAllFives.Server.Tests
 {
@@ -22,6 +23,11 @@ namespace DominoAllFives.Server.Tests
             // Act
             GameplayTests.PlayNextLegalAction(match);
             // Assert
+            GameplayContracts.MatchView view = MatchContractMapper.CreateMatchView(match);
+            Assert.That(view.Board.Tiles, Is.Empty);
+            Assert.That(view.LastRound.ClosedBoard.Tiles.Count, Is.EqualTo(placedCount + 1));
+            Assert.That(view.LastRound.Version, Is.EqualTo(match.Version));
+            Assert.That(view.Result, Is.Null);
             Assert.That(
                 new object[]
                 {
@@ -77,9 +83,17 @@ namespace DominoAllFives.Server.Tests
             IReadOnlyList<Tile> previousHand = match.GetPlayer(2).Tiles;
             long previousVersion = match.Version;
             Board previousBoard = match.Board;
+            int passingPlayer = match.CurrentPlayerId.Value;
             // Act
             match.Pass(match.CurrentPlayerId.Value, match.Version);
             // Assert
+            GameplayContracts.MatchView view = MatchContractMapper.CreateMatchView(match);
+            Assert.That(view.LastRound.ClosedBoard.Tiles.Count, Is.EqualTo(previousBoard.Tiles.Count));
+            Assert.That(view.LastRound.Version, Is.EqualTo(view.Result.Version));
+            Assert.That(view.Result.WinnerIds, Is.EqualTo(new[] { 2 }));
+            Assert.That(view.LastTurnAction.PlayerId, Is.EqualTo(passingPlayer));
+            Assert.That(view.LastTurnAction.IsPass, Is.True);
+            Assert.That(view.LastTurnAction.Version, Is.EqualTo(view.Version));
             Assert.That(
                 new object[]
                 {
@@ -118,7 +132,10 @@ namespace DominoAllFives.Server.Tests
             revealedHand.Tiles[0].FirstValue = 99;
             revealedHand.Tiles.Clear();
             view.LastRound.Scores.Clear();
+            view.LastRound.ClosedBoard.Tiles.Clear();
             // Assert
+            Assert.That(MatchContractMapper.CreateMatchView(match).LastRound.ClosedBoard.Tiles,
+                Is.Not.Empty);
             Assert.That(
                 new object[]
                 {
@@ -294,6 +311,10 @@ namespace DominoAllFives.Server.Tests
             // Act
             GameplayTests.PlayNextLegalAction(match);
             // Assert
+            GameplayContracts.MatchView view = MatchContractMapper.CreateMatchView(match);
+            Assert.That(view.Result.WinnerIds, Is.EqualTo(new[] { 1 }));
+            Assert.That(view.Result.Version, Is.EqualTo(view.Version));
+            Assert.That(view.LastRound, Is.Null);
             Assert.That(
                 new object[]
                 {
@@ -307,6 +328,27 @@ namespace DominoAllFives.Server.Tests
                     match.Version
                 },
                 Is.EqualTo(new object[] { 100, 0, 15, 0, null, MatchState.Completed, 1, 15L }));
+        }
+
+        [Test]
+        public void Draw_StockAction_ProjectsActorAndVersion()
+        {
+            Match match = new Match(1, new[] { 1, 2 }, 250, CreateDeck(109));
+            MatchPlayer player = match.GetPlayer(match.CurrentPlayerId.Value);
+            while (match.Board.HasMove(player.Tiles, match.TurnNumber))
+            {
+                Advance(match, 1);
+                player = match.GetPlayer(match.CurrentPlayerId.Value);
+            }
+
+            long previousVersion = match.Version;
+            match.Draw(player.PlayerId, previousVersion);
+
+            GameplayContracts.MatchView view = MatchContractMapper.CreateMatchView(match);
+            Assert.That(view.LastTurnAction.PlayerId, Is.EqualTo(player.PlayerId));
+            Assert.That(view.LastTurnAction.IsPass, Is.False);
+            Assert.That(view.LastTurnAction.Version, Is.EqualTo(previousVersion + 1));
+            Assert.That(view.CurrentPlayerId, Is.EqualTo(player.PlayerId));
         }
 
         private static void Advance(Match match, int actionCount)

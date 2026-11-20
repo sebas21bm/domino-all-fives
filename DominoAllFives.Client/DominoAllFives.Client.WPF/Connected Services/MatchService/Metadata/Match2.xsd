@@ -7,9 +7,11 @@
       <xs:element minOccurs="0" name="CurrentPlayerId" nillable="true" type="xs:int" />
       <xs:element minOccurs="0" name="LastPlay" nillable="true" type="tns:PlayScore" />
       <xs:element minOccurs="0" name="LastRound" nillable="true" type="tns:RoundResult" />
+      <xs:element minOccurs="0" name="LastTurnAction" nillable="true" type="tns:TurnActionNotice" />
       <xs:element minOccurs="0" name="MatchId" type="xs:int" />
       <xs:element minOccurs="0" name="OpeningTileId" type="xs:int" />
       <xs:element minOccurs="0" name="Phase" type="tns:MatchStatus" />
+      <xs:element minOccurs="0" name="Result" nillable="true" type="tns:MatchResult" />
       <xs:element minOccurs="0" name="RoundNumber" type="xs:int" />
       <xs:element minOccurs="0" name="Scores" nillable="true" type="tns:ArrayOfPlayerScore" />
       <xs:element minOccurs="0" name="StockCount" type="xs:int" />
@@ -17,6 +19,14 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="MatchView" nillable="true" type="tns:MatchView" />
+  <xs:complexType name="TurnActionNotice">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="IsPass" type="xs:boolean" />
+      <xs:element minOccurs="0" name="PlayerId" type="xs:int" />
+      <xs:element minOccurs="0" name="Version" type="xs:long" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TurnActionNotice" nillable="true" type="tns:TurnActionNotice" />
   <xs:complexType name="PublicBoard">
     <xs:sequence>
       <xs:element minOccurs="0" name="Ends" nillable="true" type="tns:ArrayOfPublicEnd" />
@@ -107,9 +117,11 @@
   <xs:complexType name="RoundResult">
     <xs:sequence>
       <xs:element minOccurs="0" name="AwardedPoints" type="xs:int" />
+      <xs:element minOccurs="0" name="ClosedBoard" nillable="true" type="tns:PublicBoard" />
       <xs:element minOccurs="0" name="RevealedHands" nillable="true" type="tns:ArrayOfPlayerHand" />
       <xs:element minOccurs="0" name="RoundNumber" type="xs:int" />
       <xs:element minOccurs="0" name="Scores" nillable="true" type="tns:ArrayOfPlayerScore" />
+      <xs:element minOccurs="0" name="Version" type="xs:long" />
       <xs:element minOccurs="0" name="WinnerId" nillable="true" type="xs:int" />
     </xs:sequence>
   </xs:complexType>

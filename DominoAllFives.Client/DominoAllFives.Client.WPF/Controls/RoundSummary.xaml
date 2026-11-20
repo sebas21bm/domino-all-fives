@@ -1,0 +1,57 @@
+<UserControl x:Class="DominoAllFives.Client.WPF.Controls.RoundSummary"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:DominoAllFives.Client.WPF.Controls"
+             xmlns:models="clr-namespace:DominoAllFives.Client.WPF.Models"
+             xmlns:strings="clr-namespace:DominoAllFives.Client.WPF.Localization">
+    <UserControl.Resources>
+        <models:MatchValueConverter x:Key="MatchValueConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Border Background="{StaticResource PureBlackBrush}" Opacity="0.82"/>
+        <Grid Margin="36,22">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="{Binding Source={x:Static strings:LanguageManager.Instance}, Path=[Match_lblRoundSummary]}"
+                       Style="{StaticResource TextRed}" FontSize="30" HorizontalAlignment="Center"/>
+            <TextBlock Grid.Row="1" Text="{Binding RoundSummaryText}" Style="{StaticResource TextCream}"
+                       FontSize="15" HorizontalAlignment="Center" Margin="0,16,0,24"/>
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl ItemsSource="{Binding RoundPlayers}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,10" MinHeight="62">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="280"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Username}" Style="{StaticResource TextCream}"
+                                           FontSize="18" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Points}" Style="{StaticResource TextCream}"
+                                           FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <ItemsControl Grid.Column="2" ItemsSource="{Binding Tiles}" Margin="20,0,0,0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Viewbox Width="28" Height="56" Margin="0,3,5,3">
+                                                <controls:DominoTile Width="56" Height="112" TopValue="{Binding FirstValue}"
+                                                    BottomValue="{Binding SecondValue}"
+                                                    TileType="{Binding SpecialPower, Converter={StaticResource MatchValueConverter}}"/>
+                                            </Viewbox>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -14,6 +14,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
     {
         private readonly MatchCallbackHandler _callback;
         private MatchServiceClient _service;
+        private EventHandler _connectionEnded;
         private bool _disposed;
         public MatchClient()
         {
@@ -23,6 +24,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
 
         public event Action<MatchView> MatchChanged;
         public event Action<PlayerHand> HandChanged;
+        public event Action ConnectionLost;
         /// <summary>
         /// Reopens the transport and binds the authenticated player to the requested match.
         /// </summary>
@@ -43,15 +45,21 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
             ResetConnection();
             try
             {
-                _service = new MatchServiceClient(new InstanceContext(_callback), "MatchEndpoint");
-                return _service.OpenMatchSession(sessionKey, matchId);
+                MatchServiceClient service = new MatchServiceClient(
+                    new InstanceContext(_callback), "MatchEndpoint");
+                _service = service;
+                ICommunicationObject channel = service;
+                _connectionEnded = (sender, args) => NotifyConnectionLost(service);
+                channel.Faulted += _connectionEnded;
+                channel.Closed += _connectionEnded;
+                return service.OpenMatchSession(sessionKey, matchId);
             }
-            catch (CommunicationException ex)
+            catch (CommunicationException)
             {
                 ResetConnection();
                 throw;
             }
-            catch (TimeoutException ex)
+            catch (TimeoutException)
             {
                 ResetConnection();
                 throw;
@@ -191,8 +199,25 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
 
         private void ResetConnection()
         {
-            Close(_service);
+            ICommunicationObject channel = _service;
             _service = null;
+            if (channel == null)
+            {
+                return;
+            }
+
+            channel.Faulted -= _connectionEnded;
+            channel.Closed -= _connectionEnded;
+            _connectionEnded = null;
+            Close(channel);
+        }
+
+        private void NotifyConnectionLost(MatchServiceClient service)
+        {
+            if (ReferenceEquals(service, _service))
+            {
+                ConnectionLost?.Invoke();
+            }
         }
 
         private static void Close(ICommunicationObject channel)

@@ -32,6 +32,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
         public MatchState Phase { get; private set; }
         public RoundSummary LastRound { get; private set; }
         public PlayScore LastPlay { get; private set; }
+        public TurnAction LastTurnAction { get; private set; }
 
         public int StockCount
         {
@@ -208,6 +209,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             while (!stockIsEmpty && !playerHasMove);
 
             Version++;
+            LastTurnAction = new TurnAction(playerId, false, Version);
         }
 
         public void Pass(int playerId, long expectedVersion)
@@ -237,6 +239,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             }
 
             Version++;
+            LastTurnAction = new TurnAction(playerId, true, Version);
         }
 
         public void Cancel(int playerId)
@@ -362,6 +365,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 roundEnd.Winner.Points += roundEnd.Summary.AwardedPoints;
             }
 
+            roundEnd.Summary.CaptureClosingBoard(Board, TurnNumber, Version + 1);
             LastRound = roundEnd.Summary;
             if (roundEnd.NextRound == null)
             {

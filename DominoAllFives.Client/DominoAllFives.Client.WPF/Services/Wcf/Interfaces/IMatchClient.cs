@@ -10,6 +10,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Interfaces
     {
         event Action<MatchView> MatchChanged;
         event Action<PlayerHand> HandChanged;
+        event Action ConnectionLost;
         /// <summary>
         /// Reopens the transport and binds the authenticated player to the requested match.
         /// </summary>

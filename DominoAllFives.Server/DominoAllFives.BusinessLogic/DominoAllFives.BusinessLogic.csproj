@@ -173,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gameplay\Domain\RoundSummary.cs" />
+    <Compile Include="Gameplay\Domain\TurnAction.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gameplay\Domain\Tile.cs" />
