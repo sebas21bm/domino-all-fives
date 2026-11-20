@@ -10,7 +10,7 @@ namespace DominoAllFives.BusinessLogic.Exceptions
     {
         public AccountIssue Issue { get; }
 
-        public AccountRuleException(AccountIssue issue) : base("The account cannot sign in.")
+        public AccountRuleException(AccountIssue issue) : base("The account operation was rejected.")
         {
             if (!Enum.IsDefined(typeof(AccountIssue), issue))
             {

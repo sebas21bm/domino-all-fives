@@ -171,7 +171,8 @@ namespace DominoAllFives.Client.Tests
             using (ViewModelFactory factory = new ViewModelFactory(navigation,
                 new DialogService(), new SessionClient(),
                 new WPF.Services.Wcf.Services.RegistrationClient(), client,
-                new WPF.Services.Wcf.Services.ProfileClient(), session,
+                new WPF.Services.Wcf.Services.ProfileClient(),
+                new WPF.Services.Wcf.Services.AccountClient(), session,
                     NullLoggerFactory.Instance, new ProfilePictureImageService(
                         NullLogger<ProfilePictureImageService>.Instance)))
             {

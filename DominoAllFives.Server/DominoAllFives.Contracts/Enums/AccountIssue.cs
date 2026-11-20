@@ -10,6 +10,14 @@ namespace DominoAllFives.Contracts.Enums
         [EnumMember]
         Banned,
         [EnumMember]
-        Suspended
+        Suspended,
+        [EnumMember]
+        PlayerNotFound,
+        [EnumMember]
+        IncorrectCurrentPassword,
+        [EnumMember]
+        InvalidPassword,
+        [EnumMember]
+        PasswordUnchanged
     }
 }

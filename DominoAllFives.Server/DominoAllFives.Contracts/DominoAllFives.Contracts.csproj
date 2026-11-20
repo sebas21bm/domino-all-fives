@@ -50,6 +50,7 @@
     <Compile Include="Services\IProfileService.cs" />
     <Compile Include="Enums\ProfileIssue.cs" />
     <Compile Include="Enums\RegistrationIssue.cs" />
+    <Compile Include="Services\IAccountService.cs" />
     <Compile Include="Services\IRankingService.cs" />
     <Compile Include="Domain\RegistrationResult.cs" />
     <Compile Include="Domain\ProfilePicture.cs" />

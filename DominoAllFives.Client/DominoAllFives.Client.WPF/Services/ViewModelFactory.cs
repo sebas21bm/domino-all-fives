@@ -20,6 +20,7 @@ namespace DominoAllFives.Client.WPF.Services
         private readonly IRegistrationClient _registrationClient;
         private readonly IRankingClient _rankingClient;
         private readonly IProfileClient _profileClient;
+        private readonly IAccountClient _accountClient;
         private readonly ProfilePictureFileService _profilePictureFileService;
         private readonly PlayerSession _playerSession;
         private readonly ILoggerFactory _loggerFactory;
@@ -32,6 +33,7 @@ namespace DominoAllFives.Client.WPF.Services
             IRegistrationClient registrationClient,
             IRankingClient rankingClient,
             IProfileClient profileClient,
+            IAccountClient accountClient,
             PlayerSession playerSession,
             ILoggerFactory loggerFactory,
             ProfilePictureImageService profilePictureImageService)
@@ -46,6 +48,7 @@ namespace DominoAllFives.Client.WPF.Services
             _rankingClient = rankingClient ?? throw new ArgumentNullException(
                 nameof(rankingClient));
             _profileClient = profileClient ?? throw new ArgumentNullException(nameof(profileClient));
+            _accountClient = accountClient ?? throw new ArgumentNullException(nameof(accountClient));
             _playerSession = playerSession ?? throw new ArgumentNullException(
                 nameof(playerSession));
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(
@@ -111,6 +114,24 @@ namespace DominoAllFives.Client.WPF.Services
                 _profileClient,
                 _profilePictureFileService,
                 _loggerFactory.CreateLogger<UploadProfilePictureViewModel>());
+            return viewModel;
+        }
+
+        public ChangePasswordViewModel CreateChangePassword(Action onSuccess, Action onCancel)
+        {
+            ChangePasswordViewModel viewModel = new ChangePasswordViewModel(
+                _playerSession, onSuccess, onCancel);
+            viewModel.Initialize(_dialogService, _accountClient,
+                _loggerFactory.CreateLogger<ChangePasswordViewModel>());
+            return viewModel;
+        }
+
+        public DeleteAccountViewModel CreateDeleteAccount(Action onSuccess, Action onCancel)
+        {
+            DeleteAccountViewModel viewModel = new DeleteAccountViewModel(
+                _playerSession, onSuccess, onCancel);
+            viewModel.Initialize(_dialogService, _accountClient,
+                _loggerFactory.CreateLogger<DeleteAccountViewModel>());
             return viewModel;
         }
 
@@ -204,8 +225,8 @@ namespace DominoAllFives.Client.WPF.Services
                     viewModel = friends;
                     break;
                 case nameof(GameSettingsViewModel):
-                    GameSettingsViewModel gameSettings = new GameSettingsViewModel();
-                    gameSettings.Initialize(_navigationService);
+                    GameSettingsViewModel gameSettings = new GameSettingsViewModel(_playerSession);
+                    gameSettings.Initialize(_navigationService, this, _dialogService);
                     viewModel = gameSettings;
                     break;
                 case nameof(HowToPlayViewModel):

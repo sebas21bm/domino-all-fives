@@ -206,12 +206,89 @@ namespace DominoAllFives.Server
         }
     }
 
+    public partial class DominoService : IAccountService
+    {
+        /// <inheritdoc/>
+        public void ChangePassword(string sessionKey, string currentPassword, string newPassword)
+        {
+            int playerId = GetSessionPlayerId(sessionKey);
+            try
+            {
+                AccountController controller = new AccountController(
+                    LoggerFactoryProvider.CreateLogger<AccountController>());
+                controller.ChangePassword(playerId, currentPassword, newPassword);
+            }
+            catch (AccountRuleException ex)
+            {
+                _logger.LogDebug(ex, "Password change rejected. Account issue: {AccountIssue}.", ex.Issue);
+                throw new FaultException<AccountIssue>(ex.Issue);
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "Password change could not complete persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (EntityException ex)
+            {
+                _logger.LogError(ex, "Password change could not complete persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Password change could not complete persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (DbEntityValidationException ex)
+            {
+                _logger.LogError(ex, "Password change could not complete persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+        }
+
+        /// <inheritdoc/>
+        public void DeleteAccount(string sessionKey, string password)
+        {
+            int playerId = GetSessionPlayerId(sessionKey);
+            try
+            {
+                AccountController controller = new AccountController(
+                    LoggerFactoryProvider.CreateLogger<AccountController>());
+                controller.DeleteAccount(playerId, password);
+            }
+            catch (AccountRuleException ex)
+            {
+                _logger.LogDebug(ex, "Account deletion rejected. Account issue: {AccountIssue}.", ex.Issue);
+                throw new FaultException<AccountIssue>(ex.Issue);
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "Account deletion could not complete persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (EntityException ex)
+            {
+                _logger.LogError(ex, "Account deletion could not complete persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Account deletion could not complete persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (DbEntityValidationException ex)
+            {
+                _logger.LogError(ex, "Account deletion could not complete persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+        }
+    }
+
     public partial class DominoService : IProfileService
     {
         /// <inheritdoc/>
         public PlayerProfile GetMyProfile(string sessionKey)
         {
-            int playerId = GetProfilePlayerId(sessionKey);
+            int playerId = GetSessionPlayerId(sessionKey);
             try
             {
                 ProfilePictureStorage storage = new ProfilePictureStorage(
@@ -252,7 +329,7 @@ namespace DominoAllFives.Server
         /// <inheritdoc/>
         public void UpdateProfileName(string sessionKey, string username)
         {
-            int playerId = GetProfilePlayerId(sessionKey);
+            int playerId = GetSessionPlayerId(sessionKey);
             try
             {
                 ProfilePictureStorage storage = new ProfilePictureStorage(
@@ -296,7 +373,7 @@ namespace DominoAllFives.Server
             string username,
             ProfilePicture picture)
         {
-            int playerId = GetProfilePlayerId(sessionKey);
+            int playerId = GetSessionPlayerId(sessionKey);
             try
             {
                 ProfilePictureStorage storage = new ProfilePictureStorage(
@@ -353,7 +430,7 @@ namespace DominoAllFives.Server
         /// <inheritdoc/>
         public void SetProfilePicture(string sessionKey, ProfilePicture picture)
         {
-            int playerId = GetProfilePlayerId(sessionKey);
+            int playerId = GetSessionPlayerId(sessionKey);
             try
             {
                 ProfilePictureStorage storage = new ProfilePictureStorage(
@@ -410,7 +487,7 @@ namespace DominoAllFives.Server
         /// <inheritdoc/>
         public void RemoveProfilePicture(string sessionKey)
         {
-            int playerId = GetProfilePlayerId(sessionKey);
+            int playerId = GetSessionPlayerId(sessionKey);
             try
             {
                 ProfilePictureStorage storage = new ProfilePictureStorage(
@@ -448,11 +525,11 @@ namespace DominoAllFives.Server
             }
         }
 
-        private int GetProfilePlayerId(string sessionKey)
+        private int GetSessionPlayerId(string sessionKey)
         {
             if (string.IsNullOrWhiteSpace(sessionKey))
             {
-                _logger.LogDebug("Profile operation rejected a missing session.");
+                _logger.LogDebug("Authenticated operation rejected a missing session.");
                 throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
             }
 
@@ -462,7 +539,7 @@ namespace DominoAllFives.Server
             }
             catch (KeyNotFoundException ex)
             {
-                _logger.LogDebug(ex, "Profile operation rejected an unavailable session.");
+                _logger.LogDebug(ex, "Authenticated operation rejected an unavailable session.");
                 throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
             }
         }

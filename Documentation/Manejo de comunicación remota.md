@@ -312,6 +312,38 @@ La evidencia y los límites están en
 
 ---
 
+### Cambio de contraseña y eliminación de cuenta
+
+`IAccountService` se publica en `DominoService` mediante
+`AccountSettingsEndpoint` en la ruta `Domino/account-settings`. El cliente
+`AccountClient` utiliza el proxy generado y la sobrecarga `void` de `WcfInvoker`.
+
+| Operación | Efecto confirmado por la respuesta |
+| --- | --- |
+| `ChangePassword(string sessionKey, string currentPassword, string newPassword)` | Guarda el hash de la nueva contraseña. |
+| `DeleteAccount(string sessionKey, string password)` | Guarda el borrado lógico e invalida la sesión de la cuenta. |
+
+`DominoService` resuelve la identidad con `SessionManager.GetPlayerId`.
+Una clave ausente, desconocida o revocada produce `FaultException<AccessIssue>`
+con `SessionRequired`. `AccountController` conserva la comprobación de
+credenciales, las reglas de negocio y la persistencia. Lanza
+`AccountRuleException` al rechazar una regla. La frontera traduce ese rechazo a
+`FaultException<AccountIssue>` y comunica los fallos de persistencia mediante
+un fault genérico seguro.
+
+Las vistas envían ambas escrituras con `BackgroundWork` y actualizan la
+presentación en el Dispatcher. Una respuesta perdida puede corresponder a un
+cambio ya guardado, por lo que las escrituras no se reintentan automáticamente.
+
+La referencia se regeneró con SvcUtil 4.8 desde el endpoint MEX de un host
+temporal de `DominoService` sobre `net.pipe`. La integración se verificó con
+SQL Server LocalDB aislado y cuentas sintéticas, incluyendo la persistencia
+del hash, el borrado lógico, la revocación y los faults ante un fallo de
+guardado. Se verificaron también los diálogos en los tres idiomas y el regreso
+a la página de inicio al confirmar la eliminación.
+
+---
+
 ## Comunicación duplex
 
 Lobby requiere que el servidor pueda enviar cambios a los jugadores sin esperar una nueva solicitud.

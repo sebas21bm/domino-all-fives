@@ -239,6 +239,18 @@ namespace DominoAllFivesService
 
         [System.Runtime.Serialization.EnumMemberAttribute()]
         Suspended = 2,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        PlayerNotFound = 3,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        IncorrectCurrentPassword = 4,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        InvalidPassword = 5,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        PasswordUnchanged = 6,
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -903,6 +915,67 @@ namespace DominoAllFivesService
         public void RemoveProfilePicture(string sessionKey)
         {
             base.Channel.RemoveProfilePicture(sessionKey);
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:domino-all-fives:services", ConfigurationName="DominoAllFivesService.IAccountService")]
+    public interface IAccountService
+    {
+
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IAccountService/ChangePassword", ReplyAction="urn:domino-all-fives:services/IAccountService/ChangePasswordResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IAccountService/ChangePasswordAccessIssueFault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccountIssue), Action="urn:domino-all-fives:services/IAccountService/ChangePasswordAccountIssueFault", Name="AccountIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        void ChangePassword(string sessionKey, string currentPassword, string newPassword);
+
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IAccountService/DeleteAccount", ReplyAction="urn:domino-all-fives:services/IAccountService/DeleteAccountResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IAccountService/DeleteAccountAccessIssueFault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccountIssue), Action="urn:domino-all-fives:services/IAccountService/DeleteAccountAccountIssueFault", Name="AccountIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        void DeleteAccount(string sessionKey, string password);
+    }
+
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public interface IAccountServiceChannel : DominoAllFivesService.IAccountService, System.ServiceModel.IClientChannel
+    {
+    }
+
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class AccountServiceClient : System.ServiceModel.ClientBase<DominoAllFivesService.IAccountService>, DominoAllFivesService.IAccountService
+    {
+
+        public AccountServiceClient()
+        {
+        }
+
+        public AccountServiceClient(string endpointConfigurationName) :
+                base(endpointConfigurationName)
+        {
+        }
+
+        public AccountServiceClient(string endpointConfigurationName, string remoteAddress) :
+                base(endpointConfigurationName, remoteAddress)
+        {
+        }
+
+        public AccountServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) :
+                base(endpointConfigurationName, remoteAddress)
+        {
+        }
+
+        public AccountServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
+                base(binding, remoteAddress)
+        {
+        }
+
+        public void ChangePassword(string sessionKey, string currentPassword, string newPassword)
+        {
+            base.Channel.ChangePassword(sessionKey, currentPassword, newPassword);
+        }
+
+        public void DeleteAccount(string sessionKey, string password)
+        {
+            base.Channel.DeleteAccount(sessionKey, password);
         }
     }
 }

@@ -1,7 +1,6 @@
 using System;
-using System.Data.Entity.Core;
-using System.Data.Entity.Infrastructure;
-using System.Data.SqlClient;
+using DominoAllFives.BusinessLogic.Exceptions;
+using DominoAllFives.BusinessLogic.Managers;
 using DominoAllFives.BusinessLogic.Security;
 using DominoAllFives.BusinessLogic.Validation;
 using DominoAllFives.Contracts.Enums;
@@ -28,7 +27,9 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// </summary>
         /// <param name = "playerId">The account identifier.</param>
         /// <param name = "password">The current password to verify.</param>
-        public DeleteStatus DeleteAccount(int playerId, string password)
+        /// <exception cref = "ArgumentOutOfRangeException">The player identifier is invalid.</exception>
+        /// <exception cref = "AccountRuleException">The account or password was rejected.</exception>
+        public void DeleteAccount(int playerId, string password)
         {
             if (playerId <= 0)
             {
@@ -37,7 +38,7 @@ namespace DominoAllFives.BusinessLogic.Controllers
 
             if (string.IsNullOrWhiteSpace(password))
             {
-                return DeleteStatus.PasswordNotMatch;
+                throw new AccountRuleException(AccountIssue.IncorrectCurrentPassword);
             }
 
             using (DominoAllFivesEntities context = new DominoAllFivesEntities())
@@ -46,23 +47,24 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 Player player = playerRepository.GetById(playerId);
                 if (player == null || player.IsDeleted)
                 {
-                    return DeleteStatus.AccountNotFound;
+                    throw new AccountRuleException(AccountIssue.PlayerNotFound);
                 }
 
                 if (!PasswordHasher.VerifyPassword(password, player.PasswordHash))
                 {
-                    return DeleteStatus.PasswordNotMatch;
+                    throw new AccountRuleException(AccountIssue.IncorrectCurrentPassword);
                 }
 
                 bool wasDeleted = playerRepository.SoftDelete(playerId);
                 if (!wasDeleted)
                 {
-                    return DeleteStatus.AccountNotFound;
+                    throw new AccountRuleException(AccountIssue.PlayerNotFound);
                 }
 
                 context.SaveChanges();
-                return DeleteStatus.None;
             }
+
+            SessionManager.RemovePlayerSession(playerId);
         }
 
         /// <summary>
@@ -72,48 +74,45 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// <param name = "playerId">The account identifier.</param>
         /// <param name = "currentPassword">The current password to verify.</param>
         /// <param name = "newPassword">The new password subject to the creation policy.</param>
-        public ChangePasswordStatus ChangePassword(
+        /// <exception cref = "ArgumentOutOfRangeException">The player identifier is invalid.</exception>
+        /// <exception cref = "AccountRuleException">The account or password was rejected.</exception>
+        public void ChangePassword(
             int playerId,
             string currentPassword,
             string newPassword)
         {
-            ChangePasswordStatus validation = ValidatePasswordChange(
-                playerId, currentPassword, newPassword);
-            if (validation != ChangePasswordStatus.None)
-            {
-                return validation;
-            }
+            ValidatePasswordChange(playerId, currentPassword, newPassword);
+
             using (DominoAllFivesEntities context = new DominoAllFivesEntities())
             {
                 IPlayerRepository playerRepository = new PlayerRepository(context);
                 Player player = playerRepository.GetById(playerId);
                 if (player == null || player.IsDeleted)
                 {
-                    return ChangePasswordStatus.AccountNotFound;
+                    throw new AccountRuleException(AccountIssue.PlayerNotFound);
                 }
 
                 if (!PasswordHasher.VerifyPassword(currentPassword, player.PasswordHash))
                 {
-                    return ChangePasswordStatus.IncorrectCurrentPassword;
+                    throw new AccountRuleException(AccountIssue.IncorrectCurrentPassword);
                 }
 
                 if (PasswordHasher.VerifyPassword(newPassword, player.PasswordHash))
                 {
-                    return ChangePasswordStatus.SameAsCurrentPassword;
+                    throw new AccountRuleException(AccountIssue.PasswordUnchanged);
                 }
 
                 string newPasswordHash = PasswordHasher.HashPassword(newPassword);
                 bool wasUpdated = playerRepository.UpdatePassword(playerId, newPasswordHash);
                 if (!wasUpdated)
                 {
-                    return ChangePasswordStatus.AccountNotFound;
+                    throw new AccountRuleException(AccountIssue.PlayerNotFound);
                 }
 
                 context.SaveChanges();
-                return ChangePasswordStatus.None;
             }
         }
-        private static ChangePasswordStatus ValidatePasswordChange(
+        private static void ValidatePasswordChange(
             int playerId, string currentPassword, string newPassword)
         {
             if (playerId <= 0)
@@ -122,10 +121,13 @@ namespace DominoAllFives.BusinessLogic.Controllers
             }
             if (string.IsNullOrWhiteSpace(currentPassword))
             {
-                return ChangePasswordStatus.IncorrectCurrentPassword;
+                throw new AccountRuleException(AccountIssue.IncorrectCurrentPassword);
             }
-            return AccountValidator.IsPasswordValid(newPassword)
-                ? ChangePasswordStatus.None : ChangePasswordStatus.InvalidNewPassword;
+
+            if (!AccountValidator.IsPasswordValid(newPassword))
+            {
+                throw new AccountRuleException(AccountIssue.InvalidPassword);
+            }
         }
     }
 }
