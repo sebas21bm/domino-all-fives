@@ -251,6 +251,9 @@ namespace DominoAllFivesService
 
         [System.Runtime.Serialization.EnumMemberAttribute()]
         PasswordUnchanged = 6,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        UnsupportedLanguage = 7,
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -932,6 +935,13 @@ namespace DominoAllFivesService
         [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IAccountService/DeleteAccountAccessIssueFault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
         [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccountIssue), Action="urn:domino-all-fives:services/IAccountService/DeleteAccountAccountIssueFault", Name="AccountIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
         void DeleteAccount(string sessionKey, string password);
+
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IAccountService/ChangePreferredLanguage", ReplyAction="urn:domino-all-fives:services/IAccountService/ChangePreferredLanguageResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IAccountService/ChangePreferredLanguageAccessIssueF" +
+            "ault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccountIssue), Action="urn:domino-all-fives:services/IAccountService/ChangePreferredLanguageAccountIssue" +
+            "Fault", Name="AccountIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        void ChangePreferredLanguage(string sessionKey, string preferredLanguageId);
     }
 
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -976,6 +986,11 @@ namespace DominoAllFivesService
         public void DeleteAccount(string sessionKey, string password)
         {
             base.Channel.DeleteAccount(sessionKey, password);
+        }
+
+        public void ChangePreferredLanguage(string sessionKey, string preferredLanguageId)
+        {
+            base.Channel.ChangePreferredLanguage(sessionKey, preferredLanguageId);
         }
     }
 }

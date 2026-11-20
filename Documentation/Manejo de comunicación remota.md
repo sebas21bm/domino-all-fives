@@ -312,7 +312,7 @@ La evidencia y los límites están en
 
 ---
 
-### Cambio de contraseña y eliminación de cuenta
+### Cambio de contraseña, idioma preferido y eliminación de cuenta
 
 `IAccountService` se publica en `DominoService` mediante
 `AccountSettingsEndpoint` en la ruta `Domino/account-settings`. El cliente
@@ -322,6 +322,7 @@ La evidencia y los límites están en
 | --- | --- |
 | `ChangePassword(string sessionKey, string currentPassword, string newPassword)` | Guarda el hash de la nueva contraseña. |
 | `DeleteAccount(string sessionKey, string password)` | Guarda el borrado lógico e invalida la sesión de la cuenta. |
+| `ChangePreferredLanguage(string sessionKey, string preferredLanguageId)` | Guarda el idioma preferido de la cuenta. |
 
 `DominoService` resuelve la identidad con `SessionManager.GetPlayerId`.
 Una clave ausente, desconocida o revocada produce `FaultException<AccessIssue>`
@@ -331,9 +332,16 @@ credenciales, las reglas de negocio y la persistencia. Lanza
 `FaultException<AccountIssue>` y comunica los fallos de persistencia mediante
 un fault genérico seguro.
 
-Las vistas envían ambas escrituras con `BackgroundWork` y actualizan la
+Las vistas envían estas escrituras con `BackgroundWork` y actualizan la
 presentación en el Dispatcher. Una respuesta perdida puede corresponder a un
 cambio ya guardado, por lo que las escrituras no se reintentan automáticamente.
+
+`AccountLanguageController` valida el idioma y usa `LanguagePreferenceStore`
+para guardar la preferencia mediante Entity Framework. Un idioma no admitido
+produce `AccountIssue.UnsupportedLanguage` y una cuenta no disponible produce
+`AccountIssue.PlayerNotFound`. En Ajustes, la confirmación de una sesión vigente
+actualiza `PlayerSession` y aplica el idioma con `LanguageManager`. Los invitados
+guardan su preferencia en el dispositivo.
 
 La referencia se regeneró con SvcUtil 4.8 desde el endpoint MEX de un host
 temporal de `DominoService` sobre `net.pipe`. La integración se verificó con

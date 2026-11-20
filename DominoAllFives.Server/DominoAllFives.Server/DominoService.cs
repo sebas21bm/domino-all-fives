@@ -27,6 +27,8 @@ namespace DominoAllFives.Server
         IncludeExceptionDetailInFaults = false)]
     public partial class DominoService : ISessionService
     {
+        private const string ServiceFailureReason = "The service could not complete the operation.";
+
         private readonly ILogger<DominoService> _logger;
 
         public DominoService()
@@ -36,8 +38,7 @@ namespace DominoAllFives.Server
 
         internal DominoService(ILogger<DominoService> logger)
         {
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -73,17 +74,17 @@ namespace DominoAllFives.Server
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "Account login could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (EntityException ex)
             {
                 _logger.LogError(ex, "Account login could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Account login could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
         }
     }
@@ -104,17 +105,17 @@ namespace DominoAllFives.Server
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "Top wins ranking could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (EntityException ex)
             {
                 _logger.LogError(ex, "Top wins ranking could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Top wins ranking could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
         }
 
@@ -142,17 +143,17 @@ namespace DominoAllFives.Server
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "Wins ranking position could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (EntityException ex)
             {
                 _logger.LogError(ex, "Wins ranking position could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Wins ranking position could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
         }
     }
@@ -173,7 +174,7 @@ namespace DominoAllFives.Server
             {
                 _logger.LogDebug(
                     ex,
-                    "Registration rejected. Issue: {RegistrationIssue}.",
+                    "Registration rejected. Registration issue: {RegistrationIssue}.",
                     ex.Issue);
                 throw new FaultException<RegistrationIssue>(ex.Issue);
             }
@@ -186,28 +187,72 @@ namespace DominoAllFives.Server
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "Registration could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (EntityException ex)
             {
                 _logger.LogError(ex, "Registration could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Registration could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbEntityValidationException ex)
             {
                 _logger.LogError(ex, "Registration failed persistence validation.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
         }
     }
 
     public partial class DominoService : IAccountService
     {
+        /// <inheritdoc/>
+        public void ChangePreferredLanguage(string sessionKey, string preferredLanguageId)
+        {
+            int playerId = GetSessionPlayerId(sessionKey);
+            try
+            {
+                AccountLanguageController controller = new AccountLanguageController(
+                    LoggerFactoryProvider.CreateLogger<AccountLanguageController>());
+                controller.ChangePreferredLanguage(playerId, preferredLanguageId);
+            }
+            catch (AccountRuleException ex)
+            {
+                _logger.LogDebug(
+                    ex, "Preferred language change rejected. Account issue: {AccountIssue}.",
+                    ex.Issue);
+                throw new FaultException<AccountIssue>(ex.Issue);
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "Preferred language change could not complete persistence.");
+                throw new FaultException(ServiceFailureReason);
+            }
+            catch (EntityException ex)
+            {
+                _logger.LogError(ex, "Preferred language change could not complete persistence.");
+                throw new FaultException(ServiceFailureReason);
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Preferred language change could not complete persistence.");
+                throw new FaultException(ServiceFailureReason);
+            }
+            catch (DbEntityValidationException ex)
+            {
+                _logger.LogError(ex, "Preferred language change could not complete persistence.");
+                throw new FaultException(ServiceFailureReason);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, "Preferred language change could not complete persistence.");
+                throw new FaultException(ServiceFailureReason);
+            }
+        }
+
         /// <inheritdoc/>
         public void ChangePassword(string sessionKey, string currentPassword, string newPassword)
         {
@@ -220,28 +265,29 @@ namespace DominoAllFives.Server
             }
             catch (AccountRuleException ex)
             {
-                _logger.LogDebug(ex, "Password change rejected. Account issue: {AccountIssue}.", ex.Issue);
+                _logger.LogDebug(
+                    ex, "Password change rejected. Account issue: {AccountIssue}.", ex.Issue);
                 throw new FaultException<AccountIssue>(ex.Issue);
             }
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "Password change could not complete persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (EntityException ex)
             {
                 _logger.LogError(ex, "Password change could not complete persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Password change could not complete persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbEntityValidationException ex)
             {
                 _logger.LogError(ex, "Password change could not complete persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
         }
 
@@ -257,28 +303,29 @@ namespace DominoAllFives.Server
             }
             catch (AccountRuleException ex)
             {
-                _logger.LogDebug(ex, "Account deletion rejected. Account issue: {AccountIssue}.", ex.Issue);
+                _logger.LogDebug(
+                    ex, "Account deletion rejected. Account issue: {AccountIssue}.", ex.Issue);
                 throw new FaultException<AccountIssue>(ex.Issue);
             }
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "Account deletion could not complete persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (EntityException ex)
             {
                 _logger.LogError(ex, "Account deletion could not complete persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Account deletion could not complete persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbEntityValidationException ex)
             {
                 _logger.LogError(ex, "Account deletion could not complete persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
         }
     }
@@ -300,29 +347,29 @@ namespace DominoAllFives.Server
             {
                 _logger.LogDebug(
                     ex,
-                    "Profile retrieval rejected. Issue: {ProfileIssue}.",
+                    "Profile retrieval rejected. Profile issue: {ProfileIssue}.",
                     ex.Issue);
                 throw new FaultException<ProfileIssue>(ex.Issue);
             }
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "Profile retrieval could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (EntityException ex)
             {
                 _logger.LogError(ex, "Profile retrieval could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Profile retrieval could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogError(ex, "Profile retrieval could not reconstruct the stored profile.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
         }
 
@@ -341,29 +388,29 @@ namespace DominoAllFives.Server
             {
                 _logger.LogDebug(
                     ex,
-                    "Profile update rejected. Issue: {ProfileIssue}.",
+                    "Profile update rejected. Profile issue: {ProfileIssue}.",
                     ex.Issue);
                 throw new FaultException<ProfileIssue>(ex.Issue);
             }
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "Profile update could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (EntityException ex)
             {
                 _logger.LogError(ex, "Profile update could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Profile update could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbEntityValidationException ex)
             {
                 _logger.LogError(ex, "Profile update failed persistence validation.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
         }
 
@@ -374,6 +421,12 @@ namespace DominoAllFives.Server
             ProfilePicture picture)
         {
             int playerId = GetSessionPlayerId(sessionKey);
+            if (picture == null)
+            {
+                _logger.LogDebug("Profile and picture update rejected an incomplete request.");
+                throw new FaultException<ProfileIssue>(ProfileIssue.InvalidProfilePicture);
+            }
+
             try
             {
                 ProfilePictureStorage storage = new ProfilePictureStorage(
@@ -385,45 +438,39 @@ namespace DominoAllFives.Server
             {
                 _logger.LogDebug(
                     ex,
-                    "Profile and picture update rejected. Issue: {ProfileIssue}.",
+                    "Profile and picture update rejected. Profile issue: {ProfileIssue}.",
                     ex.Issue);
                 throw new FaultException<ProfileIssue>(ex.Issue);
-            }
-            catch (ArgumentNullException ex) when (ex.ParamName == "replacementPicture")
-            {
-                _logger.LogDebug(ex, "Profile and picture update rejected an incomplete request.");
-                throw new FaultException<ProfileIssue>(
-                    ProfileIssue.InvalidProfilePicture);
             }
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "Profile and picture update could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (EntityException ex)
             {
                 _logger.LogError(ex, "Profile and picture update could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Profile and picture update could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbEntityValidationException ex)
             {
                 _logger.LogError(ex, "Profile and picture update failed persistence validation.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (IOException ex)
             {
                 _logger.LogError(ex, "Profile update could not write picture storage.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (UnauthorizedAccessException ex)
             {
                 _logger.LogError(ex, "Profile update could not write picture storage.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
         }
 
@@ -442,7 +489,7 @@ namespace DominoAllFives.Server
             {
                 _logger.LogDebug(
                     ex,
-                    "Picture replacement rejected. Issue: {ProfileIssue}.",
+                    "Picture replacement rejected. Profile issue: {ProfileIssue}.",
                     ex.Issue);
                 throw new FaultException<ProfileIssue>(ex.Issue);
             }
@@ -455,32 +502,32 @@ namespace DominoAllFives.Server
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "Picture replacement could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (EntityException ex)
             {
                 _logger.LogError(ex, "Picture replacement could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Picture replacement could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbEntityValidationException ex)
             {
                 _logger.LogError(ex, "Picture replacement failed persistence validation.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (IOException ex)
             {
                 _logger.LogError(ex, "Picture replacement could not write picture storage.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (UnauthorizedAccessException ex)
             {
                 _logger.LogError(ex, "Picture replacement could not write picture storage.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
         }
 
@@ -499,29 +546,29 @@ namespace DominoAllFives.Server
             {
                 _logger.LogDebug(
                     ex,
-                    "Picture removal rejected. Issue: {ProfileIssue}.",
+                    "Picture removal rejected. Profile issue: {ProfileIssue}.",
                     ex.Issue);
                 throw new FaultException<ProfileIssue>(ex.Issue);
             }
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "Picture removal could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (EntityException ex)
             {
                 _logger.LogError(ex, "Picture removal could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Picture removal could not access persistence.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
             catch (DbEntityValidationException ex)
             {
                 _logger.LogError(ex, "Picture removal failed persistence validation.");
-                throw new FaultException("The service could not complete the operation.");
+                throw new FaultException(ServiceFailureReason);
             }
         }
 

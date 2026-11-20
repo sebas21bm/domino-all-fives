@@ -7,7 +7,6 @@ using DominoAllFives.Client.WPF.Services.Threading;
 using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.Services.Wcf.Services;
 using DominoAllFives.Client.WPF.ViewModels;
-using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF
 {
@@ -23,7 +22,6 @@ namespace DominoAllFives.Client.WPF
             PlayerSession playerSession = new PlayerSession();
             MainWindowViewModel mainWindowViewModel = new MainWindowViewModel();
             mainWindowViewModel.Initialize(navigationService);
-            ILoggerFactory loggerFactory = LoggerFactoryProvider.Instance;
             ProfilePictureImageService profilePictureImageService =
                 new ProfilePictureImageService(
                 LoggerFactoryProvider.CreateLogger<ProfilePictureImageService>());
@@ -38,7 +36,6 @@ namespace DominoAllFives.Client.WPF
                 new ProfileClient(),
                 new AccountClient(),
                 playerSession,
-                loggerFactory,
                 profilePictureImageService);
             bool closingStarted = false;
             bool closingCompleted = false;

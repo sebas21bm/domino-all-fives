@@ -5,7 +5,6 @@ using DominoAllFives.Client.WPF.Services.Wcf.Interfaces;
 using DominoAllFives.Client.WPF.Services.Wcf.Services;
 using DominoAllFives.Client.WPF.ViewModels;
 using DominoAllFives.Client.WPF.ViewModels.Base;
-using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Client.WPF.Services
 {
@@ -23,9 +22,9 @@ namespace DominoAllFives.Client.WPF.Services
         private readonly IAccountClient _accountClient;
         private readonly ProfilePictureFileService _profilePictureFileService;
         private readonly PlayerSession _playerSession;
-        private readonly ILoggerFactory _loggerFactory;
         private readonly ProfilePictureImageService _profilePictureImageService;
         private readonly ILobbyClient _lobbyService;
+
         public ViewModelFactory(
             IFrameNavigationService navigationService,
             IDialogService dialogService,
@@ -35,7 +34,6 @@ namespace DominoAllFives.Client.WPF.Services
             IProfileClient profileClient,
             IAccountClient accountClient,
             PlayerSession playerSession,
-            ILoggerFactory loggerFactory,
             ProfilePictureImageService profilePictureImageService)
         {
             _navigationService = navigationService ?? throw new ArgumentNullException(
@@ -47,17 +45,16 @@ namespace DominoAllFives.Client.WPF.Services
                 nameof(registrationClient));
             _rankingClient = rankingClient ?? throw new ArgumentNullException(
                 nameof(rankingClient));
-            _profileClient = profileClient ?? throw new ArgumentNullException(nameof(profileClient));
-            _accountClient = accountClient ?? throw new ArgumentNullException(nameof(accountClient));
+            _profileClient = profileClient ?? throw new ArgumentNullException(
+                nameof(profileClient));
+            _accountClient = accountClient ?? throw new ArgumentNullException(
+                nameof(accountClient));
             _playerSession = playerSession ?? throw new ArgumentNullException(
                 nameof(playerSession));
-            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(
-                nameof(loggerFactory));
             _profilePictureImageService = profilePictureImageService
-                ?? throw new ArgumentNullException(
-                nameof(profilePictureImageService));
+                ?? throw new ArgumentNullException(nameof(profilePictureImageService));
             _profilePictureFileService = new ProfilePictureFileService(
-                _loggerFactory.CreateLogger<ProfilePictureFileService>());
+                LoggerFactoryProvider.CreateLogger<ProfilePictureFileService>());
             _lobbyService = new LobbyClient(_playerSession);
         }
 
@@ -72,8 +69,7 @@ namespace DominoAllFives.Client.WPF.Services
             Action onGoToRegister,
             Action onGoToRecover)
         {
-            LoginViewModel viewModel =
-                new LoginViewModel(
+            LoginViewModel viewModel = new LoginViewModel(
                 _playerSession,
                 onLoginSuccess,
                 onCancel,
@@ -113,7 +109,7 @@ namespace DominoAllFives.Client.WPF.Services
                 _dialogService,
                 _profileClient,
                 _profilePictureFileService,
-                _loggerFactory.CreateLogger<UploadProfilePictureViewModel>());
+                LoggerFactoryProvider.CreateLogger<UploadProfilePictureViewModel>());
             return viewModel;
         }
 
@@ -122,7 +118,7 @@ namespace DominoAllFives.Client.WPF.Services
             ChangePasswordViewModel viewModel = new ChangePasswordViewModel(
                 _playerSession, onSuccess, onCancel);
             viewModel.Initialize(_dialogService, _accountClient,
-                _loggerFactory.CreateLogger<ChangePasswordViewModel>());
+                LoggerFactoryProvider.CreateLogger<ChangePasswordViewModel>());
             return viewModel;
         }
 
@@ -131,7 +127,7 @@ namespace DominoAllFives.Client.WPF.Services
             DeleteAccountViewModel viewModel = new DeleteAccountViewModel(
                 _playerSession, onSuccess, onCancel);
             viewModel.Initialize(_dialogService, _accountClient,
-                _loggerFactory.CreateLogger<DeleteAccountViewModel>());
+                LoggerFactoryProvider.CreateLogger<DeleteAccountViewModel>());
             return viewModel;
         }
 
@@ -216,7 +212,7 @@ namespace DominoAllFives.Client.WPF.Services
                         _navigationService,
                         _profileClient,
                         _dialogService,
-                        _loggerFactory.CreateLogger<EditProfileViewModel>());
+                        LoggerFactoryProvider.CreateLogger<EditProfileViewModel>());
                     viewModel = editProfile;
                     break;
                 case nameof(FriendsViewModel):
@@ -226,7 +222,10 @@ namespace DominoAllFives.Client.WPF.Services
                     break;
                 case nameof(GameSettingsViewModel):
                     GameSettingsViewModel gameSettings = new GameSettingsViewModel(_playerSession);
-                    gameSettings.Initialize(_navigationService, this, _dialogService);
+                    gameSettings.ConfigureLogger(
+                        LoggerFactoryProvider.CreateLogger<GameSettingsViewModel>());
+                    gameSettings.Initialize(
+                        _navigationService, this, _dialogService, _accountClient);
                     viewModel = gameSettings;
                     break;
                 case nameof(HowToPlayViewModel):
@@ -241,7 +240,7 @@ namespace DominoAllFives.Client.WPF.Services
                     break;
                 case nameof(ProfileViewModel):
                     ProfileViewModel profile = new ProfileViewModel(_playerSession);
-                    profile.ConfigureLogger(_loggerFactory.CreateLogger<ProfileViewModel>());
+                    profile.ConfigureLogger(LoggerFactoryProvider.CreateLogger<ProfileViewModel>());
                     profile.Initialize(
                         _navigationService,
                         _profileClient,

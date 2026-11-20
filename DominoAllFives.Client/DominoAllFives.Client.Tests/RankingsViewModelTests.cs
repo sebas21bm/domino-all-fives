@@ -173,8 +173,8 @@ namespace DominoAllFives.Client.Tests
                 new WPF.Services.Wcf.Services.RegistrationClient(), client,
                 new WPF.Services.Wcf.Services.ProfileClient(),
                 new WPF.Services.Wcf.Services.AccountClient(), session,
-                    NullLoggerFactory.Instance, new ProfilePictureImageService(
-                        NullLogger<ProfilePictureImageService>.Instance)))
+                new ProfilePictureImageService(
+                    NullLogger<ProfilePictureImageService>.Instance)))
             {
                 // Act
                 HomePageViewModel home = factory.Create<HomePageViewModel>();
