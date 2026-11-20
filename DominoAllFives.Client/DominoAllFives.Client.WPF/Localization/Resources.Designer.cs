@@ -1141,11 +1141,11 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
 
         /// <summary>
-        ///   Busca una cadena traducida similar a Actualizar.
+        ///   Busca una cadena traducida similar a RECONECTAR.
         /// </summary>
-        public static string Match_btnRefresh {
+        public static string Match_btnReconnect {
             get {
-                return ResourceManager.GetString("Match_btnRefresh", resourceCulture);
+                return ResourceManager.GetString("Match_btnReconnect", resourceCulture);
             }
         }
 
@@ -1249,7 +1249,7 @@ namespace DominoAllFives.Client.WPF.Localization {
         }
 
         /// <summary>
-        ///   Busca una cadena traducida similar a No se pudo comunicar con el servidor. Puedes salir y volver a entrar a la partida..
+        ///   Busca una cadena traducida similar a Se perdió la conexión con el servidor.
         /// </summary>
         public static string Match_msgConnectionFailed {
             get {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading;
 using DominoAllFives.Client.WPF.Models;
@@ -33,16 +34,19 @@ namespace DominoAllFives.Client.Tests
                 // Act
                 WpfTestHost.Invoke(model.Initialize);
                 WaitFor(client.WorkEntered);
+                bool isStarting = WpfTestHost.Invoke(() => model.IsStarting);
                 WpfTestHost.Invoke(model.Initialize);
-                WpfTestHost.Invoke(() => model.RefreshCommand.Execute(null));
-                bool canRefresh = WpfTestHost.Invoke(() => model.RefreshCommand.CanExecute(null));
+                WpfTestHost.Invoke(() => model.ReconnectCommand.Execute(null));
+                bool canReconnect = WpfTestHost.Invoke(() => model.ReconnectCommand.CanExecute(null));
                 client.ReleaseWork.Set();
                 WaitUntilReady(model);
                 // Assert
-                Assert.That(canRefresh, Is.False);
+                Assert.That(canReconnect, Is.False);
+                Assert.That(isStarting, Is.True);
                 Assert.That(client.OpenCalls, Is.EqualTo(1));
                 Assert.That(client.WorkerThreadId, Is.Not.EqualTo(uiThreadId));
                 Assert.That(WpfTestHost.Invoke(() => model.Hand.Count), Is.EqualTo(1));
+                Assert.That(WpfTestHost.Invoke(() => model.IsStarting), Is.False);
             }
             finally
             {
@@ -67,15 +71,176 @@ namespace DominoAllFives.Client.Tests
                 // Act
                 WpfTestHost.Invoke(model.Initialize);
                 WaitUntilReady(model);
-                string failure = WpfTestHost.Invoke(() => model.Status);
+                bool showAlert = errorType != typeof(InvalidOperationException);
+                string failure = WpfTestHost.Invoke(() => showAlert ? model.ConnectionMessage : model.Status);
+                Assert.That(WpfTestHost.Invoke(() => model.ShowConnectionAlert), Is.EqualTo(showAlert));
                 client.OpenError = null;
-                WpfTestHost.Invoke(model.Initialize);
+                if (showAlert)
+                {
+                    WpfTestHost.Invoke(() => model.ReconnectCommand.Execute(null));
+                }
+                else
+                {
+                    WpfTestHost.Invoke(model.Initialize);
+                }
                 WaitUntilReady(model);
                 // Assert
                 Assert.That(failure, Is.Not.Null.And.Not.Empty);
                 Assert.That(client.OpenCalls, Is.EqualTo(2));
                 Assert.That(WpfTestHost.Invoke(() => model.Hand.Count), Is.EqualTo(1));
                 Assert.That(WpfTestHost.Invoke(() => model.Status), Is.Empty);
+            }
+            finally
+            {
+                DisposeModel(model, client);
+            }
+        }
+
+        [Test]
+        public void Reconnect_ChannelLoss_ConfirmsSameVersionAndPreventsDoubleClick()
+        {
+            MatchWorkerClient client = new MatchWorkerClient();
+            MatchViewModel model = CreateModel(client);
+            try
+            {
+                InitializeModel(model);
+                WpfTestHost.Invoke(() => model.SelectedTile = model.Hand[0]);
+                Assert.That(WpfTestHost.Invoke(() => model.PlayCommand.CanExecute(null)), Is.True);
+                Assert.That(WpfTestHost.Invoke(() => model.ReconnectCommand.CanExecute(null)), Is.False);
+
+                client.Disconnect();
+                WaitUntil(() => WpfTestHost.Invoke(() => model.ShowConnectionAlert));
+                Assert.That(WpfTestHost.Invoke(() => model.Hand.Count), Is.EqualTo(1));
+                Assert.That(WpfTestHost.Invoke(() => model.PlayCommand.CanExecute(null)), Is.False);
+                Assert.That(WpfTestHost.Invoke(() => model.DrawCommand.CanExecute(null)), Is.False);
+                Assert.That(WpfTestHost.Invoke(() => model.PassCommand.CanExecute(null)), Is.False);
+                string alert = WpfTestHost.Invoke(() => model.ConnectionMessage);
+                client.BlockedOperation = MatchWorkerOperation.GetMatch;
+                WpfTestHost.Invoke(() => model.ReconnectCommand.Execute(null));
+                WaitFor(client.WorkEntered);
+                Assert.That(WpfTestHost.Invoke(() => model.ConnectionMessage), Is.Not.EqualTo(alert));
+                Assert.That(WpfTestHost.Invoke(() => model.ReconnectCommand.CanExecute(null)), Is.False);
+                WpfTestHost.Invoke(() => model.ReconnectCommand.Execute(null));
+
+                client.ReleaseWork.Set();
+                WaitUntilReady(model);
+                Assert.That(client.OpenCalls, Is.EqualTo(2));
+                Assert.That(WpfTestHost.Invoke(() => model.ShowConnectionAlert), Is.False);
+                Assert.That(WpfTestHost.Invoke(() => model.PlayCommand.CanExecute(null)), Is.True);
+            }
+            finally
+            {
+                client.ReleaseWork.Set();
+                DisposeModel(model, client);
+            }
+        }
+
+        [Test]
+        public void Reconnect_MismatchedVersions_KeepsAlertUntilFreshMatchingPair()
+        {
+            MatchWorkerClient client = new MatchWorkerClient
+            {
+                View = MatchWorkerClient.CreateView(2)
+            };
+            MatchViewModel model = CreateModel(client);
+            try
+            {
+                InitializeModel(model);
+                Assert.That(client.GetMatchCalls, Is.EqualTo(8));
+
+                WpfTestHost.Invoke(() => model.ReconnectCommand.Execute(null));
+                WaitUntilReady(model);
+                Assert.That(WpfTestHost.Invoke(() => model.ShowConnectionAlert), Is.True);
+                Assert.That(WpfTestHost.Invoke(() => model.Hand), Is.Empty);
+                Assert.That(WpfTestHost.Invoke(() => model.ReconnectCommand.CanExecute(null)), Is.True);
+
+                client.Hand = MatchWorkerClient.CreateHand(2);
+                WpfTestHost.Invoke(() => model.ReconnectCommand.Execute(null));
+                WaitUntilReady(model);
+                Assert.That(WpfTestHost.Invoke(() => model.ShowConnectionAlert), Is.False);
+                Assert.That(WpfTestHost.Invoke(() => model.Hand.Count), Is.EqualTo(1));
+            }
+            finally
+            {
+                DisposeModel(model, client);
+            }
+        }
+
+        [Test]
+        public void Reconnect_AfterLostPlayReply_RecoversFinalResultWithoutReplaying()
+        {
+            MatchWorkerClient client = new MatchWorkerClient();
+            MatchViewModel model = CreateModel(client);
+            try
+            {
+                InitializeModel(model);
+                client.PlayError = new TimeoutException("The play response was lost.");
+                WpfTestHost.Invoke(() => model.SelectedTile = model.Hand[0]);
+                WpfTestHost.Invoke(() => model.PlayCommand.Execute(null));
+                WaitUntilReady(model);
+                Assert.That(WpfTestHost.Invoke(() => model.ShowConnectionAlert), Is.True);
+
+                MatchView terminal = MatchWorkerClient.CreateView(2);
+                terminal.Phase = MatchStatus.Completed;
+                terminal.CurrentPlayerId = null;
+                terminal.Result = new MatchResult
+                {
+                    Phase = terminal.Phase,
+                    Version = terminal.Version,
+                    Scores = terminal.Scores,
+                    WinnerIds = new List<int> { 1 }
+                };
+                client.View = terminal;
+                client.Hand = MatchWorkerClient.CreateHand(2);
+                client.Hand.Tiles.Clear();
+                WpfTestHost.Invoke(() => model.ReconnectCommand.Execute(null));
+                WaitUntilReady(model);
+
+                Assert.That(client.PlayCalls, Is.EqualTo(1));
+                Assert.That(WpfTestHost.Invoke(() => model.IsMatchResultVisible), Is.True);
+                Assert.That(WpfTestHost.Invoke(() => model.ShowConnectionAlert), Is.False);
+                Assert.That(WpfTestHost.Invoke(() => model.Hand), Is.Empty);
+            }
+            finally
+            {
+                DisposeModel(model, client);
+            }
+        }
+
+        [Test]
+        public void Reconnect_DuringRoundSummary_DoesNotReplayTheSameClosure()
+        {
+            MatchWorkerClient client = new MatchWorkerClient();
+            MatchViewModel model = CreateModel(client);
+            try
+            {
+                InitializeModel(model);
+                MatchView nextRound = MatchWorkerClient.CreateView(2);
+                nextRound.RoundNumber = 2;
+                nextRound.LastRound = new RoundResult
+                {
+                    Version = 2,
+                    RoundNumber = 1,
+                    Scores = new List<PlayerScore>(),
+                    RevealedHands = new List<PlayerHand>(),
+                    ClosedBoard = client.View.Board
+                };
+                client.View = nextRound;
+                client.Hand = MatchWorkerClient.CreateHand(2);
+                client.Hand.Tiles[0].TileId = 8;
+                client.Emit(nextRound, client.Hand);
+                WaitUntil(() => WpfTestHost.Invoke(() => model.IsRoundSummaryVisible));
+
+                client.Disconnect();
+                WaitUntil(() => WpfTestHost.Invoke(() => model.ShowConnectionAlert));
+                WpfTestHost.Invoke(() => model.ReconnectCommand.Execute(null));
+                WaitUntilReady(model);
+                WaitUntil(() => WpfTestHost.Invoke(() => model.Hand[0].TileId == 8));
+
+                Assert.That(WpfTestHost.Invoke(() => model.ShowConnectionAlert), Is.False);
+                Assert.That(WpfTestHost.Invoke(() => model.IsRoundSummaryVisible), Is.False);
+                client.Emit(nextRound, client.Hand);
+                Assert.That(WpfTestHost.Invoke(() => model.IsRoundSummaryVisible), Is.False);
             }
             finally
             {
@@ -188,7 +353,7 @@ namespace DominoAllFives.Client.Tests
                 Assert.That(client.LeaveCalls, Is.Zero);
                 Assert.That(client.DisposeThreadId, Is.Not.EqualTo(uiThreadId));
                 Assert.That(WpfTestHost.Invoke(() => model.Hand.Count), Is.Zero);
-                Assert.That(WpfTestHost.Invoke(() => model.RefreshCommand.CanExecute(null)),
+                Assert.That(WpfTestHost.Invoke(() => model.ReconnectCommand.CanExecute(null)),
                     Is.False);
             }
             finally
@@ -287,7 +452,7 @@ namespace DominoAllFives.Client.Tests
 
         private static void WaitUntilReady(MatchViewModel model)
         {
-            WaitUntil(() => WpfTestHost.Invoke(() => model.RefreshCommand.CanExecute(null)));
+            WaitUntil(() => WpfTestHost.Invoke(() => model.LeaveCommand.CanExecute(null)));
         }
 
         private static void WaitUntil(Func<bool> condition)

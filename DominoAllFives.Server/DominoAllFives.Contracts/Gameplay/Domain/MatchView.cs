@@ -38,5 +38,11 @@ namespace DominoAllFives.Contracts.Gameplay
 
         [DataMember]
         public PlayScore LastPlay { get; set; }
+
+        [DataMember]
+        public TurnActionNotice LastTurnAction { get; set; }
+
+        [DataMember]
+        public MatchResult Result { get; set; }
     }
 }

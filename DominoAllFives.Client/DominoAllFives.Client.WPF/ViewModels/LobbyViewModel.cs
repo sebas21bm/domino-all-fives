@@ -243,7 +243,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 PlayerSession = _playerSession,
                 TargetPoints = _client.CurrentLobby.Settings.TargetPoints,
                 PlayerNames = _client.CurrentLobby.Participants.ToDictionary(participant
-                    => participant.PlayerId, participant => participant.Username)
+                    => participant.PlayerId, participant => participant.Username),
+                PlayerAvatars = Players.ToDictionary(player => player.PlayerId,
+                    player => (System.Windows.Media.ImageSource)player.AvatarImage)
             };
             Dispose();
             BackgroundJob<MatchNavigation, bool> job =

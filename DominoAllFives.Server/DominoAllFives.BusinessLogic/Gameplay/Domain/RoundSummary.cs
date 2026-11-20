@@ -10,6 +10,16 @@ namespace DominoAllFives.BusinessLogic.Gameplay
         public int AwardedPoints { get; }
         public IReadOnlyDictionary<int, int> Scores { get; }
         public IReadOnlyDictionary<int, IReadOnlyList<Tile>> RemainingHands { get; }
+        internal Board ClosedBoard { get; private set; }
+        internal int ClosingTurn { get; private set; }
+        internal long Version { get; private set; }
+
+        internal void CaptureClosingBoard(Board board, int turnNumber, long version)
+        {
+            ClosedBoard = board.Copy();
+            ClosingTurn = turnNumber;
+            Version = version;
+        }
 
         internal RoundSummary(
             int roundNumber,

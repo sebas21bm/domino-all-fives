@@ -134,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gameplay\Domain\PlayScore.cs" />
+    <Compile Include="Gameplay\Domain\TurnActionNotice.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Domain\ChatMessage.cs" />

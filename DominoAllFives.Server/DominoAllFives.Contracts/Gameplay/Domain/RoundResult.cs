@@ -20,5 +20,11 @@ namespace DominoAllFives.Contracts.Gameplay
 
         [DataMember]
         public List<PlayerHand> RevealedHands { get; set; }
+
+        [DataMember]
+        public PublicBoard ClosedBoard { get; set; }
+
+        [DataMember]
+        public long Version { get; set; }
     }
 }
