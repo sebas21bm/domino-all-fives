@@ -258,138 +258,6 @@ namespace DominoAllFivesService
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="RankingEntry", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
-    public partial class RankingEntry : object, System.Runtime.Serialization.IExtensibleDataObject
-    {
-
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-
-        private int RankField;
-
-        private string UsernameField;
-
-        private int GamesWonField;
-
-        private DominoAllFivesService.ProfilePicture PictureField;
-
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData
-        {
-            get
-            {
-                return this.extensionDataField;
-            }
-            set
-            {
-                this.extensionDataField = value;
-            }
-        }
-
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public int Rank
-        {
-            get
-            {
-                return this.RankField;
-            }
-            set
-            {
-                this.RankField = value;
-            }
-        }
-
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public string Username
-        {
-            get
-            {
-                return this.UsernameField;
-            }
-            set
-            {
-                this.UsernameField = value;
-            }
-        }
-
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
-        public int GamesWon
-        {
-            get
-            {
-                return this.GamesWonField;
-            }
-            set
-            {
-                this.GamesWonField = value;
-            }
-        }
-
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=3)]
-        public DominoAllFivesService.ProfilePicture Picture
-        {
-            get
-            {
-                return this.PictureField;
-            }
-            set
-            {
-                this.PictureField = value;
-            }
-        }
-    }
-
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="ProfilePicture", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
-    public partial class ProfilePicture : object, System.Runtime.Serialization.IExtensibleDataObject
-    {
-
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-
-        private string OriginalFileNameField;
-
-        private byte[] ImageDataField;
-
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData
-        {
-            get
-            {
-                return this.extensionDataField;
-            }
-            set
-            {
-                this.extensionDataField = value;
-            }
-        }
-
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public string OriginalFileName
-        {
-            get
-            {
-                return this.OriginalFileNameField;
-            }
-            set
-            {
-                this.OriginalFileNameField = value;
-            }
-        }
-
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
-        public byte[] ImageData
-        {
-            get
-            {
-                return this.ImageDataField;
-            }
-            set
-            {
-                this.ImageDataField = value;
-            }
-        }
-    }
-
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="AccountRegistration", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
     public partial class AccountRegistration : object, System.Runtime.Serialization.IExtensibleDataObject
     {
@@ -491,6 +359,21 @@ namespace DominoAllFivesService
 
         [System.Runtime.Serialization.EnumMemberAttribute()]
         EmailAlreadyExists = 5,
+    }
+
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+    public enum AccessIssue : int
+    {
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        SessionRequired = 0,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        RegisteredAccountRequired = 1,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        PermissionDenied = 2,
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -625,19 +508,55 @@ namespace DominoAllFivesService
         }
     }
 
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
-    public enum AccessIssue : int
+    [System.Runtime.Serialization.DataContractAttribute(Name="ProfilePicture", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
+    public partial class ProfilePicture : object, System.Runtime.Serialization.IExtensibleDataObject
     {
 
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        SessionRequired = 0,
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
 
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        RegisteredAccountRequired = 1,
+        private string OriginalFileNameField;
 
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        PermissionDenied = 2,
+        private byte[] ImageDataField;
+
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData
+        {
+            get
+            {
+                return this.extensionDataField;
+            }
+            set
+            {
+                this.extensionDataField = value;
+            }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string OriginalFileName
+        {
+            get
+            {
+                return this.OriginalFileNameField;
+            }
+            set
+            {
+                this.OriginalFileNameField = value;
+            }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
+        public byte[] ImageData
+        {
+            get
+            {
+                return this.ImageDataField;
+            }
+            set
+            {
+                this.ImageDataField = value;
+            }
+        }
     }
 
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
@@ -665,6 +584,87 @@ namespace DominoAllFivesService
 
         [System.Runtime.Serialization.EnumMemberAttribute()]
         InvalidProfilePicture = 6,
+    }
+
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="RankingEntry", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
+    public partial class RankingEntry : object, System.Runtime.Serialization.IExtensibleDataObject
+    {
+
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+
+        private int RankField;
+
+        private string UsernameField;
+
+        private int GamesWonField;
+
+        private DominoAllFivesService.ProfilePicture PictureField;
+
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData
+        {
+            get
+            {
+                return this.extensionDataField;
+            }
+            set
+            {
+                this.extensionDataField = value;
+            }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public int Rank
+        {
+            get
+            {
+                return this.RankField;
+            }
+            set
+            {
+                this.RankField = value;
+            }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string Username
+        {
+            get
+            {
+                return this.UsernameField;
+            }
+            set
+            {
+                this.UsernameField = value;
+            }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
+        public int GamesWon
+        {
+            get
+            {
+                return this.GamesWonField;
+            }
+            set
+            {
+                this.GamesWonField = value;
+            }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=3)]
+        public DominoAllFivesService.ProfilePicture Picture
+        {
+            get
+            {
+                return this.PictureField;
+            }
+            set
+            {
+                this.PictureField = value;
+            }
+        }
     }
 
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -718,64 +718,6 @@ namespace DominoAllFivesService
     }
 
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:domino-all-fives:services", ConfigurationName="DominoAllFivesService.IRankingRemoteService")]
-    public interface IRankingRemoteService
-    {
-
-        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IRankingRemoteService/GetTopWinsRanking", ReplyAction="urn:domino-all-fives:services/IRankingRemoteService/GetTopWinsRankingResponse")]
-        System.Collections.Generic.List<DominoAllFivesService.RankingEntry> GetTopWinsRanking();
-
-        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IRankingRemoteService/GetWinsRankingPositionById", ReplyAction="urn:domino-all-fives:services/IRankingRemoteService/GetWinsRankingPositionByIdRes" +
-            "ponse")]
-        int GetWinsRankingPositionById(int playerId);
-    }
-
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface IRankingRemoteServiceChannel : DominoAllFivesService.IRankingRemoteService, System.ServiceModel.IClientChannel
-    {
-    }
-
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class RankingRemoteServiceClient : System.ServiceModel.ClientBase<DominoAllFivesService.IRankingRemoteService>, DominoAllFivesService.IRankingRemoteService
-    {
-
-        public RankingRemoteServiceClient()
-        {
-        }
-
-        public RankingRemoteServiceClient(string endpointConfigurationName) :
-                base(endpointConfigurationName)
-        {
-        }
-
-        public RankingRemoteServiceClient(string endpointConfigurationName, string remoteAddress) :
-                base(endpointConfigurationName, remoteAddress)
-        {
-        }
-
-        public RankingRemoteServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) :
-                base(endpointConfigurationName, remoteAddress)
-        {
-        }
-
-        public RankingRemoteServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
-                base(binding, remoteAddress)
-        {
-        }
-
-        public System.Collections.Generic.List<DominoAllFivesService.RankingEntry> GetTopWinsRanking()
-        {
-            return base.Channel.GetTopWinsRanking();
-        }
-
-        public int GetWinsRankingPositionById(int playerId)
-        {
-            return base.Channel.GetWinsRankingPositionById(playerId);
-        }
-    }
-
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(Namespace="urn:domino-all-fives:services", ConfigurationName="DominoAllFivesService.IRegistrationService")]
     public interface IRegistrationService
     {
@@ -823,6 +765,79 @@ namespace DominoAllFivesService
         public DominoAllFivesService.PlayerAccount Register(DominoAllFivesService.AccountRegistration registrationData)
         {
             return base.Channel.Register(registrationData);
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:domino-all-fives:services", ConfigurationName="DominoAllFivesService.IAccountService")]
+    public interface IAccountService
+    {
+
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IAccountService/ChangePassword", ReplyAction="urn:domino-all-fives:services/IAccountService/ChangePasswordResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IAccountService/ChangePasswordAccessIssueFault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccountIssue), Action="urn:domino-all-fives:services/IAccountService/ChangePasswordAccountIssueFault", Name="AccountIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        void ChangePassword(string sessionKey, string currentPassword, string newPassword);
+
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IAccountService/DeleteAccount", ReplyAction="urn:domino-all-fives:services/IAccountService/DeleteAccountResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IAccountService/DeleteAccountAccessIssueFault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccountIssue), Action="urn:domino-all-fives:services/IAccountService/DeleteAccountAccountIssueFault", Name="AccountIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        void DeleteAccount(string sessionKey, string password);
+
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IAccountService/ChangePreferredLanguage", ReplyAction="urn:domino-all-fives:services/IAccountService/ChangePreferredLanguageResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IAccountService/ChangePreferredLanguageAccessIssueF" +
+            "ault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccountIssue), Action="urn:domino-all-fives:services/IAccountService/ChangePreferredLanguageAccountIssue" +
+            "Fault", Name="AccountIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        void ChangePreferredLanguage(string sessionKey, string preferredLanguageId);
+    }
+
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public interface IAccountServiceChannel : DominoAllFivesService.IAccountService, System.ServiceModel.IClientChannel
+    {
+    }
+
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class AccountServiceClient : System.ServiceModel.ClientBase<DominoAllFivesService.IAccountService>, DominoAllFivesService.IAccountService
+    {
+
+        public AccountServiceClient()
+        {
+        }
+
+        public AccountServiceClient(string endpointConfigurationName) :
+                base(endpointConfigurationName)
+        {
+        }
+
+        public AccountServiceClient(string endpointConfigurationName, string remoteAddress) :
+                base(endpointConfigurationName, remoteAddress)
+        {
+        }
+
+        public AccountServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) :
+                base(endpointConfigurationName, remoteAddress)
+        {
+        }
+
+        public AccountServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
+                base(binding, remoteAddress)
+        {
+        }
+
+        public void ChangePassword(string sessionKey, string currentPassword, string newPassword)
+        {
+            base.Channel.ChangePassword(sessionKey, currentPassword, newPassword);
+        }
+
+        public void DeleteAccount(string sessionKey, string password)
+        {
+            base.Channel.DeleteAccount(sessionKey, password);
+        }
+
+        public void ChangePreferredLanguage(string sessionKey, string preferredLanguageId)
+        {
+            base.Channel.ChangePreferredLanguage(sessionKey, preferredLanguageId);
         }
     }
 
@@ -922,75 +937,60 @@ namespace DominoAllFivesService
     }
 
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:domino-all-fives:services", ConfigurationName="DominoAllFivesService.IAccountService")]
-    public interface IAccountService
+    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:domino-all-fives:services", ConfigurationName="DominoAllFivesService.IRankingRemoteService")]
+    public interface IRankingRemoteService
     {
 
-        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IAccountService/ChangePassword", ReplyAction="urn:domino-all-fives:services/IAccountService/ChangePasswordResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IAccountService/ChangePasswordAccessIssueFault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
-        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccountIssue), Action="urn:domino-all-fives:services/IAccountService/ChangePasswordAccountIssueFault", Name="AccountIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
-        void ChangePassword(string sessionKey, string currentPassword, string newPassword);
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IRankingRemoteService/GetTopWinsRanking", ReplyAction="urn:domino-all-fives:services/IRankingRemoteService/GetTopWinsRankingResponse")]
+        System.Collections.Generic.List<DominoAllFivesService.RankingEntry> GetTopWinsRanking();
 
-        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IAccountService/DeleteAccount", ReplyAction="urn:domino-all-fives:services/IAccountService/DeleteAccountResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IAccountService/DeleteAccountAccessIssueFault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
-        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccountIssue), Action="urn:domino-all-fives:services/IAccountService/DeleteAccountAccountIssueFault", Name="AccountIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
-        void DeleteAccount(string sessionKey, string password);
-
-        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IAccountService/ChangePreferredLanguage", ReplyAction="urn:domino-all-fives:services/IAccountService/ChangePreferredLanguageResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IAccountService/ChangePreferredLanguageAccessIssueF" +
-            "ault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
-        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccountIssue), Action="urn:domino-all-fives:services/IAccountService/ChangePreferredLanguageAccountIssue" +
-            "Fault", Name="AccountIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
-        void ChangePreferredLanguage(string sessionKey, string preferredLanguageId);
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IRankingRemoteService/GetWinsRankingPositionById", ReplyAction="urn:domino-all-fives:services/IRankingRemoteService/GetWinsRankingPositionByIdRes" +
+            "ponse")]
+        int GetWinsRankingPositionById(int playerId);
     }
 
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface IAccountServiceChannel : DominoAllFivesService.IAccountService, System.ServiceModel.IClientChannel
+    public interface IRankingRemoteServiceChannel : DominoAllFivesService.IRankingRemoteService, System.ServiceModel.IClientChannel
     {
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class AccountServiceClient : System.ServiceModel.ClientBase<DominoAllFivesService.IAccountService>, DominoAllFivesService.IAccountService
+    public partial class RankingRemoteServiceClient : System.ServiceModel.ClientBase<DominoAllFivesService.IRankingRemoteService>, DominoAllFivesService.IRankingRemoteService
     {
 
-        public AccountServiceClient()
+        public RankingRemoteServiceClient()
         {
         }
 
-        public AccountServiceClient(string endpointConfigurationName) :
+        public RankingRemoteServiceClient(string endpointConfigurationName) :
                 base(endpointConfigurationName)
         {
         }
 
-        public AccountServiceClient(string endpointConfigurationName, string remoteAddress) :
+        public RankingRemoteServiceClient(string endpointConfigurationName, string remoteAddress) :
                 base(endpointConfigurationName, remoteAddress)
         {
         }
 
-        public AccountServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) :
+        public RankingRemoteServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) :
                 base(endpointConfigurationName, remoteAddress)
         {
         }
 
-        public AccountServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
+        public RankingRemoteServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
                 base(binding, remoteAddress)
         {
         }
 
-        public void ChangePassword(string sessionKey, string currentPassword, string newPassword)
+        public System.Collections.Generic.List<DominoAllFivesService.RankingEntry> GetTopWinsRanking()
         {
-            base.Channel.ChangePassword(sessionKey, currentPassword, newPassword);
+            return base.Channel.GetTopWinsRanking();
         }
 
-        public void DeleteAccount(string sessionKey, string password)
+        public int GetWinsRankingPositionById(int playerId)
         {
-            base.Channel.DeleteAccount(sessionKey, password);
-        }
-
-        public void ChangePreferredLanguage(string sessionKey, string preferredLanguageId)
-        {
-            base.Channel.ChangePreferredLanguage(sessionKey, preferredLanguageId);
+            return base.Channel.GetWinsRankingPositionById(playerId);
         }
     }
 }

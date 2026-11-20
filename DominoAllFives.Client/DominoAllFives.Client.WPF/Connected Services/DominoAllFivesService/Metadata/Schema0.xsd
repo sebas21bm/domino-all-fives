@@ -1,18 +1,138 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="urn:domino-all-fives:services" elementFormDefault="qualified" targetNamespace="urn:domino-all-fives:services" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" />
+  <xs:import schemaLocation="Schema2.xsd" namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" />
   <xs:element name="LoginWithAccount">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="credentials" nillable="true" xmlns:q1="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q1:Credentials" />
+        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" minOccurs="0" name="credentials" nillable="true" type="q1:Credentials" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="LoginWithAccountResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="LoginWithAccountResult" nillable="true" xmlns:q2="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q2:PlayerAccount" />
+        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" minOccurs="0" name="LoginWithAccountResult" nillable="true" type="q2:PlayerAccount" />
       </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Register">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" minOccurs="0" name="registrationData" nillable="true" type="q3:AccountRegistration" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RegisterResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" minOccurs="0" name="RegisterResult" nillable="true" type="q4:PlayerAccount" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ChangePassword">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="sessionKey" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="currentPassword" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="newPassword" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ChangePasswordResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteAccount">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="sessionKey" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="password" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteAccountResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ChangePreferredLanguage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="sessionKey" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="preferredLanguageId" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ChangePreferredLanguageResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetMyProfile">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="sessionKey" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetMyProfileResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" minOccurs="0" name="GetMyProfileResult" nillable="true" type="q5:PlayerProfile" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateProfileName">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="sessionKey" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="username" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateProfileNameResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateProfileWithPicture">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="sessionKey" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="username" nillable="true" type="xs:string" />
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" minOccurs="0" name="picture" nillable="true" type="q6:ProfilePicture" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateProfileWithPictureResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetProfilePicture">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="sessionKey" nillable="true" type="xs:string" />
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" minOccurs="0" name="picture" nillable="true" type="q7:ProfilePicture" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetProfilePictureResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RemoveProfilePicture">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="sessionKey" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RemoveProfilePictureResponse">
+    <xs:complexType>
+      <xs:sequence />
     </xs:complexType>
   </xs:element>
   <xs:element name="GetTopWinsRanking">
@@ -23,7 +143,7 @@
   <xs:element name="GetTopWinsRankingResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="GetTopWinsRankingResult" nillable="true" xmlns:q3="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q3:ArrayOfRankingEntry" />
+        <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" minOccurs="0" name="GetTopWinsRankingResult" nillable="true" type="q8:ArrayOfRankingEntry" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -38,20 +158,6 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="GetWinsRankingPositionByIdResult" type="xs:int" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Register">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="registrationData" nillable="true" xmlns:q4="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q4:AccountRegistration" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="RegisterResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="RegisterResult" nillable="true" xmlns:q5="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain" type="q5:PlayerAccount" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

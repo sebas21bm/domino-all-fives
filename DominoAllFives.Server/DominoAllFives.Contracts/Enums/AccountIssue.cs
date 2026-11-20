@@ -27,6 +27,9 @@ namespace DominoAllFives.Contracts.Enums
         InvalidPassword,
 
         [EnumMember]
+        PasswordUnchanged,
+
+        [EnumMember]
         UnsupportedLanguage
     }
 }

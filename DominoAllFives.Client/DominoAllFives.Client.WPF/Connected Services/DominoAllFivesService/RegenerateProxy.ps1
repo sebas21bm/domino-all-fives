@@ -14,7 +14,13 @@ if ($ContractsAssembly) {
     $null = New-Item -ItemType Directory -Path $metadataPath -Force
     $assembly = [Reflection.Assembly]::LoadFrom((Resolve-Path $ContractsAssembly).Path)
     $exporter = New-Object System.ServiceModel.Description.WsdlExporter
-    foreach ($name in @('ISessionService', 'IRankingService', 'IRegistrationService')) {
+    foreach ($name in @(
+        'ISessionService',
+        'IRankingService',
+        'IRegistrationService',
+        'IProfileService',
+        'IAccountService'
+    )) {
         $contract = [System.ServiceModel.Description.ContractDescription]::GetContract(
             $assembly.GetType(('DominoAllFives.Contracts.Services.' + $name), $true))
         $exporter.ExportContract($contract)
