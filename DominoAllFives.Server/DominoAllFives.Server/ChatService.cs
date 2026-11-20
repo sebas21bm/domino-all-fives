@@ -56,7 +56,7 @@ namespace DominoAllFives.Server
         /// </exception>
         /// <exception cref="FaultException">
         /// The server cannot resolve the player session because persistence failed.
-        /// </exception>
+        /// </exception
         public void OpenChatSession(string sessionKey)
         {
             if (_player != null)
@@ -110,6 +110,12 @@ namespace DominoAllFives.Server
             }
         }
 
+        public void SendMessage(ChatMessage message)
+        {
+
+        }
+
+        /*
         /// <summary>
         /// Registers and broadcasts a chat message to the authorized participants of its context.
         /// </summary>
@@ -127,7 +133,8 @@ namespace DominoAllFives.Server
         /// </exception>
         public ChatMessage SendMessage(ChatMessage message)
         {
-            Player player = GetPlayer();
+            
+            //Player player = GetPlayer();
             if (player.IsGuest)
             {
                 throw new FaultException<AccessIssue>(AccessIssue.RegisteredAccountRequired);
@@ -140,11 +147,9 @@ namespace DominoAllFives.Server
 
             try
             {
-                List<Player> recipients;
-                ChatMessage registeredMessage =
-                    controller.SendMessage(player, message, out recipients);
-
-                publisher.PublishMessageReceived(recipients, registeredMessage);
+                // registeredMessage = controller.SendMessage(player, message);
+                //List<Player> recipients = controller.GetRecipients(registeredMessage.Context);
+                //publisher.PublishMessageReceived(recipients, registeredMessage);
                 return registeredMessage;
             }
             catch (ChatRuleException ex)
@@ -152,47 +157,8 @@ namespace DominoAllFives.Server
                 throw new FaultException<ChatIssue>(ex.Issue);
             }
         }
+        */
 
-        /// <summary>
-        /// Retrieves the ordered message history for a chat context accessible to the player.
-        /// </summary>
-        /// <param name = "context">The lobby or match chat context to query.</param>
-        /// <returns>
-        /// The list of messages registered in the specified context ordered by date.
-        /// </returns>
-        /// <exception cref="FaultException{AccessIssue}">
-        /// The connection has no authenticated session.
-        /// </exception>
-        /// <exception cref="FaultException{ChatIssue}">
-        /// The player is not an authorized participant of the requested chat context.
-        /// </exception>
-        public List<ChatMessage> GetMessages(ChatContext context)
-        {
-            Player player = GetPlayer();
-            if (context == null)
-            {
-                throw new FaultException<ChatIssue>(ChatIssue.PlayerNotInChat);
-            }
-
-            try
-            {
-                return controller.GetMessages(player.PlayerId, context);
-            }
-            catch (ChatRuleException ex)
-            {
-                throw new FaultException<ChatIssue>(ex.Issue);
-            }
-        }
-
-        private Player GetPlayer()
-        {
-            if (_player == null)
-            {
-                throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
-            }
-
-            return _player;
-        }
 
         private void OnCallbackEnded(object sender, EventArgs eventArgs)
         {
