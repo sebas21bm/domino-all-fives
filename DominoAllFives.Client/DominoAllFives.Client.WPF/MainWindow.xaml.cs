@@ -35,6 +35,7 @@ namespace DominoAllFives.Client.WPF
                 new SessionClient(),
                 new RegistrationClient(),
                 rankingService,
+                new ProfileClient(),
                 playerSession,
                 loggerFactory,
                 profilePictureImageService);

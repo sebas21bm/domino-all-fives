@@ -19,6 +19,8 @@ namespace DominoAllFives.Client.WPF.Services
         private readonly ISessionClient _loginClient;
         private readonly IRegistrationClient _registrationClient;
         private readonly IRankingClient _rankingClient;
+        private readonly IProfileClient _profileClient;
+        private readonly ProfilePictureFileService _profilePictureFileService;
         private readonly PlayerSession _playerSession;
         private readonly ILoggerFactory _loggerFactory;
         private readonly ProfilePictureImageService _profilePictureImageService;
@@ -29,6 +31,7 @@ namespace DominoAllFives.Client.WPF.Services
             ISessionClient loginClient,
             IRegistrationClient registrationClient,
             IRankingClient rankingClient,
+            IProfileClient profileClient,
             PlayerSession playerSession,
             ILoggerFactory loggerFactory,
             ProfilePictureImageService profilePictureImageService)
@@ -42,6 +45,7 @@ namespace DominoAllFives.Client.WPF.Services
                 nameof(registrationClient));
             _rankingClient = rankingClient ?? throw new ArgumentNullException(
                 nameof(rankingClient));
+            _profileClient = profileClient ?? throw new ArgumentNullException(nameof(profileClient));
             _playerSession = playerSession ?? throw new ArgumentNullException(
                 nameof(playerSession));
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(
@@ -49,6 +53,8 @@ namespace DominoAllFives.Client.WPF.Services
             _profilePictureImageService = profilePictureImageService
                 ?? throw new ArgumentNullException(
                 nameof(profilePictureImageService));
+            _profilePictureFileService = new ProfilePictureFileService(
+                _loggerFactory.CreateLogger<ProfilePictureFileService>());
             _lobbyService = new LobbyClient(_playerSession);
         }
 
@@ -89,6 +95,22 @@ namespace DominoAllFives.Client.WPF.Services
                 _dialogService,
                 _registrationClient,
                 LoggerFactoryProvider.CreateLogger<RegisterAccountViewModel>());
+            return viewModel;
+        }
+
+        public UploadProfilePictureViewModel CreateUploadProfilePicture(
+            Action onFinishRegistration,
+            Action onCancel)
+        {
+            UploadProfilePictureViewModel viewModel = new UploadProfilePictureViewModel(
+                _playerSession,
+                onFinishRegistration,
+                onCancel);
+            viewModel.Initialize(
+                _dialogService,
+                _profileClient,
+                _profilePictureFileService,
+                _loggerFactory.CreateLogger<UploadProfilePictureViewModel>());
             return viewModel;
         }
 
@@ -165,8 +187,15 @@ namespace DominoAllFives.Client.WPF.Services
             switch (typeof(TViewModel).Name)
             {
                 case nameof(EditProfileViewModel):
-                    EditProfileViewModel editProfile = new EditProfileViewModel();
-                    editProfile.Initialize(_navigationService);
+                    EditProfileViewModel editProfile = new EditProfileViewModel(_playerSession);
+                    editProfile.ConfigurePictures(
+                        _profilePictureImageService,
+                        _profilePictureFileService);
+                    editProfile.Initialize(
+                        _navigationService,
+                        _profileClient,
+                        _dialogService,
+                        _loggerFactory.CreateLogger<EditProfileViewModel>());
                     viewModel = editProfile;
                     break;
                 case nameof(FriendsViewModel):
@@ -190,8 +219,13 @@ namespace DominoAllFives.Client.WPF.Services
                     viewModel = matchHistory;
                     break;
                 case nameof(ProfileViewModel):
-                    ProfileViewModel profile = new ProfileViewModel();
-                    profile.Initialize(_navigationService);
+                    ProfileViewModel profile = new ProfileViewModel(_playerSession);
+                    profile.ConfigureLogger(_loggerFactory.CreateLogger<ProfileViewModel>());
+                    profile.Initialize(
+                        _navigationService,
+                        _profileClient,
+                        _profilePictureImageService,
+                        _dialogService);
                     viewModel = profile;
                     break;
                 default:

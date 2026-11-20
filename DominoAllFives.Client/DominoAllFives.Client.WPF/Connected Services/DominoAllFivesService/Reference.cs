@@ -478,6 +478,180 @@ namespace DominoAllFivesService
         EmailAlreadyExists = 5,
     }
 
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="PlayerProfile", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
+    public partial class PlayerProfile : object, System.Runtime.Serialization.IExtensibleDataObject
+    {
+
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+
+        private string UsernameField;
+
+        private DominoAllFivesService.PlayerStatistics StatisticsField;
+
+        private DominoAllFivesService.ProfilePicture PictureField;
+
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData
+        {
+            get
+            {
+                return this.extensionDataField;
+            }
+            set
+            {
+                this.extensionDataField = value;
+            }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string Username
+        {
+            get
+            {
+                return this.UsernameField;
+            }
+            set
+            {
+                this.UsernameField = value;
+            }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
+        public DominoAllFivesService.PlayerStatistics Statistics
+        {
+            get
+            {
+                return this.StatisticsField;
+            }
+            set
+            {
+                this.StatisticsField = value;
+            }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
+        public DominoAllFivesService.ProfilePicture Picture
+        {
+            get
+            {
+                return this.PictureField;
+            }
+            set
+            {
+                this.PictureField = value;
+            }
+        }
+    }
+
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="PlayerStatistics", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Domain")]
+    public partial class PlayerStatistics : object, System.Runtime.Serialization.IExtensibleDataObject
+    {
+
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+
+        private int GamesWonField;
+
+        private int TotalPointsScoredField;
+
+        private int GamesPlayedField;
+
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData
+        {
+            get
+            {
+                return this.extensionDataField;
+            }
+            set
+            {
+                this.extensionDataField = value;
+            }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public int GamesWon
+        {
+            get
+            {
+                return this.GamesWonField;
+            }
+            set
+            {
+                this.GamesWonField = value;
+            }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public int TotalPointsScored
+        {
+            get
+            {
+                return this.TotalPointsScoredField;
+            }
+            set
+            {
+                this.TotalPointsScoredField = value;
+            }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
+        public int GamesPlayed
+        {
+            get
+            {
+                return this.GamesPlayedField;
+            }
+            set
+            {
+                this.GamesPlayedField = value;
+            }
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+    public enum AccessIssue : int
+    {
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        SessionRequired = 0,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        RegisteredAccountRequired = 1,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        PermissionDenied = 2,
+    }
+
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ProfileIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+    public enum ProfileIssue : int
+    {
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        PlayerNotFound = 0,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        InvalidUsername = 1,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        SameUsername = 2,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        UsernameAlreadyExists = 3,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        InvalidProfilePictureFormat = 4,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        ProfilePictureTooLarge = 5,
+
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        InvalidProfilePicture = 6,
+    }
+
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(Namespace="urn:domino-all-fives:services", ConfigurationName="DominoAllFivesService.ISessionAccount")]
     public interface ISessionAccount
@@ -634,6 +808,101 @@ namespace DominoAllFivesService
         public DominoAllFivesService.PlayerAccount Register(DominoAllFivesService.AccountRegistration registrationData)
         {
             return base.Channel.Register(registrationData);
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:domino-all-fives:services", ConfigurationName="DominoAllFivesService.IProfileService")]
+    public interface IProfileService
+    {
+
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IProfileService/GetMyProfile", ReplyAction="urn:domino-all-fives:services/IProfileService/GetMyProfileResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IProfileService/GetMyProfileAccessIssueFault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.ProfileIssue), Action="urn:domino-all-fives:services/IProfileService/GetMyProfileProfileIssueFault", Name="ProfileIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        DominoAllFivesService.PlayerProfile GetMyProfile(string sessionKey);
+
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IProfileService/UpdateProfileName", ReplyAction="urn:domino-all-fives:services/IProfileService/UpdateProfileNameResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IProfileService/UpdateProfileNameAccessIssueFault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.ProfileIssue), Action="urn:domino-all-fives:services/IProfileService/UpdateProfileNameProfileIssueFault", Name="ProfileIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        void UpdateProfileName(string sessionKey, string username);
+
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IProfileService/UpdateProfileWithPicture", ReplyAction="urn:domino-all-fives:services/IProfileService/UpdateProfileWithPictureResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IProfileService/UpdateProfileWithPictureAccessIssue" +
+            "Fault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.ProfileIssue), Action="urn:domino-all-fives:services/IProfileService/UpdateProfileWithPictureProfileIssu" +
+            "eFault", Name="ProfileIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        void UpdateProfileWithPicture(string sessionKey, string username, DominoAllFivesService.ProfilePicture picture);
+
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IProfileService/SetProfilePicture", ReplyAction="urn:domino-all-fives:services/IProfileService/SetProfilePictureResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IProfileService/SetProfilePictureAccessIssueFault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.ProfileIssue), Action="urn:domino-all-fives:services/IProfileService/SetProfilePictureProfileIssueFault", Name="ProfileIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        void SetProfilePicture(string sessionKey, DominoAllFivesService.ProfilePicture picture);
+
+        [System.ServiceModel.OperationContractAttribute(Action="urn:domino-all-fives:services/IProfileService/RemoveProfilePicture", ReplyAction="urn:domino-all-fives:services/IProfileService/RemoveProfilePictureResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.AccessIssue), Action="urn:domino-all-fives:services/IProfileService/RemoveProfilePictureAccessIssueFaul" +
+            "t", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DominoAllFivesService.ProfileIssue), Action="urn:domino-all-fives:services/IProfileService/RemoveProfilePictureProfileIssueFau" +
+            "lt", Name="ProfileIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        void RemoveProfilePicture(string sessionKey);
+    }
+
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public interface IProfileServiceChannel : DominoAllFivesService.IProfileService, System.ServiceModel.IClientChannel
+    {
+    }
+
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class ProfileServiceClient : System.ServiceModel.ClientBase<DominoAllFivesService.IProfileService>, DominoAllFivesService.IProfileService
+    {
+
+        public ProfileServiceClient()
+        {
+        }
+
+        public ProfileServiceClient(string endpointConfigurationName) :
+                base(endpointConfigurationName)
+        {
+        }
+
+        public ProfileServiceClient(string endpointConfigurationName, string remoteAddress) :
+                base(endpointConfigurationName, remoteAddress)
+        {
+        }
+
+        public ProfileServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) :
+                base(endpointConfigurationName, remoteAddress)
+        {
+        }
+
+        public ProfileServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
+                base(binding, remoteAddress)
+        {
+        }
+
+        public DominoAllFivesService.PlayerProfile GetMyProfile(string sessionKey)
+        {
+            return base.Channel.GetMyProfile(sessionKey);
+        }
+
+        public void UpdateProfileName(string sessionKey, string username)
+        {
+            base.Channel.UpdateProfileName(sessionKey, username);
+        }
+
+        public void UpdateProfileWithPicture(string sessionKey, string username, DominoAllFivesService.ProfilePicture picture)
+        {
+            base.Channel.UpdateProfileWithPicture(sessionKey, username, picture);
+        }
+
+        public void SetProfilePicture(string sessionKey, DominoAllFivesService.ProfilePicture picture)
+        {
+            base.Channel.SetProfilePicture(sessionKey, picture);
+        }
+
+        public void RemoveProfilePicture(string sessionKey)
+        {
+            base.Channel.RemoveProfilePicture(sessionKey);
         }
     }
 }

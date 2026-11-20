@@ -82,7 +82,9 @@
     <Compile Include="PasswordHasherTests.cs" />
     <Compile Include="PlayerAccountTests.cs" />
     <Compile Include="PlayerRepositoryTests.cs" />
+    <Compile Include="ProfileRuleTests.cs" />
     <Compile Include="RankingControllerTests.cs" />
+    <Compile Include="RegistrationRuleTests.cs" />
     <Compile Include="SessionContractTests.cs" />
     <Compile Include="SessionManagerTests.cs" />
     <Compile Include="TileTests.cs" />

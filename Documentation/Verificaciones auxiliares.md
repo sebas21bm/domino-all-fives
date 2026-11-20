@@ -443,3 +443,257 @@ aislada configurada antes de su verificación integral. No se probaron UI manual
 net.tcp desplegado, fallos reales de persistencia ni el timeout exacto de Close.
 No se afirma cobertura de fallos posteriores al commit ni idempotencia; una
 respuesta perdida puede corresponder a una cuenta ya creada.
+
+
+## Migración de perfil e imagen (2026-11-19)
+
+Se añadieron 44 casos auxiliares: 34 del servidor con proxy generado/host net.pipe
+y 10 del cliente con WPF y servicios concretos. Todos pasaron. Se ejecutaron
+además 46 regresiones existentes: 13 en el reporte WCF y 33 del cliente.
+Resultado final seleccionado: 90 Passed, cero fallidos y cero omitidos.
+
+Los casos de sesión cubren las cinco operaciones con clave nula, vacía, espacios,
+desconocida y revocada. Se espera AccessIssue.SessionRequired antes de acceder a
+persistencia. Los casos de imagen con sesión auténtica usan un identificador sin
+datos y se detienen por validación antes de crear el contexto EF: selección nula,
+vacía, extensión inválida, precedencia extensión/tamaño, tamaño mayor a 1 MiB y
+reemplazo conjunto nulo. Se espera el ProfileIssue indicado en cada caso.
+
+Los tres roundtrips conservan perfil con y sin imagen, estadísticas, nombres y
+contenido seleccionado independiente. Las diez comprobaciones de presentación
+usan FrameNavigationService, MainWindowViewModel/DialogService, PlayerSession,
+ProfileClient, ProfilePictureFileService y ProfilePictureImageService
+concretos; ninguna abre el selector ni llama al servidor. Comprueban ausencia
+de sesión, carga deshabilitada, subida sin selección, omisión/cancelación que
+conservan la cuenta y fallback de imagen ausente, vacía o corrupta.
+
+No se añadieron entradas de producción para pruebas ni dobles. El proyecto
+auxiliar del cliente está en DominoAllFives.Client/AdditionalTest, separado del
+proyecto histórico de tests y no incorporado a la solución. No se agregan estos
+casos al catálogo unitario de Pruebas.md.
+
+Evidencia individual bajo DominoAllFives.Server/Tests/TestResults:
+
+| N.º | Caso ejecutado | Resultado y evidencia |
+| --- | --- | --- |
+| AUX-059 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("GetProfile","null")` | Passed; `profile-wcf.trx`; `8c6d3256-3940-9bd7-6c22-2cf143bf646e`; `00:00:03.0890000`. |
+| AUX-060 | `UpdateProfileWithPicture_NullSelection_ReturnsTypedFaultBeforePersistence` | Passed; `profile-wcf.trx`; `37f752c3-6428-968d-e1ef-dbe153a67949`; `00:00:00.0150000`. |
+| AUX-061 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("RemoveProfilePicture","whitespace")` | Passed; `profile-wcf.trx`; `3f546032-922b-188b-8991-ab5ee23ff6fa`; `00:00:00.0160000`. |
+| AUX-062 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("RemoveProfilePicture","null")` | Passed; `profile-wcf.trx`; `1775d322-3e37-19eb-e2c4-090fd38c6608`; `00:00:00.0110000`. |
+| AUX-063 | `Serialize_SelectedPicture_PreservesOriginalNameAndCopiedContent` | Passed; `profile-wcf.trx`; `ca15e7fe-e1c9-3b66-d641-79d87e3c2d54`; `00:00:00.0010000`. |
+| AUX-064 | `Serialize_Profile_PreservesIdentityStatisticsAndOptionalPicture(False)` | Passed; `profile-wcf.trx`; `aa5eb4c4-82b5-cdcb-7f31-8595e5b6759a`; `00:00:00.1840000`. |
+| AUX-065 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("UpdateProfile","whitespace")` | Passed; `profile-wcf.trx`; `4c301ddf-2bf2-9c2b-8a86-5bf7eb271473`; `00:00:00.0130000`. |
+| AUX-066 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("GetProfile","unknown")` | Passed; `profile-wcf.trx`; `3ceb3a94-09dd-349d-3907-a2abc86b0694`; `00:00:00.0240000`. |
+| AUX-067 | `SetProfilePicture_InvalidSelection_ReturnsTypedFaultBeforePersistence("null",InvalidProfilePicture)` | Passed; `profile-wcf.trx`; `eb1b662e-6d3f-ad89-9abf-c758a74be0a3`; `00:00:00.0200000`. |
+| AUX-068 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("SetProfilePicture","whitespace")` | Passed; `profile-wcf.trx`; `069e77bf-4d37-b627-82a5-67241fa42cc0`; `00:00:00.0090000`. |
+| AUX-069 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("UpdateProfileWithPicture","null")` | Passed; `profile-wcf.trx`; `fb3a0b53-a9e4-60ec-b67e-588fcb1db72d`; `00:00:00.0270000`. |
+| AUX-070 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("UpdateProfile","null")` | Passed; `profile-wcf.trx`; `5bb1bc40-704b-ddd1-774d-1fd72181c0c9`; `00:00:00.0350000`. |
+| AUX-071 | `SetProfilePicture_InvalidSelection_ReturnsTypedFaultBeforePersistence("format-before-size",InvalidProfilePictureFormat)` | Passed; `profile-wcf.trx`; `0d04c2f4-c42d-4627-083d-67c7a6814991`; `00:00:00.0250000`. |
+| AUX-072 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("SetProfilePicture","revoked")` | Passed; `profile-wcf.trx`; `588ef6b5-eac2-20b4-c4b2-c6594772a0db`; `00:00:00.0150000`. |
+| AUX-073 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("GetProfile","whitespace")` | Passed; `profile-wcf.trx`; `03b86169-c8ff-a66c-e0a8-0149be1d9d22`; `00:00:00.0200000`. |
+| AUX-074 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("UpdateProfileWithPicture","empty")` | Passed; `profile-wcf.trx`; `c079bcde-2904-9cb6-6ef9-f4eb9514f1a5`; `00:00:00.0110000`. |
+| AUX-075 | `SetProfilePicture_InvalidSelection_ReturnsTypedFaultBeforePersistence("empty",InvalidProfilePicture)` | Passed; `profile-wcf.trx`; `77f0f3df-469e-5a47-829e-7b1b7c3cc41c`; `00:00:00.1290000`. |
+| AUX-076 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("UpdateProfileWithPicture","unknown")` | Passed; `profile-wcf.trx`; `e2864800-81b8-5fa9-dd76-0cb3d734c56f`; `00:00:00.0090000`. |
+| AUX-077 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("SetProfilePicture","unknown")` | Passed; `profile-wcf.trx`; `b388b902-e4db-9748-4068-58169d5487bb`; `00:00:00.0120000`. |
+| AUX-078 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("GetProfile","empty")` | Passed; `profile-wcf.trx`; `a55723f8-7d01-b184-813e-9280b0fa8dca`; `00:00:00.0210000`. |
+| AUX-079 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("SetProfilePicture","empty")` | Passed; `profile-wcf.trx`; `9c842590-160c-f1fe-7b50-f05f0d0a5309`; `00:00:00.0140000`. |
+| AUX-080 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("RemoveProfilePicture","empty")` | Passed; `profile-wcf.trx`; `54bb2a53-5d61-c5af-2de8-11e0a78d0920`; `00:00:00.0130000`. |
+| AUX-081 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("SetProfilePicture","null")` | Passed; `profile-wcf.trx`; `bf9885eb-9eaa-0969-e72c-b566349664da`; `00:00:00.0120000`. |
+| AUX-082 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("UpdateProfileWithPicture","whitespace")` | Passed; `profile-wcf.trx`; `49da57a4-403f-fca2-ff45-787aa440907d`; `00:00:00.0130000`. |
+| AUX-083 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("RemoveProfilePicture","unknown")` | Passed; `profile-wcf.trx`; `a0a857ec-a54e-7d2a-228a-592ed524f9d4`; `00:00:00.0140000`. |
+| AUX-084 | `SetProfilePicture_InvalidSelection_ReturnsTypedFaultBeforePersistence("large",ProfilePictureTooLarge)` | Passed; `profile-wcf.trx`; `486d9c77-4bd2-80bf-3fab-84a74bc066e4`; `00:00:00.0220000`. |
+| AUX-085 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("RemoveProfilePicture","revoked")` | Passed; `profile-wcf.trx`; `ed78beb1-b4b4-defd-aa96-a3faaeeb2edb`; `00:00:00.0130000`. |
+| AUX-086 | `SetProfilePicture_InvalidSelection_ReturnsTypedFaultBeforePersistence("format",InvalidProfilePictureFormat)` | Passed; `profile-wcf.trx`; `7fbd840d-43fd-67de-3c3f-da401f7f26af`; `00:00:00.0140000`. |
+| AUX-087 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("UpdateProfileWithPicture","revoked")` | Passed; `profile-wcf.trx`; `bd66562e-b34b-7391-08ab-64a023555bd6`; `00:00:00.0140000`. |
+| AUX-088 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("UpdateProfile","unknown")` | Passed; `profile-wcf.trx`; `34cc09b3-eb48-6370-dacc-82c0a6bf496f`; `00:00:00.0100000`. |
+| AUX-089 | `Serialize_Profile_PreservesIdentityStatisticsAndOptionalPicture(True)` | Passed; `profile-wcf.trx`; `c84a6f4d-7d3f-f485-1c3f-1c3248fbf455`; `00:00:00.0140000`. |
+| AUX-090 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("GetProfile","revoked")` | Passed; `profile-wcf.trx`; `82f8b31a-4366-0411-18a6-7b3e89d8c3f8`; `00:00:00.0140000`. |
+| AUX-091 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("UpdateProfile","revoked")` | Passed; `profile-wcf.trx`; `178d0629-956e-6e38-8b51-886daa3985cf`; `00:00:00.0150000`. |
+| AUX-092 | `Operation_InvalidSession_ReturnsTypedAccessFaultBeforePersistence("UpdateProfile","empty")` | Passed; `profile-wcf.trx`; `5c0b4134-81ab-15b7-a68c-b47c23ce55c0`; `00:00:00.0100000`. |
+| AUX-093 | `SkipOrCancel_IdleUpload_InvokesCallbackAndPreservesCreatedAccount(True)` | Passed; `profile-client-additional.trx`; `8948b09f-73eb-f3fa-b94a-0bb7e949f829`; `00:00:00.0000001`. |
+| AUX-094 | `GetProfilePicture_AbsentContent_ReturnsFrozenDefaultImage(False)` | Passed; `profile-client-additional.trx`; `acb8d60c-7c13-89d2-ce44-976b3a800d63`; `00:00:00.0910000`. |
+| AUX-095 | `Profile_WithoutServerSession_ShowsNotFoundAndDisablesProfileActions(True)` | Passed; `profile-client-additional.trx`; `c349a129-17e9-db49-fad8-4df3be11c8ec`; `00:00:00.0000001`. |
+| AUX-096 | `GetProfilePicture_CorruptedContent_ReturnsFrozenDefaultImage` | Passed; `profile-client-additional.trx`; `c9d9c523-6c83-56bd-d576-a1a308ecaeda`; `00:00:00.0160000`. |
+| AUX-097 | `Profile_WithoutServerSession_ShowsNotFoundAndDisablesProfileActions(False)` | Passed; `profile-client-additional.trx`; `cbb3490a-e510-3217-f590-b83fb16a1a22`; `00:00:00.0010000`. |
+| AUX-098 | `EditProfile_WithoutServerSession_ShowsNotFoundAndDisablesChanges(False)` | Passed; `profile-client-additional.trx`; `02d56817-f88c-f1fd-9b8c-b83bc2ffb2f2`; `00:00:00.0020000`. |
+| AUX-099 | `SkipOrCancel_IdleUpload_InvokesCallbackAndPreservesCreatedAccount(False)` | Passed; `profile-client-additional.trx`; `929ef781-8d60-72e1-c007-c7f24d9f3f88`; `00:00:00.0000001`. |
+| AUX-100 | `GetProfilePicture_AbsentContent_ReturnsFrozenDefaultImage(True)` | Passed; `profile-client-additional.trx`; `8c96e016-9dee-c324-7e0a-94b39c4a1205`; `00:00:00.0000001`. |
+| AUX-101 | `EditProfile_WithoutServerSession_ShowsNotFoundAndDisablesChanges(True)` | Passed; `profile-client-additional.trx`; `79c9b559-1257-bc4f-46bf-d51c39f1b1b5`; `00:00:00.0000001`. |
+| AUX-102 | `AddPhoto_WithoutSelection_ShowsInvalidImageAndPreservesSession` | Passed; `profile-client-additional.trx`; `9ab4ed87-edc8-2a4e-9c01-6aef67b98ce5`; `00:00:00.2540000`. |
+
+Fuentes:
+[ProfileServiceWcfTests.cs](../DominoAllFives.Server/AdditionalTest/ProfileServiceWcfTests.cs)
+y [ProfilePresentationTests.cs](../DominoAllFives.Client/AdditionalTest/ProfilePresentationTests.cs).
+
+Reportes finales: profile-wcf.trx (47 Passed), profile-client-additional.trx
+(10 Passed) y profile-client-regression.trx (33 Passed). La regresión de fábrica
+se adaptó al regreso de perfil que refresca MainMenuViewModel: siete regresos
+simples y un refresco, en lugar de ocho regresos simples. La primera ejecución
+detectó esa expectativa anterior; la final pasó íntegra.
+
+Compilaciones Debug verificadas con MSBuild de Visual Studio: solución servidor,
+solución cliente y proyecto auxiliar cliente independiente. Logs:
+profile-server-solution-build.log, profile-client-build.log y
+profile-client-additional-build.log. La primera compilación cliente detectó la
+colisión entre el namespace local ProfilePicture y el DTO del proxy; se resolvió
+con un alias explícito al DTO. Permanecen MSB3836 y CS0168 preexistentes. El restore
+auxiliar emitió NU1900 al no poder consultar el índice de vulnerabilidades de
+NuGet; los paquetes requeridos sí se restauraron y el proyecto compiló.
+
+Se renderizó EditProfile a 1600×900 desde los recursos WPF compilados, sin abrir
+una ventana ni ejecutar llamadas remotas. La inspección visual de
+profile-edit-layout.png confirmó que el nuevo botón de eliminación cabe entre
+la imagen y el nombre y que los botones inferiores permanecen visibles.
+Se usaron datos de presentación de prueba; esto no sustituye una prueba funcional
+manual de selección, guardado o eliminación.
+
+La referencia se generó mediante SvcUtil 4.8 consultando metadatos MEX de un host
+real de DominoService temporal y aislado. Los JSON conservan la URL
+http://localhost:8734/Domino/ para Visual Studio. No se modificaron los endpoints
+previos ni los bindings; únicamente se añadió el endpoint del nuevo contrato.
+
+Límites: no se operó sobre SQL Server ni sobre imágenes reales almacenadas.
+Consulta exitosa, username duplicado, guardado conjunto, eliminación persistida,
+compensación de archivos y su interacción con una BD requieren infraestructura
+aislada antes de verificarse integralmente. No se probó net.tcp desplegado ni
+la selección manual de archivos. El reemplazo concurrente conserva el riesgo
+previo de archivos huérfanos; no se afirma una transacción distribuida disco/BD,
+idempotencia, reversión tras una respuesta perdida ni cancelación remota.
+
+
+## Corrección de registro y perfil al patrón de excepciones (2026-11-19)
+
+Los controllers ahora lanzan RegistrationRuleException o ProfileRuleException
+con el Issue correspondiente. DominoService las captura, registra con Debug y
+lanza directamente FaultException<TIssue>(ex.Issue). Se eliminaron los estados
+retornados, los switches Status→Issue y los helpers de conversión; la consulta
+de perfil ya no devuelve null para indicar un rechazo. Los argumentos nulos
+siguen siendo ArgumentNullException dentro del servidor y la frontera los
+traduce con capturas filtradas por ParamName para conservar el fault remoto.
+
+Se preservaron el orden de validación, el contexto EF por operación, el guardado
+conjunto y los finally de compensación. Se retiraron loggers y métodos sin uso;
+Storage conserva el único diagnóstico de los fallos de limpieza que recupera.
+Los catches técnicos se ajustaron a cada ruta en lugar de copiar la misma lista
+para todas. La revisión se contrastó con AuthenticationController,
+RankingController, sus operaciones WCF, Manejo de excepciones, Manejo de
+comunicación remota y sección 4.7 del estándar.
+
+Compiló la solución servidor Debug con MSBuild de Visual Studio. Evidencia:
+rules-server-solution-build.log; permanecen advertencias MSB3836 preexistentes.
+Pasaron 137 verificaciones seleccionadas: 54 casos unitarios nuevos de reglas,
+36 regresiones unitarias existentes y 47 verificaciones auxiliares remotas.
+Las fichas unitarias PU-360 a PU-413 se documentan exclusivamente en Pruebas.md.
+
+La reejecución auxiliar no añade casos: rules-wcf.trx conserva los 34 de perfil,
+nueve de registro y cuatro de guardas de Login/Ranking previamente catalogados.
+Los 47 pasaron. Se usaron hosts net.pipe, proxies generados y componentes reales;
+las solicitudes se detienen antes de persistencia. El reporte contiene el nombre,
+los parámetros, el identificador y la duración individual de cada caso.
+Las regresiones unitarias están en rules-server-regression.trx (36 Passed) y
+las pruebas nuevas en rules-unit.trx (54 Passed).
+
+Se verificó mediante SHA-256 que permanecieron idénticos al inicio de esta
+corrección ambos App.config, los dos JSON de referencia, Reference.cs, WcfInvoker
+y las interfaces IRegistrationService e IPlayerProfileService. No fue necesario
+regenerar proxy ni cambiar contratos o configuración WCF.
+
+La indicación del usuario quedó registrada fuera del repositorio en
+agent-instructions/implementation.md: toda migración debe contrastarse con las
+guías y el estándar y, ante dudas, con Login o Ranking. Trasladar código local no
+se considera suficiente para completar una migración.
+
+Límites: no se utilizó SQL Server ni almacenamiento persistido de imágenes.
+No se afirma haber comprobado éxito persistido, duplicados en BD, cuenta borrada,
+compensación tras fallo de SaveChanges ni el efecto de escrituras concurrentes.
+La corrección conserva esos flujos; las comprobaciones ejecutadas se detienen
+en reglas o guardas anteriores a persistencia y comprueban serialización/faults.
+
+El alcance compilado es Server y sus pruebas; no se compiló ni adaptó OldClient.
+Sus adaptadores locales todavía consumen las firmas históricas de los controllers;
+no se añadieron rutas paralelas ni conversiones de estados para sostener ese flujo.
+Los tipos de estado legados se conservan por sus consumidores históricos, pero
+ya no intervienen en los controllers ni en la frontera WCF corregidos.
+
+
+## Inicialización de los ViewModels de perfil (2026-11-19)
+
+ProfileViewModel, EditProfileViewModel y UploadProfilePictureViewModel siguen la
+separación de Login: constructor para sesión/acciones, estado y comandos;
+inyección de servicios posterior mediante Initialize. Los constructores no
+cargan datos ni muestran diálogos, incluso con una sesión activa.
+ViewModelFactory construye, configura e inicializa antes de devolver cada objeto.
+
+Los comandos permanecen deshabilitados hasta completar Initialize; las entradas
+protegen el uso previo y las segundas inicializaciones se rechazan antes de
+recargar. Para cumplir el máximo de cuatro argumentos por método, Profile
+configura el logger previamente como Lobby; Edit configura previamente los
+servicios locales de imagen y archivo. ConfigurePictures valida ambas
+dependencias antes de asignarlas para no dejar una configuración parcial.
+Initialize conserva el cliente remoto como última dependencia asignada.
+
+Compilaron la solución Client y el proyecto auxiliar cliente. Logs:
+profile-initialize-client-build.log y profile-initialize-additional-build.log.
+Permanecen las advertencias CS0168 anteriores y NU1900 del proyecto auxiliar.
+No se modificaron configuración WCF, referencias de servicio, WcfInvoker ni
+DominoService; se comprobó su conservación mediante SHA-256.
+
+Pasaron 54 verificaciones seleccionadas: 21 del fixture auxiliar de perfil
+(profile-initialize-additional.trx) y 33 regresiones históricas del cliente
+(profile-initialize-regression.trx). Los diez casos auxiliares anteriores se
+adaptaron a la nueva inicialización y volvieron a pasar. Las once incorporaciones
+se identifican individualmente abajo; no se agregan al catálogo unitario.
+
+| N.º | Caso nuevo ejecutado | Resultado y evidencia |
+| --- | --- | --- |
+| AUX-103 | `Initialize_UploadTwice_RejectsSecondInitialization` | Passed; `profile-initialize-additional.trx`; `e0d50535-52b4-e3e8-398a-83f0091cc0d3`; `00:00:00.0010000`. |
+| AUX-104 | `ConfigurePictures_MissingDependency_ThrowsArgumentNullException(False)` | Passed; `profile-initialize-additional.trx`; `a820572f-e7a0-88f4-acf7-4c694c590c11`; `00:00:00.0010000`. |
+| AUX-105 | `Initialize_EditTwice_RejectsSecondInitialization` | Passed; `profile-initialize-additional.trx`; `dbae07c1-6311-c748-320f-b815961b500a`; `00:00:00.0010000`. |
+| AUX-106 | `Constructor_EditWithActiveSession_DoesNotLoadAndDisablesCommands` | Passed; `profile-initialize-additional.trx`; `e2ac5385-5924-f4b2-8fae-8582274f2196`; `00:00:00.0010000`. |
+| AUX-107 | `Initialize_ProfileWithoutLogger_ThrowsBeforeLoading` | Passed; `profile-initialize-additional.trx`; `07566f15-8c0d-6f3b-8590-1684c6ba5ece`; `00:00:00.0010000`. |
+| AUX-108 | `ConfigurePictures_MissingDependency_ThrowsArgumentNullException(True)` | Passed; `profile-initialize-additional.trx`; `86c1d8eb-72e7-7bd4-1300-ae3650b09c4d`; `00:00:00.0000001`. |
+| AUX-109 | `Constructor_UploadWithActiveSession_DoesNotLoadAndDisablesCommands` | Passed; `profile-initialize-additional.trx`; `52e21dd9-3cd3-1860-cd5d-87904ab09f04`; `00:00:00.0000001`. |
+| AUX-110 | `Initialize_ProfileTwice_RejectsSecondInitialization` | Passed; `profile-initialize-additional.trx`; `f81554e4-248f-7854-406e-a1bf6a808bb0`; `00:00:00.0010000`. |
+| AUX-111 | `Constructor_ProfileWithActiveSession_DoesNotLoadAndDisablesCommands` | Passed; `profile-initialize-additional.trx`; `b85ceb28-249a-e988-a624-1d4c7e9c902d`; `00:00:00.0000001`. |
+| AUX-112 | `Initialize_EditWithoutPictures_ThrowsBeforeLoading` | Passed; `profile-initialize-additional.trx`; `386cb825-f50d-7682-1504-4c283686a05b`; `00:00:00.0010000`. |
+| AUX-113 | `ConfigureLogger_NullLogger_ThrowsArgumentNullException` | Passed; `profile-initialize-additional.trx`; `7743c533-c240-8e6d-1584-9ada1fbf02b8`; `00:00:00.0100000`. |
+
+Fuente: [ProfilePresentationTests.cs](../DominoAllFives.Client/AdditionalTest/ProfilePresentationTests.cs).
+
+Los tres casos de constructor usan sesión activa sin inicializar servicios y
+esperan ausencia de diálogos y comandos deshabilitados. Las dependencias nulas
+producen ArgumentNullException. Inicializar sin configuración previa o repetir
+Initialize produce InvalidOperationException. Las inicializaciones que cargan
+usan una sesión sin token para detenerse antes de la red.
+
+Las pruebas utilizan componentes concretos y recursos WPF sin ventanas visibles,
+sin dobles, reflexión, selección manual, red ni BD. Se conservan los snapshots,
+comparaciones de sesión, continuaciones con Dispatcher y navegación existentes.
+No se afirma haber ejecutado una consulta o edición persistida ni una interacción
+manual completa en esta corrección.
+
+
+## Renombrado del contrato de perfil (2026-11-19)
+
+Se alinearon los nombres del contrato y de sus consumidores: IProfileService,
+ProfileIssue, ProfileRuleException, ProfileClient, GetMyProfile y
+UpdateProfileName. UpdateProfileWithPicture conserva su nombre. La clase privada
+que captura la sesión y la imagen durante la subida se denomina PictureUploaded
+y continúa siendo sealed.
+
+El proxy se regeneró desde los metadatos del servidor mediante un host temporal
+net.pipe. ConnectedService.json y dotnet-svcutil.params.json conservaron la URL
+http://localhost:8734/Domino/ y WcfInvoker permaneció idéntico. En los dos
+App.config solo se actualizó la referencia contract= al nuevo nombre; no cambiaron
+endpoint, dirección, binding ni puerto.
+
+Compilaron Server, Client y el proyecto auxiliar del cliente. Pasaron 121
+verificaciones seleccionadas: 33 reglas de perfil, 34 operaciones/serializaciones
+WCF, 21 presentaciones de perfil y 33 regresiones de Login, registro, Ranking,
+credenciales y BackgroundJob. Los reportes finales son
+profile-renames-unit.trx, profile-renames-wcf-final.trx,
+profile-renames-presentation.trx y profile-renames-client-regression.trx.
+
+Permanecen advertencias previas de redirecciones de ensamblados en Server,
+CS0168 en Client y NU1900 al consultar el índice de vulnerabilidades del proyecto
+auxiliar. No se utilizó SQL Server ni almacenamiento persistido de imágenes.

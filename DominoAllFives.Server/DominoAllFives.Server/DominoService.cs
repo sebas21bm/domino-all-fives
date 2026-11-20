@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
 using System.Data.SqlClient;
+using System.IO;
 using System.ServiceModel;
 using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Exceptions;
@@ -160,28 +162,26 @@ namespace DominoAllFives.Server
         /// <inheritdoc/>
         public PlayerAccount Register(AccountRegistration registrationData)
         {
-            if (registrationData == null)
-            {
-                _logger.LogDebug("Registration rejected a missing request.");
-                throw new FaultException<RegistrationIssue>(
-                    RegistrationIssue.InvalidRegistrationData);
-            }
-
             try
             {
-                RegistrationController controller = new RegistrationController(
-                    LoggerFactoryProvider.CreateLogger<RegistrationController>());
-                RegistrationResult result = controller.Register(registrationData);
-                if (result.Status != RegistrationStatus.None)
-                {
-                    RegistrationIssue issue = GetRegistrationIssue(result.Status);
-                    _logger.LogDebug("Registration rejected. Issue: {RegistrationIssue}.", issue);
-                    throw new FaultException<RegistrationIssue>(issue);
-                }
-
-                PlayerAccount account = result.Account;
+                RegistrationController controller = new RegistrationController();
+                PlayerAccount account = controller.Register(registrationData);
                 account.SetSessionKey(SessionManager.CreateSession(account.PlayerId));
                 return account;
+            }
+            catch (RegistrationRuleException ex)
+            {
+                _logger.LogDebug(
+                    ex,
+                    "Registration rejected. Issue: {RegistrationIssue}.",
+                    ex.Issue);
+                throw new FaultException<RegistrationIssue>(ex.Issue);
+            }
+            catch (ArgumentNullException ex) when (ex.ParamName == nameof(registrationData))
+            {
+                _logger.LogDebug(ex, "Registration rejected an incomplete request.");
+                throw new FaultException<RegistrationIssue>(
+                    RegistrationIssue.InvalidRegistrationData);
             }
             catch (SqlException ex)
             {
@@ -198,29 +198,272 @@ namespace DominoAllFives.Server
                 _logger.LogError(ex, "Registration could not access persistence.");
                 throw new FaultException("The service could not complete the operation.");
             }
-            catch (System.Data.Entity.Validation.DbEntityValidationException ex)
+            catch (DbEntityValidationException ex)
             {
-                _logger.LogError(ex, "Registration persistence validation failed.");
+                _logger.LogError(ex, "Registration failed persistence validation.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+        }
+    }
+
+    public partial class DominoService : IProfileService
+    {
+        /// <inheritdoc/>
+        public PlayerProfile GetMyProfile(string sessionKey)
+        {
+            int playerId = GetProfilePlayerId(sessionKey);
+            try
+            {
+                ProfilePictureStorage storage = new ProfilePictureStorage(
+                    LoggerFactoryProvider.CreateLogger<ProfilePictureStorage>());
+                ProfileController controller = new ProfileController(storage);
+                return controller.GetProfile(playerId);
+            }
+            catch (ProfileRuleException ex)
+            {
+                _logger.LogDebug(
+                    ex,
+                    "Profile retrieval rejected. Issue: {ProfileIssue}.",
+                    ex.Issue);
+                throw new FaultException<ProfileIssue>(ex.Issue);
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "Profile retrieval could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (EntityException ex)
+            {
+                _logger.LogError(ex, "Profile retrieval could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Profile retrieval could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, "Profile retrieval could not reconstruct the stored profile.");
                 throw new FaultException("The service could not complete the operation.");
             }
         }
 
-        private static RegistrationIssue GetRegistrationIssue(RegistrationStatus status)
+        /// <inheritdoc/>
+        public void UpdateProfileName(string sessionKey, string username)
         {
-            switch (status)
+            int playerId = GetProfilePlayerId(sessionKey);
+            try
             {
-                case RegistrationStatus.InvalidUsername:
-                    return RegistrationIssue.InvalidUsername;
-                case RegistrationStatus.InvalidEmail:
-                    return RegistrationIssue.InvalidEmail;
-                case RegistrationStatus.InvalidPassword:
-                    return RegistrationIssue.InvalidPassword;
-                case RegistrationStatus.UsernameAlreadyExists:
-                    return RegistrationIssue.UsernameAlreadyExists;
-                case RegistrationStatus.EmailAlreadyExists:
-                    return RegistrationIssue.EmailAlreadyExists;
-                default:
-                    return RegistrationIssue.InvalidRegistrationData;
+                ProfilePictureStorage storage = new ProfilePictureStorage(
+                    LoggerFactoryProvider.CreateLogger<ProfilePictureStorage>());
+                ProfileController controller = new ProfileController(storage);
+                controller.UpdateProfileName(playerId, username);
+            }
+            catch (ProfileRuleException ex)
+            {
+                _logger.LogDebug(
+                    ex,
+                    "Profile update rejected. Issue: {ProfileIssue}.",
+                    ex.Issue);
+                throw new FaultException<ProfileIssue>(ex.Issue);
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "Profile update could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (EntityException ex)
+            {
+                _logger.LogError(ex, "Profile update could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Profile update could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (DbEntityValidationException ex)
+            {
+                _logger.LogError(ex, "Profile update failed persistence validation.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+        }
+
+        /// <inheritdoc/>
+        public void UpdateProfileWithPicture(
+            string sessionKey,
+            string username,
+            ProfilePicture picture)
+        {
+            int playerId = GetProfilePlayerId(sessionKey);
+            try
+            {
+                ProfilePictureStorage storage = new ProfilePictureStorage(
+                    LoggerFactoryProvider.CreateLogger<ProfilePictureStorage>());
+                ProfileController controller = new ProfileController(storage);
+                controller.UpdateProfileWithPicture(playerId, username, picture);
+            }
+            catch (ProfileRuleException ex)
+            {
+                _logger.LogDebug(
+                    ex,
+                    "Profile and picture update rejected. Issue: {ProfileIssue}.",
+                    ex.Issue);
+                throw new FaultException<ProfileIssue>(ex.Issue);
+            }
+            catch (ArgumentNullException ex) when (ex.ParamName == "replacementPicture")
+            {
+                _logger.LogDebug(ex, "Profile and picture update rejected an incomplete request.");
+                throw new FaultException<ProfileIssue>(
+                    ProfileIssue.InvalidProfilePicture);
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "Profile and picture update could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (EntityException ex)
+            {
+                _logger.LogError(ex, "Profile and picture update could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Profile and picture update could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (DbEntityValidationException ex)
+            {
+                _logger.LogError(ex, "Profile and picture update failed persistence validation.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (IOException ex)
+            {
+                _logger.LogError(ex, "Profile update could not write picture storage.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogError(ex, "Profile update could not write picture storage.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+        }
+
+        /// <inheritdoc/>
+        public void SetProfilePicture(string sessionKey, ProfilePicture picture)
+        {
+            int playerId = GetProfilePlayerId(sessionKey);
+            try
+            {
+                ProfilePictureStorage storage = new ProfilePictureStorage(
+                    LoggerFactoryProvider.CreateLogger<ProfilePictureStorage>());
+                ProfilePictureController controller = new ProfilePictureController(storage);
+                controller.SetProfilePicture(playerId, picture);
+            }
+            catch (ProfileRuleException ex)
+            {
+                _logger.LogDebug(
+                    ex,
+                    "Picture replacement rejected. Issue: {ProfileIssue}.",
+                    ex.Issue);
+                throw new FaultException<ProfileIssue>(ex.Issue);
+            }
+            catch (ArgumentNullException ex) when (ex.ParamName == nameof(picture))
+            {
+                _logger.LogDebug(ex, "Picture replacement rejected an incomplete request.");
+                throw new FaultException<ProfileIssue>(
+                    ProfileIssue.InvalidProfilePicture);
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "Picture replacement could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (EntityException ex)
+            {
+                _logger.LogError(ex, "Picture replacement could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Picture replacement could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (DbEntityValidationException ex)
+            {
+                _logger.LogError(ex, "Picture replacement failed persistence validation.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (IOException ex)
+            {
+                _logger.LogError(ex, "Picture replacement could not write picture storage.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogError(ex, "Picture replacement could not write picture storage.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+        }
+
+        /// <inheritdoc/>
+        public void RemoveProfilePicture(string sessionKey)
+        {
+            int playerId = GetProfilePlayerId(sessionKey);
+            try
+            {
+                ProfilePictureStorage storage = new ProfilePictureStorage(
+                    LoggerFactoryProvider.CreateLogger<ProfilePictureStorage>());
+                ProfilePictureController controller = new ProfilePictureController(storage);
+                controller.RemoveProfilePicture(playerId);
+            }
+            catch (ProfileRuleException ex)
+            {
+                _logger.LogDebug(
+                    ex,
+                    "Picture removal rejected. Issue: {ProfileIssue}.",
+                    ex.Issue);
+                throw new FaultException<ProfileIssue>(ex.Issue);
+            }
+            catch (SqlException ex)
+            {
+                _logger.LogError(ex, "Picture removal could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (EntityException ex)
+            {
+                _logger.LogError(ex, "Picture removal could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Picture removal could not access persistence.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+            catch (DbEntityValidationException ex)
+            {
+                _logger.LogError(ex, "Picture removal failed persistence validation.");
+                throw new FaultException("The service could not complete the operation.");
+            }
+        }
+
+        private int GetProfilePlayerId(string sessionKey)
+        {
+            if (string.IsNullOrWhiteSpace(sessionKey))
+            {
+                _logger.LogDebug("Profile operation rejected a missing session.");
+                throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
+            }
+
+            try
+            {
+                return SessionManager.GetPlayerId(sessionKey);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogDebug(ex, "Profile operation rejected an unavailable session.");
+                throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
             }
         }
     }

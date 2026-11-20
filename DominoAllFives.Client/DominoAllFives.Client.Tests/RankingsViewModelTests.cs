@@ -170,7 +170,8 @@ namespace DominoAllFives.Client.Tests
             };
             using (ViewModelFactory factory = new ViewModelFactory(navigation,
                 new DialogService(), new SessionClient(),
-                new WPF.Services.Wcf.Services.RegistrationClient(), client, session,
+                new WPF.Services.Wcf.Services.RegistrationClient(), client,
+                new WPF.Services.Wcf.Services.ProfileClient(), session,
                     NullLoggerFactory.Instance, new ProfilePictureImageService(
                         NullLogger<ProfilePictureImageService>.Instance)))
             {
@@ -221,7 +222,8 @@ namespace DominoAllFives.Client.Tests
                 factory.Create<MatchHistoryViewModel>().GoBackCommand.Execute(null);
                 factory.Create<ProfileViewModel>().GoBackCommand.Execute(null);
                 // Assert
-                Assert.That(navigation.BackCalls, Is.EqualTo(8));
+                Assert.That(navigation.BackCalls, Is.EqualTo(7));
+                Assert.That(navigation.LastRefreshedViewModel, Is.EqualTo(typeof(MainMenuViewModel)));
                 Assert.Throws<InvalidOperationException>(() => factory.Create<LobbyViewModel>());
             }
         }
@@ -319,6 +321,7 @@ namespace DominoAllFives.Client.Tests
         private sealed class NavigationService : IFrameNavigationService
         {
             public int BackCalls { get; private set; }
+            public Type LastRefreshedViewModel { get; private set; }
 
             public bool CanGoBack
             {
@@ -341,6 +344,7 @@ namespace DominoAllFives.Client.Tests
             public void GoBackToRefresh<TViewModel>()
                 where TViewModel : ViewModelBase
             {
+                LastRefreshedViewModel = typeof(TViewModel);
             }
 
             public void NavigateAsRoot<TViewModel>()

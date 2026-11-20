@@ -1,14 +1,19 @@
 using System;
+using System.Runtime.Serialization;
 
 namespace DominoAllFives.Contracts.Domain
 {
     /// <summary>
     /// Composes the public identity, statistics and optional picture of a player.
     /// </summary>
+    [DataContract]
     public sealed class PlayerProfile
     {
+        [DataMember(Order = 1, IsRequired = true)]
         public string Username { get; private set; }
+        [DataMember(Order = 2, IsRequired = true)]
         public PlayerStatistics Statistics { get; private set; }
+        [DataMember(Order = 3, IsRequired = true)]
         public ProfilePicture Picture { get; private set; }
 
         private PlayerProfile()

@@ -62,6 +62,7 @@
     <Compile Include="MatchProxyCallback.cs" />
     <Compile Include="MatchServiceWcfTests.cs" />
     <Compile Include="MatchPublicationWcfTests.cs" />
+    <Compile Include="ProfileServiceWcfTests.cs" />
     <Compile Include="RankingServiceTests.cs" />
     <Compile Include="RegistrationServiceWcfTests.cs" />
     <Compile Include="SessionServiceTests.cs" />

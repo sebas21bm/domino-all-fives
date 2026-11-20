@@ -197,9 +197,11 @@ RegistrationController → RegistrationValidator / repositorios / Entity Framewo
 
 `Register(AccountRegistration)` devuelve un `PlayerAccount` con su `SessionKey`.
 El controller conserva las reglas de negocio, el hash de contraseña y la creación
-de Player y PlayerStats dentro del contexto de una operación. Conserva su
-RegistrationResult interno; DominoService traduce sus rechazos a
-FaultException<RegistrationIssue> y los errores de persistencia a faults seguros.
+de Player y PlayerStats dentro del contexto de una operación. Devuelve directamente
+PlayerAccount y comunica los rechazos con RegistrationRuleException, que contiene
+RegistrationIssue. DominoService captura esa excepción y lanza directamente
+new FaultException<RegistrationIssue>(ex.Issue), como Login. Los errores técnicos
+se propagan hasta la frontera y se traducen a faults seguros.
 Una solicitud nula produce InvalidRegistrationData. La frontera abre la sesión
 con SessionManager después del alta, como en Login.
 
@@ -226,6 +228,87 @@ OldClient permanece como implementación histórica; el cliente actual no
 referencia IAccountService local, BusinessLogic, repositorios ni Entity Framework.
 
 [Verificaciones del registro](Verificaciones%20auxiliares.md#migración-del-registro-de-cuenta-2026-11-18).
+
+---
+
+### Perfil de jugador e imagen
+
+El perfil usa IProfileService en DominoService, con el endpoint nuevo
+PlayerProfileEndpoint en la ruta Domino/profile y los bindings existentes.
+ProfileClient consume el proxy generado mediante WcfInvoker, con el mismo
+patrón de lambdas utilizado por SessionClient y RankingClient.
+
+| Operación | Resultado |
+| --- | --- |
+| GetMyProfile(sessionKey) | PlayerProfile propio con nombre, estadísticas y contenido de imagen opcional. |
+| UpdateProfileName(sessionKey, username) | Actualiza el nombre y conserva la imagen. |
+| UpdateProfileWithPicture(sessionKey, username, picture) | Guarda nombre e imagen en la operación conjunta del controller. |
+| SetProfilePicture(sessionKey, picture) | Establece o reemplaza la imagen. |
+| RemoveProfilePicture(sessionKey) | Retira la imagen asignada y aplica la limpieza existente. |
+
+Todas las operaciones resuelven el propietario mediante SessionManager; no reciben
+un identificador de jugador elegido por el cliente. Una clave ausente, desconocida
+o revocada produce FaultException<AccessIssue>. Los controllers conservan EF,
+repositorios, validadores, almacenamiento y limpieza de archivos. Las cuentas
+borradas se consideran no encontradas. Los controllers devuelven datos o finalizan
+sin resultado al tener éxito; los rechazos se comunican con ProfileRuleException.
+DominoService captura esa excepción y lanza directamente
+new FaultException<ProfileIssue>(ex.Issue), sin estados ni switches de conversión.
+Los errores de persistencia o escritura se registran en la frontera y se convierten
+en faults seguros. Los argumentos nulos conservan ArgumentNullException en el
+controller y se traducen mediante capturas filtradas por su parámetro en WCF.
+Los bloques finally de compensación y la recuperación de limpieza permanecen
+en los componentes responsables, sin duplicar el logging de Storage.
+
+PlayerProfile y PlayerStatistics tienen contratos de datos explícitos. Se utiliza
+ProfilePicture, que ya transportaba nombre de selección y bytes, sin enviar rutas
+de almacenamiento del servidor. Se conserva la validación actual de extensión
+y tamaño máximo de 1 MiB; no se añade una política nueva de contenido del lado
+servidor.
+
+Los constructores de perfil reciben únicamente PlayerSession y, en la subida
+opcional, las acciones de navegación. Inicializan estado y comandos sin acceder
+a servicios ni cargar datos. ViewModelFactory inyecta los servicios después de
+construirlos y llama a Initialize, con protección frente a uso previo o repetido.
+
+Para respetar el límite de cuatro parámetros por método, Profile configura
+primero el logger mediante ConfigureLogger, como Lobby. EditProfile configura
+primero los dos servicios locales de imagen mediante ConfigurePictures. Después,
+Initialize recibe los servicios restantes y comienza la carga. Upload recibe
+sus cuatro servicios en Initialize y espera una acción del usuario. No se crean
+contenedores adicionales de dependencias. Los comandos permanecen deshabilitados
+hasta que la inicialización está completa.
+
+ProfileViewModel y EditProfileViewModel cargan mediante BackgroundJob. Guardar,
+subir y eliminar también usan BackgroundWork; las continuaciones actualizan la
+vista en el Dispatcher. Se bloquean acciones incompatibles mientras hay una llamada
+pendiente y se capturan clave, nombre e imagen antes de enviarla. La sesión se
+actualiza con el nombre enviado que se confirmó, y se ignoran continuaciones cuya
+clave ya no corresponde a PlayerSession.
+
+EditProfile conserva la selección y previsualización local, el guardado conjunto,
+los mensajes localizados y el regreso con refresco del perfil. El botón de
+eliminación pide confirmación y explica que se guarda inmediatamente; descartar
+las ediciones de nombre no revierte una eliminación ya confirmada. Al volver
+desde perfil se refresca el menú para mostrar el nombre actual.
+
+Después del registro vuelve a mostrarse UploadProfilePicture: subir una imagen
+u omitir el paso lleva al menú; cancelar cierra el modal conservando la cuenta.
+La previsualización decodifica bytes localmente y las imágenes dañadas recuperan
+la imagen predeterminada sin dejar escapar errores de formato o lectura.
+
+WcfInvoker dispone de una sobrecarga para operaciones void que reutiliza el
+mismo cierre/aborto del invocador con resultado. El cliente no interpreta estados
+de persistencia ni referencia IAccountService, BusinessLogic o Entity Framework.
+
+Se mantienen las URL originales de ConnectedService.json y
+dotnet-svcutil.params.json para actualizar desde el servidor en Visual Studio.
+El proxy de esta entrega se generó con SvcUtil desde metadatos de DominoService
+alojado temporalmente para desarrollo; no se cambiaron los bindings, direcciones
+ni endpoints previos.
+
+La evidencia y los límites están en
+[Verificaciones auxiliares](Verificaciones%20auxiliares.md#migración-de-perfil-e-imagen-2026-11-19).
 
 ---
 

@@ -1,16 +1,13 @@
 using System;
-using System.Data.Entity.Core;
-using System.Data.Entity.Infrastructure;
-using System.Data.SqlClient;
+using DominoAllFives.BusinessLogic.Exceptions;
 using DominoAllFives.BusinessLogic.Storage;
 using DominoAllFives.BusinessLogic.Validation;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Models;
-using Player = DominoAllFives.DataAccess.Models.Player;
 using DominoAllFives.DataAccess.Repositories;
-using Microsoft.Extensions.Logging;
+using Player = DominoAllFives.DataAccess.Models.Player;
 
 namespace DominoAllFives.BusinessLogic.Controllers
 {
@@ -20,14 +17,14 @@ namespace DominoAllFives.BusinessLogic.Controllers
     public class ProfileController
     {
         private readonly ProfilePictureStorage _profilePictureStorage;
-        private readonly ILogger<ProfileController> _logger;
-        public ProfileController(
-            ProfilePictureStorage profilePictureStorage,
-            ILogger<ProfileController> logger)
+
+        /// <summary>Initializes profile operations with storage for optional pictures.</summary>
+        /// <param name = "profilePictureStorage">The profile picture storage.</param>
+        /// <exception cref = "ArgumentNullException">The storage is null.</exception>
+        public ProfileController(ProfilePictureStorage profilePictureStorage)
         {
             _profilePictureStorage = profilePictureStorage ?? throw new ArgumentNullException(
                 nameof(profilePictureStorage));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -35,6 +32,13 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// </summary>
         /// <param name = "playerId">The account identifier.</param>
         /// <returns>The domain value produced by the operation.</returns>
+        /// <exception cref = "ArgumentOutOfRangeException">
+        /// The player identifier is invalid.
+        /// </exception>
+        /// <exception cref = "ProfileRuleException">The player is unavailable.</exception>
+        /// <exception cref = "InvalidOperationException">
+        /// The required statistics are missing.
+        /// </exception>
         public PlayerProfile GetProfile(int playerId)
         {
             if (playerId <= 0)
@@ -46,9 +50,9 @@ namespace DominoAllFives.BusinessLogic.Controllers
             {
                 IPlayerRepository playerRepository = new PlayerRepository(context);
                 Player player = playerRepository.GetById(playerId);
-                if (player == null)
+                if (player == null || player.IsDeleted)
                 {
-                    return null;
+                    throw new ProfileRuleException(ProfileIssue.PlayerNotFound);
                 }
 
                 if (player.PlayerStats == null)
@@ -56,14 +60,14 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     throw new InvalidOperationException("The player has no required statistics.");
                 }
 
-                return PlayerProfile.FromStoredProfile(
-                    player.Username,
-                    PlayerStatistics.FromStoredStatistics(
+                PlayerStatistics statistics = PlayerStatistics.FromStoredStatistics(
                     player.PlayerStats.GamesWon,
                     player.PlayerStats.TotalPointsScored,
-                    player.PlayerStats.GamesPlayed),
-                    ProfilePicture.FromStoredContent(
-                    _profilePictureStorage.GetProfilePictureData(player.ProfilePicture)));
+                    player.PlayerStats.GamesPlayed);
+                byte[] pictureData = _profilePictureStorage.GetProfilePictureData(
+                    player.ProfilePicture);
+                ProfilePicture picture = ProfilePicture.FromStoredContent(pictureData);
+                return PlayerProfile.FromStoredProfile(player.Username, statistics, picture);
             }
         }
 
@@ -72,9 +76,15 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// </summary>
         /// <param name = "playerId">The account identifier.</param>
         /// <param name = "username">The requested username.</param>
-        public UpdateProfileStatus UpdateProfile(int playerId, string username)
+        /// <exception cref = "ArgumentOutOfRangeException">
+        /// The player identifier is invalid.
+        /// </exception>
+        /// <exception cref = "ProfileRuleException">
+        /// The requested update was rejected.
+        /// </exception>
+        public void UpdateProfileName(int playerId, string username)
         {
-            return UpdateProfileCore(playerId, username, false, null);
+            UpdateProfileCore(playerId, username, false, null);
         }
 
         /// <summary>
@@ -83,7 +93,14 @@ namespace DominoAllFives.BusinessLogic.Controllers
         /// <param name = "playerId">The account identifier.</param>
         /// <param name = "username">The requested username.</param>
         /// <param name = "replacementPicture">The replacement snapshot; null is invalid.</param>
-        public UpdateProfileStatus UpdateProfile(
+        /// <exception cref = "ArgumentOutOfRangeException">
+        /// The player identifier is invalid.
+        /// </exception>
+        /// <exception cref = "ArgumentNullException">The replacement picture is null.</exception>
+        /// <exception cref = "ProfileRuleException">
+        /// The requested update was rejected.
+        /// </exception>
+        public void UpdateProfileWithPicture(
             int playerId,
             string username,
             ProfilePicture replacementPicture)
@@ -93,10 +110,10 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 throw new ArgumentNullException(nameof(replacementPicture));
             }
 
-            return UpdateProfileCore(playerId, username, true, replacementPicture);
+            UpdateProfileCore(playerId, username, true, replacementPicture);
         }
 
-        private UpdateProfileStatus UpdateProfileCore(
+        private void UpdateProfileCore(
             int playerId,
             string username,
             bool replacePicture,
@@ -112,34 +129,30 @@ namespace DominoAllFives.BusinessLogic.Controllers
             {
                 using (DominoAllFivesEntities context = new DominoAllFivesEntities())
                 {
-                    return UpdateStoredProfile(context, update);
+                    UpdateStoredProfile(context, update);
                 }
             }
             finally
             {
                 if (!update.ChangesCommitted)
                 {
-                    DeleteNewProfilePictureIfNecessary(update.NewPictureFileName);
+                    _profilePictureStorage.TryDeleteProfilePicture(update.NewPictureFileName);
                 }
             }
         }
 
-        private UpdateProfileStatus UpdateStoredProfile(
+        private void UpdateStoredProfile(
             DominoAllFivesEntities context,
             ProfileUpdate update)
         {
             IPlayerRepository repository = new PlayerRepository(context);
             Player player = repository.GetById(update.PlayerId);
-            if (player == null)
+            if (player == null || player.IsDeleted)
             {
-                return UpdateProfileStatus.PlayerNotFound;
+                throw new ProfileRuleException(ProfileIssue.PlayerNotFound);
             }
 
-            UpdateProfileStatus validation = ValidateRequestedChanges(player, repository, update);
-            if (validation != UpdateProfileStatus.None)
-            {
-                return validation;
-            }
+            ValidateRequestedChanges(player, repository, update);
 
             string previousPictureFileName = player.ProfilePicture;
             if (update.ReplacePicture)
@@ -152,22 +165,17 @@ namespace DominoAllFives.BusinessLogic.Controllers
                     update.Picture.ImageData);
             }
 
-            if (!ApplyStoredValues(repository, player, update))
-            {
-                return UpdateProfileStatus.PlayerNotFound;
-            }
+            ApplyStoredValues(repository, player, update);
 
             context.SaveChanges();
             update.ChangesCommitted = true;
             if (update.ReplacePicture)
             {
-                DeletePreviousProfilePicture(previousPictureFileName);
+                _profilePictureStorage.TryDeleteProfilePicture(previousPictureFileName);
             }
-
-            return UpdateProfileStatus.None;
         }
 
-        private UpdateProfileStatus ValidateRequestedChanges(
+        private static void ValidateRequestedChanges(
             Player player,
             IPlayerRepository repository,
             ProfileUpdate update)
@@ -175,23 +183,21 @@ namespace DominoAllFives.BusinessLogic.Controllers
             bool usernameChanged = player.Username != update.Username;
             if (!usernameChanged && !update.ReplacePicture)
             {
-                return UpdateProfileStatus.SameUsername;
+                throw new ProfileRuleException(ProfileIssue.SameUsername);
             }
 
             if (usernameChanged)
             {
-                UpdateProfileStatus status = ValidateUsername(update.Username, repository);
-                if (status != UpdateProfileStatus.None)
-                {
-                    return status;
-                }
+                ValidateUsername(update.Username, repository);
             }
 
-            return update.ReplacePicture
-                ? ValidateProfilePicture(update.Picture) : UpdateProfileStatus.None;
+            if (update.ReplacePicture)
+            {
+                ValidateProfilePicture(update.Picture);
+            }
         }
 
-        private static bool ApplyStoredValues(
+        private static void ApplyStoredValues(
             IPlayerRepository repository,
             Player player,
             ProfileUpdate update)
@@ -199,21 +205,14 @@ namespace DominoAllFives.BusinessLogic.Controllers
             if (player.Username != update.Username
                 && !repository.UpdateUsername(update.PlayerId, update.Username))
             {
-                return false;
+                throw new ProfileRuleException(ProfileIssue.PlayerNotFound);
             }
 
             if (update.ReplacePicture
                 && !repository.UpdateProfilePicture(update.PlayerId, update.NewPictureFileName))
             {
-                return false;
+                throw new ProfileRuleException(ProfileIssue.PlayerNotFound);
             }
-
-            return true;
-        }
-
-        private void LogUpdateFailure(Exception ex, int playerId)
-        {
-            _logger.LogError(ex, "Unable to update profile for player {PlayerId}.", playerId);
         }
 
         private sealed class ProfileUpdate
@@ -238,68 +237,37 @@ namespace DominoAllFives.BusinessLogic.Controllers
             }
         }
 
-        private UpdateProfileStatus ValidateUsername(
+        private static void ValidateUsername(
             string username,
             IPlayerRepository playerRepository)
         {
             if (!AccountValidator.IsUsernameValid(username))
             {
-                return UpdateProfileStatus.InvalidUsername;
+                throw new ProfileRuleException(ProfileIssue.InvalidUsername);
             }
 
             if (playerRepository.UsernameExists(username))
             {
-                return UpdateProfileStatus.UsernameAlreadyExists;
+                throw new ProfileRuleException(ProfileIssue.UsernameAlreadyExists);
             }
-
-            return UpdateProfileStatus.None;
         }
 
-        private UpdateProfileStatus ValidateProfilePicture(ProfilePicture picture)
+        private static void ValidateProfilePicture(ProfilePicture picture)
         {
             if (picture == null || picture.ImageData == null || picture.ImageData.Length == 0)
             {
-                return UpdateProfileStatus.InvalidProfilePicture;
+                throw new ProfileRuleException(ProfileIssue.InvalidProfilePicture);
             }
 
             if (!ProfilePictureValidator.HasValidExtension(picture.OriginalFileName))
             {
-                return UpdateProfileStatus.InvalidProfilePictureFormat;
+                throw new ProfileRuleException(
+                    ProfileIssue.InvalidProfilePictureFormat);
             }
 
             if (!ProfilePictureValidator.HasValidFileSize(picture.ImageData))
             {
-                return UpdateProfileStatus.ProfilePictureTooLarge;
-            }
-
-            return UpdateProfileStatus.None;
-        }
-
-        private void DeleteNewProfilePictureIfNecessary(string profilePictureFileName)
-        {
-            if (string.IsNullOrWhiteSpace(profilePictureFileName))
-            {
-                return;
-            }
-
-            _profilePictureStorage.TryDeleteProfilePicture(profilePictureFileName);
-        }
-
-        private void DeletePreviousProfilePicture(string profilePictureFileName)
-        {
-            if (string.IsNullOrWhiteSpace(profilePictureFileName))
-            {
-                return;
-            }
-
-            bool wasDeleted =
-                _profilePictureStorage.TryDeleteProfilePicture(profilePictureFileName);
-            if (!wasDeleted)
-            {
-                _logger.LogWarning(
-                    "The previous profile picture file "
-                        + "{ProfilePictureFileName} could not be deleted.",
-                    profilePictureFileName);
+                throw new ProfileRuleException(ProfileIssue.ProfilePictureTooLarge);
             }
         }
     }

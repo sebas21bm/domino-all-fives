@@ -47,6 +47,8 @@
     <Compile Include="Services\IChatService.cs" />
     <Compile Include="Services\ISessionService.cs" />
     <Compile Include="Services\IRegistrationService.cs" />
+    <Compile Include="Services\IProfileService.cs" />
+    <Compile Include="Enums\ProfileIssue.cs" />
     <Compile Include="Enums\RegistrationIssue.cs" />
     <Compile Include="Services\IRankingService.cs" />
     <Compile Include="Domain\RegistrationResult.cs" />
