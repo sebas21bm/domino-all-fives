@@ -6,7 +6,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
     /// <summary>
     /// Invokes login using client types generated from the server metadata.
     /// </summary>
-    public sealed class LoginClient : ILoginClient
+    public sealed class SessionClient : ISessionClient
     {
         public PlayerAccount LoginWithAccount(Credentials credentials)
         {

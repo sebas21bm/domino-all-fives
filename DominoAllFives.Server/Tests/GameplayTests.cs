@@ -594,12 +594,7 @@ namespace DominoAllFives.Server.Tests
                 coordinator.PlayTile(
                     1,
                     playerId,
-                    new Move
-                    {
-                        TileId = tileId,
-                        End = BoardEndPosition.Left,
-                        ExpectedVersion = 0
-                    });
+                    new Move(tileId, BoardEndPosition.Left, 0));
                 return true;
             }
             catch (MatchRuleException ex) when (ex.Issue == MatchIssue.StaleVersion)

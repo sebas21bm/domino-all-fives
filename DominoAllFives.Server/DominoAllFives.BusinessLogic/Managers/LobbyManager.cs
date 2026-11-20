@@ -169,11 +169,18 @@ namespace DominoAllFives.BusinessLogic.Managers
             lock (_syncRoot)
             {
                 string lobbyCode;
+                if (!_playerLobbyCodes.TryGetValue(playerId, out lobbyCode))
+                {
+                    return;
+                }
+
                 Lobby lobby;
-                if (_playerLobbyCodes.TryGetValue(playerId, out lobbyCode)
-                    && _lobbies.TryGetValue(lobbyCode, out lobby)
-                    && lobby.Host.PlayerId == playerId
-                    && lobby.State == LobbyState.Starting)
+                if (!_lobbies.TryGetValue(lobbyCode, out lobby))
+                {
+                    return;
+                }
+
+                if (lobby.Host.PlayerId == playerId && lobby.State == LobbyState.Starting)
                 {
                     lobby.State = LobbyState.Waiting;
                 }

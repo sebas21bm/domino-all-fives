@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
-    public sealed class RoundSetup
+    internal sealed class RoundSetup
     {
         private const int MinimumPlayers = 2;
         private const int MaximumPlayers = 4;
@@ -117,7 +117,12 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 
         private static void ValidateDeck(List<Tile> deck)
         {
-            if (deck == null || deck.Count != DeckSize)
+            if (deck == null)
+            {
+                throw new ArgumentNullException(nameof(deck));
+            }
+
+            if (deck.Count != DeckSize)
             {
                 throw new ArgumentException("A complete double-six deck is required.");
             }

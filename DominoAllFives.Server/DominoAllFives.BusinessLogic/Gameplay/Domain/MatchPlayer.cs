@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
-    public sealed class MatchPlayer
+    internal sealed class MatchPlayer
     {
         internal List<Tile> Hand { get; set; } = new List<Tile>();
         public int PlayerId { get; internal set; }

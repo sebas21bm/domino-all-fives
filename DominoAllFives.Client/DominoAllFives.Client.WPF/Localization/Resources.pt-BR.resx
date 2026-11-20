@@ -1077,19 +1077,49 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
     <value>A sala está cheia ou já começou.</value>
   </data>
   <data name="Match_btnPass">
-    <value>Passar</value>
+    <value>PASSAR</value>
   </data>
   <data name="Match_msgRejected">
     <value>A jogada foi rejeitada. Confira o estado atualizado.</value>
   </data>
   <data name="Match_btnLeave">
-    <value>Sair</value>
+    <value>SAIR</value>
+  </data>
+  <data name="Match_msgDrew">
+    <value>{0} comprou do monte</value>
+  </data>
+  <data name="Match_msgPassed">
+    <value>{0} passou a vez</value>
+  </data>
+  <data name="Match_msgRoundAward">
+    <value>{0} ganha {1} pontos</value>
+  </data>
+  <data name="Match_msgRoundTied">
+    <value>Rodada empatada. Nenhum ponto concedido.</value>
+  </data>
+  <data name="Match_lblRoundSummary">
+    <value>PONTUAÇÕES</value>
+  </data>
+  <data name="Match_lblGameOver">
+    <value>FIM DE JOGO</value>
+  </data>
+  <data name="Match_lblGameCancelled">
+    <value>PARTIDA CANCELADA</value>
+  </data>
+  <data name="Match_lblWinner">
+    <value>VENCEDOR</value>
   </data>
   <data name="Match_lblPreviousRound">
     <value>Peças reveladas ao terminar a rodada anterior</value>
   </data>
   <data name="Match_lblTurn">
     <value>Vez do jogador {0}</value>
+  </data>
+  <data name="Match_lblOpener">
+    <value>{0} começa</value>
+  </data>
+  <data name="Match_lblEnd">
+    <value>Extremidade</value>
   </data>
   <data name="Match_lblRevealed">
     <value>Jogador {0}: {1}</value>
@@ -1101,7 +1131,10 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
     <value>Abaixo</value>
   </data>
   <data name="Match_msgConnectionFailed">
-    <value>Não foi possível conectar ao servidor. Pressione Atualizar para tentar novamente.</value>
+    <value>A conexão com o servidor foi perdida.</value>
+  </data>
+  <data name="Match_msgReconnecting">
+    <value>Reconectando…</value>
   </data>
   <data name="Match_lblScore">
     <value>Jogador {0}: {1} pontos · {2} peças</value>
@@ -1109,8 +1142,8 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
   <data name="Match_msgCancelled">
     <value>Partida cancelada, sem vencedor.</value>
   </data>
-  <data name="Match_btnRefresh">
-    <value>Atualizar</value>
+  <data name="Match_btnReconnect">
+    <value>RECONECTAR</value>
   </data>
   <data name="Match_endRight">
     <value>Direita</value>
@@ -1119,13 +1152,16 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
     <value>Acima</value>
   </data>
   <data name="Match_btnPlay">
-    <value>Jogar</value>
+    <value>JOGAR</value>
   </data>
   <data name="Match_btnDraw">
     <value>Comprar do monte</value>
   </data>
   <data name="Match_lblRound">
     <value>Rodada {0} · Monte: {1}</value>
+  </data>
+  <data name="Match_lblScoreMultiplier">
+    <value>×{0}</value>
   </data>
   <data name="Match_msgCompleted">
     <value>Partida encerrada. A maior pontuação identifica o vencedor.</value>
@@ -1143,6 +1179,15 @@ Somente é possível utilizar: .png, .jpg, .jpeg</value>
     <value>CHAT</value>
   </data>
   <data name="Match_msgOperationFailed" xml:space="preserve">
-    <value>Não foi possível concluir a operação. Atualize o estado e tente novamente.</value>
+    <value>Não foi possível concluir a operação. Tente novamente.</value>
+  </data>
+  <data name="EditProfile_btnRemovePicture" xml:space="preserve">
+    <value>Remover imagem</value>
+  </data>
+  <data name="MessageProfile_msgRemovePictureTitle" xml:space="preserve">
+    <value>Remover imagem de perfil</value>
+  </data>
+  <data name="MessageProfile_msgRemovePicture" xml:space="preserve">
+    <value>Deseja remover sua imagem de perfil? Esta alteração será salva imediatamente.</value>
   </data>
 </root>

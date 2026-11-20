@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Windows;
-using MatchService;
-
 namespace DominoAllFives.Client.WPF.Models
 {
     public sealed class TilePosition

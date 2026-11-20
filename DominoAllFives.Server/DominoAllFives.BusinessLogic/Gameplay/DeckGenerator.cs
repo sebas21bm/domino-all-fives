@@ -4,12 +4,25 @@ using System.Security.Cryptography;
 
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
-    public sealed class DeckGenerator
+    internal sealed class DeckGenerator
     {
         private const int PowerOptions = 2;
         private const int SpecialTileCount = 5;
 
         public List<Tile> Generate()
+        {
+            List<Tile> tiles = CreateStandardTiles();
+            using (RandomNumberGenerator random = RandomNumberGenerator.Create())
+            {
+                Shuffle(tiles, random);
+                AssignSpecialPowers(tiles, random);
+                Shuffle(tiles, random);
+            }
+
+            return tiles;
+        }
+
+        private static List<Tile> CreateStandardTiles()
         {
             List<Tile> tiles = new List<Tile>();
             for (int firstValue = 0; firstValue <= Tile.MaximumPips; firstValue++)
@@ -25,43 +38,40 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 }
             }
 
-            using (RandomNumberGenerator random = RandomNumberGenerator.Create())
-            {
-                Shuffle(tiles, random);
-                for (int tileIndex = 0; tileIndex < SpecialTileCount; tileIndex++)
-                {
-                    Tile tile = tiles[tileIndex];
-                    SpecialPower power = SpecialPower.Block;
-                    if (Next(random, PowerOptions) == 0)
-                    {
-                        power = SpecialPower.DoublePoints;
-                    }
+            return tiles;
+        }
 
-                    tiles[tileIndex] = new Tile(
-                        tile.TileId,
-                        tile.FirstValue,
-                        tile.SecondValue,
-                        power);
+        private static void AssignSpecialPowers(List<Tile> tiles, RandomNumberGenerator random)
+        {
+            for (int tileIndex = 0; tileIndex < SpecialTileCount; tileIndex++)
+            {
+                Tile tile = tiles[tileIndex];
+                SpecialPower power = SpecialPower.Block;
+                if (GetRandomIndex(random, PowerOptions) == 0)
+                {
+                    power = SpecialPower.DoublePoints;
                 }
 
-                Shuffle(tiles, random);
+                tiles[tileIndex] = new Tile(
+                    tile.TileId,
+                    tile.FirstValue,
+                    tile.SecondValue,
+                    power);
             }
-
-            return tiles;
         }
 
         private static void Shuffle(List<Tile> tiles, RandomNumberGenerator random)
         {
             for (int tileIndex = tiles.Count - 1; tileIndex > 0; tileIndex--)
             {
-                int otherIndex = Next(random, tileIndex + 1);
-                Tile saved = tiles[tileIndex];
-                tiles[tileIndex] = tiles[otherIndex];
-                tiles[otherIndex] = saved;
+                int swapIndex = GetRandomIndex(random, tileIndex + 1);
+                Tile swappedTile = tiles[tileIndex];
+                tiles[tileIndex] = tiles[swapIndex];
+                tiles[swapIndex] = swappedTile;
             }
         }
 
-        private static int Next(RandomNumberGenerator random, int exclusiveMaximum)
+        private static int GetRandomIndex(RandomNumberGenerator random, int exclusiveMaximum)
         {
             byte[] bytes = new byte[sizeof(uint)];
             uint limit = uint.MaxValue - uint.MaxValue % (uint)exclusiveMaximum;

@@ -6,59 +6,44 @@ using DominoAllFives.Client.WPF.Models;
 
 namespace DominoAllFives.Client.WPF.Controls
 {
-    /// <summary>
-    /// Reusable user control that renders an interactive or visual
-    /// domino tile with its corresponding pips.
-    /// </summary>
     public partial class DominoTile : UserControl
     {
-        /// <summary>
-        /// Identifies the TopValue dependency property.
-        /// </summary>
         private const int PipsPerHalf = 7;
+
         public static readonly DependencyProperty TopValueProperty =
             DependencyProperty.Register(
             nameof(TopValue),
             typeof(int),
             typeof(DominoTile),
             new PropertyMetadata(
-            0,
-            OnTilePropertyChanged));
-        /// <summary>
-        /// Identifies the BottomValue dependency property.
-        /// </summary>
+                0,
+                OnTilePropertyChanged));
+
         public static readonly DependencyProperty BottomValueProperty =
             DependencyProperty.Register(
             nameof(BottomValue),
             typeof(int),
             typeof(DominoTile),
             new PropertyMetadata(
-            0,
-            OnTilePropertyChanged));
-        /// <summary>
-        /// Identifies the TileType dependency property.
-        /// </summary>
+                0,
+                OnTilePropertyChanged));
+
         public static readonly DependencyProperty TileTypeProperty =
             DependencyProperty.Register(
             nameof(TileType),
             typeof(DominoTileType),
             typeof(DominoTile),
             new PropertyMetadata(
-            DominoTileType.Normal,
-            OnTilePropertyChanged));
-        /// <summary>
-        /// Identifies the PipBrush dependency property.
-        /// </summary>
+                DominoTileType.Normal,
+                OnTilePropertyChanged));
+
         public static readonly DependencyProperty PipBrushProperty =
             DependencyProperty.Register(
             nameof(PipBrush),
             typeof(Brush),
             typeof(DominoTile),
-            new PropertyMetadata(
-            Brushes.Black));
-        /// <summary>
-        /// Gets or sets the top numeric value of the domino tile.
-        /// </summary>
+            new PropertyMetadata(Brushes.Black));
+
         public int TopValue
         {
             get
@@ -70,9 +55,7 @@ namespace DominoAllFives.Client.WPF.Controls
                 SetValue(TopValueProperty, value);
             }
         }
-        /// <summary>
-        /// Gets or sets the bottom numeric value of the domino tile.
-        /// </summary>
+
         public int BottomValue
         {
             get
@@ -84,9 +67,7 @@ namespace DominoAllFives.Client.WPF.Controls
                 SetValue(BottomValueProperty, value);
             }
         }
-        /// <summary>
-        /// Gets or sets the type of the domino tile.
-        /// </summary>
+
         public DominoTileType TileType
         {
             get
@@ -98,9 +79,7 @@ namespace DominoAllFives.Client.WPF.Controls
                 SetValue(TileTypeProperty, value);
             }
         }
-        /// <summary>
-        /// Gets or sets the brush used to paint the pips of the domino tile.
-        /// </summary>
+
         public Brush PipBrush
         {
             get
@@ -113,9 +92,6 @@ namespace DominoAllFives.Client.WPF.Controls
             }
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref = "DominoTile"/> class.
-        /// </summary>
         public DominoTile()
         {
             InitializeComponent();
@@ -184,13 +160,7 @@ namespace DominoAllFives.Client.WPF.Controls
                 return;
             }
 
-            foreach (Ellipse pip in pips)
-            {
-                if (pip != null)
-                {
-                    pip.Visibility = Visibility.Collapsed;
-                }
-            }
+            ClearPips(pips);
 
             Ellipse topLeftPip = pips[0];
             Ellipse topRightPip = pips[1];
@@ -234,6 +204,17 @@ namespace DominoAllFives.Client.WPF.Controls
                     bottomLeftPip.Visibility = Visibility.Visible;
                     bottomRightPip.Visibility = Visibility.Visible;
                     break;
+            }
+        }
+
+        private static void ClearPips(Ellipse[] pips)
+        {
+            foreach (Ellipse pip in pips)
+            {
+                if (pip != null)
+                {
+                    pip.Visibility = Visibility.Collapsed;
+                }
             }
         }
     }

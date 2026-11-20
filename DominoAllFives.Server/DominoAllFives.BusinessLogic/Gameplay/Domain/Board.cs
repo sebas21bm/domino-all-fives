@@ -3,40 +3,11 @@ using System.Collections.Generic;
 
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
-    public sealed class Board
+    internal sealed class Board
     {
         private const int UnblockedTurn = -1;
         private readonly List<Placement> _tiles = new List<Placement>();
         private readonly List<BoardEndState> _ends = new List<BoardEndState>();
-
-        internal Board Copy()
-        {
-            Board copy = new Board();
-            foreach (Placement placement in _tiles)
-            {
-                copy._tiles.Add(new Placement
-                {
-                    Tile = placement.Tile,
-                    End = placement.End,
-                    ConnectingValue = placement.ConnectingValue,
-                    ExposedValue = placement.ExposedValue
-                });
-            }
-
-            foreach (BoardEndState end in _ends)
-            {
-                copy._ends.Add(new BoardEndState
-                {
-                    End = end.End,
-                    Value = end.Value,
-                    ScoreValue = end.ScoreValue,
-                    BlockedTurn = end.BlockedTurn,
-                    IsOpeningEnd = end.IsOpeningEnd
-                });
-            }
-
-            return copy;
-        }
 
         public IReadOnlyList<Placement> Tiles
         {
@@ -112,23 +83,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 
             BoardEndState target = FindEnd(end);
             int connectingValue = target.Value;
-            target.Value = tile.GetOtherValue(connectingValue);
-
-            if (tile.IsDouble)
-            {
-                target.ScoreValue = tile.TotalPips;
-            }
-            else
-            {
-                target.ScoreValue = target.Value;
-            }
-
-            target.IsOpeningEnd = false;
-            target.BlockedTurn = UnblockedTurn;
-            if (tile.SpecialPower == SpecialPower.Block)
-            {
-                target.BlockedTurn = turnNumber + 1;
-            }
+            UpdateEnd(target, tile, turnNumber);
 
             Placement placement = new Placement
             {
@@ -169,6 +124,56 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             }
 
             return scoringValues.ToArray();
+        }
+
+        internal Board Copy()
+        {
+            Board copy = new Board();
+            foreach (Placement placement in _tiles)
+            {
+                copy._tiles.Add(new Placement
+                {
+                    Tile = placement.Tile,
+                    End = placement.End,
+                    ConnectingValue = placement.ConnectingValue,
+                    ExposedValue = placement.ExposedValue
+                });
+            }
+
+            foreach (BoardEndState end in _ends)
+            {
+                copy._ends.Add(new BoardEndState
+                {
+                    End = end.End,
+                    Value = end.Value,
+                    ScoreValue = end.ScoreValue,
+                    BlockedTurn = end.BlockedTurn,
+                    IsOpeningEnd = end.IsOpeningEnd
+                });
+            }
+
+            return copy;
+        }
+
+        private static void UpdateEnd(BoardEndState target, Tile tile, int turnNumber)
+        {
+            target.Value = tile.GetOtherValue(target.Value);
+
+            if (tile.IsDouble)
+            {
+                target.ScoreValue = tile.TotalPips;
+            }
+            else
+            {
+                target.ScoreValue = target.Value;
+            }
+
+            target.IsOpeningEnd = false;
+            target.BlockedTurn = UnblockedTurn;
+            if (tile.SpecialPower == SpecialPower.Block)
+            {
+                target.BlockedTurn = turnNumber + 1;
+            }
         }
 
         private void BlockOpeningEndWhenRequired(

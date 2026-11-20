@@ -23,6 +23,7 @@ namespace DominoAllFives.Server.Tests
         [TestCase(typeof(PublicBoard))]
         [TestCase(typeof(PublicEnd))]
         [TestCase(typeof(RoundResult))]
+        [TestCase(typeof(TurnActionNotice))]
         public void DataContract_Model_DeclaresSimpleMembers(Type modelType)
         {
             // Arrange

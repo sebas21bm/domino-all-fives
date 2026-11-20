@@ -1,7 +1,5 @@
 using System;
-using System.Data.Entity.Core;
-using System.Data.Entity.Infrastructure;
-using System.Data.SqlClient;
+using DominoAllFives.BusinessLogic.Exceptions;
 using DominoAllFives.Contracts.Enums;
 using DominoAllFives.DataAccess.Interfaces;
 using DominoAllFives.DataAccess.Repositories;
@@ -17,63 +15,67 @@ namespace DominoAllFives.BusinessLogic.Controllers
         private const string SpanishLanguageId = "es-MX";
         private const string EnglishLanguageId = "en-US";
         private const string PortugueseLanguageId = "pt-BR";
-        private readonly Func<ILanguagePreferenceStore> _storeFactory;
-        private readonly ILogger<AccountLanguageController> _logger;
-        public AccountLanguageController(ILogger<AccountLanguageController> logger) : this(
-            () => new LanguagePreferenceStore(),
-            logger)
-        {
-        }
 
-        public AccountLanguageController(
-            Func<ILanguagePreferenceStore> storeFactory,
-            ILogger<AccountLanguageController> logger)
+        private readonly ILogger<AccountLanguageController> _logger;
+
+        public AccountLanguageController(ILogger<AccountLanguageController> logger)
         {
-            _storeFactory = storeFactory ?? throw new ArgumentNullException(nameof(storeFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
         /// Validates the language and commits it before reporting completion.
         /// </summary>
-        public LanguagePreferenceStatus ChangePreferredLanguage(int playerId, string languageId)
+        /// <param name = "playerId">The player identified by the server.</param>
+        /// <param name = "preferredLanguageId">The requested language identifier.</param>
+        /// <exception cref = "ArgumentOutOfRangeException">
+        /// The player ID is not positive.
+        /// </exception>
+        /// <exception cref = "AccountRuleException">
+        /// The account or language was rejected.
+        /// </exception>
+        /// <exception cref = "InvalidOperationException">
+        /// The supported language is missing from the catalog.
+        /// </exception>
+        public void ChangePreferredLanguage(int playerId, string preferredLanguageId)
         {
             if (playerId <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(playerId));
             }
 
-            if (languageId != SpanishLanguageId
-                && languageId != EnglishLanguageId
-                && languageId != PortugueseLanguageId)
+            if (preferredLanguageId != SpanishLanguageId
+                && preferredLanguageId != EnglishLanguageId
+                && preferredLanguageId != PortugueseLanguageId)
             {
-                throw new ArgumentException("The language is not supported.", nameof(languageId));
+                throw new AccountRuleException(AccountIssue.UnsupportedLanguage);
             }
 
-            using (ILanguagePreferenceStore store = _storeFactory())
+            using (ILanguagePreferenceStore store = new LanguagePreferenceStore())
             {
-                return PersistLanguage(store, playerId, languageId);
+                PersistLanguage(store, playerId, preferredLanguageId);
             }
+
+            _logger.LogDebug("Preferred language saved for player {PlayerId}.", playerId);
         }
 
-        private static LanguagePreferenceStatus PersistLanguage(
+        private static void PersistLanguage(
             ILanguagePreferenceStore store,
             int playerId,
-            string languageId)
+            string preferredLanguageId)
         {
-            if (!store.LanguageExists(languageId))
+            if (!store.LanguageExists(preferredLanguageId))
             {
                 throw new InvalidOperationException(
                     "The supported language is absent from the language catalog.");
             }
 
-            if (!store.UpdatePreferredLanguage(playerId, languageId))
+            if (!store.UpdatePreferredLanguage(playerId, preferredLanguageId))
             {
-                return LanguagePreferenceStatus.AccountNotFound;
+                throw new AccountRuleException(AccountIssue.PlayerNotFound);
             }
 
             store.SaveChanges();
-            return LanguagePreferenceStatus.None;
         }
     }
 }

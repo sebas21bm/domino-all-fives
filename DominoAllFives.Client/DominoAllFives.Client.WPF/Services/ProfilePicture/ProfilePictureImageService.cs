@@ -70,6 +70,17 @@ namespace DominoAllFives.Client.WPF.Services.ProfilePicture
                     "Unable to create a profile picture from the provided image data.");
                 return GetDefaultProfilePicture();
             }
+            catch (FileFormatException ex)
+            {
+                _logger.LogWarning(ex, "Profile picture content has an invalid image format.");
+                return GetDefaultProfilePicture();
+            }
+            catch (IOException ex)
+            {
+                _logger.LogWarning(ex, "Profile picture content could not be decoded.");
+                return GetDefaultProfilePicture();
+            }
+
         }
 
         private BitmapImage GetDefaultProfilePicture()

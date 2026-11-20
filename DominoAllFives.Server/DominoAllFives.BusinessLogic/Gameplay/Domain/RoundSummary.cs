@@ -3,13 +3,16 @@ using System.Collections.ObjectModel;
 
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
-    public sealed class RoundSummary
+    internal sealed class RoundSummary
     {
         public int RoundNumber { get; }
         public int? WinnerId { get; }
         public int AwardedPoints { get; }
         public IReadOnlyDictionary<int, int> Scores { get; }
         public IReadOnlyDictionary<int, IReadOnlyList<Tile>> RemainingHands { get; }
+        internal Board ClosedBoard { get; private set; }
+        internal int ClosingTurn { get; private set; }
+        internal long Version { get; private set; }
 
         internal RoundSummary(
             int roundNumber,
@@ -38,6 +41,13 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 
             Scores = new ReadOnlyDictionary<int, int>(scores);
             RemainingHands = new ReadOnlyDictionary<int, IReadOnlyList<Tile>>(remainingHands);
+        }
+
+        internal void CaptureClosingBoard(Board board, int turnNumber, long version)
+        {
+            ClosedBoard = board.Copy();
+            ClosingTurn = turnNumber;
+            Version = version;
         }
     }
 }

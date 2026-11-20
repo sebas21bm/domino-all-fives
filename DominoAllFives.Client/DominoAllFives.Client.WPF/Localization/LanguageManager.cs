@@ -13,17 +13,19 @@ namespace DominoAllFives.Client.WPF.Localization
     /// </summary>
     public class LanguageManager : INotifyPropertyChanged
     {
-        private const string DefaultLanguageCode = "es-MX";
         private const string SpanishLanguageCode = "es-MX";
         private const string EnglishLanguageCode = "en-US";
         private const string PortugueseLanguageCode = "pt-BR";
+        private const string DefaultLanguageCode = SpanishLanguageCode;
+
         private static readonly Lazy<LanguageManager> instance =
-            new Lazy<LanguageManager>(
-            () => new LanguageManager());
+            new Lazy<LanguageManager>(CreateInstance);
+
         private readonly ResourceManager _resourceManager;
-        private string _currentLanguageCode;
         private readonly Func<string> _readDeviceLanguage;
         private readonly Action<string> _saveDeviceLanguage;
+        private string _currentLanguageCode;
+
         public static LanguageManager Instance
         {
             get
@@ -31,6 +33,7 @@ namespace DominoAllFives.Client.WPF.Localization
                 return instance.Value;
             }
         }
+
         public string CurrentLanguageCode
         {
             get
@@ -38,6 +41,7 @@ namespace DominoAllFives.Client.WPF.Localization
                 return _currentLanguageCode;
             }
         }
+
         public CultureInfo CurrentCulture
         {
             get
@@ -63,7 +67,7 @@ namespace DominoAllFives.Client.WPF.Localization
             }
         }
 
-        private LanguageManager() : this(() => Settings.Default.LanguageCode, SaveDeviceLanguage)
+        private LanguageManager() : this(ReadDeviceLanguage, SaveDeviceLanguage)
         {
         }
 
@@ -77,8 +81,7 @@ namespace DominoAllFives.Client.WPF.Localization
             _saveDeviceLanguage = saveDeviceLanguage ?? throw new ArgumentNullException(
                 nameof(saveDeviceLanguage));
             _resourceManager = new ResourceManager(
-                "DominoAllFives.Client.WPF.Localization.Resources",
-                typeof(Resources).Assembly);
+                typeof(Resources).FullName, typeof(Resources).Assembly);
             string savedLanguage = _readDeviceLanguage();
             if (string.IsNullOrWhiteSpace(savedLanguage) || !IsSupportedLanguage(savedLanguage))
             {
@@ -89,16 +92,11 @@ namespace DominoAllFives.Client.WPF.Localization
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
         public void ChangeLanguage(string cultureCode)
         {
-            if (string.IsNullOrWhiteSpace(cultureCode) || !IsSupportedLanguage(cultureCode))
-            {
-                cultureCode = DefaultLanguageCode;
-            }
-
-            _saveDeviceLanguage(cultureCode);
-            ApplyCulture(cultureCode);
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
+            string savedLanguage = PersistDeviceLanguage(cultureCode);
+            ApplyLanguage(savedLanguage);
         }
 
         /// <summary>
@@ -106,13 +104,7 @@ namespace DominoAllFives.Client.WPF.Localization
         /// </summary>
         public void ApplyAccountLanguage(string languageCode)
         {
-            if (!IsSupportedLanguage(languageCode))
-            {
-                languageCode = DefaultLanguageCode;
-            }
-
-            ApplyCulture(languageCode);
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
+            ApplyLanguage(languageCode);
         }
 
         /// <summary>
@@ -120,9 +112,37 @@ namespace DominoAllFives.Client.WPF.Localization
         /// </summary>
         public void RestoreDeviceLanguage()
         {
-            string languageCode = _readDeviceLanguage();
-            ApplyCulture(IsSupportedLanguage(languageCode) ? languageCode : DefaultLanguageCode);
+            ApplyLanguage(_readDeviceLanguage());
+        }
+
+        /// <summary>Saves the device preference without applying it.</summary>
+        internal string PersistDeviceLanguage(string languageCode)
+        {
+            string supportedLanguage = IsSupportedLanguage(languageCode)
+                ? languageCode
+                : DefaultLanguageCode;
+            _saveDeviceLanguage(supportedLanguage);
+            return supportedLanguage;
+        }
+
+        /// <summary>Applies a language and refreshes bindings on the UI thread.</summary>
+        internal void ApplyLanguage(string languageCode)
+        {
+            string supportedLanguage = IsSupportedLanguage(languageCode)
+                ? languageCode
+                : DefaultLanguageCode;
+            ApplyCulture(supportedLanguage);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
+        }
+
+        private static LanguageManager CreateInstance()
+        {
+            return new LanguageManager();
+        }
+
+        private static string ReadDeviceLanguage()
+        {
+            return Settings.Default.LanguageCode;
         }
 
         private static bool IsSupportedLanguage(string languageCode)
@@ -130,16 +150,6 @@ namespace DominoAllFives.Client.WPF.Localization
             return languageCode == SpanishLanguageCode
                 || languageCode == EnglishLanguageCode
                 || languageCode == PortugueseLanguageCode;
-        }
-
-        private void ApplyCulture(string cultureCode)
-        {
-            CultureInfo culture = new CultureInfo(cultureCode);
-            Thread.CurrentThread.CurrentCulture = culture;
-            Thread.CurrentThread.CurrentUICulture = culture;
-            CultureInfo.DefaultThreadCurrentCulture = culture;
-            CultureInfo.DefaultThreadCurrentUICulture = culture;
-            _currentLanguageCode = cultureCode;
         }
 
         private static void SaveDeviceLanguage(string language)
@@ -150,11 +160,21 @@ namespace DominoAllFives.Client.WPF.Localization
             {
                 Settings.Default.Save();
             }
-            catch (ConfigurationErrorsException ex)
+            catch (ConfigurationErrorsException)
             {
                 Settings.Default.LanguageCode = previousLanguage;
                 throw;
             }
+        }
+
+        private void ApplyCulture(string cultureCode)
+        {
+            CultureInfo culture = new CultureInfo(cultureCode);
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+            _currentLanguageCode = cultureCode;
         }
     }
 }

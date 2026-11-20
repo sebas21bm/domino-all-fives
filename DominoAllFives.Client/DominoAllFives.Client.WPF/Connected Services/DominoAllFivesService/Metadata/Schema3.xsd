@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="AccountIssue">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="InvalidCredentials" />
+      <xs:enumeration value="Banned" />
+      <xs:enumeration value="Suspended" />
+      <xs:enumeration value="PlayerNotFound" />
+      <xs:enumeration value="IncorrectCurrentPassword" />
+      <xs:enumeration value="InvalidPassword" />
+      <xs:enumeration value="PasswordUnchanged" />
+      <xs:enumeration value="UnsupportedLanguage" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="AccountIssue" nillable="true" type="tns:AccountIssue" />
+  <xs:simpleType name="RegistrationIssue">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="InvalidRegistrationData" />
+      <xs:enumeration value="InvalidUsername" />
+      <xs:enumeration value="InvalidEmail" />
+      <xs:enumeration value="InvalidPassword" />
+      <xs:enumeration value="UsernameAlreadyExists" />
+      <xs:enumeration value="EmailAlreadyExists" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="RegistrationIssue" nillable="true" type="tns:RegistrationIssue" />
+  <xs:simpleType name="AccessIssue">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SessionRequired" />
+      <xs:enumeration value="RegisteredAccountRequired" />
+      <xs:enumeration value="PermissionDenied" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="AccessIssue" nillable="true" type="tns:AccessIssue" />
+  <xs:simpleType name="ProfileIssue">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PlayerNotFound" />
+      <xs:enumeration value="InvalidUsername" />
+      <xs:enumeration value="SameUsername" />
+      <xs:enumeration value="UsernameAlreadyExists" />
+      <xs:enumeration value="InvalidProfilePictureFormat" />
+      <xs:enumeration value="ProfilePictureTooLarge" />
+      <xs:enumeration value="InvalidProfilePicture" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="ProfileIssue" nillable="true" type="tns:ProfileIssue" />
+</xs:schema>

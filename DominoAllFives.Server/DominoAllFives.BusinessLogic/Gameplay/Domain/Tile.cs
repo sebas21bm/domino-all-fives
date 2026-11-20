@@ -2,7 +2,7 @@ using System;
 
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
-    public sealed class Tile
+    internal sealed class Tile
     {
         public const int MaximumPips = 6;
         public int TileId { get; }
@@ -66,7 +66,12 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 throw new MatchRuleException(MatchIssue.InvalidPlacement);
             }
 
-            return FirstValue == value ? SecondValue : FirstValue;
+            if (FirstValue == value)
+            {
+                return SecondValue;
+            }
+
+            return FirstValue;
         }
     }
 }

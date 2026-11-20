@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\..\packages\EntityFramework.6.5.2\build\EntityFramework.props" Condition="Exists('..\..\packages\EntityFramework.6.5.2\build\EntityFramework.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -90,6 +90,8 @@
     <Compile Include="Controllers\RankingController.cs" />
     <Compile Include="Controllers\RegistrationController.cs" />
     <Compile Include="Exceptions\AccountRuleException.cs" />
+    <Compile Include="Exceptions\RegistrationRuleException.cs" />
+    <Compile Include="Exceptions\ProfileRuleException.cs" />
     <Compile Include="Exceptions\LobbyRuleException.cs" />
     <Compile Include="Managers\LobbyManager.cs" />
     <Compile Include="Managers\SessionManager.cs" />
@@ -171,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gameplay\Domain\RoundSummary.cs" />
+    <Compile Include="Gameplay\Domain\TurnAction.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gameplay\Domain\Tile.cs" />

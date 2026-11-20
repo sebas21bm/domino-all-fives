@@ -4,28 +4,23 @@ using DominoAllFives.Contracts.Gameplay;
 
 namespace DominoAllFives.Contracts.Services
 {
-    /// <summary>
-    /// Exposes authenticated match operations over a duplex WCF session.
-    /// </summary>
-    [ServiceContract(Namespace = "urn:domino-all-fives:services", CallbackContract = typeof(
-        IMatchCallback), SessionMode = SessionMode.Required)]
+    [ServiceContract(
+        Namespace = "urn:domino-all-fives:services",
+        CallbackContract = typeof(IMatchCallback),
+        SessionMode = SessionMode.Required)]
     public interface IMatchService
     {
         /// <summary>
-        /// Binds the authenticated player and callback to a match they participate in.
+        /// Binds an authenticated player and callback to a match.
         /// </summary>
-        /// <param name = "sessionKey">
-        /// The authentication token, revalidated for each service operation.
-        /// </param>
-        /// <param name = "matchId">
-        /// The match identifier, which must agree with the bound session.
-        /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The session is missing, revoked or bound to another match.
+        /// <param name="sessionKey">The authentication token.</param>
+        /// <param name="matchId">The match identifier.</param>
+        /// <returns>The current public match snapshot.</returns>
+        /// <exception cref="FaultException{AccessIssue}">
+        /// The token is invalid or this connection is already bound.
         /// </exception>
-        /// <exception cref = "FaultException{MatchIssue}">
-        /// Membership, version or a gameplay rule rejects the request.
+        /// <exception cref="FaultException{MatchIssue}">
+        /// The match is unavailable or the player does not belong to it.
         /// </exception>
         [OperationContract(IsInitiating = true)]
         [FaultContract(typeof(AccessIssue))]
@@ -33,17 +28,15 @@ namespace DominoAllFives.Contracts.Services
         MatchView OpenMatchSession(string sessionKey, int matchId);
 
         /// <summary>
-        /// Retrieves the public match snapshot without exposing opponents' hands.
+        /// Retrieves the public state of the match.
         /// </summary>
-        /// <param name = "matchId">
-        /// The match identifier, which must agree with the bound session.
-        /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The session is missing, revoked or bound to another match.
+        /// <param name="matchId">The bound match identifier.</param>
+        /// <returns>The board, turn and scores at the current version.</returns>
+        /// <exception cref="FaultException{AccessIssue}">
+        /// The session is invalid or cannot access the match.
         /// </exception>
-        /// <exception cref = "FaultException{MatchIssue}">
-        /// Membership, version or a gameplay rule rejects the request.
+        /// <exception cref="FaultException{MatchIssue}">
+        /// The match is unavailable or the player does not belong to it.
         /// </exception>
         [OperationContract(IsInitiating = false)]
         [FaultContract(typeof(AccessIssue))]
@@ -51,17 +44,15 @@ namespace DominoAllFives.Contracts.Services
         MatchView GetMatch(int matchId);
 
         /// <summary>
-        /// Retrieves only the authenticated player's hand and its snapshot version.
+        /// Retrieves the authenticated player's hand.
         /// </summary>
-        /// <param name = "matchId">
-        /// The match identifier, which must agree with the bound session.
-        /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The session is missing, revoked or bound to another match.
+        /// <param name="matchId">The bound match identifier.</param>
+        /// <returns>The player's private tiles and their snapshot version.</returns>
+        /// <exception cref="FaultException{AccessIssue}">
+        /// The session is invalid or cannot access the match.
         /// </exception>
-        /// <exception cref = "FaultException{MatchIssue}">
-        /// Membership, version or a gameplay rule rejects the request.
+        /// <exception cref="FaultException{MatchIssue}">
+        /// The match is unavailable or the player does not belong to it.
         /// </exception>
         [OperationContract(IsInitiating = false)]
         [FaultContract(typeof(AccessIssue))]
@@ -69,22 +60,17 @@ namespace DominoAllFives.Contracts.Services
         PlayerHand GetHand(int matchId);
 
         /// <summary>
-        /// Places an owned tile using server values and the expected match version.
+        /// Places an owned tile on the board.
         /// </summary>
-        /// <param name = "matchId">
-        /// The match identifier, which must agree with the bound session.
-        /// </param>
-        /// <param name = "tile">The selected tile; the server trusts only its identifier.</param>
-        /// <param name = "end">The logical end on which to place the tile.</param>
-        /// <param name = "expectedVersion">
-        /// The snapshot version on which the player's intention is based.
-        /// </param>
-        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The session is missing, revoked or bound to another match.
+        /// <param name="matchId">The bound match identifier.</param>
+        /// <param name="tile">The selected tile, identified by its ID.</param>
+        /// <param name="end">The board end to play on.</param>
+        /// <param name="expectedVersion">The version displayed when the move was selected.</param>
+        /// <exception cref="FaultException{AccessIssue}">
+        /// The session is invalid or cannot access the match.
         /// </exception>
-        /// <exception cref = "FaultException{MatchIssue}">
-        /// Membership, version or a gameplay rule rejects the request.
+        /// <exception cref="FaultException{MatchIssue}">
+        /// The match, version, turn or placement does not allow the move.
         /// </exception>
         [OperationContract(IsInitiating = false)]
         [FaultContract(typeof(AccessIssue))]
@@ -92,20 +78,15 @@ namespace DominoAllFives.Contracts.Services
         void PlayTile(int matchId, DominoTile tile, BoardEnd end, long expectedVersion);
 
         /// <summary>
-        /// Draws until a legal move exists or the stock is exhausted, preserving the turn.
+        /// Draws until a legal move exists or the stock is exhausted.
         /// </summary>
-        /// <param name = "matchId">
-        /// The match identifier, which must agree with the bound session.
-        /// </param>
-        /// <param name = "expectedVersion">
-        /// The snapshot version on which the player's intention is based.
-        /// </param>
-        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The session is missing, revoked or bound to another match.
+        /// <param name="matchId">The bound match identifier.</param>
+        /// <param name="expectedVersion">The version used to request the action.</param>
+        /// <exception cref="FaultException{AccessIssue}">
+        /// The session is invalid or cannot access the match.
         /// </exception>
-        /// <exception cref = "FaultException{MatchIssue}">
-        /// Membership, version or a gameplay rule rejects the request.
+        /// <exception cref="FaultException{MatchIssue}">
+        /// The match, version, turn or drawing rules disallow the action.
         /// </exception>
         [OperationContract(IsInitiating = false)]
         [FaultContract(typeof(AccessIssue))]
@@ -113,20 +94,15 @@ namespace DominoAllFives.Contracts.Services
         void DrawTiles(int matchId, long expectedVersion);
 
         /// <summary>
-        /// Passes only when the stock is empty and the player has no legal move.
+        /// Passes when the stock is empty and there is no legal move.
         /// </summary>
-        /// <param name = "matchId">
-        /// The match identifier, which must agree with the bound session.
-        /// </param>
-        /// <param name = "expectedVersion">
-        /// The snapshot version on which the player's intention is based.
-        /// </param>
-        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The session is missing, revoked or bound to another match.
+        /// <param name="matchId">The bound match identifier.</param>
+        /// <param name="expectedVersion">The version used to request the action.</param>
+        /// <exception cref="FaultException{AccessIssue}">
+        /// The session is invalid or cannot access the match.
         /// </exception>
-        /// <exception cref = "FaultException{MatchIssue}">
-        /// Membership, version or a gameplay rule rejects the request.
+        /// <exception cref="FaultException{MatchIssue}">
+        /// The match, version, turn or passing rules disallow the action.
         /// </exception>
         [OperationContract(IsInitiating = false)]
         [FaultContract(typeof(AccessIssue))]
@@ -134,16 +110,14 @@ namespace DominoAllFives.Contracts.Services
         void PassTurn(int matchId, long expectedVersion);
 
         /// <summary>
-        /// Cancels the match without a winner when a participant explicitly leaves.
+        /// Cancels an active match without a winner.
         /// </summary>
-        /// <param name = "matchId">
-        /// The match identifier, which must agree with the bound session.
-        /// </param>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The session is missing, revoked or bound to another match.
+        /// <param name="matchId">The bound match identifier.</param>
+        /// <exception cref="FaultException{AccessIssue}">
+        /// The session is invalid or cannot access the match.
         /// </exception>
-        /// <exception cref = "FaultException{MatchIssue}">
-        /// Membership, version or a gameplay rule rejects the request.
+        /// <exception cref="FaultException{MatchIssue}">
+        /// The match is unavailable or the player does not belong to it.
         /// </exception>
         [OperationContract(IsInitiating = false)]
         [FaultContract(typeof(AccessIssue))]

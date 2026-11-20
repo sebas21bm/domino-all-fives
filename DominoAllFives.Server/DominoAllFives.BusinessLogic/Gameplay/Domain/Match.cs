@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
-    public sealed class Match
+    internal sealed class Match
     {
         private const int MinimumPlayers = 2;
         private const int MaximumPlayers = 4;
@@ -32,6 +32,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
         public MatchState Phase { get; private set; }
         public RoundSummary LastRound { get; private set; }
         public PlayScore LastPlay { get; private set; }
+        public TurnAction LastTurnAction { get; private set; }
 
         public int StockCount
         {
@@ -79,8 +80,8 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 throw new ArgumentNullException(nameof(playerIds));
             }
 
-            List<int> ids = playerIds.ToList();
-            ValidatePlayerIds(ids, nameof(playerIds));
+            List<int> matchPlayerIds = playerIds.ToList();
+            ValidatePlayerIds(matchPlayerIds, nameof(playerIds));
             if (!allowedTargets.Contains(targetPoints))
             {
                 throw new ArgumentOutOfRangeException(nameof(targetPoints));
@@ -88,7 +89,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 
             MatchId = matchId;
             TargetPoints = targetPoints;
-            _players = CreatePlayers(ids);
+            _players = CreatePlayers(matchPlayerIds);
             BeginRound(initialDeck);
         }
 
@@ -126,6 +127,71 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 
             PreparedPlay play = PreparePlay(player, tile, end);
             ApplyPlay(play);
+        }
+
+        public void Draw(int playerId, long expectedVersion)
+        {
+            MatchPlayer player = ValidateTurn(playerId, expectedVersion);
+            bool playerHasMove = Board.HasMove(player.Hand, TurnNumber);
+            bool stockIsEmpty = _stock.Count == 0;
+            if (playerHasMove || stockIsEmpty)
+            {
+                throw new MatchRuleException(MatchIssue.DrawNotAllowed);
+            }
+
+            do
+            {
+                Tile drawnTile = _stock.Dequeue();
+                player.Hand.Add(drawnTile);
+                playerHasMove = Board.HasMove(player.Hand, TurnNumber);
+                stockIsEmpty = _stock.Count == 0;
+            }
+            while (!stockIsEmpty && !playerHasMove);
+
+            Version++;
+            LastTurnAction = new TurnAction(playerId, false, Version);
+        }
+
+        public void Pass(int playerId, long expectedVersion)
+        {
+            MatchPlayer player = ValidateTurn(playerId, expectedVersion);
+            bool stockHasTiles = _stock.Count > 0;
+            bool playerHasMove = Board.HasMove(player.Hand, TurnNumber);
+            if (stockHasTiles || playerHasMove)
+            {
+                throw new MatchRuleException(MatchIssue.PassNotAllowed);
+            }
+
+            int nextPassCount = _consecutivePasses + 1;
+            int nextTurnNumber = TurnNumber + 1;
+            PreparedRoundEnd roundEnd = null;
+            if (nextPassCount >= _players.Count && !AnyPlayerHasMove(nextTurnNumber))
+            {
+                RoundSummary round = RoundResolution.ResolveBlocked(_players, RoundNumber);
+                roundEnd = PrepareRoundEnd(round);
+            }
+
+            _consecutivePasses = nextPassCount;
+            AdvanceTurn();
+            if (roundEnd != null)
+            {
+                ApplyRoundEnd(roundEnd);
+            }
+
+            Version++;
+            LastTurnAction = new TurnAction(playerId, true, Version);
+        }
+
+        public void Cancel(int playerId)
+        {
+            GetPlayer(playerId);
+            if (Phase != MatchState.InProgress)
+            {
+                return;
+            }
+
+            Phase = MatchState.Cancelled;
+            Version++;
         }
 
         private PreparedPlay PreparePlay(MatchPlayer player, Tile tile, BoardEndPosition end)
@@ -185,69 +251,6 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 AdvanceTurn();
             }
 
-            Version++;
-        }
-
-        public void Draw(int playerId, long expectedVersion)
-        {
-            MatchPlayer player = ValidateTurn(playerId, expectedVersion);
-            bool playerHasMove = Board.HasMove(player.Hand, TurnNumber);
-            bool stockIsEmpty = _stock.Count == 0;
-            if (playerHasMove || stockIsEmpty)
-            {
-                throw new MatchRuleException(MatchIssue.DrawNotAllowed);
-            }
-
-            do
-            {
-                Tile drawnTile = _stock.Dequeue();
-                player.Hand.Add(drawnTile);
-                playerHasMove = Board.HasMove(player.Hand, TurnNumber);
-                stockIsEmpty = _stock.Count == 0;
-            }
-            while (!stockIsEmpty && !playerHasMove);
-
-            Version++;
-        }
-
-        public void Pass(int playerId, long expectedVersion)
-        {
-            MatchPlayer player = ValidateTurn(playerId, expectedVersion);
-            bool stockHasTiles = _stock.Count > 0;
-            bool playerHasMove = Board.HasMove(player.Hand, TurnNumber);
-            if (stockHasTiles || playerHasMove)
-            {
-                throw new MatchRuleException(MatchIssue.PassNotAllowed);
-            }
-
-            int nextPassCount = _consecutivePasses + 1;
-            int nextTurnNumber = TurnNumber + 1;
-            PreparedRoundEnd roundEnd = null;
-            if (nextPassCount >= _players.Count && !AnyPlayerHasMove(nextTurnNumber))
-            {
-                RoundSummary round = RoundResolution.ResolveBlocked(_players, RoundNumber);
-                roundEnd = PrepareRoundEnd(round);
-            }
-
-            _consecutivePasses = nextPassCount;
-            AdvanceTurn();
-            if (roundEnd != null)
-            {
-                ApplyRoundEnd(roundEnd);
-            }
-
-            Version++;
-        }
-
-        public void Cancel(int playerId)
-        {
-            GetPlayer(playerId);
-            if (Phase != MatchState.InProgress)
-            {
-                return;
-            }
-
-            Phase = MatchState.Cancelled;
             Version++;
         }
 
@@ -362,6 +365,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 roundEnd.Winner.Points += roundEnd.Summary.AwardedPoints;
             }
 
+            roundEnd.Summary.CaptureClosingBoard(Board, TurnNumber, Version + 1);
             LastRound = roundEnd.Summary;
             if (roundEnd.NextRound == null)
             {
@@ -403,9 +407,9 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 
         private void ApplyPreparedRound(PreparedRound round, List<MatchPlayer> orderedPlayers)
         {
-            for (int index = 0; index < orderedPlayers.Count; index++)
+            for (int playerIndex = 0; playerIndex < orderedPlayers.Count; playerIndex++)
             {
-                orderedPlayers[index].Hand = round.Players[index].Hand;
+                orderedPlayers[playerIndex].Hand = round.Players[playerIndex].Hand;
             }
 
             _players = orderedPlayers;

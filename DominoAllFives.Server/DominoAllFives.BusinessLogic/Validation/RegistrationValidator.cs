@@ -1,47 +1,40 @@
+using System;
+using DominoAllFives.BusinessLogic.Exceptions;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
 
 namespace DominoAllFives.BusinessLogic.Validation
 {
-    /// <summary>
-    /// Validates business rules for player account registration.
-    /// </summary>
+    /// <summary>Validates the ordered business rules for account registration.</summary>
     public static class RegistrationValidator
     {
-        /// <summary>
-        /// Validates the registration data against the account
-        /// registration business rules.
-        /// </summary>
-        /// <param name = "registrationData">
-        /// The registration information to validate.
-        /// </param>
-        /// <returns>
-        /// None when the data is valid; otherwise, the reason
-        /// why validation failed.
-        /// </returns>
-        public static RegistrationStatus Validate(AccountRegistration registrationData)
+        /// <summary>Validates username, email and password in their established order.</summary>
+        /// <param name = "registrationData">The account information supplied by the player.</param>
+        /// <exception cref = "ArgumentNullException">The registration data is null.</exception>
+        /// <exception cref = "RegistrationRuleException">
+        /// An account rule is not satisfied.
+        /// </exception>
+        public static void Validate(AccountRegistration registrationData)
         {
             if (registrationData == null)
             {
-                throw new System.ArgumentNullException(nameof(registrationData));
+                throw new ArgumentNullException(nameof(registrationData));
             }
 
             if (!AccountValidator.IsUsernameValid(registrationData.Username))
             {
-                return RegistrationStatus.InvalidUsername;
+                throw new RegistrationRuleException(RegistrationIssue.InvalidUsername);
             }
 
             if (!AccountValidator.IsEmailValid(registrationData.Email))
             {
-                return RegistrationStatus.InvalidEmail;
+                throw new RegistrationRuleException(RegistrationIssue.InvalidEmail);
             }
 
             if (!AccountValidator.IsPasswordValid(registrationData.Password))
             {
-                return RegistrationStatus.InvalidPassword;
+                throw new RegistrationRuleException(RegistrationIssue.InvalidPassword);
             }
-
-            return RegistrationStatus.None;
         }
     }
 }

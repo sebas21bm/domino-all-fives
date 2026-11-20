@@ -136,7 +136,7 @@ Esto evita reutilizar canales WCF que hayan quedado en estado `Faulted`.
 El cliente utiliza:
 
 ```text
-LoginClient (:ILoginClient)
+SessionClient (:ISessionClient)
     │
     ▼
 SessionAccountClient
@@ -148,7 +148,7 @@ AuthenticationEndpoint
 DominoService
 ```
 
-`LoginClient` no contiene lógica de autenticación. Su responsabilidad consiste en adaptar la llamada del cliente al proxy generado:
+`SessionClient` no contiene lógica de autenticación. Su responsabilidad consiste en adaptar la llamada del cliente al proxy generado:
 
 ```csharp
 return WcfInvoker.Invoke<SessionAccountClient, PlayerAccount>(
@@ -186,6 +186,171 @@ GetWinsRankingPositionById(int playerId)
 
 Cada operación crea y libera su propio proxy mediante `WcfInvoker`.
 
+
+### Ejemplo: Registro de cuenta
+
+El registro utiliza el patrón request/response:
+RegisterAccountViewModel → IRegistrationClient / RegistrationClient →
+RegistrationServiceClient (proxy generado) → RegistrationEndpoint
+(net.tcp, ruta Domino/registration) → DominoService : IRegistrationService →
+RegistrationController → RegistrationValidator / repositorios / Entity Framework.
+
+`Register(AccountRegistration)` devuelve un `PlayerAccount` con su `SessionKey`.
+El controller conserva las reglas de negocio, el hash de contraseña y la creación
+de Player y PlayerStats dentro del contexto de una operación. Devuelve directamente
+PlayerAccount y comunica los rechazos con RegistrationRuleException, que contiene
+RegistrationIssue. DominoService captura esa excepción y lanza directamente
+new FaultException<RegistrationIssue>(ex.Issue), como Login. Los errores técnicos
+se propagan hasta la frontera y se traducen a faults seguros.
+Una solicitud nula produce InvalidRegistrationData. La frontera abre la sesión
+con SessionManager después del alta, como en Login.
+
+El ViewModel comprueba campos requeridos y coincidencia de contraseñas, captura
+usuario/correo sin espacios externos y el idioma actual, y conserva la contraseña
+sin transformarla. Ejecuta el registro con BackgroundJob y BackgroundWork;
+deshabilita registrar y cancelar mientras espera. Clasifica rechazo, fault técnico
+y pérdida de comunicación para seleccionar mensajes existentes de los recursos.
+Después de validar la respuesta inicia PlayerSession con cuatro argumentos y
+navega al menú principal al aceptar el mensaje de éxito.
+
+Los metadatos WSDL/XSD se conservan junto a la referencia DominoAllFivesService.
+RegenerateProxy.ps1 permite exportarlos desde Contracts y generar Reference.cs
+con SvcUtil o con el generador de .NET Framework. No requiere iniciar el servidor.
+Se ejecuta con Windows PowerShell, indicando el ensamblado Contracts compilado en
+`-ContractsAssembly` y, opcionalmente, `-SvcUtilPath`.
+
+WcfInvoker conserva el resultado recibido cuando Close falla por comunicación o
+timeout: registra el cierre anómalo y aborta el canal. Un timeout durante la
+operación sigue propagándose. No hay reintento automático de registro: un fallo
+de transporte antes de recibir respuesta no permite asegurar si el alta ocurrió.
+
+OldClient permanece como implementación histórica; el cliente actual no
+referencia IAccountService local, BusinessLogic, repositorios ni Entity Framework.
+
+[Verificaciones del registro](Verificaciones%20auxiliares.md#migración-del-registro-de-cuenta-2026-11-18).
+
+---
+
+### Perfil de jugador e imagen
+
+El perfil usa IProfileService en DominoService, con el endpoint nuevo
+PlayerProfileEndpoint en la ruta Domino/profile y los bindings existentes.
+ProfileClient consume el proxy generado mediante WcfInvoker, con el mismo
+patrón de lambdas utilizado por SessionClient y RankingClient.
+
+| Operación | Resultado |
+| --- | --- |
+| GetMyProfile(sessionKey) | PlayerProfile propio con nombre, estadísticas y contenido de imagen opcional. |
+| UpdateProfileName(sessionKey, username) | Actualiza el nombre y conserva la imagen. |
+| UpdateProfileWithPicture(sessionKey, username, picture) | Guarda nombre e imagen en la operación conjunta del controller. |
+| SetProfilePicture(sessionKey, picture) | Establece o reemplaza la imagen. |
+| RemoveProfilePicture(sessionKey) | Retira la imagen asignada y aplica la limpieza existente. |
+
+Todas las operaciones resuelven el propietario mediante SessionManager; no reciben
+un identificador de jugador elegido por el cliente. Una clave ausente, desconocida
+o revocada produce FaultException<AccessIssue>. Los controllers conservan EF,
+repositorios, validadores, almacenamiento y limpieza de archivos. Las cuentas
+borradas se consideran no encontradas. Los controllers devuelven datos o finalizan
+sin resultado al tener éxito; los rechazos se comunican con ProfileRuleException.
+DominoService captura esa excepción y lanza directamente
+new FaultException<ProfileIssue>(ex.Issue), sin estados ni switches de conversión.
+Los errores de persistencia o escritura se registran en la frontera y se convierten
+en faults seguros. Los argumentos nulos conservan ArgumentNullException en el
+controller y se traducen mediante capturas filtradas por su parámetro en WCF.
+Los bloques finally de compensación y la recuperación de limpieza permanecen
+en los componentes responsables, sin duplicar el logging de Storage.
+
+PlayerProfile y PlayerStatistics tienen contratos de datos explícitos. Se utiliza
+ProfilePicture, que ya transportaba nombre de selección y bytes, sin enviar rutas
+de almacenamiento del servidor. Se conserva la validación actual de extensión
+y tamaño máximo de 1 MiB; no se añade una política nueva de contenido del lado
+servidor.
+
+Los constructores de perfil reciben únicamente PlayerSession y, en la subida
+opcional, las acciones de navegación. Inicializan estado y comandos sin acceder
+a servicios ni cargar datos. ViewModelFactory inyecta los servicios después de
+construirlos y llama a Initialize, con protección frente a uso previo o repetido.
+
+Para respetar el límite de cuatro parámetros por método, Profile configura
+primero el logger mediante ConfigureLogger, como Lobby. EditProfile configura
+primero los dos servicios locales de imagen mediante ConfigurePictures. Después,
+Initialize recibe los servicios restantes y comienza la carga. Upload recibe
+sus cuatro servicios en Initialize y espera una acción del usuario. No se crean
+contenedores adicionales de dependencias. Los comandos permanecen deshabilitados
+hasta que la inicialización está completa.
+
+ProfileViewModel y EditProfileViewModel cargan mediante BackgroundJob. Guardar,
+subir y eliminar también usan BackgroundWork; las continuaciones actualizan la
+vista en el Dispatcher. Se bloquean acciones incompatibles mientras hay una llamada
+pendiente y se capturan clave, nombre e imagen antes de enviarla. La sesión se
+actualiza con el nombre enviado que se confirmó, y se ignoran continuaciones cuya
+clave ya no corresponde a PlayerSession.
+
+EditProfile conserva la selección y previsualización local, el guardado conjunto,
+los mensajes localizados y el regreso con refresco del perfil. El botón de
+eliminación pide confirmación y explica que se guarda inmediatamente; descartar
+las ediciones de nombre no revierte una eliminación ya confirmada. Al volver
+desde perfil se refresca el menú para mostrar el nombre actual.
+
+Después del registro vuelve a mostrarse UploadProfilePicture: subir una imagen
+u omitir el paso lleva al menú; cancelar cierra el modal conservando la cuenta.
+La previsualización decodifica bytes localmente y las imágenes dañadas recuperan
+la imagen predeterminada sin dejar escapar errores de formato o lectura.
+
+WcfInvoker dispone de una sobrecarga para operaciones void que reutiliza el
+mismo cierre/aborto del invocador con resultado. El cliente no interpreta estados
+de persistencia ni referencia IAccountService, BusinessLogic o Entity Framework.
+
+Se mantienen las URL originales de ConnectedService.json y
+dotnet-svcutil.params.json para actualizar desde el servidor en Visual Studio.
+El proxy de esta entrega se generó con SvcUtil desde metadatos de DominoService
+alojado temporalmente para desarrollo; no se cambiaron los bindings, direcciones
+ni endpoints previos.
+
+La evidencia y los límites están en
+[Verificaciones auxiliares](Verificaciones%20auxiliares.md#migración-de-perfil-e-imagen-2026-11-19).
+
+---
+
+### Cambio de contraseña, idioma preferido y eliminación de cuenta
+
+`IAccountService` se publica en `DominoService` mediante
+`AccountSettingsEndpoint` en la ruta `Domino/account-settings`. El cliente
+`AccountClient` utiliza el proxy generado y la sobrecarga `void` de `WcfInvoker`.
+
+| Operación | Efecto confirmado por la respuesta |
+| --- | --- |
+| `ChangePassword(string sessionKey, string currentPassword, string newPassword)` | Guarda el hash de la nueva contraseña. |
+| `DeleteAccount(string sessionKey, string password)` | Guarda el borrado lógico e invalida la sesión de la cuenta. |
+| `ChangePreferredLanguage(string sessionKey, string preferredLanguageId)` | Guarda el idioma preferido de la cuenta. |
+
+`DominoService` resuelve la identidad con `SessionManager.GetPlayerId`.
+Una clave ausente, desconocida o revocada produce `FaultException<AccessIssue>`
+con `SessionRequired`. `AccountController` conserva la comprobación de
+credenciales, las reglas de negocio y la persistencia. Lanza
+`AccountRuleException` al rechazar una regla. La frontera traduce ese rechazo a
+`FaultException<AccountIssue>` y comunica los fallos de persistencia mediante
+un fault genérico seguro.
+
+Las vistas envían estas escrituras con `BackgroundWork` y actualizan la
+presentación en el Dispatcher. Una respuesta perdida puede corresponder a un
+cambio ya guardado, por lo que las escrituras no se reintentan automáticamente.
+
+`AccountLanguageController` valida el idioma y usa `LanguagePreferenceStore`
+para guardar la preferencia mediante Entity Framework. Un idioma no admitido
+produce `AccountIssue.UnsupportedLanguage` y una cuenta no disponible produce
+`AccountIssue.PlayerNotFound`. En Ajustes, la confirmación de una sesión vigente
+actualiza `PlayerSession` y aplica el idioma con `LanguageManager`. Los invitados
+guardan su preferencia en el dispositivo.
+
+La referencia se regeneró con SvcUtil 4.8 desde el endpoint MEX de un host
+temporal de `DominoService` sobre `net.pipe`. La integración se verificó con
+SQL Server LocalDB aislado y cuentas sintéticas, incluyendo la persistencia
+del hash, el borrado lógico, la revocación y los faults ante un fallo de
+guardado. Se verificaron también los diálogos en los tres idiomas y el regreso
+a la página de inicio al confirmar la eliminación.
+
+---
 
 ## Comunicación duplex
 

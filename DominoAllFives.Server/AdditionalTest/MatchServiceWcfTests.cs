@@ -19,6 +19,153 @@ namespace DominoAllFives.Server.AdditionalTest
     {
         private static int nextMatchId = 20000;
 
+        [TestCase(2)]
+        [TestCase(3)]
+        [TestCase(4)]
+        public void GeneratedClients_PlayMatchAndRecoverSharedStateAfterTransportLoss(int count)
+        {
+            const int MaximumActions = 600;
+            int matchId = Interlocked.Increment(ref nextMatchId);
+            int[] players = Enumerable.Range(matchId * 10, count).ToArray();
+            CreateMatch(matchId, players, 100);
+            string[] keys = players.Select(SessionManager.CreateSession).ToArray();
+            Proxy.MatchServiceClient[] clients = new Proxy.MatchServiceClient[count];
+            using (ServiceHost host = CreateHost())
+            {
+                try
+                {
+                    host.Open();
+                    EndpointAddress address = host.Description.Endpoints[0].Address;
+                    for (int index = 0; index < count; index++)
+                    {
+                        clients[index] = OpenGeneratedClient(address, keys[index], matchId);
+                        Proxy.PlayerHand hand = clients[index].GetHand(matchId);
+                        Assert.That(hand.PlayerId, Is.EqualTo(players[index]));
+                        Assert.That(hand.Tiles.Count, Is.EqualTo(count == 2 ? 7 : 5));
+                    }
+
+                    Proxy.MatchView initial = clients[0].GetMatch(matchId);
+                    clients[0].Abort();
+                    clients[0] = OpenGeneratedClient(address, keys[0], matchId);
+                    Assert.That(clients[0].GetHand(matchId).Version, Is.EqualTo(initial.Version));
+
+                    int starter = Array.IndexOf(players, initial.CurrentPlayerId.Value);
+                    Proxy.DominoTile opening = clients[starter].GetHand(matchId).Tiles
+                        .Single(tile => tile.TileId == initial.OpeningTileId);
+                    clients[starter].PlayTile(matchId, opening, Proxy.BoardEnd.Left, initial.Version);
+                    clients[starter].Abort();
+                    clients[starter] = OpenGeneratedClient(address, keys[starter], matchId);
+                    Proxy.MatchView current = clients[starter].GetMatch(matchId);
+                    Proxy.PlayerHand remaining = clients[starter].GetHand(matchId);
+                    Assert.That(current.Version, Is.EqualTo(initial.Version + 1));
+                    Assert.That(remaining.Version, Is.EqualTo(current.Version));
+                    Assert.That(current.Board.Tiles.Single().Tile.TileId, Is.EqualTo(opening.TileId));
+                    Assert.That(remaining.Tiles.Any(tile => tile.TileId == opening.TileId), Is.False);
+
+                    for (int action = 0; action < MaximumActions
+                        && current.Phase == Proxy.MatchStatus.InProgress; action++)
+                    {
+                        int actor = Array.IndexOf(players, current.CurrentPlayerId.Value);
+                        PlayLegalAction(clients[actor], current, players[actor]);
+                        Proxy.MatchView next = clients[actor].GetMatch(matchId);
+                        Assert.That(next.Version, Is.EqualTo(current.Version + 1));
+                        if (next.LastRound?.Version == next.Version)
+                        {
+                            Assert.That(next.LastRound.ClosedBoard.Tiles, Is.Not.Empty);
+                            Assert.That(next.LastRound.RevealedHands.Count, Is.EqualTo(count));
+                        }
+
+                        current = next;
+                    }
+
+                    Assert.That(current.Phase, Is.EqualTo(Proxy.MatchStatus.Completed));
+                    Assert.That(current.Result.WinnerIds.Count, Is.EqualTo(1));
+                    clients[0].Abort();
+                    clients[0] = OpenGeneratedClient(address, keys[0], matchId);
+                    for (int index = 0; index < count; index++)
+                    {
+                        Proxy.MatchView final = clients[index].GetMatch(matchId);
+                        Proxy.PlayerHand hand = clients[index].GetHand(matchId);
+                        Assert.That(final.Result.WinnerIds, Is.EqualTo(current.Result.WinnerIds));
+                        Assert.That(final.Scores.Count, Is.EqualTo(count));
+                        Assert.That(hand.PlayerId, Is.EqualTo(players[index]));
+                        Assert.That(hand.Version, Is.EqualTo(final.Version));
+                    }
+                }
+                finally
+                {
+                    foreach (Proxy.MatchServiceClient client in clients)
+                    {
+                        client?.Abort();
+                    }
+
+                    host.Abort();
+                    foreach (string key in keys)
+                    {
+                        SessionManager.RemoveSession(key);
+                    }
+
+                    MatchManager.Instance.RemoveMatch(matchId);
+                }
+            }
+        }
+
+        private static Proxy.MatchServiceClient OpenGeneratedClient(
+            EndpointAddress address, string key, int matchId)
+        {
+            Proxy.MatchServiceClient client = new Proxy.MatchServiceClient(
+                new InstanceContext(new MatchProxyCallback()), CreateBinding(), address);
+            try
+            {
+                client.OpenMatchSession(key, matchId);
+                return client;
+            }
+            catch
+            {
+                client.Abort();
+                throw;
+            }
+        }
+
+        private static void PlayLegalAction(
+            Proxy.MatchServiceClient client, Proxy.MatchView view, int playerId)
+        {
+            Proxy.PlayerHand hand = client.GetHand(view.MatchId);
+            Assert.That(hand.PlayerId, Is.EqualTo(playerId));
+            Assert.That(hand.Version, Is.EqualTo(view.Version));
+            if (view.Board.Tiles.Count == 0)
+            {
+                Proxy.DominoTile opening = hand.Tiles.Single(tile => tile.TileId == view.OpeningTileId);
+                client.PlayTile(view.MatchId, opening, Proxy.BoardEnd.Left, view.Version);
+                return;
+            }
+
+            foreach (Proxy.PublicEnd end in view.Board.Ends.Where(candidate => !candidate.IsBlocked))
+            {
+                Proxy.DominoTile tile = hand.Tiles.FirstOrDefault(candidate =>
+                    candidate.FirstValue == end.Value || candidate.SecondValue == end.Value);
+                if (tile != null)
+                {
+                    client.PlayTile(view.MatchId, tile, end.End, view.Version);
+                    return;
+                }
+            }
+
+            if (view.StockCount > 0)
+            {
+                client.DrawTiles(view.MatchId, view.Version);
+            }
+            else
+            {
+                client.PassTurn(view.MatchId, view.Version);
+            }
+
+            Proxy.TurnActionNotice notice = client.GetMatch(view.MatchId).LastTurnAction;
+            Assert.That(notice.PlayerId, Is.EqualTo(playerId));
+            Assert.That(notice.IsPass, Is.EqualTo(view.StockCount == 0));
+            Assert.That(notice.Version, Is.EqualTo(view.Version + 1));
+        }
+
         [TestCase(false)]
         [TestCase(true)]
         public void LeaveMatch_GeneratedProxy_PublishesSingleTerminalSnapshot(bool repeat)

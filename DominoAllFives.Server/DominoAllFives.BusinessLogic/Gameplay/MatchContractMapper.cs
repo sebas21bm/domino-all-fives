@@ -7,22 +7,10 @@ namespace DominoAllFives.BusinessLogic.Gameplay
     {
         public static GameplayContracts.MatchView CreateMatchView(Match match)
         {
-            List<GameplayContracts.PlacedTile> placedTiles =
-                new List<GameplayContracts.PlacedTile>();
-            foreach (Placement placement in match.Board.Tiles)
+            GameplayContracts.MatchResult result = null;
+            if (match.Phase != MatchState.InProgress)
             {
-                GameplayContracts.PlacedTile placedTile = CreatePlacedTile(placement);
-                placedTiles.Add(placedTile);
-            }
-
-            List<GameplayContracts.PublicEnd> publicEnds =
-                new List<GameplayContracts.PublicEnd>();
-            foreach (BoardEndState boardEnd in match.Board.Ends)
-            {
-                GameplayContracts.PublicEnd publicEnd = CreatePublicBoardEnd(
-                    boardEnd,
-                    match.TurnNumber);
-                publicEnds.Add(publicEnd);
+                result = CreateMatchResult(match);
             }
 
             return new GameplayContracts.MatchView
@@ -37,11 +25,9 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 Scores = CreatePlayerScores(match),
                 LastRound = CreateRoundResult(match),
                 LastPlay = CreatePlayScore(match.LastPlay),
-                Board = new GameplayContracts.PublicBoard
-                {
-                    Tiles = placedTiles,
-                    Ends = publicEnds
-                }
+                LastTurnAction = CreateTurnActionNotice(match.LastTurnAction),
+                Result = result,
+                Board = CreatePublicBoard(match.Board, match.TurnNumber)
             };
         }
 
@@ -88,6 +74,48 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 Version = match.Version,
                 Phase = (GameplayContracts.MatchStatus)match.Phase,
                 WinnerIds = winnerIds
+            };
+        }
+
+        private static GameplayContracts.PublicBoard CreatePublicBoard(Board board, int turnNumber)
+        {
+            List<GameplayContracts.PlacedTile> placedTiles =
+                new List<GameplayContracts.PlacedTile>();
+            foreach (Placement placement in board.Tiles)
+            {
+                GameplayContracts.PlacedTile placedTile = CreatePlacedTile(placement);
+                placedTiles.Add(placedTile);
+            }
+
+            List<GameplayContracts.PublicEnd> publicEnds =
+                new List<GameplayContracts.PublicEnd>();
+            foreach (BoardEndState boardEnd in board.Ends)
+            {
+                GameplayContracts.PublicEnd publicEnd = CreatePublicBoardEnd(
+                    boardEnd,
+                    turnNumber);
+                publicEnds.Add(publicEnd);
+            }
+
+            return new GameplayContracts.PublicBoard
+            {
+                Tiles = placedTiles,
+                Ends = publicEnds
+            };
+        }
+
+        private static GameplayContracts.TurnActionNotice CreateTurnActionNotice(TurnAction action)
+        {
+            if (action == null)
+            {
+                return null;
+            }
+
+            return new GameplayContracts.TurnActionNotice
+            {
+                PlayerId = action.PlayerId,
+                IsPass = action.IsPass,
+                Version = action.Version
             };
         }
 
@@ -177,7 +205,9 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 WinnerId = round.WinnerId,
                 AwardedPoints = round.AwardedPoints,
                 Scores = playerScores,
-                RevealedHands = revealedHands
+                RevealedHands = revealedHands,
+                ClosedBoard = CreatePublicBoard(round.ClosedBoard, round.ClosingTurn),
+                Version = round.Version
             };
         }
 
@@ -244,7 +274,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             {
                 MatchId = match.MatchId,
                 PlayerId = hand.Key,
-                Version = match.Version,
+                Version = match.LastRound.Version,
                 Tiles = dominoTiles
             };
         }

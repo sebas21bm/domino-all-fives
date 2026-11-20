@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.ServiceModel;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Threading;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
@@ -31,6 +33,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private bool _isModalVisible;
         private ViewModelBase _currentModal;
         private string _statusMessage = string.Empty;
+
         public ViewModelBase CurrentModal
         {
             get
@@ -116,8 +119,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
             KickPlayerCommand = new RelayCommand(DoNothing, CannotExecute);
         }
 
-        public void Initialize(IFrameNavigationService navigation, ILobbyClient lobbyService,
-            ProfilePictureImageService pictureService, IDialogService dialogService)
+        public void Initialize(
+            IFrameNavigationService navigation,
+            ILobbyClient lobbyService,
+            ProfilePictureImageService pictureService,
+            IDialogService dialogService)
         {
             if (_client != null)
             {
@@ -191,7 +197,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OnLobbyChanged(Lobby lobby)
         {
-            Dispatch(() => ApplyLobbyUpdate(lobby));
+            Dispatch(ApplyLobbyUpdate, lobby);
         }
 
         private void OnLobbyClosed()
@@ -201,7 +207,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void OnMatchStarted(int matchId)
         {
-            Dispatch(() => HandleMatchStartedOnUi(matchId));
+            Dispatch(HandleMatchStartedOnUi, matchId);
         }
 
         private void ApplyLobbyUpdate(Lobby lobby)
@@ -237,19 +243,37 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 return;
             }
 
-            MatchNavigation context = new MatchNavigation
-            {
-                MatchId = matchId,
-                PlayerSession = _playerSession,
-                TargetPoints = _client.CurrentLobby.Settings.TargetPoints,
-                PlayerNames = _client.CurrentLobby.Participants.ToDictionary(participant
-                    => participant.PlayerId, participant => participant.Username)
-            };
+            Lobby lobby = _client.CurrentLobby;
+            MatchPlayerDirectory players = CreateMatchPlayers(lobby);
+            MatchNavigation context = new MatchNavigation(
+                matchId,
+                lobby.Settings.TargetPoints,
+                _playerSession,
+                players);
             Dispose();
-            BackgroundJob<MatchNavigation, bool> job =
-                new BackgroundJob<MatchNavigation, bool>(
-                    ResetLobbyForMatch, context, OnMatchReady, OnMatchResetFailed);
+            BackgroundJob<MatchNavigation, bool> job = new BackgroundJob<MatchNavigation, bool>(
+                ResetLobbyForMatch,
+                context,
+                OnMatchReady,
+                OnMatchResetFailed);
             BackgroundWork.Start(job);
+        }
+
+        private MatchPlayerDirectory CreateMatchPlayers(Lobby lobby)
+        {
+            Dictionary<int, string> playerNames = new Dictionary<int, string>();
+            foreach (Player participant in lobby.Participants)
+            {
+                playerNames.Add(participant.PlayerId, participant.Username);
+            }
+
+            Dictionary<int, ImageSource> playerAvatars = new Dictionary<int, ImageSource>();
+            foreach (LobbyPlayerRecord player in Players)
+            {
+                playerAvatars.Add(player.PlayerId, player.AvatarImage);
+            }
+
+            return new MatchPlayerDirectory(playerNames, playerAvatars);
         }
 
         private bool ResetLobbyOnWorker(object state)
@@ -384,6 +408,19 @@ namespace DominoAllFives.Client.WPF.ViewModels
             else
             {
                 Application.Current.Dispatcher.BeginInvoke(action);
+            }
+        }
+
+        private static void Dispatch<T>(Action<T> action, T argument)
+        {
+            Dispatcher dispatcher = Application.Current.Dispatcher;
+            if (dispatcher.CheckAccess())
+            {
+                action(argument);
+            }
+            else
+            {
+                dispatcher.BeginInvoke(action, argument);
             }
         }
 

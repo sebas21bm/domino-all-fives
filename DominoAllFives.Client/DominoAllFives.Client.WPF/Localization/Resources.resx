@@ -1076,19 +1076,49 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
     <value>La sala está llena o ya inició.</value>
   </data>
   <data name="Match_btnPass">
-    <value>Pasar</value>
+    <value>PASAR</value>
   </data>
   <data name="Match_msgRejected">
     <value>La jugada fue rechazada. Revisa el estado actualizado.</value>
   </data>
   <data name="Match_btnLeave">
-    <value>Salir</value>
+    <value>SALIR</value>
+  </data>
+  <data name="Match_msgDrew">
+    <value>{0} tomó del pozo</value>
+  </data>
+  <data name="Match_msgPassed">
+    <value>{0} pasó el turno</value>
+  </data>
+  <data name="Match_msgRoundAward">
+    <value>{0} gana {1} puntos</value>
+  </data>
+  <data name="Match_msgRoundTied">
+    <value>Ronda empatada. No se otorgan puntos.</value>
+  </data>
+  <data name="Match_lblRoundSummary">
+    <value>PUNTUACIONES</value>
+  </data>
+  <data name="Match_lblGameOver">
+    <value>FIN DEL JUEGO</value>
+  </data>
+  <data name="Match_lblGameCancelled">
+    <value>PARTIDA CANCELADA</value>
+  </data>
+  <data name="Match_lblWinner">
+    <value>GANADOR</value>
   </data>
   <data name="Match_lblPreviousRound">
     <value>Fichas reveladas al terminar la ronda anterior</value>
   </data>
   <data name="Match_lblTurn">
     <value>Turno del jugador {0}</value>
+  </data>
+  <data name="Match_lblOpener">
+    <value>Empieza {0}</value>
+  </data>
+  <data name="Match_lblEnd">
+    <value>Extremo</value>
   </data>
   <data name="Match_lblRevealed">
     <value>Jugador {0}: {1}</value>
@@ -1100,7 +1130,10 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
     <value>Abajo</value>
   </data>
   <data name="Match_msgConnectionFailed">
-    <value>No se pudo comunicar con el servidor. Pulsa Actualizar para reconectar.</value>
+    <value>Se perdió la conexión con el servidor.</value>
+  </data>
+  <data name="Match_msgReconnecting">
+    <value>Reconectando…</value>
   </data>
   <data name="Match_lblScore">
     <value>Jugador {0}: {1} puntos · {2} fichas</value>
@@ -1108,8 +1141,8 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
   <data name="Match_msgCancelled">
     <value>Partida cancelada, sin ganador.</value>
   </data>
-  <data name="Match_btnRefresh">
-    <value>Actualizar</value>
+  <data name="Match_btnReconnect">
+    <value>RECONECTAR</value>
   </data>
   <data name="Match_endRight">
     <value>Derecha</value>
@@ -1118,13 +1151,16 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
     <value>Arriba</value>
   </data>
   <data name="Match_btnPlay">
-    <value>Colocar</value>
+    <value>JUGAR</value>
   </data>
   <data name="Match_btnDraw">
     <value>Comer del pozo</value>
   </data>
   <data name="Match_lblRound">
     <value>Ronda {0} · Pozo: {1}</value>
+  </data>
+  <data name="Match_lblScoreMultiplier">
+    <value>×{0}</value>
   </data>
   <data name="Match_msgCompleted">
     <value>Partida terminada. La puntuación mayor identifica al ganador.</value>
@@ -1142,6 +1178,15 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
     <value>CHAT</value>
   </data>
   <data name="Match_msgOperationFailed" xml:space="preserve">
-    <value>No se pudo completar la operación. Actualiza el estado e inténtalo de nuevo.</value>
+    <value>No se pudo completar la operación. Inténtalo de nuevo.</value>
+  </data>
+  <data name="EditProfile_btnRemovePicture" xml:space="preserve">
+    <value>Eliminar imagen</value>
+  </data>
+  <data name="MessageProfile_msgRemovePictureTitle" xml:space="preserve">
+    <value>Eliminar imagen de perfil</value>
+  </data>
+  <data name="MessageProfile_msgRemovePicture" xml:space="preserve">
+    <value>¿Quieres eliminar tu imagen de perfil? Este cambio se guardará de inmediato.</value>
   </data>
 </root>

@@ -13,10 +13,9 @@ namespace DominoAllFives.Client.WPF.Views
 
         private void OnLoaded(object sender, RoutedEventArgs eventArgs)
         {
-            MatchViewModel model = DataContext as MatchViewModel;
-            if (model != null)
+            if (DataContext is MatchViewModel viewModel)
             {
-                model.Initialize();
+                viewModel.Initialize();
             }
         }
 
