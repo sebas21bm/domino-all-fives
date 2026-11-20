@@ -1,6 +1,6 @@
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
-    public sealed class Placement
+    internal sealed class Placement
     {
         public Tile Tile { get; internal set; }
         public BoardEndPosition End { get; internal set; }

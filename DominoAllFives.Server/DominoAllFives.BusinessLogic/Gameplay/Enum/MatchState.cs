@@ -2,7 +2,7 @@ using System;
 
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
-    public enum MatchState
+    internal enum MatchState
     {
         InProgress,
         Completed,

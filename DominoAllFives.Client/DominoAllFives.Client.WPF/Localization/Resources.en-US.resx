@@ -1160,6 +1160,9 @@ Only the following are allowed: .png, .jpg, .jpeg.</value>
   <data name="Match_lblRound">
     <value>Round {0} · Stock: {1}</value>
   </data>
+  <data name="Match_lblScoreMultiplier">
+    <value>×{0}</value>
+  </data>
   <data name="Match_msgCompleted">
     <value>Match completed. The highest score identifies the winner.</value>
   </data>

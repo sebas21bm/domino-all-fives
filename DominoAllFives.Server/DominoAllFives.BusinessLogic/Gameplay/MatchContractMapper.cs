@@ -7,6 +7,12 @@ namespace DominoAllFives.BusinessLogic.Gameplay
     {
         public static GameplayContracts.MatchView CreateMatchView(Match match)
         {
+            GameplayContracts.MatchResult result = null;
+            if (match.Phase != MatchState.InProgress)
+            {
+                result = CreateMatchResult(match);
+            }
+
             return new GameplayContracts.MatchView
             {
                 MatchId = match.MatchId,
@@ -20,50 +26,8 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 LastRound = CreateRoundResult(match),
                 LastPlay = CreatePlayScore(match.LastPlay),
                 LastTurnAction = CreateTurnActionNotice(match.LastTurnAction),
-                Result = match.Phase == MatchState.InProgress ? null : CreateMatchResult(match),
+                Result = result,
                 Board = CreatePublicBoard(match.Board, match.TurnNumber)
-            };
-        }
-
-        private static GameplayContracts.PublicBoard CreatePublicBoard(Board board, int turnNumber)
-        {
-            List<GameplayContracts.PlacedTile> placedTiles =
-                new List<GameplayContracts.PlacedTile>();
-            foreach (Placement placement in board.Tiles)
-            {
-                GameplayContracts.PlacedTile placedTile = CreatePlacedTile(placement);
-                placedTiles.Add(placedTile);
-            }
-
-            List<GameplayContracts.PublicEnd> publicEnds =
-                new List<GameplayContracts.PublicEnd>();
-            foreach (BoardEndState boardEnd in board.Ends)
-            {
-                GameplayContracts.PublicEnd publicEnd = CreatePublicBoardEnd(
-                    boardEnd,
-                    turnNumber);
-                publicEnds.Add(publicEnd);
-            }
-
-            return new GameplayContracts.PublicBoard
-            {
-                Tiles = placedTiles,
-                Ends = publicEnds
-            };
-        }
-
-        private static GameplayContracts.TurnActionNotice CreateTurnActionNotice(TurnAction action)
-        {
-            if (action == null)
-            {
-                return null;
-            }
-
-            return new GameplayContracts.TurnActionNotice
-            {
-                PlayerId = action.PlayerId,
-                IsPass = action.IsPass,
-                Version = action.Version
             };
         }
 
@@ -110,6 +74,48 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 Version = match.Version,
                 Phase = (GameplayContracts.MatchStatus)match.Phase,
                 WinnerIds = winnerIds
+            };
+        }
+
+        private static GameplayContracts.PublicBoard CreatePublicBoard(Board board, int turnNumber)
+        {
+            List<GameplayContracts.PlacedTile> placedTiles =
+                new List<GameplayContracts.PlacedTile>();
+            foreach (Placement placement in board.Tiles)
+            {
+                GameplayContracts.PlacedTile placedTile = CreatePlacedTile(placement);
+                placedTiles.Add(placedTile);
+            }
+
+            List<GameplayContracts.PublicEnd> publicEnds =
+                new List<GameplayContracts.PublicEnd>();
+            foreach (BoardEndState boardEnd in board.Ends)
+            {
+                GameplayContracts.PublicEnd publicEnd = CreatePublicBoardEnd(
+                    boardEnd,
+                    turnNumber);
+                publicEnds.Add(publicEnd);
+            }
+
+            return new GameplayContracts.PublicBoard
+            {
+                Tiles = placedTiles,
+                Ends = publicEnds
+            };
+        }
+
+        private static GameplayContracts.TurnActionNotice CreateTurnActionNotice(TurnAction action)
+        {
+            if (action == null)
+            {
+                return null;
+            }
+
+            return new GameplayContracts.TurnActionNotice
+            {
+                PlayerId = action.PlayerId,
+                IsPass = action.IsPass,
+                Version = action.Version
             };
         }
 

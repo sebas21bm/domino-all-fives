@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Windows.Media;
 using System.Windows.Threading;
 using DominoAllFives.Client.WPF.Models;
 using DominoAllFives.Client.WPF.Services;
@@ -441,9 +442,16 @@ namespace DominoAllFives.Client.Tests
         {
             PlayerSession session = new PlayerSession();
             session.Start(1, "Alice", "es-MX", "test-session");
-            return new MatchViewModel(new Navigation(), new MatchNavigation { MatchId = 1,
-                PlayerSession = session, TargetPoints = 150, PlayerNames = new Dictionary<int,
-                    string> { { 1, "Alice" }, { 2, "Bob" } } }, client);
+            Dictionary<int, string> playerNames = new Dictionary<int, string>
+            {
+                { 1, "Alice" },
+                { 2, "Bob" }
+            };
+            MatchPlayerDirectory players = new MatchPlayerDirectory(
+                playerNames,
+                new Dictionary<int, ImageSource>());
+            MatchNavigation context = new MatchNavigation(1, 150, session, players);
+            return new MatchViewModel(new Navigation(), context, client);
         }
 
         private static MatchView View(long version)

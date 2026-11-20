@@ -14,11 +14,13 @@ namespace DominoAllFives.Contracts.Services
         /// <param name = "lobby">The updated lobby snapshot.</param>
         [OperationContract(IsOneWay = true)]
         void OnLobbyChanged(Lobby lobby);
+
         /// <summary>
         /// Notifies the client that its current lobby has been closed.
         /// </summary>
         [OperationContract(IsOneWay = true)]
         void OnLobbyClosed();
+
         /// <summary>
         /// Notifies the client that the lobby has entered a match.
         /// </summary>

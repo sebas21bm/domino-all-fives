@@ -1,6 +1,6 @@
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
-    public sealed class BoardEndState
+    internal sealed class BoardEndState
     {
         private const int UnblockedTurn = -1;
 

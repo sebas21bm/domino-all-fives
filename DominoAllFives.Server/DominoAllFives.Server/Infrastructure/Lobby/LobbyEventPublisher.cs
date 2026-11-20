@@ -43,10 +43,7 @@ namespace DominoAllFives.Server.Infrastructure.Lobby
             Publish(lobby, LobbyCallbackEvent.MatchStarted, matchId);
         }
 
-        private void Publish(
-            LobbyModel lobby,
-            LobbyCallbackEvent callbackEvent,
-            int matchId)
+        private void Publish(LobbyModel lobby, LobbyCallbackEvent callbackEvent, int matchId)
         {
             if (lobby == null)
             {

@@ -16,34 +16,62 @@
             <TextBlock FontSize="42" HorizontalAlignment="Center">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource TextCream}">
-                        <Setter Property="Text" Value="{Binding Source={x:Static strings:LanguageManager.Instance}, Path=[Match_lblGameOver]}"/>
+                        <Setter
+                            Property="Text"
+                            Value="{Binding Source={x:Static strings:LanguageManager.Instance},
+                                Path=[Match_lblGameOver]}"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsMatchCancelled}" Value="True">
-                                <Setter Property="Text" Value="{Binding Source={x:Static strings:LanguageManager.Instance}, Path=[Match_lblGameCancelled]}"/>
+                                <Setter
+                                    Property="Text"
+                            Value="{Binding Source={x:Static strings:LanguageManager.Instance},
+                                        Path=[Match_lblGameCancelled]}"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
             <StackPanel Visibility="{Binding HasWinner, Converter={StaticResource BoolToVis}}">
-                <TextBlock Text="{Binding Source={x:Static strings:LanguageManager.Instance}, Path=[Match_lblWinner]}"
-                           Style="{StaticResource TextRed}" FontSize="27" HorizontalAlignment="Center" Margin="0,26,0,0"/>
+                <TextBlock
+                    Text="{Binding Source={x:Static strings:LanguageManager.Instance},
+                        Path=[Match_lblWinner]}"
+                           Style="{StaticResource TextRed}"
+                           FontSize="27"
+                           HorizontalAlignment="Center"
+                           Margin="0,26,0,0"/>
                 <Ellipse Width="200" Height="200" Stroke="{StaticResource CreamLightBrush}"
                          StrokeThickness="4" Margin="0,28">
                     <Ellipse.Fill>
-                        <ImageBrush ImageSource="{Binding WinnerAvatar, TargetNullValue={StaticResource DefaultWinnerAvatar}}"
+                        <ImageBrush
+                            ImageSource="{Binding WinnerAvatar,
+                                TargetNullValue={StaticResource DefaultWinnerAvatar}}"
                                     Stretch="UniformToFill"/>
                     </Ellipse.Fill>
                 </Ellipse>
                 <TextBlock Text="{Binding WinnerNames}" Style="{StaticResource TextCream}"
-                           FontSize="28" HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="620"/>
+                           FontSize="28"
+                           HorizontalAlignment="Center"
+                           TextWrapping="Wrap"
+                           MaxWidth="620"/>
             </StackPanel>
         </StackPanel>
-        <Border Width="315" Padding="20" Margin="0,0,0,18" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                Background="{StaticResource DarkBgBrush}" BorderBrush="{StaticResource HeaderLineBrush}" BorderThickness="2">
+        <Border
+            Width="315"
+            Padding="20"
+            Margin="0,0,0,18"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+                Background="{StaticResource DarkBgBrush}"
+                BorderBrush="{StaticResource HeaderLineBrush}"
+                BorderThickness="2">
             <StackPanel>
-                <TextBlock Text="{Binding Source={x:Static strings:LanguageManager.Instance}, Path=[Match_lblScores]}"
-                           Style="{StaticResource TextGray}" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                <TextBlock
+                    Text="{Binding Source={x:Static strings:LanguageManager.Instance},
+                        Path=[Match_lblScores]}"
+                           Style="{StaticResource TextGray}"
+                           FontSize="16"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,12"/>
                 <ItemsControl ItemsSource="{Binding Players}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -52,18 +80,32 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="62"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Username}" Style="{StaticResource TextRed}"
-                                           FontSize="12" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Points}" Style="{StaticResource TextCream}"
-                                           FontSize="16" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBlock
+                                    Text="{Binding Username}"
+                                    Style="{StaticResource TextRed}"
+                                           FontSize="12"
+                                           TextTrimming="CharacterEllipsis"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Text="{Binding Points}"
+                                    Style="{StaticResource TextCream}"
+                                           FontSize="16"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"/>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
         </Border>
-        <Button x:Name="btnLeave" Grid.Row="1" Command="{Binding LeaveCommand}" Style="{StaticResource PrimaryButton}"
-                Content="{Binding Source={x:Static strings:LanguageManager.Instance}, Path=[Match_btnLeave]}"
+        <Button
+            x:Name="btnLeave"
+            Grid.Row="1"
+            Command="{Binding LeaveCommand}"
+            Style="{StaticResource PrimaryButton}"
+                Content="{Binding Source={x:Static strings:LanguageManager.Instance},
+                    Path=[Match_btnLeave]}"
                 MinWidth="180" Height="48" HorizontalAlignment="Center"/>
     </Grid>
 </UserControl>

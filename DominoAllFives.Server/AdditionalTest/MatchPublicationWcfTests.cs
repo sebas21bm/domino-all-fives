@@ -66,12 +66,10 @@ namespace DominoAllFives.Server.AdditionalTest
                         factories[1].Abort();
                     }
 
-                    Move move = new Move
-                    {
-                        TileId = initial.OpeningTileId,
-                        End = BoardEndPosition.Left,
-                        ExpectedVersion = initial.Version
-                    };
+                    Move move = new Move(
+                        initial.OpeningTileId,
+                        BoardEndPosition.Left,
+                        initial.Version);
                     MatchManager.Instance.PlayTile(
                         lobby.LobbyId,
                         initial.CurrentPlayerId.Value,

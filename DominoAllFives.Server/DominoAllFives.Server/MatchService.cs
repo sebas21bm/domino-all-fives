@@ -8,14 +8,11 @@ using DominoAllFives.Contracts.Gameplay;
 using DominoAllFives.Contracts.Services;
 using DominoAllFives.Server.Infrastructure;
 using DominoAllFives.Server.Logging;
-using Domain = DominoAllFives.BusinessLogic.Gameplay;
 using Microsoft.Extensions.Logging;
+using Domain = DominoAllFives.BusinessLogic.Gameplay;
 
 namespace DominoAllFives.Server
 {
-    /// <summary>
-    /// Validates the session identity before applying authoritative match operations.
-    /// </summary>
     [ServiceBehavior(
         InstanceContextMode = InstanceContextMode.PerSession,
         ConcurrencyMode = ConcurrencyMode.Reentrant,
@@ -25,7 +22,7 @@ namespace DominoAllFives.Server
         private static readonly MatchController controller;
         private static readonly MatchCallbackRegistry callbacks;
         private static readonly MatchEventPublisher publisher;
-        private static readonly ILogger<MatchEventPublisher> publisherLogger;
+        private static readonly ILogger<MatchService> logger;
         private string _sessionKey;
         private int _playerId;
         private int _matchId;
@@ -36,29 +33,13 @@ namespace DominoAllFives.Server
         {
             controller = new MatchController(MatchManager.Instance);
             callbacks = new MatchCallbackRegistry();
-            publisherLogger = LoggerFactoryProvider.CreateLogger<MatchEventPublisher>();
-            publisher = new MatchEventPublisher(
-                callbacks,
-                publisherLogger);
+            ILogger<MatchEventPublisher> publisherLogger =
+                LoggerFactoryProvider.CreateLogger<MatchEventPublisher>();
+            publisher = new MatchEventPublisher(callbacks, publisherLogger);
+            logger = LoggerFactoryProvider.CreateLogger<MatchService>();
             publisher.MatchEnded += LobbyManager.Instance.ReleaseMatch;
         }
 
-        /// <summary>
-        /// Binds the authenticated player and callback to a match they participate in.
-        /// </summary>
-        /// <param name = "sessionKey">
-        /// The authentication token, revalidated for each service operation.
-        /// </param>
-        /// <param name = "matchId">
-        /// The match identifier, which must agree with the bound session.
-        /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The session is missing, revoked or bound to another match.
-        /// </exception>
-        /// <exception cref = "FaultException{MatchIssue}">
-        /// Membership, version or a gameplay rule rejects the request.
-        /// </exception>
         public MatchView OpenMatchSession(string sessionKey, int matchId)
         {
             if (_sessionKey != null)
@@ -80,7 +61,6 @@ namespace DominoAllFives.Server
                 _callbackChannel.Faulted += OnChannelEnded;
             }
 
-            // The second snapshot recovers a mutation that raced callback registration.
             MatchView current = GetMatchView(matchId, playerId);
             if (current.Phase != MatchStatus.InProgress)
             {
@@ -90,62 +70,18 @@ namespace DominoAllFives.Server
             return current;
         }
 
-        /// <summary>
-        /// Retrieves the public match snapshot without exposing opponents' hands.
-        /// </summary>
-        /// <param name = "matchId">
-        /// The match identifier, which must agree with the bound session.
-        /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The session is missing, revoked or bound to another match.
-        /// </exception>
-        /// <exception cref = "FaultException{MatchIssue}">
-        /// Membership, version or a gameplay rule rejects the request.
-        /// </exception>
         public MatchView GetMatch(int matchId)
         {
             ValidateSessionCanAccessMatch(matchId);
             return GetMatchView(matchId, _playerId);
         }
 
-        /// <summary>
-        /// Retrieves only the authenticated player's hand and its snapshot version.
-        /// </summary>
-        /// <param name = "matchId">
-        /// The match identifier, which must agree with the bound session.
-        /// </param>
-        /// <returns>The authoritative snapshot after the requested operation.</returns>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The session is missing, revoked or bound to another match.
-        /// </exception>
-        /// <exception cref = "FaultException{MatchIssue}">
-        /// Membership, version or a gameplay rule rejects the request.
-        /// </exception>
         public PlayerHand GetHand(int matchId)
         {
             ValidateSessionCanAccessMatch(matchId);
             return GetPlayerHand(matchId, _playerId);
         }
 
-        /// <summary>
-        /// Places an owned tile using server values and the expected match version.
-        /// </summary>
-        /// <param name = "matchId">
-        /// The match identifier, which must agree with the bound session.
-        /// </param>
-        /// <param name = "tile">The selected tile; the server trusts only its identifier.</param>
-        /// <param name = "end">The logical end on which to place the tile.</param>
-        /// <param name = "expectedVersion">
-        /// The snapshot version on which the player's intention is based.
-        /// </param>
-        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The session is missing, revoked or bound to another match.
-        /// </exception>
-        /// <exception cref = "FaultException{MatchIssue}">
-        /// Membership, version or a gameplay rule rejects the request.
-        /// </exception>
         public void PlayTile(int matchId, DominoTile tile, BoardEnd end, long expectedVersion)
         {
             ValidateSessionCanAccessMatch(matchId);
@@ -154,19 +90,10 @@ namespace DominoAllFives.Server
                 throw new FaultException<MatchIssue>(MatchIssue.TileNotOwned);
             }
 
-            // Values and SpecialPower sent by the client are deliberately ignored.
-            Move move = new Move
-            {
-                TileId = tile.TileId,
-                End = (Domain.BoardEndPosition)end,
-                ExpectedVersion = expectedVersion
-            };
+            Move move = new Move(tile.TileId, (Domain.BoardEndPosition)end, expectedVersion);
             try
             {
-                MatchUpdate update = controller.PlayTile(
-                    matchId,
-                    _playerId,
-                    move);
+                MatchUpdate update = controller.PlayTile(matchId, _playerId, move);
                 publisher.PublishPending(update);
             }
             catch (Domain.MatchRuleException ex)
@@ -175,31 +102,12 @@ namespace DominoAllFives.Server
             }
         }
 
-        /// <summary>
-        /// Draws until a legal move exists or the stock is exhausted, preserving the turn.
-        /// </summary>
-        /// <param name = "matchId">
-        /// The match identifier, which must agree with the bound session.
-        /// </param>
-        /// <param name = "expectedVersion">
-        /// The snapshot version on which the player's intention is based.
-        /// </param>
-        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The session is missing, revoked or bound to another match.
-        /// </exception>
-        /// <exception cref = "FaultException{MatchIssue}">
-        /// Membership, version or a gameplay rule rejects the request.
-        /// </exception>
         public void DrawTiles(int matchId, long expectedVersion)
         {
             ValidateSessionCanAccessMatch(matchId);
             try
             {
-                MatchUpdate update = controller.DrawTiles(
-                    matchId,
-                    _playerId,
-                    expectedVersion);
+                MatchUpdate update = controller.DrawTiles(matchId, _playerId, expectedVersion);
                 publisher.PublishPending(update);
             }
             catch (Domain.MatchRuleException ex)
@@ -208,31 +116,12 @@ namespace DominoAllFives.Server
             }
         }
 
-        /// <summary>
-        /// Passes only when the stock is empty and the player has no legal move.
-        /// </summary>
-        /// <param name = "matchId">
-        /// The match identifier, which must agree with the bound session.
-        /// </param>
-        /// <param name = "expectedVersion">
-        /// The snapshot version on which the player's intention is based.
-        /// </param>
-        /// <remarks>State changes are delivered through callbacks; faults use the reply.</remarks>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The session is missing, revoked or bound to another match.
-        /// </exception>
-        /// <exception cref = "FaultException{MatchIssue}">
-        /// Membership, version or a gameplay rule rejects the request.
-        /// </exception>
         public void PassTurn(int matchId, long expectedVersion)
         {
             ValidateSessionCanAccessMatch(matchId);
             try
             {
-                MatchUpdate update = controller.PassTurn(
-                    matchId,
-                    _playerId,
-                    expectedVersion);
+                MatchUpdate update = controller.PassTurn(matchId, _playerId, expectedVersion);
                 publisher.PublishPending(update);
             }
             catch (Domain.MatchRuleException ex)
@@ -241,18 +130,6 @@ namespace DominoAllFives.Server
             }
         }
 
-        /// <summary>
-        /// Cancels the match without a winner when a participant explicitly leaves.
-        /// </summary>
-        /// <param name = "matchId">
-        /// The match identifier, which must agree with the bound session.
-        /// </param>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The session is missing, revoked or bound to another match.
-        /// </exception>
-        /// <exception cref = "FaultException{MatchIssue}">
-        /// Membership, version or a gameplay rule rejects the request.
-        /// </exception>
         public void LeaveMatch(int matchId)
         {
             ValidateSessionCanAccessMatch(matchId);
@@ -269,8 +146,7 @@ namespace DominoAllFives.Server
 
         private void ValidateSessionCanAccessMatch(int matchId)
         {
-            if (GetAuthenticatedPlayerId(_sessionKey) != _playerId
-                || matchId != _matchId)
+            if (GetAuthenticatedPlayerId(_sessionKey) != _playerId || matchId != _matchId)
             {
                 throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
             }
@@ -287,8 +163,9 @@ namespace DominoAllFives.Server
             {
                 return SessionManager.GetPlayerId(sessionKey);
             }
-            catch (KeyNotFoundException)
+            catch (KeyNotFoundException ex)
             {
+                logger.LogDebug(ex, "The match session could not resolve the player.");
                 throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
             }
         }

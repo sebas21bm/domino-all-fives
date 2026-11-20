@@ -16,17 +16,15 @@ namespace DominoAllFives.Server.Infrastructure
         private readonly MatchCallbackRegistry _callbacks;
         private readonly ILogger<MatchEventPublisher> _logger;
 
-        public event Action<int> MatchEnded;
-
         public MatchEventPublisher(
             MatchCallbackRegistry callbacks,
             ILogger<MatchEventPublisher> logger)
         {
-            _callbacks = callbacks
-                ?? throw new ArgumentNullException(nameof(callbacks));
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
+            _callbacks = callbacks ?? throw new ArgumentNullException(nameof(callbacks));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+
+        public event Action<int> MatchEnded;
 
         public void Register(int matchId, int playerId, IMatchCallback callback, string sessionKey)
         {
@@ -126,23 +124,25 @@ namespace DominoAllFives.Server.Infrastructure
             }
         }
 
-        private static bool IsAuthenticated(MatchCallbackRegistration registration)
+        private bool IsAuthenticated(MatchCallbackRegistration registration)
         {
             try
             {
-                return SessionManager.GetPlayerId(registration.SessionKey)
-                    == registration.PlayerId;
+                return SessionManager.GetPlayerId(registration.SessionKey) == registration.PlayerId;
             }
-            catch (KeyNotFoundException)
+            catch (KeyNotFoundException ex)
             {
+                _logger.LogDebug(
+                    ex,
+                    "Match callback for player {PlayerId} has no active session.",
+                    registration.PlayerId);
                 return false;
             }
         }
 
         private void Release(int matchId)
         {
-            List<MatchCallbackRegistration> callbacks =
-                _callbacks.GetCallbacks(matchId);
+            List<MatchCallbackRegistration> callbacks = _callbacks.GetCallbacks(matchId);
 
             foreach (MatchCallbackRegistration callback in callbacks)
             {
@@ -154,7 +154,9 @@ namespace DominoAllFives.Server.Infrastructure
         {
             Remove(recipient.MatchId, recipient.PlayerId, recipient.Callback);
             _logger.LogDebug(
-                ex, "Match callback failed for player {PlayerId}.", recipient.PlayerId);
+                ex,
+                "Match callback failed for player {PlayerId}.",
+                recipient.PlayerId);
         }
     }
 }

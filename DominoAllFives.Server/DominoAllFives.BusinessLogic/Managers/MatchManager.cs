@@ -159,11 +159,7 @@ namespace DominoAllFives.BusinessLogic.Managers
             long previousVersion)
         {
             Match match = activeMatch.Match;
-            if (match.Phase != MatchState.InProgress
-                && !activeMatch.FinishedAt.HasValue)
-            {
-                activeMatch.FinishedAt = DateTime.UtcNow;
-            }
+            activeMatch.RecordMatchFinish();
 
             GameplayContracts.MatchView view = MatchContractMapper.CreateMatchView(match);
             bool hasStateChange = previousVersion != match.Version;
@@ -179,14 +175,7 @@ namespace DominoAllFives.BusinessLogic.Managers
                 return update;
             }
 
-            update.Hands = new List<GameplayContracts.PlayerHand>();
-            foreach (MatchPlayer player in match.Players)
-            {
-                GameplayContracts.PlayerHand hand = MatchContractMapper.CreatePlayerHand(
-                    match,
-                    player.PlayerId);
-                update.Hands.Add(hand);
-            }
+            update.Hands = CreateHandsSnapshot(match);
 
             if (!ReferenceEquals(previousRound, match.LastRound))
             {
@@ -200,6 +189,20 @@ namespace DominoAllFives.BusinessLogic.Managers
 
             activeMatch.PendingUpdates.Enqueue(update);
             return update;
+        }
+
+        private static IReadOnlyList<GameplayContracts.PlayerHand> CreateHandsSnapshot(Match match)
+        {
+            List<GameplayContracts.PlayerHand> hands = new List<GameplayContracts.PlayerHand>();
+            foreach (MatchPlayer player in match.Players)
+            {
+                GameplayContracts.PlayerHand hand = MatchContractMapper.CreatePlayerHand(
+                    match,
+                    player.PlayerId);
+                hands.Add(hand);
+            }
+
+            return hands.AsReadOnly();
         }
 
         private ActiveMatch GetActiveMatch(int matchId)

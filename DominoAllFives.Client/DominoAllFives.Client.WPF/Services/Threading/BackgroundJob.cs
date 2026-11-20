@@ -63,7 +63,7 @@ namespace DominoAllFives.Client.WPF.Services.Threading
 
         void IBackgroundJob.Execute()
         {
-            Task<TResult> operation = new Task<TResult>(() => Work(State));
+            Task<TResult> operation = new Task<TResult>(ExecuteWork);
             operation.RunSynchronously();
             if (operation.IsFaulted)
             {
@@ -95,6 +95,11 @@ namespace DominoAllFives.Client.WPF.Services.Threading
             {
                 OnCompleted(Result, State);
             }
+        }
+
+        private TResult ExecuteWork()
+        {
+            return Work(State);
         }
     }
 }

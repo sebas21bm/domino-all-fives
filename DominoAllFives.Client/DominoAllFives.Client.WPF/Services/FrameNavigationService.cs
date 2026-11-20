@@ -13,6 +13,7 @@ namespace DominoAllFives.Client.WPF.Services
         private readonly Frame _navigationFrame;
         private readonly Dictionary<Type, Type> _viewModelToPageMap;
         private ViewModelFactory _viewModelFactory;
+
         public bool CanGoBack
         {
             get
@@ -59,9 +60,7 @@ namespace DominoAllFives.Client.WPF.Services
             }
 
             Page pageInstance = CreatePage<TViewModel>();
-            NavigatedEventHandler navigationHandler = null;
-            navigationHandler = (sender, eventArgs) => CompleteRefresh(navigationHandler);
-            _navigationFrame.Navigated += navigationHandler;
+            _navigationFrame.Navigated += CompleteRefresh;
             _navigationFrame.Navigate(pageInstance);
         }
 
@@ -69,9 +68,7 @@ namespace DominoAllFives.Client.WPF.Services
             where TViewModel : ViewModelBase
         {
             Page pageInstance = CreatePage<TViewModel>();
-            NavigatedEventHandler navigationHandler = null;
-            navigationHandler = (sender, eventArgs) => ClearHistory(navigationHandler);
-            _navigationFrame.Navigated += navigationHandler;
+            _navigationFrame.Navigated += ClearHistory;
             _navigationFrame.Navigate(pageInstance);
         }
 
@@ -90,8 +87,10 @@ namespace DominoAllFives.Client.WPF.Services
             {
                 if (parameter != null)
                 {
-                    viewModelInstance = (ViewModelBase)Activator.CreateInstance(viewModelType,
-                        this, parameter);
+                    viewModelInstance = (ViewModelBase)Activator.CreateInstance(
+                        viewModelType,
+                        this,
+                        parameter);
                 }
                 else
                 {
@@ -107,8 +106,8 @@ namespace DominoAllFives.Client.WPF.Services
             catch (MissingMethodException ex)
             {
                 throw new InvalidOperationException(
-                    $"The ViewModel {viewModelType.Name} must have a "
-                    + $"constructor accepting IFrameNavigationService.", ex);
+                    $"No matching navigation constructor was found for {viewModelType.Name}.",
+                    ex);
             }
 
             return (TViewModel)viewModelInstance;
@@ -120,8 +119,9 @@ namespace DominoAllFives.Client.WPF.Services
             Type viewModelType = typeof(TViewModel);
             if (!_viewModelToPageMap.TryGetValue(viewModelType, out Type pageType))
             {
-                throw new InvalidOperationException($"No page registered for ViewModel type: "
-                    + $"{viewModelType.FullName}");
+                string viewModelName = viewModelType.FullName;
+                throw new InvalidOperationException(
+                    $"No page is registered for the ViewModel type {viewModelName}.");
             }
 
             TViewModel viewModelInstance = CreateViewModel<TViewModel>(parameter);
@@ -147,9 +147,9 @@ namespace DominoAllFives.Client.WPF.Services
             _viewModelToPageMap.Add(typeof(MatchHistoryViewModel), typeof(MatchHistory));
         }
 
-        private void CompleteRefresh(NavigatedEventHandler navigationHandler)
+        private void CompleteRefresh(object sender, NavigationEventArgs eventArgs)
         {
-            _navigationFrame.Navigated -= navigationHandler;
+            _navigationFrame.Navigated -= CompleteRefresh;
             _navigationFrame.RemoveBackEntry();
             if (_navigationFrame.CanGoBack)
             {
@@ -157,9 +157,9 @@ namespace DominoAllFives.Client.WPF.Services
             }
         }
 
-        private void ClearHistory(NavigatedEventHandler navigationHandler)
+        private void ClearHistory(object sender, NavigationEventArgs eventArgs)
         {
-            _navigationFrame.Navigated -= navigationHandler;
+            _navigationFrame.Navigated -= ClearHistory;
             while (_navigationFrame.CanGoBack)
             {
                 _navigationFrame.RemoveBackEntry();

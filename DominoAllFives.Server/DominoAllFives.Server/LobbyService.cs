@@ -17,9 +17,6 @@ using Microsoft.Extensions.Logging;
 
 namespace DominoAllFives.Server
 {
-    /// <summary>
-    /// Coordinates authenticated lobby operations and publishes participant callbacks.
-    /// </summary>
     [ServiceBehavior(
         InstanceContextMode = InstanceContextMode.PerSession,
         ConcurrencyMode = ConcurrencyMode.Reentrant,
@@ -31,11 +28,11 @@ namespace DominoAllFives.Server
         private static readonly LobbyCallbackRegistry callbacks;
         private static readonly LobbyEventPublisher publisher;
         private static readonly ILogger<LobbyService> logger;
-        private static readonly ProfilePictureStorage pictureStorage =
-            new ProfilePictureStorage(LoggerFactoryProvider.CreateLogger<ProfilePictureStorage>());
+        private static readonly ProfilePictureStorage pictureStorage;
         private Player _player;
         private ILobbyCallback _callback;
         private ICommunicationObject _callbackChannel;
+
         static LobbyService()
         {
             LobbyManager lobbyManager = LobbyManager.Instance;
@@ -46,18 +43,10 @@ namespace DominoAllFives.Server
                 callbacks,
                 LoggerFactoryProvider.CreateLogger<LobbyEventPublisher>());
             logger = LoggerFactoryProvider.CreateLogger<LobbyService>();
+            pictureStorage = new ProfilePictureStorage(
+                LoggerFactoryProvider.CreateLogger<ProfilePictureStorage>());
         }
 
-        /// <summary>
-        /// Associates the duplex connection and callback with an authenticated player.
-        /// </summary>
-        /// <param name = "sessionKey">The authentication token for the player session.</param>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The connection has no authenticated session or the player lacks permission.
-        /// </exception>
-        /// <exception cref = "FaultException">
-        /// The server cannot resolve the player session because persistence failed.
-        /// </exception>
         public void OpenLobbySession(string sessionKey)
         {
             if (_player != null)
@@ -72,12 +61,11 @@ namespace DominoAllFives.Server
 
             try
             {
-                _player = controller.GetAuthenticatedPlayer(
-                    sessionKey,
-                    pictureStorage);
+                _player = controller.GetAuthenticatedPlayer(sessionKey, pictureStorage);
             }
-            catch (KeyNotFoundException)
+            catch (KeyNotFoundException ex)
             {
+                logger.LogDebug(ex, "The lobby session could not resolve the player.");
                 throw new FaultException<AccessIssue>(AccessIssue.SessionRequired);
             }
             catch (SqlException ex)
@@ -96,7 +84,8 @@ namespace DominoAllFives.Server
                 throw new FaultException("The service could not complete the operation.");
             }
 
-            ILobbyCallback callback = OperationContext.Current.GetCallbackChannel<ILobbyCallback>();
+            OperationContext operationContext = OperationContext.Current;
+            ILobbyCallback callback = operationContext.GetCallbackChannel<ILobbyCallback>();
             bool callbackRegistered = callbacks.RegisterCallback(_player.PlayerId, callback);
             if (!callbackRegistered)
             {
@@ -113,16 +102,6 @@ namespace DominoAllFives.Server
             }
         }
 
-        /// <summary>
-        /// Creates a lobby owned by the authenticated player.
-        /// </summary>
-        /// <param name = "settings">The requested lobby configuration.</param>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The connection has no authenticated session or the player lacks permission.
-        /// </exception>
-        /// <exception cref = "FaultException{LobbyIssue}">
-        /// The requested operation violates a lobby rule or the lobby is unavailable.
-        /// </exception>
         public void CreateLobby(LobbySettings settings)
         {
             try
@@ -137,16 +116,6 @@ namespace DominoAllFives.Server
             }
         }
 
-        /// <summary>
-        /// Adds the authenticated player to an existing lobby.
-        /// </summary>
-        /// <param name = "lobbyCode">The code identifying the target lobby.</param>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The connection has no authenticated session or the player lacks permission.
-        /// </exception>
-        /// <exception cref = "FaultException{LobbyIssue}">
-        /// The requested operation violates a lobby rule or the lobby is unavailable.
-        /// </exception>
         public void JoinLobby(string lobbyCode)
         {
             try
@@ -161,15 +130,6 @@ namespace DominoAllFives.Server
             }
         }
 
-        /// <summary>
-        /// Removes the authenticated player from the current lobby.
-        /// </summary>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The connection has no authenticated session or the player lacks permission.
-        /// </exception>
-        /// <exception cref = "FaultException{LobbyIssue}">
-        /// The requested operation violates a lobby rule or the lobby is unavailable.
-        /// </exception>
         public void LeaveLobby()
         {
             try
@@ -191,17 +151,6 @@ namespace DominoAllFives.Server
             }
         }
 
-        /// <summary>
-        /// Retrieves a lobby snapshot for an authenticated connection.
-        /// </summary>
-        /// <param name = "lobbyCode">The code identifying the requested lobby.</param>
-        /// <returns>The current lobby snapshot.</returns>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The connection has no authenticated session or the player lacks permission.
-        /// </exception>
-        /// <exception cref = "FaultException{LobbyIssue}">
-        /// The requested operation violates a lobby rule or the lobby is unavailable.
-        /// </exception>
         public Lobby GetLobby(string lobbyCode)
         {
             GetPlayer();
@@ -215,15 +164,6 @@ namespace DominoAllFives.Server
             }
         }
 
-        /// <summary>
-        /// Starts the current lobby when the authenticated player is its owner.
-        /// </summary>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The connection has no authenticated session or the player lacks permission.
-        /// </exception>
-        /// <exception cref = "FaultException{LobbyIssue}">
-        /// The requested operation violates a lobby rule or the lobby is unavailable.
-        /// </exception>
         public void StartMatch()
         {
             Player player = GetPlayer();
@@ -252,29 +192,20 @@ namespace DominoAllFives.Server
             {
                 throw new FaultException<LobbyIssue>(ex.Issue);
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
+                logger.LogDebug(ex, "The player was denied permission to start the match.");
                 throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
             }
             finally
             {
-                if (startingLobby != null
-                    && !matchCreated)
+                if (startingLobby != null && !matchCreated)
                 {
                     controller.RestoreLobbyAfterMatchStartFailure(player.PlayerId);
                 }
             }
         }
 
-        /// <summary>
-        /// Closes the current lobby when the authenticated player is its owner.
-        /// </summary>
-        /// <exception cref = "FaultException{AccessIssue}">
-        /// The connection has no authenticated session or the player lacks permission.
-        /// </exception>
-        /// <exception cref = "FaultException{LobbyIssue}">
-        /// The requested operation violates a lobby rule or the lobby is unavailable.
-        /// </exception>
         public void CloseLobby()
         {
             try
@@ -287,8 +218,9 @@ namespace DominoAllFives.Server
             {
                 throw new FaultException<LobbyIssue>(ex.Issue);
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
+                logger.LogDebug(ex, "The player was denied permission to close the lobby.");
                 throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
             }
         }

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace DominoAllFives.BusinessLogic.Gameplay
 {
-    public sealed class Match
+    internal sealed class Match
     {
         private const int MinimumPlayers = 2;
         private const int MaximumPlayers = 4;
@@ -80,8 +80,8 @@ namespace DominoAllFives.BusinessLogic.Gameplay
                 throw new ArgumentNullException(nameof(playerIds));
             }
 
-            List<int> ids = playerIds.ToList();
-            ValidatePlayerIds(ids, nameof(playerIds));
+            List<int> matchPlayerIds = playerIds.ToList();
+            ValidatePlayerIds(matchPlayerIds, nameof(playerIds));
             if (!allowedTargets.Contains(targetPoints))
             {
                 throw new ArgumentOutOfRangeException(nameof(targetPoints));
@@ -89,7 +89,7 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 
             MatchId = matchId;
             TargetPoints = targetPoints;
-            _players = CreatePlayers(ids);
+            _players = CreatePlayers(matchPlayerIds);
             BeginRound(initialDeck);
         }
 
@@ -127,66 +127,6 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 
             PreparedPlay play = PreparePlay(player, tile, end);
             ApplyPlay(play);
-        }
-
-        private PreparedPlay PreparePlay(MatchPlayer player, Tile tile, BoardEndPosition end)
-        {
-            Board board = Board.Copy();
-            board.Place(tile, end, TurnNumber);
-            MatchPlayer projectedPlayer = new MatchPlayer
-            {
-                PlayerId = player.PlayerId,
-                Points = player.Points,
-                Hand = new List<Tile>(player.Hand)
-            };
-            projectedPlayer.Hand.Remove(tile);
-
-            PlayScore score = PlayScoring.Evaluate(board, TurnNumber);
-            score.PlayerId = player.PlayerId;
-            score.RoundNumber = RoundNumber;
-            projectedPlayer.Points += score.Points;
-            PreparedPlay play = new PreparedPlay(board, projectedPlayer, score);
-
-            if (projectedPlayer.Points >= TargetPoints)
-            {
-                play.Phase = MatchState.Completed;
-                return play;
-            }
-
-            if (projectedPlayer.Hand.Count == 0)
-            {
-                List<MatchPlayer> projectedPlayers = new List<MatchPlayer>(_players);
-                projectedPlayers[_currentPlayerIndex] = projectedPlayer;
-                RoundSummary round = RoundResolution.ResolvePlayedOut(
-                    projectedPlayers,
-                    RoundNumber,
-                    player.PlayerId);
-                play.RoundEnd = PrepareRoundEnd(round);
-                score.RoundPoints = round.AwardedPoints;
-            }
-
-            return play;
-        }
-
-        private void ApplyPlay(PreparedPlay play)
-        {
-            MatchPlayer player = _players[_currentPlayerIndex];
-            player.Hand = play.Player.Hand;
-            player.Points = play.Player.Points;
-            Board = play.Board;
-            LastPlay = play.Score;
-            Phase = play.Phase;
-            _consecutivePasses = 0;
-            if (play.RoundEnd != null)
-            {
-                ApplyRoundEnd(play.RoundEnd);
-            }
-            else if (Phase == MatchState.InProgress)
-            {
-                AdvanceTurn();
-            }
-
-            Version++;
         }
 
         public void Draw(int playerId, long expectedVersion)
@@ -251,6 +191,66 @@ namespace DominoAllFives.BusinessLogic.Gameplay
             }
 
             Phase = MatchState.Cancelled;
+            Version++;
+        }
+
+        private PreparedPlay PreparePlay(MatchPlayer player, Tile tile, BoardEndPosition end)
+        {
+            Board board = Board.Copy();
+            board.Place(tile, end, TurnNumber);
+            MatchPlayer projectedPlayer = new MatchPlayer
+            {
+                PlayerId = player.PlayerId,
+                Points = player.Points,
+                Hand = new List<Tile>(player.Hand)
+            };
+            projectedPlayer.Hand.Remove(tile);
+
+            PlayScore score = PlayScoring.Evaluate(board, TurnNumber);
+            score.PlayerId = player.PlayerId;
+            score.RoundNumber = RoundNumber;
+            projectedPlayer.Points += score.Points;
+            PreparedPlay play = new PreparedPlay(board, projectedPlayer, score);
+
+            if (projectedPlayer.Points >= TargetPoints)
+            {
+                play.Phase = MatchState.Completed;
+                return play;
+            }
+
+            if (projectedPlayer.Hand.Count == 0)
+            {
+                List<MatchPlayer> projectedPlayers = new List<MatchPlayer>(_players);
+                projectedPlayers[_currentPlayerIndex] = projectedPlayer;
+                RoundSummary round = RoundResolution.ResolvePlayedOut(
+                    projectedPlayers,
+                    RoundNumber,
+                    player.PlayerId);
+                play.RoundEnd = PrepareRoundEnd(round);
+                score.RoundPoints = round.AwardedPoints;
+            }
+
+            return play;
+        }
+
+        private void ApplyPlay(PreparedPlay play)
+        {
+            MatchPlayer player = _players[_currentPlayerIndex];
+            player.Hand = play.Player.Hand;
+            player.Points = play.Player.Points;
+            Board = play.Board;
+            LastPlay = play.Score;
+            Phase = play.Phase;
+            _consecutivePasses = 0;
+            if (play.RoundEnd != null)
+            {
+                ApplyRoundEnd(play.RoundEnd);
+            }
+            else if (Phase == MatchState.InProgress)
+            {
+                AdvanceTurn();
+            }
+
             Version++;
         }
 
@@ -407,9 +407,9 @@ namespace DominoAllFives.BusinessLogic.Gameplay
 
         private void ApplyPreparedRound(PreparedRound round, List<MatchPlayer> orderedPlayers)
         {
-            for (int index = 0; index < orderedPlayers.Count; index++)
+            for (int playerIndex = 0; playerIndex < orderedPlayers.Count; playerIndex++)
             {
-                orderedPlayers[index].Hand = round.Players[index].Hand;
+                orderedPlayers[playerIndex].Hand = round.Players[playerIndex].Hand;
             }
 
             _players = orderedPlayers;
