@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+
 using DominoAllFives.Contracts.Services;
 
 namespace DominoAllFives.Server.Infrastructure.Chat
@@ -9,7 +10,8 @@ namespace DominoAllFives.Server.Infrastructure.Chat
     {
         private readonly ConcurrentDictionary<int, IChatCallback> _callbacks =
             new ConcurrentDictionary<int, IChatCallback>();
-        public bool RegisterCallback(int playerId, IChatCallback callback)
+
+        public void RegisterCallback(int playerId, IChatCallback callback)
         {
             if (playerId <= 0)
             {
@@ -22,18 +24,16 @@ namespace DominoAllFives.Server.Infrastructure.Chat
             }
 
             _callbacks[playerId] = callback;
-            return true;
         }
 
-        public IChatCallback GetCallback(int playerId)
+        public bool TryGetCallback(int playerId, out IChatCallback callback)
         {
-            IChatCallback callback;
-            if (!_callbacks.TryGetValue(playerId, out callback))
+            if (playerId <= 0)
             {
-                throw new KeyNotFoundException();
+                throw new ArgumentOutOfRangeException(nameof(playerId));
             }
 
-            return callback;
+            return _callbacks.TryGetValue(playerId, out callback);
         }
 
         public bool RemoveCallback(int playerId, IChatCallback callback)

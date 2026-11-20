@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
+
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Services;
 using Microsoft.Extensions.Logging;
@@ -11,28 +12,24 @@ namespace DominoAllFives.Server.Infrastructure.Chat
     {
         private readonly ChatCallbackRegistry _callbacks;
         private readonly ILogger<ChatEventPublisher> _logger;
+
         public ChatEventPublisher(
             ChatCallbackRegistry callbacks,
             ILogger<ChatEventPublisher> logger)
         {
-            _callbacks = callbacks ?? throw new ArgumentNullException(nameof(callbacks));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _callbacks = callbacks
+                ?? throw new ArgumentNullException(nameof(callbacks));
+            _logger = logger
+                ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public void PublishMessageReceived(
-            IEnumerable<Player> recipients,
+            IEnumerable<int> recipientIds,
             ChatMessage message)
         {
-            Publish(recipients, message, callback => callback.OnMessageReceived(message));
-        }
-        private void Publish(
-            IEnumerable<Player> recipients,
-            ChatMessage message,
-            Action<IChatCallback> notification)
-        {
-            if (recipients == null)
+            if (recipientIds == null)
             {
-                throw new ArgumentNullException(nameof(recipients));
+                throw new ArgumentNullException(nameof(recipientIds));
             }
 
             if (message == null)
@@ -40,47 +37,43 @@ namespace DominoAllFives.Server.Infrastructure.Chat
                 throw new ArgumentNullException(nameof(message));
             }
 
-            foreach (Player player in recipients)
+            foreach (int playerId in recipientIds)
             {
                 IChatCallback callback;
-                try
-                {
-                    callback = _callbacks.GetCallback(player.PlayerId);
-                }
-                catch (KeyNotFoundException)
+                if (!_callbacks.TryGetCallback(playerId, out callback))
                 {
                     continue;
                 }
 
                 try
                 {
-                    notification(callback);
+                    callback.OnMessageReceived(message);
                 }
                 catch (CommunicationException ex)
                 {
-                    _callbacks.RemoveCallback(player.PlayerId, callback);
-                    _logger.LogDebug(
-                        ex,
-                        "Chat callback failed for player {PlayerId}.",
-                        player.PlayerId);
+                    RemoveFailedCallback(playerId, callback, ex);
                 }
                 catch (TimeoutException ex)
                 {
-                    _callbacks.RemoveCallback(player.PlayerId, callback);
-                    _logger.LogDebug(
-                        ex,
-                        "Chat callback failed for player {PlayerId}.",
-                        player.PlayerId);
+                    RemoveFailedCallback(playerId, callback, ex);
                 }
                 catch (ObjectDisposedException ex)
                 {
-                    _callbacks.RemoveCallback(player.PlayerId, callback);
-                    _logger.LogDebug(
-                        ex,
-                        "Chat callback failed for player {PlayerId}.",
-                        player.PlayerId);
+                    RemoveFailedCallback(playerId, callback, ex);
                 }
             }
+        }
+
+        private void RemoveFailedCallback(
+            int playerId,
+            IChatCallback callback,
+            Exception ex)
+        {
+            _callbacks.RemoveCallback(playerId, callback);
+            _logger.LogDebug(
+                ex,
+                "Chat callback failed for player {PlayerId}.",
+                playerId);
         }
     }
 }

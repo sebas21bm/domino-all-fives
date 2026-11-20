@@ -48,7 +48,10 @@ namespace DominoAllFives.BusinessLogic.Managers
                     LobbyId = _nextLobbyId++,
                     LobbyCode = code,
                     Host = CopyPlayer(host),
-                    Participants = new List<Player> { CopyPlayer(host) },
+                    Participants = new List<Player> 
+                    { 
+                        CopyPlayer(host) 
+                    },
                     KickedPlayers = new List<Player>(),
                     Settings = CopySettings(settings),
                     State = LobbyState.Waiting

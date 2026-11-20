@@ -1,26 +1,53 @@
 using System;
 using System.Collections.Generic;
+
 using DominoAllFives.BusinessLogic.Exceptions;
 using DominoAllFives.BusinessLogic.Managers;
 using DominoAllFives.Contracts.Domain;
 using DominoAllFives.Contracts.Enums;
+using DominoAllFives.DataAccess.Interfaces;
+using DominoAllFives.DataAccess.Models;
+using DominoAllFives.DataAccess.Repositories;
+using Player = DominoAllFives.Contracts.Domain.Player;
+using StoredPlayer = DominoAllFives.DataAccess.Models.Player;
 
 namespace DominoAllFives.BusinessLogic.Controllers
 {
     public sealed class ChatController
     {
         private const int MaximumMessageLength = 150;
+
         private readonly LobbyManager _lobbyManager;
 
         public ChatController(LobbyManager lobbyManager)
         {
-            _lobbyManager = lobbyManager ?? throw new ArgumentNullException(nameof(lobbyManager));
+            _lobbyManager = lobbyManager
+                ?? throw new ArgumentNullException(nameof(lobbyManager));
         }
 
-        public ChatMessage SendMessage(
-            Player sender,
-            ChatMessage message,
-            out List<Player> recipients)
+        public Player GetAuthenticatedPlayer(string sessionKey)
+        {
+            int playerId = SessionManager.GetPlayerId(sessionKey);
+            using (DominoAllFivesEntities context = new DominoAllFivesEntities())
+            {
+                IPlayerRepository playerRepository = new PlayerRepository(context);
+                StoredPlayer storedPlayer = playerRepository.GetById(playerId);
+                if (storedPlayer == null || storedPlayer.IsDeleted)
+                {
+                    SessionManager.RemoveSession(sessionKey);
+                    throw new KeyNotFoundException();
+                }
+
+                return new Player
+                {
+                    PlayerId = storedPlayer.IdPlayer,
+                    Username = storedPlayer.Username,
+                    IsGuest = storedPlayer.IsGuest
+                };
+            }
+        }
+
+        public List<int> SendMessage(Player sender, ChatMessage message)
         {
             ValidatePlayer(sender);
             if (message == null)
@@ -28,43 +55,36 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 throw new ArgumentNullException(nameof(message));
             }
 
-            ValidateContext(message.ContextId);
-            string normalizedContent = ValidateAndNormalizeContent(message.Content);
+            if (message.ContextId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(message));
+            }
+
+            if (sender.IsGuest)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            List<int> recipientIds;
             switch (message.Scope)
             {
                 case ChatScope.Lobby:
-                    ChatMessage registeredMessage = _lobbyManager.AddChatMessage(
-                        sender,
+                    recipientIds = _lobbyManager.GetChatRecipientIds(
                         message.ContextId,
-                        normalizedContent);
-
-                    recipients = _lobbyManager.GetChatRecipients(
-                        message.ContextId);
-
-                    return registeredMessage;
+                        sender.PlayerId);
+                    break;
                 case ChatScope.Match:
                     throw new ChatRuleException(ChatIssue.PlayerNotInChat);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(message));
             }
-        }
 
-        /*
-        public List<ChatMessage> GetMessages(int playerId, ChatContext context)
-        {
-            ValidateId(playerId, nameof(playerId));
-            //ValidateContext(context);
-            switch (context.Scope)
-            {
-                case ChatScope.Lobby:
-                    return _lobbyManager.GetChatMessages(context.ContextId, playerId);
-                case ChatScope.Match:
-                    throw new ChatRuleException(ChatIssue.PlayerNotInChat);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(context));
-            }
+            string normalizedContent = ValidateAndNormalizeContent(message.Content);
+            message.SenderId = sender.PlayerId;
+            message.SenderUsername = sender.Username;
+            message.Content = normalizedContent;
+            return recipientIds;
         }
-        */
 
         private static void ValidatePlayer(Player player)
         {
@@ -73,36 +93,16 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 throw new ArgumentNullException(nameof(player));
             }
 
-            ValidateId(player.PlayerId, nameof(player));
+            if (player.PlayerId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(player));
+            }
+
             if (string.IsNullOrWhiteSpace(player.Username))
             {
-                throw new ArgumentException(null, nameof(player));
-            }
-        }
-
-        private static void ValidateContext(int contextId)
-        {
-            /*
-             * TODO: Remove this method
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            if (!Enum.IsDefined(typeof(ChatScope), context.Scope))
-            {
-                throw new ArgumentOutOfRangeException(nameof(context));
-            }
-
-            ValidateId(context.ContextId, nameof(context));
-            */
-        }
-
-        private static void ValidateId(int value, string parameterName)
-        {
-            if (value <= 0)
-            {
-                throw new ArgumentOutOfRangeException(parameterName);
+                throw new ArgumentException(
+                    "The player username cannot be empty.",
+                    nameof(player));
             }
         }
 
@@ -113,13 +113,13 @@ namespace DominoAllFives.BusinessLogic.Controllers
                 throw new ChatRuleException(ChatIssue.EmptyMessage);
             }
 
-            string trimmed = content.Trim();
-            if (trimmed.Length > MaximumMessageLength)
+            string trimmedContent = content.Trim();
+            if (trimmedContent.Length > MaximumMessageLength)
             {
                 throw new ChatRuleException(ChatIssue.MessageTooLong);
             }
 
-            return trimmed;
+            return trimmedContent;
         }
     }
 }
