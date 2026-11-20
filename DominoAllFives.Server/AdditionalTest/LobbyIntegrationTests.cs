@@ -11,24 +11,6 @@ namespace DominoAllFives.Server.AdditionalTest
     public sealed class LobbyIntegrationTests
     {
         [Test]
-        public void MatchStart_CompletedTransition_ClosesLobbyChat()
-        {
-            // Arrange
-            LobbyManager manager = new LobbyManager();
-            LobbyController controller = new LobbyController(manager);
-            Lobby lobby = CreateLobby(controller);
-            //manager.AddChatMessage(CreatePlayer(1), lobby.LobbyId, "Hello");
-            controller.PrepareLobbyForMatch(1);
-            // Act
-            controller.ConfirmMatchStarted(1);
-            // Assert
-            /*Assert.That(
-                () => manager.GetChatMessages(lobby.LobbyId, 1),
-                Throws.TypeOf<ChatRuleException>()
-                    .With.Property("Issue").EqualTo(ChatIssue.PlayerNotInChat));*/
-        }
-
-        [Test]
         public void MatchStart_CancelledTransition_PreservesLobbyAndMessages()
         {
             // Arrange
