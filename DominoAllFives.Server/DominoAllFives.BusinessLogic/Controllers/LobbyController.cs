@@ -110,6 +110,12 @@ namespace DominoAllFives.BusinessLogic.Controllers
             return _lobbyManager.CloseLobby(playerId);
         }
 
+        public Lobby GetLobbyForInvitation(int playerId)
+        {
+            ValidatePlayerId(playerId);
+            return _lobbyManager.GetLobbyForInvitation(playerId);
+        }
+
         public Lobby GetLobby(string code)
         {
             if (code == null)

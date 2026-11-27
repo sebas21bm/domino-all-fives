@@ -102,7 +102,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public ObservableCollection<LobbyPlayerRecord> Players { get; } =
             new ObservableCollection<LobbyPlayerRecord>();
         public RelayCommand GoBackCommand { get; }
-        public RelayCommand InviteFriendsCommand { get; }
+        public RelayCommand InviteByEmailCommand { get; }
         public RelayCommand StartGameCommand { get; }
         public RelayCommand ViewProfileCommand { get; }
         public RelayCommand KickPlayerCommand { get; }
@@ -112,7 +112,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
             _logger = LoggerFactoryProvider.CreateLogger<LobbyViewModel>();
             _playerSession = playerSession;
             GoBackCommand = new RelayCommand(Leave, CanLeave);
-            InviteFriendsCommand = new RelayCommand(DoNothing, CannotExecute);
+            InviteByEmailCommand = new RelayCommand(OpenInvitationDialog, CanInviteByEmail);
             StartGameCommand = new RelayCommand(StartGame, CanStartGame);
             ViewProfileCommand = new RelayCommand(DoNothing, CannotExecute);
             KickPlayerCommand = new RelayCommand(DoNothing, CannotExecute);
@@ -185,6 +185,64 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private bool CanStartGame()
         {
             return !_isBusy && !_disposed && IsHost && Players.Count >= MinimumPlayersToStart;
+        }
+
+        private bool CanInviteByEmail()
+        {
+            return !_isBusy && !_disposed && IsHost && _client?.CurrentLobby?.State == LobbyState.Waiting;
+        }
+
+        private void OpenInvitationDialog()
+        {
+            if (!CanInviteByEmail())
+            {
+                return;
+            }
+
+            CurrentModal = new InviteByEmailViewModel(CloseInvitationDialog, SendInvitation);
+            IsModalVisible = true;
+        }
+
+        private void CloseInvitationDialog()
+        {
+            CurrentModal = null;
+            IsModalVisible = false;
+        }
+
+        private void SendInvitation(string recipientEmail)
+        {
+            SetBusy(true);
+            InviteByEmailViewModel modal = (InviteByEmailViewModel)CurrentModal;
+            modal.SetStatus("InviteByEmail_msgSending");
+            BackgroundJob<string, bool> job = new BackgroundJob<string, bool>(SendInvitationOnWorker,
+                recipientEmail, OnInvitationSent, OnInvitationSendFailed);
+            BackgroundWork.Start(job);
+        }
+
+        private bool SendInvitationOnWorker(string recipientEmail)
+        {
+            _client.SendLobbyInvitation(recipientEmail);
+            return true;
+        }
+
+        private void OnInvitationSent(bool sent, string recipientEmail)
+        {
+            if (!_disposed && CurrentModal is InviteByEmailViewModel modal)
+            {
+                modal.RecipientEmail = string.Empty;
+                modal.SetStatus("InviteByEmail_msgSent");
+                SetBusy(false);
+            }
+        }
+
+        private void OnInvitationSendFailed(Exception error, string recipientEmail)
+        {
+            _logger.LogWarning("The lobby invitation operation failed ({ErrorType}).", error.GetType().Name);
+            if (!_disposed && CurrentModal is InviteByEmailViewModel modal)
+            {
+                modal.SetStatus("InviteByEmail_msgSendFailed");
+                SetBusy(false);
+            }
         }
 
         private void OnLobbyChanged(Lobby lobby)
@@ -419,6 +477,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         private void SetBusy(bool value)
         {
             _isBusy = value;
+            (CurrentModal as InviteByEmailViewModel)?.SetBusy(value);
             RaiseCommands();
         }
 
@@ -426,6 +485,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         {
             GoBackCommand.RaiseCanExecuteChanged();
             StartGameCommand.RaiseCanExecuteChanged();
+            InviteByEmailCommand.RaiseCanExecuteChanged();
         }
     }
 }

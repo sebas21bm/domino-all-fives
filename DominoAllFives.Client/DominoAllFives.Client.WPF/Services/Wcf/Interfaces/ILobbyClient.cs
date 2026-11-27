@@ -23,6 +23,7 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Interfaces
 
         void CreateLobby(LobbySettings settings);
         void JoinLobby(string lobbyCode);
+        void SendLobbyInvitation(string recipientEmail);
         Lobby GetLobby(string lobbyCode);
         void LeaveLobby();
         void StartMatch();

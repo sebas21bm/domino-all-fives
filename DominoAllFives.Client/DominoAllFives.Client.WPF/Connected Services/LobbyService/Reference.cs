@@ -442,6 +442,11 @@ namespace LobbyService
         [System.ServiceModel.FaultContractAttribute(typeof(LobbyService.LobbyIssue), Action="urn:domino-all-fives:services/ILobbyService/JoinLobbyLobbyIssueFault", Name="LobbyIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
         [System.ServiceModel.FaultContractAttribute(typeof(LobbyService.AccessIssue), Action="urn:domino-all-fives:services/ILobbyService/JoinLobbyAccessIssueFault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
         void JoinLobby(string lobbyCode);
+
+        [System.ServiceModel.OperationContractAttribute(IsInitiating=false, Action="urn:domino-all-fives:services/ILobbyService/SendLobbyInvitation", ReplyAction="urn:domino-all-fives:services/ILobbyService/SendLobbyInvitationResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(LobbyService.AccessIssue), Action="urn:domino-all-fives:services/ILobbyService/SendLobbyInvitationAccessIssueFault", Name="AccessIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        [System.ServiceModel.FaultContractAttribute(typeof(LobbyService.LobbyIssue), Action="urn:domino-all-fives:services/ILobbyService/SendLobbyInvitationLobbyIssueFault", Name="LobbyIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
+        void SendLobbyInvitation(string recipientEmail);
         
         [System.ServiceModel.OperationContractAttribute(IsInitiating=false, Action="urn:domino-all-fives:services/ILobbyService/LeaveLobby", ReplyAction="urn:domino-all-fives:services/ILobbyService/LeaveLobbyResponse")]
         [System.ServiceModel.FaultContractAttribute(typeof(LobbyService.LobbyIssue), Action="urn:domino-all-fives:services/ILobbyService/LeaveLobbyLobbyIssueFault", Name="LobbyIssue", Namespace="http://schemas.datacontract.org/2004/07/DominoAllFives.Contracts.Enums")]
@@ -526,6 +531,11 @@ namespace LobbyService
         public void JoinLobby(string lobbyCode)
         {
             base.Channel.JoinLobby(lobbyCode);
+        }
+
+        public void SendLobbyInvitation(string recipientEmail)
+        {
+            base.Channel.SendLobbyInvitation(recipientEmail);
         }
         
         public void LeaveLobby()

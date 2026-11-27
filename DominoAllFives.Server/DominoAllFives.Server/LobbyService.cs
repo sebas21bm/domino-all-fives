@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity.Core;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
+using System.Net.Mail;
 using System.ServiceModel;
 using DominoAllFives.BusinessLogic.Controllers;
 using DominoAllFives.BusinessLogic.Exceptions;
@@ -23,6 +24,8 @@ namespace DominoAllFives.Server
         IncludeExceptionDetailInFaults = false)]
     public sealed class LobbyService : ILobbyService
     {
+        private const int MaximumEmailLength = 254;
+        private static readonly TimeSpan invitationInterval = TimeSpan.FromSeconds(5);
         private static readonly LobbyController controller;
         private static readonly MatchController matchController;
         private static readonly LobbyCallbackRegistry callbacks;
@@ -32,6 +35,10 @@ namespace DominoAllFives.Server
         private Player _player;
         private ILobbyCallback _callback;
         private ICommunicationObject _callbackChannel;
+        private int _invitationLobbyId;
+        private readonly HashSet<string> _invitedAddresses =
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private DateTime _lastInvitationAttemptUtc;
 
         static LobbyService()
         {
@@ -128,6 +135,86 @@ namespace DominoAllFives.Server
             {
                 throw new FaultException<LobbyIssue>(ex.Issue);
             }
+        }
+
+        public void SendLobbyInvitation(string recipientEmail)
+        {
+            int playerId = GetPlayer().PlayerId;
+            Lobby lobby;
+            try
+            {
+                lobby = controller.GetLobbyForInvitation(playerId);
+            }
+            catch (LobbyRuleException ex)
+            {
+                throw new FaultException<LobbyIssue>(ex.Issue);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw new FaultException<AccessIssue>(AccessIssue.PermissionDenied);
+            }
+
+            MailAddress recipient = ParseInvitationAddress(recipientEmail);
+            if (_invitationLobbyId != lobby.LobbyId)
+            {
+                _invitationLobbyId = lobby.LobbyId;
+                _invitedAddresses.Clear();
+            }
+
+            if (_invitedAddresses.Contains(recipient.Address))
+            {
+                return;
+            }
+
+            DateTime nowUtc = DateTime.UtcNow;
+            if (nowUtc - _lastInvitationAttemptUtc < invitationInterval)
+            {
+                throw new FaultException("Please wait before sending another invitation.");
+            }
+
+            _lastInvitationAttemptUtc = nowUtc;
+            try
+            {
+                LobbyInvitationEmail.Send(recipient, lobby.LobbyCode);
+                _invitedAddresses.Add(recipient.Address);
+            }
+            catch (SmtpException ex)
+            {
+                logger.LogWarning("Gmail rejected a lobby invitation. SMTP status: {Status}.", ex.StatusCode);
+                throw new FaultException("The invitation email could not be sent.");
+            }
+            catch (FormatException)
+            {
+                logger.LogWarning("The Gmail sender address is invalid.");
+                throw new FaultException("The invitation email could not be sent.");
+            }
+            catch (InvalidOperationException)
+            {
+                logger.LogWarning("The Gmail sender could not be configured for lobby invitations.");
+                throw new FaultException("The invitation email could not be sent.");
+            }
+        }
+
+        private static MailAddress ParseInvitationAddress(string recipientEmail)
+        {
+            string address = recipientEmail?.Trim();
+            if (!string.IsNullOrEmpty(address) && address.Length <= MaximumEmailLength)
+            {
+                try
+                {
+                    MailAddress recipient = new MailAddress(address);
+                    if (string.Equals(recipient.Address, address, StringComparison.Ordinal))
+                    {
+                        return recipient;
+                    }
+                }
+                catch (FormatException)
+                {
+                    throw new FaultException("Enter a valid recipient email address.");
+                }
+            }
+
+            throw new FaultException("Enter a valid recipient email address.");
         }
 
         public void LeaveLobby()

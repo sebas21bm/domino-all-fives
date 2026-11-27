@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:DominoAllFives.Client.WPF.Views"
       xmlns:loc="clr-namespace:DominoAllFives.Client.WPF.Localization"
+      xmlns:vm="clr-namespace:DominoAllFives.Client.WPF.ViewModels"
       mc:Ignorable="d" 
       d:DesignHeight="900" d:DesignWidth="1600"
       Title="Lobby"
@@ -150,13 +151,13 @@
                             VerticalAlignment="Center" 
                             Margin="0,0,45,0">
 
-                    <Button x:Name="btnInviteFriends"
-                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Lobby_btnInviteFriends]}"
+                    <Button x:Name="btnInviteByEmail"
+                            Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Lobby_btnInviteByEmail]}"
                             Style="{StaticResource DarkButton}" 
                             Width="300" Height="60" 
                             FontSize="12"
                             Margin="0,0,20,0"
-                            Command="{Binding InviteFriendsCommand}"/>
+                            Command="{Binding InviteByEmailCommand}"/>
 
                     <Button x:Name="btnStartGame"
                             Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Lobby_btnStartGame]}"
@@ -181,11 +182,40 @@
 
         <Grid x:Name="grdModalOveral" 
             Visibility="{Binding IsModalVisible, Converter={StaticResource BoolToVis}}"
+            Background="Transparent"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch">
             <ContentControl Content="{Binding CurrentModal}" 
                             HorizontalAlignment="Center" 
-                            VerticalAlignment="Center"/>
+                            VerticalAlignment="Center">
+                <ContentControl.Resources>
+                    <DataTemplate DataType="{x:Type vm:InviteByEmailViewModel}">
+                        <Border Width="540" Style="{StaticResource RoundedPanelStyle}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Lobby_btnInviteByEmail]}"
+                                           Style="{StaticResource SectionTitleText}" Margin="0,0,0,20"/>
+                                <Label Target="{Binding ElementName=txtRecipientEmail}" Padding="0,0,0,6"
+                                       Foreground="{StaticResource CreamLightBrush}"
+                                       Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_lblEmail]}"/>
+                                <TextBox x:Name="txtRecipientEmail" Style="{StaticResource CreamTextBox}"
+                                         Text="{Binding RecipientEmail, UpdateSourceTrigger=PropertyChanged}"
+                                         IsReadOnly="{Binding IsBusy}" MaxLength="254" Height="42"/>
+                                <TextBlock Text="{Binding StatusMessage}" Style="{StaticResource DataValueText}"
+                                           TextWrapping="Wrap" Margin="0,12,0,0" MinHeight="25"
+                                           AutomationProperties.LiveSetting="Polite"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                                    <Button Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnBack]}"
+                                            Command="{Binding CloseCommand}" Style="{StaticResource OutlineButton}"
+                                            MinWidth="130" Height="42" Margin="0,0,10,0"/>
+                                    <Button Content="{Binding Source={x:Static loc:LanguageManager.Instance}, Path=[Global_btnSend]}"
+                                            Command="{Binding SendCommand}" Style="{StaticResource DarkButton}"
+                                            MinWidth="140" Height="42"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ContentControl.Resources>
+            </ContentControl>
         </Grid>
     </Grid>
 </Page>

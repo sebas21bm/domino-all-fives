@@ -54,6 +54,12 @@ namespace DominoAllFives.Contracts.Services
         [FaultContract(typeof(AccessIssue))]
         void JoinLobby(string lobbyCode);
 
+        /// <summary>Sends the current host's lobby code to the specified email address.</summary>
+        [OperationContract(IsInitiating = false)]
+        [FaultContract(typeof(AccessIssue))]
+        [FaultContract(typeof(LobbyIssue))]
+        void SendLobbyInvitation(string recipientEmail);
+
         /// <summary>
         /// Removes the authenticated player from the current lobby.
         /// </summary>

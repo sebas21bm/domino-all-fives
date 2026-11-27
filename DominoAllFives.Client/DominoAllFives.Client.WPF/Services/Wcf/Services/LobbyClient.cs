@@ -103,6 +103,12 @@ namespace DominoAllFives.Client.WPF.Services.Wcf.Services
             }
         }
 
+        public void SendLobbyInvitation(string recipientEmail)
+        {
+            EnsureActive();
+            _client.SendLobbyInvitation(recipientEmail);
+        }
+
         public Lobby GetLobby(string lobbyCode)
         {
             EnsureActive();

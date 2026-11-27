@@ -1189,4 +1189,19 @@ Los dominios válidos son: gmail, hotmail, outlook</value>
   <data name="MessageProfile_msgRemovePicture" xml:space="preserve">
     <value>¿Quieres eliminar tu imagen de perfil? Este cambio se guardará de inmediato.</value>
   </data>
+  <data name="Lobby_btnInviteByEmail" xml:space="preserve">
+    <value>Invitar por correo</value>
+  </data>
+  <data name="InviteByEmail_msgSending" xml:space="preserve">
+    <value>Enviando invitación…</value>
+  </data>
+  <data name="InviteByEmail_msgSent" xml:space="preserve">
+    <value>Invitación enviada.</value>
+  </data>
+  <data name="InviteByEmail_msgSendFailed" xml:space="preserve">
+    <value>No se pudo enviar la invitación. Inténtalo de nuevo en unos segundos.</value>
+  </data>
+  <data name="InviteByEmail_msgInvalidAddress" xml:space="preserve">
+    <value>Ingresa una dirección de correo válida.</value>
+  </data>
 </root>

@@ -128,6 +128,17 @@ namespace DominoAllFives.BusinessLogic.Managers
             }
         }
 
+        public Lobby GetLobbyForInvitation(int playerId)
+        {
+            lock (_syncRoot)
+            {
+                Lobby lobby = GetPlayerLobby(playerId);
+                ValidatePlayerIsHost(lobby, playerId);
+                ValidateLobbyIsWaiting(lobby);
+                return CreateSnapshot(lobby);
+            }
+        }
+
         public Lobby PrepareLobbyForMatch(int playerId)
         {
             lock (_syncRoot)

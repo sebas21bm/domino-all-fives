@@ -14,6 +14,20 @@ namespace DominoAllFives.Client.Tests
     public class WcfLobbyServiceTests
     {
         [Test]
+        public void Invitation_UsesEnteredEmailOverActiveLobbyChannel()
+        {
+            TestLobbyService remoteService = new TestLobbyService();
+            using (TestLobbyHost host = new TestLobbyHost(remoteService))
+            using (LobbyClient service = host.CreateClient())
+            {
+                service.CreateLobby(new LobbySettings());
+                service.SendLobbyInvitation("recipient@example.com");
+
+                Assert.That(remoteService.InvitedEmail, Is.EqualTo("recipient@example.com"));
+            }
+        }
+
+        [Test]
         public void Create_OpenFailure_ReleasesClientAndAllowsAnotherAttempt()
         {
             // Arrange
@@ -234,6 +248,7 @@ namespace DominoAllFives.Client.Tests
             public bool ChangeBeforeResponse { get; set; }
             public int OpenCount { get; private set; }
             public int LeaveCount { get; private set; }
+            public string InvitedEmail { get; private set; }
 
             public void OpenLobbySession(string sessionKey)
             {
@@ -270,6 +285,11 @@ namespace DominoAllFives.Client.Tests
                 {
                     throw new FaultException("Leave failed.");
                 }
+            }
+
+            public void SendLobbyInvitation(string recipientEmail)
+            {
+                InvitedEmail = recipientEmail;
             }
 
             public Lobby GetLobby(string lobbyCode)

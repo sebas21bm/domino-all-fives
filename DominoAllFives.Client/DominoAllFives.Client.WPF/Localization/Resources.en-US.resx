@@ -1190,4 +1190,19 @@ Only the following are allowed: .png, .jpg, .jpeg.</value>
   <data name="MessageProfile_msgRemovePicture" xml:space="preserve">
     <value>Do you want to remove your profile picture? This change will be saved immediately.</value>
   </data>
+  <data name="Lobby_btnInviteByEmail" xml:space="preserve">
+    <value>Invite by email</value>
+  </data>
+  <data name="InviteByEmail_msgSending" xml:space="preserve">
+    <value>Sending invitation…</value>
+  </data>
+  <data name="InviteByEmail_msgSent" xml:space="preserve">
+    <value>Invitation sent.</value>
+  </data>
+  <data name="InviteByEmail_msgSendFailed" xml:space="preserve">
+    <value>Could not send the invitation. Try again in a few seconds.</value>
+  </data>
+  <data name="InviteByEmail_msgInvalidAddress" xml:space="preserve">
+    <value>Enter a valid email address.</value>
+  </data>
 </root>
