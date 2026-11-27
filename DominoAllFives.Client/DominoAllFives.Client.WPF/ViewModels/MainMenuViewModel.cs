@@ -1,4 +1,3 @@
-using System;
 using System.Windows;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Localization;
@@ -44,8 +43,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public MainMenuViewModel(PlayerSession playerSession)
         {
-            _playerSession = playerSession ?? throw new ArgumentNullException(
-                nameof(playerSession));
+            _playerSession = playerSession;
             GoToProfileCommand = new RelayCommand(
                 unusedParameter => _navigationService.NavigateTo<ProfileViewModel>());
             GoToFriendsCommand = new RelayCommand(
@@ -65,17 +63,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public void Initialize(IFrameNavigationService navigationService)
         {
-            if (_navigationService != null)
-            {
-                throw new InvalidOperationException(
-                    "MainMenuViewModel has already been initialized.");
-            }
-
-            if (navigationService == null)
-            {
-                throw new ArgumentNullException(nameof(navigationService));
-            }
-
             _navigationService = navigationService;
         }
 

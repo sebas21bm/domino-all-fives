@@ -69,11 +69,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         /// <summary>Creates the profile draft and commands without querying the server.</summary>
         /// <param name = "playerSession">The current local player session.</param>
-        /// <exception cref = "ArgumentNullException">The session is null.</exception>
         public EditProfileViewModel(PlayerSession playerSession)
         {
-            _playerSession = playerSession
-                ?? throw new ArgumentNullException(nameof(playerSession));
+            _playerSession = playerSession;
             _username = string.Empty;
             GoBackCommand = new RelayCommand(GoBack, CanGoBack);
             ChangePictureCommand = new RelayCommand(ChangePicture, CanEdit);
@@ -89,26 +87,12 @@ namespace DominoAllFives.Client.WPF.ViewModels
         /// Creates display images from selected or stored content.
         /// </param>
         /// <param name = "fileService">Selects and reads a local picture file.</param>
-        /// <exception cref = "ArgumentNullException">A picture service is null.</exception>
-        /// <exception cref = "InvalidOperationException">
-        /// Picture services are already configured.
-        /// </exception>
         public void ConfigurePictures(
             ProfilePictureImageService imageService,
             ProfilePictureFileService fileService)
         {
-            if (_imageService != null || _fileService != null || _profileClient != null)
-            {
-                throw new InvalidOperationException(
-                    "Profile picture services are already configured.");
-            }
-
-            ProfilePictureImageService configuredImageService = imageService
-                ?? throw new ArgumentNullException(nameof(imageService));
-            ProfilePictureFileService configuredFileService = fileService
-                ?? throw new ArgumentNullException(nameof(fileService));
-            _imageService = configuredImageService;
-            _fileService = configuredFileService;
+            _imageService = imageService;
+            _fileService = fileService;
         }
 
         /// <summary>
@@ -118,45 +102,18 @@ namespace DominoAllFives.Client.WPF.ViewModels
         /// <param name = "profileClient">The remote profile client.</param>
         /// <param name = "dialogService">The localized dialog service.</param>
         /// <param name = "logger">The profile editing logger.</param>
-        /// <exception cref = "ArgumentNullException">A required service is null.</exception>
-        /// <exception cref = "InvalidOperationException">
-        /// Already initialized or local picture services have not been configured.
-        /// </exception>
         public void Initialize(
             IFrameNavigationService navigationService,
             IProfileClient profileClient,
             IDialogService dialogService,
             ILogger<EditProfileViewModel> logger)
         {
-            if (_profileClient != null)
-            {
-                throw new InvalidOperationException("EditProfileViewModel is already initialized.");
-            }
-
-            if (_imageService == null || _fileService == null)
-            {
-                throw new InvalidOperationException(
-                    "Configure picture services before initialization.");
-            }
-
-            _navigationService = navigationService
-                ?? throw new ArgumentNullException(nameof(navigationService));
-            _dialogService = dialogService
-                ?? throw new ArgumentNullException(nameof(dialogService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _profileClient = profileClient
-                ?? throw new ArgumentNullException(nameof(profileClient));
+            _navigationService = navigationService;
+            _dialogService = dialogService;
+            _logger = logger;
+            _profileClient = profileClient;
             SetBusy(false);
             LoadProfile();
-        }
-
-        private void EnsureInitialized()
-        {
-            if (_profileClient == null)
-            {
-                throw new InvalidOperationException(
-                    "EditProfileViewModel must be initialized first.");
-            }
         }
 
         private void LoadProfile()
@@ -203,7 +160,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ChangePicture()
         {
-            EnsureInitialized();
             if (!CanEdit())
             {
                 return;
@@ -232,7 +188,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void Save()
         {
-            EnsureInitialized();
             if (!CanSave())
             {
                 return;
@@ -298,7 +253,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void ConfirmRemovePicture()
         {
-            EnsureInitialized();
             if (!CanRemovePicture())
             {
                 return;
@@ -315,7 +269,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void RemovePicture()
         {
-            EnsureInitialized();
             if (!CanRemovePicture())
             {
                 return;
@@ -413,7 +366,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void GoBack()
         {
-            EnsureInitialized();
             if (!CanGoBack())
             {
                 return;

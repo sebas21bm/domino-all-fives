@@ -33,12 +33,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public DeleteAccountViewModel(PlayerSession playerSession, Action onSuccess, Action onCancel)
         {
-            _playerSession = playerSession
-                ?? throw new ArgumentNullException(nameof(playerSession));
-            _onSuccess = onSuccess
-                ?? throw new ArgumentNullException(nameof(onSuccess));
-            _onCancel = onCancel
-                ?? throw new ArgumentNullException(nameof(onCancel));
+            _playerSession = playerSession;
+            _onSuccess = onSuccess;
+            _onCancel = onCancel;
             ConfirmDeleteCommand = new RelayCommand(ExecuteDeleteAccount, unused => CanSubmit());
             CancelCommand = new RelayCommand(Cancel, () => !_isBusy);
         }
@@ -48,17 +45,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
             IAccountClient accountClient,
             ILogger<DeleteAccountViewModel> logger)
         {
-            if (_accountClient != null)
-            {
-                throw new InvalidOperationException("DeleteAccountViewModel has already been initialized.");
-            }
-
-            _dialogService = dialogService
-                ?? throw new ArgumentNullException(nameof(dialogService));
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
-            _accountClient = accountClient
-                ?? throw new ArgumentNullException(nameof(accountClient));
+            _dialogService = dialogService;
+            _logger = logger;
+            _accountClient = accountClient;
             ConfirmDeleteCommand.RaiseCanExecuteChanged();
         }
 

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Windows;
 using DominoAllFives.Client.WPF.Commands;
@@ -89,22 +88,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
             IFrameNavigationService navigationService,
             ViewModelFactory viewModelFactory)
         {
-            if (_navigationService != null)
-            {
-                throw new InvalidOperationException(
-                    "HomePageViewModel has already been initialized.");
-            }
-
-            if (navigationService == null)
-            {
-                throw new ArgumentNullException(nameof(navigationService));
-            }
-
-            if (viewModelFactory == null)
-            {
-                throw new ArgumentNullException(nameof(viewModelFactory));
-            }
-
             _navigationService = navigationService;
             _viewModelFactory = viewModelFactory;
         }

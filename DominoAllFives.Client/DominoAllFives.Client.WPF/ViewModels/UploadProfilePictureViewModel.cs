@@ -50,20 +50,14 @@ namespace DominoAllFives.Client.WPF.ViewModels
         /// Continues after uploading or skipping a picture.
         /// </param>
         /// <param name = "onCancel">Closes the optional picture step.</param>
-        /// <exception cref = "ArgumentNullException">
-        /// A required constructor argument is null.
-        /// </exception>
         public UploadProfilePictureViewModel(
             PlayerSession playerSession,
             Action onFinishRegistration,
             Action onCancel)
         {
-            _playerSession = playerSession
-                ?? throw new ArgumentNullException(nameof(playerSession));
-            _onFinishRegistration = onFinishRegistration
-                ?? throw new ArgumentNullException(nameof(onFinishRegistration));
-            _onCancel = onCancel
-                ?? throw new ArgumentNullException(nameof(onCancel));
+            _playerSession = playerSession;
+            _onFinishRegistration = onFinishRegistration;
+            _onCancel = onCancel;
             SelectPhotoCommand = new RelayCommand(SelectPhoto, CanInteract);
             AddPhotoCommand = new RelayCommand(AddPhoto, CanInteract);
             SkipPhotoCommand = new RelayCommand(SkipPhoto, CanInteract);
@@ -75,41 +69,21 @@ namespace DominoAllFives.Client.WPF.ViewModels
         /// <param name = "profileClient">The remote profile client.</param>
         /// <param name = "fileService">The local picture selection service.</param>
         /// <param name = "logger">The picture upload logger.</param>
-        /// <exception cref = "ArgumentNullException">A required service is null.</exception>
-        /// <exception cref = "InvalidOperationException">Already initialized.</exception>
         public void Initialize(
             IDialogService dialogService,
             IProfileClient profileClient,
             ProfilePictureFileService fileService,
             ILogger<UploadProfilePictureViewModel> logger)
         {
-            if (_profileClient != null)
-            {
-                throw new InvalidOperationException("Picture upload has already been initialized.");
-            }
-
-            _dialogService = dialogService
-                ?? throw new ArgumentNullException(nameof(dialogService));
-            _fileService = fileService
-                ?? throw new ArgumentNullException(nameof(fileService));
-            _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
-            _profileClient = profileClient
-                ?? throw new ArgumentNullException(nameof(profileClient));
+            _dialogService = dialogService;
+            _fileService = fileService;
+            _logger = logger;
+            _profileClient = profileClient;
             SetBusy(false);
-        }
-
-        private void EnsureInitialized()
-        {
-            if (_profileClient == null)
-            {
-                throw new InvalidOperationException("Picture upload must be initialized first.");
-            }
         }
 
         private void SelectPhoto()
         {
-            EnsureInitialized();
             if (!CanInteract())
             {
                 return;
@@ -181,7 +155,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void AddPhoto()
         {
-            EnsureInitialized();
             if (_isBusy)
             {
                 return;
@@ -253,7 +226,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void SkipPhoto()
         {
-            EnsureInitialized();
             if (CanInteract())
             {
                 _onFinishRegistration();
@@ -262,7 +234,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void Cancel()
         {
-            EnsureInitialized();
             if (CanInteract())
             {
                 _onCancel();

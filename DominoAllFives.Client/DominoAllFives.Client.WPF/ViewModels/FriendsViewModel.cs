@@ -1,4 +1,3 @@
-using System;
 using System.Collections.ObjectModel;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Services;
@@ -38,17 +37,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public void Initialize(IFrameNavigationService navigationService)
         {
-            if (_navigationService != null)
-            {
-                throw new InvalidOperationException(
-                    "FriendsViewModel has already been initialized.");
-            }
-
-            if (navigationService == null)
-            {
-                throw new ArgumentNullException(nameof(navigationService));
-            }
-
             _navigationService = navigationService;
         }
         private static void IgnoreUnavailableCommand()

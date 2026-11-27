@@ -95,11 +95,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         /// <summary>Creates profile presentation state and commands without loading data.</summary>
         /// <param name = "playerSession">The current local player session.</param>
-        /// <exception cref = "ArgumentNullException">The session is null.</exception>
         public ProfileViewModel(PlayerSession playerSession)
         {
-            _playerSession = playerSession
-                ?? throw new ArgumentNullException(nameof(playerSession));
+            _playerSession = playerSession;
             _username = string.Empty;
             GoBackCommand = new RelayCommand(GoBack, CanGoBack);
             GoToEditProfileCommand = new RelayCommand(GoToEditProfile, CanUseProfile);
@@ -108,18 +106,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         /// <summary>Configures diagnostics before initializing the profile services.</summary>
         /// <param name = "logger">The profile logger.</param>
-        /// <exception cref = "ArgumentNullException">The logger is null.</exception>
-        /// <exception cref = "InvalidOperationException">
-        /// Diagnostics were already configured.
-        /// </exception>
         public void ConfigureLogger(ILogger<ProfileViewModel> logger)
         {
-            if (_logger != null || _profileClient != null)
-            {
-                throw new InvalidOperationException("Profile diagnostics are already configured.");
-            }
-
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger;
         }
 
         /// <summary>
@@ -129,45 +118,18 @@ namespace DominoAllFives.Client.WPF.ViewModels
         /// <param name = "profileClient">The remote profile client.</param>
         /// <param name = "imageService">The profile picture presentation service.</param>
         /// <param name = "dialogService">The localized dialog service.</param>
-        /// <exception cref = "ArgumentNullException">A required service is null.</exception>
-        /// <exception cref = "InvalidOperationException">
-        /// Already initialized or diagnostics have not been configured.
-        /// </exception>
         public void Initialize(
             IFrameNavigationService navigationService,
             IProfileClient profileClient,
             ProfilePictureImageService imageService,
             IDialogService dialogService)
         {
-            if (_profileClient != null)
-            {
-                throw new InvalidOperationException(
-                    "ProfileViewModel has already been initialized.");
-            }
-
-            if (_logger == null)
-            {
-                throw new InvalidOperationException(
-                    "Configure profile diagnostics before initialization.");
-            }
-
-            _navigationService = navigationService
-                ?? throw new ArgumentNullException(nameof(navigationService));
-            _imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
-            _dialogService = dialogService
-                ?? throw new ArgumentNullException(nameof(dialogService));
-            _profileClient = profileClient
-                ?? throw new ArgumentNullException(nameof(profileClient));
+            _navigationService = navigationService;
+            _imageService = imageService;
+            _dialogService = dialogService;
+            _profileClient = profileClient;
             SetBusy(false);
             LoadProfile();
-        }
-
-        private void EnsureInitialized()
-        {
-            if (_profileClient == null)
-            {
-                throw new InvalidOperationException("ProfileViewModel must be initialized first.");
-            }
         }
 
         private void LoadProfile()
@@ -244,7 +206,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void GoBack()
         {
-            EnsureInitialized();
             if (CanGoBack())
             {
                 _navigationService.GoBackToRefresh<MainMenuViewModel>();
@@ -253,7 +214,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void GoToEditProfile()
         {
-            EnsureInitialized();
             if (CanUseProfile())
             {
                 _navigationService.NavigateTo<EditProfileViewModel>();
@@ -262,7 +222,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         private void GoToMatchHistory()
         {
-            EnsureInitialized();
             if (CanUseProfile())
             {
                 _navigationService.NavigateTo<MatchHistoryViewModel>();
