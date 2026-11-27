@@ -148,8 +148,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public GameSettingsViewModel(PlayerSession playerSession)
         {
-            _playerSession = playerSession ?? throw new ArgumentNullException(
-                nameof(playerSession));
+            _playerSession = playerSession;
             _selectedLanguageCode = string.Empty;
             ShowAccountSectionCommand = new RelayCommand(ShowAccountSection, CanOpenAccountAction);
             ShowLanguageSectionCommand = new RelayCommand(ShowLanguageSection, CanOpenLanguage);
@@ -163,17 +162,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         /// <summary>Configures diagnostics before initializing the settings services.</summary>
         /// <param name = "logger">The settings logger.</param>
-        /// <exception cref = "ArgumentNullException">The logger is null.</exception>
-        /// <exception cref = "InvalidOperationException">Diagnostics are configured.</exception>
         public void ConfigureLogger(ILogger<GameSettingsViewModel> logger)
         {
-            if (_logger != null)
-            {
-                throw new InvalidOperationException(
-                    "Settings diagnostics are already configured.");
-            }
-
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger;
         }
 
         /// <summary>Initializes the services used by the settings commands.</summary>
@@ -181,38 +172,19 @@ namespace DominoAllFives.Client.WPF.ViewModels
         /// <param name = "viewModelFactory">The factory for account dialogs.</param>
         /// <param name = "dialogService">The localized message service.</param>
         /// <param name = "accountClient">The remote account client.</param>
-        /// <exception cref = "ArgumentNullException">A required service is null.</exception>
-        /// <exception cref = "InvalidOperationException">
-        /// Settings are initialized or diagnostics are missing.
-        /// </exception>
         public void Initialize(
             IFrameNavigationService navigationService,
             ViewModelFactory viewModelFactory,
             IDialogService dialogService,
             IAccountClient accountClient)
         {
-            if (_accountClient != null)
-            {
-                throw new InvalidOperationException(
-                    "GameSettingsViewModel has already been initialized.");
-            }
-
-            if (_logger == null)
-            {
-                throw new InvalidOperationException("Configure settings diagnostics first.");
-            }
-
-            _navigationService = navigationService
-                ?? throw new ArgumentNullException(nameof(navigationService));
-            _viewModelFactory = viewModelFactory
-                ?? throw new ArgumentNullException(nameof(viewModelFactory));
-            _dialogService = dialogService ?? throw new ArgumentNullException(
-                nameof(dialogService));
+            _navigationService = navigationService;
+            _viewModelFactory = viewModelFactory;
+            _dialogService = dialogService;
             IsAccountSectionVisible = _playerSession.HasServerSession;
             IsLanguageSectionVisible = IsGuest;
             SelectedLanguageCode = LanguageManager.Instance.CurrentLanguageCode;
-            _accountClient = accountClient ?? throw new ArgumentNullException(
-                nameof(accountClient));
+            _accountClient = accountClient;
             GoBackCommand.RaiseCanExecuteChanged();
         }
 

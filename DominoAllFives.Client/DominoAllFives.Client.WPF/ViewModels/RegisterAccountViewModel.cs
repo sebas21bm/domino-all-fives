@@ -113,10 +113,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
             Action onRegistrationSuccess,
             Action onCancel)
         {
-            _playerSession = playerSession ?? throw new ArgumentNullException(nameof(playerSession));
-            _onRegistrationSuccess = onRegistrationSuccess
-                ?? throw new ArgumentNullException(nameof(onRegistrationSuccess));
-            _onCancel = onCancel ?? throw new ArgumentNullException(nameof(onCancel));
+            _playerSession = playerSession;
+            _onRegistrationSuccess = onRegistrationSuccess;
+            _onCancel = onCancel;
             _username = string.Empty;
             _email = string.Empty;
             RegisterCommand = new RelayCommand(ExecuteRegister, CanRegister);
@@ -127,22 +126,14 @@ namespace DominoAllFives.Client.WPF.ViewModels
         /// <param name = "dialogService">Displays localized messages.</param>
         /// <param name = "registrationClient">Requests account creation.</param>
         /// <param name = "logger">Records registration failures.</param>
-        /// <exception cref = "ArgumentNullException">A required dependency is missing.</exception>
-        /// <exception cref = "InvalidOperationException">Already initialized.</exception>
         public void Initialize(
             IDialogService dialogService,
             IRegistrationClient registrationClient,
             ILogger<RegisterAccountViewModel> logger)
         {
-            if (_registrationClient != null)
-            {
-                throw new InvalidOperationException("Registration has already been initialized.");
-            }
-
-            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _registrationClient = registrationClient
-                ?? throw new ArgumentNullException(nameof(registrationClient));
+            _dialogService = dialogService;
+            _logger = logger;
+            _registrationClient = registrationClient;
         }
 
         private void ExecuteRegister(object parameter)
@@ -150,11 +141,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
             if (_isBusy)
             {
                 return;
-            }
-
-            if (_registrationClient == null)
-            {
-                throw new InvalidOperationException("Registration must be initialized first.");
             }
 
             PasswordBox[] passwordBoxes = parameter as PasswordBox[];

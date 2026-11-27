@@ -124,7 +124,7 @@ namespace DominoAllFives.Client.Tests
         }
 
         [Test]
-        public void Initialize_InvalidOrRepeatedDependencies_RejectsBeforeLoading()
+        public void Initialize_AuthenticatedSession_LoadsRankingAfterConstruction()
         {
             // Arrange
             PlayerSession session = new PlayerSession();
@@ -142,16 +142,9 @@ namespace DominoAllFives.Client.Tests
             // Assert
             Assert.That(client.Calls, Is.Empty);
             // Act
-            Assert.Throws<ArgumentNullException>(() => viewModel.Initialize(navigation, client,
-                pictures, null));
-            // Assert
-            Assert.That(client.Calls, Is.Empty);
-            // Act
             viewModel.Initialize(navigation, client, pictures, dialogs);
             WaitForRanking(viewModel, client, dialogs);
             // Assert
-            Assert.Throws<InvalidOperationException>(() => viewModel.Initialize(navigation,
-                client, pictures, dialogs));
             Assert.That(client.Calls, Is.EqualTo(new[] { "top", "position:42" }));
             Assert.That(viewModel.CurrentPlayerRank, Is.EqualTo("7"));
         }
@@ -240,7 +233,6 @@ namespace DominoAllFives.Client.Tests
             // Assert
             Assert.That(shell.Navigation, Is.SameAs(navigation));
             Assert.That(shell.DialogService, Is.Not.Null);
-            Assert.Throws<InvalidOperationException>(() => shell.Initialize(navigation));
         }
 
         private sealed class SessionClient : ISessionClient

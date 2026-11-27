@@ -1,4 +1,3 @@
-using System;
 using DominoAllFives.Client.WPF.Services;
 using DominoAllFives.Client.WPF.ViewModels.Base;
 
@@ -47,14 +46,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public void Initialize(IFrameNavigationService navigationService)
         {
-            if (_navigationService != null)
-            {
-                throw new InvalidOperationException(
-                    "MainWindowViewModel has already been initialized.");
-            }
-
-            _navigationService = navigationService ?? throw new ArgumentNullException(
-                nameof(navigationService));
+            _navigationService = navigationService;
         }
 
         private void ShowDialog(CustomMessageViewModel dialogViewModel)

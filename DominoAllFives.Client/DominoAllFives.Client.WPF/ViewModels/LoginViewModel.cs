@@ -85,15 +85,11 @@ namespace DominoAllFives.Client.WPF.ViewModels
             Action onGoToRegister,
             Action onGoToRecover)
         {
-            _playerSession = playerSession ?? throw new ArgumentNullException(
-                nameof(playerSession));
-            _onLoginSuccess = onLoginSuccess ?? throw new ArgumentNullException(
-                nameof(onLoginSuccess));
-            _onCancel = onCancel ?? throw new ArgumentNullException(nameof(onCancel));
-            _onGoToRegister = onGoToRegister ?? throw new ArgumentNullException(
-                nameof(onGoToRegister));
-            _onGoToRecover = onGoToRecover ?? throw new ArgumentNullException(
-                nameof(onGoToRecover));
+            _playerSession = playerSession;
+            _onLoginSuccess = onLoginSuccess;
+            _onCancel = onCancel;
+            _onGoToRegister = onGoToRegister;
+            _onGoToRecover = onGoToRecover;
             _email = string.Empty;
             _password = string.Empty;
             _isEmailRequiredVisible = false;
@@ -110,16 +106,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
             ILogger<LoginViewModel> logger,
             LanguageManager languageManager = null)
         {
-            if (_loginClient != null)
-            {
-                throw new InvalidOperationException("LoginViewModel has already been initialized.");
-            }
-
-            _dialogService = dialogService ?? throw new ArgumentNullException(
-                nameof(dialogService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _dialogService = dialogService;
+            _logger = logger;
             _languageManager = languageManager ?? LanguageManager.Instance;
-            _loginClient = loginClient ?? throw new ArgumentNullException(nameof(loginClient));
+            _loginClient = loginClient;
         }
 
         private void ExecuteLogin(object parameter)
@@ -127,12 +117,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
             if (_isBusy)
             {
                 return;
-            }
-
-            if (_loginClient == null)
-            {
-                throw new InvalidOperationException(
-                    "LoginViewModel must be initialized before login.");
             }
 
             if (parameter is PasswordBox passwordBox)

@@ -1,4 +1,3 @@
-using System;
 using System.Windows.Input;
 using DominoAllFives.Client.WPF.Commands;
 using DominoAllFives.Client.WPF.Services;
@@ -18,17 +17,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public void Initialize(IFrameNavigationService navigationService)
         {
-            if (_navigationService != null)
-            {
-                throw new InvalidOperationException(
-                    "HowToPlayViewModel has already been initialized.");
-            }
-
-            if (navigationService == null)
-            {
-                throw new ArgumentNullException(nameof(navigationService));
-            }
-
             _navigationService = navigationService;
         }
 

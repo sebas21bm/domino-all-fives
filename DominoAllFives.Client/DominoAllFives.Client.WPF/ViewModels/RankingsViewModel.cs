@@ -54,8 +54,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public RankingsViewModel(PlayerSession playerSession)
         {
-            _playerSession = playerSession ?? throw new ArgumentNullException(
-                nameof(playerSession));
+            _playerSession = playerSession;
             _leaderboard = new ObservableCollection<PlayerRankingRecord>();
             _currentPlayerRank = string.Empty;
             GoBackCommand = new RelayCommand(unusedParameter => _navigationService.GoBack());
@@ -67,32 +66,6 @@ namespace DominoAllFives.Client.WPF.ViewModels
             ProfilePictureImageService profilePictureImageService,
             IDialogService dialogService)
         {
-            if (_navigationService != null)
-            {
-                throw new InvalidOperationException(
-                    "RankingsViewModel has already been initialized.");
-            }
-
-            if (navigationService == null)
-            {
-                throw new ArgumentNullException(nameof(navigationService));
-            }
-
-            if (rankingService == null)
-            {
-                throw new ArgumentNullException(nameof(rankingService));
-            }
-
-            if (profilePictureImageService == null)
-            {
-                throw new ArgumentNullException(nameof(profilePictureImageService));
-            }
-
-            if (dialogService == null)
-            {
-                throw new ArgumentNullException(nameof(dialogService));
-            }
-
             _navigationService = navigationService;
             _rankingService = rankingService;
             _profilePictureImageService = profilePictureImageService;

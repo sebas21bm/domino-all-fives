@@ -110,8 +110,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
         public LobbyViewModel(PlayerSession playerSession)
         {
             _logger = LoggerFactoryProvider.CreateLogger<LobbyViewModel>();
-            _playerSession = playerSession
-                ?? throw new ArgumentNullException(nameof(playerSession));
+            _playerSession = playerSession;
             GoBackCommand = new RelayCommand(Leave, CanLeave);
             InviteFriendsCommand = new RelayCommand(DoNothing, CannotExecute);
             StartGameCommand = new RelayCommand(StartGame, CanStartGame);
@@ -125,17 +124,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
             ProfilePictureImageService pictureService,
             IDialogService dialogService)
         {
-            if (_client != null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
-            _client = lobbyService ?? throw new ArgumentNullException(nameof(lobbyService));
-            _pictureService = pictureService
-                ?? throw new ArgumentNullException(nameof(pictureService));
-            _dialogService = dialogService
-                ?? throw new ArgumentNullException(nameof(dialogService));
+            _navigation = navigation;
+            _client = lobbyService;
+            _pictureService = pictureService;
+            _dialogService = dialogService;
             if (!_client.IsActive)
             {
                 throw new InvalidOperationException("No active lobby session.");
@@ -173,7 +165,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public void ConfigureLogger(ILogger<LobbyViewModel> logger)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger;
         }
 
         private void DoNothing()

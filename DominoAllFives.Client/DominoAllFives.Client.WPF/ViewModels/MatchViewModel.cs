@@ -217,9 +217,9 @@ namespace DominoAllFives.Client.WPF.ViewModels
                 Interval = TimeSpan.FromSeconds(RoundSummarySeconds)
             };
             _roundSummaryTimer.Tick += EndRoundSummary;
-            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _navigation = navigation;
+            _context = context;
+            _client = client;
             _client.MatchChanged += OnMatchChanged;
             _client.HandChanged += OnHandChanged;
             _client.ConnectionLost += OnConnectionLost;

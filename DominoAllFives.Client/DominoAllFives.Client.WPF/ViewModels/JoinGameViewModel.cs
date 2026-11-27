@@ -85,8 +85,7 @@ namespace DominoAllFives.Client.WPF.ViewModels
 
         public JoinGameViewModel(PlayerSession playerSession)
         {
-            _playerSession = playerSession ?? throw new ArgumentNullException(
-                nameof(playerSession));
+            _playerSession = playerSession;
             GoBackCommand = new RelayCommand(GoBack, CanInteract);
             SwitchModeCommand = new RelayCommand(SwitchMode, CanInteract);
             JoinRoomCommand = new RelayCommand(JoinRoom, CanJoinRoom);
@@ -99,16 +98,10 @@ namespace DominoAllFives.Client.WPF.ViewModels
             IDialogService dialogService,
             ILogger<JoinGameViewModel> logger)
         {
-            if (_lobbyService != null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            _navigation = navigation ?? throw new ArgumentNullException(nameof(navigation));
-            _lobbyService = lobbyService ?? throw new ArgumentNullException(nameof(lobbyService));
-            _dialogService = dialogService ?? throw new ArgumentNullException(
-                nameof(dialogService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _navigation = navigation;
+            _lobbyService = lobbyService;
+            _dialogService = dialogService;
+            _logger = logger;
             RaiseCommands();
         }
 
